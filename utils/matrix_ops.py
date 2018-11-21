@@ -1,6 +1,18 @@
 import numpy as np
 
 
+# column bind
+def cbind(x, y):
+    return np.concatenate((x, y), 
+                          axis = 1)
+
+
+# column bind
+def rbind(x, y):
+    return np.concatenate((x, y), 
+                          axis = 0)
+
+
 # computes t(x)%*%y
 def crossprod(x, y = None):
     # assert on dimensions
