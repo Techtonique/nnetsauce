@@ -3,7 +3,7 @@ from numpy import linalg as la
 import nnetsauce.utils.matrix_ops as mo
 
 
-# in Alphabetical order
+# in alphabetical order
 # computes beta_hat = (t(x)%*%x + lam*I)^{-1}%*%t(x)%*%y    
 def beta_hat(x, y, lam = 0.1):
     # assert on dimensions
