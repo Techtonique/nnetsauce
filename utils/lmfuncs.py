@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import linalg as la
-from matrix_ops import crossprod
+from matrixops import crossprod
 
 
 # in alphabetical order

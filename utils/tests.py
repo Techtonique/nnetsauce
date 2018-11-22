@@ -1,8 +1,8 @@
 import numpy as np
-import psd_check as psdx
-import matrix_ops as mo
+import psdcheck as psdx
+import matrixops as mo
 import misc as mx
-import lm_funcs as lmf 
+import lmfuncs as lmf 
 from sklearn import datasets
 
 # Basic tests
