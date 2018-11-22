@@ -1,0 +1,18 @@
+import nodesimulation as ns 
+
+print("ns.generate_sobol(n_dims = 3, n_points = 4): ")
+print("\n")
+print(ns.generate_sobol(n_dims = 3, n_points = 4))
+print("\n")
+print("ns.generate_hammersley(n_dims = 4, n_points = 5): ")
+print("\n")
+print(ns.generate_hammersley(n_dims = 4, n_points = 5))
+print("\n")
+print("ns.generate_halton(n_dims = 5, n_points = 6): ")
+print("\n")
+print(ns.generate_halton(n_dims = 5, n_points = 6))
+print("\n")
+print("ns.generate_uniform(n_dims = 2, n_points = 10, seed = 123): ")
+print("\n")
+print(ns.generate_uniform(n_dims = 2, n_points = 10, seed = 123))
+print("\n")
