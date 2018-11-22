@@ -1,13 +1,13 @@
 import numpy as np
-import nnetsauce.simulation.nodes_simulation as ns
-import nnetsauce.utils.matrix_ops as mo
 from numpy import linalg as la
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from ..utils import matrixops as mo
+from ..simulation import nodesimulation as ns
 
 # do DOCSTRINGS
 # do GCV
-class Base():
+class Base(object):
     
     
     # construct the object -----
@@ -73,7 +73,7 @@ class Base():
                    activation_name='relu', 
                    nodes_sim='sobol',
                    n_clusters=None,
-                   seed = 123):
+                   seed=123):
         
         activation_options = {
             'relu': lambda x: np.maximum(x, 0),
@@ -147,6 +147,33 @@ class Base():
             return self.encoder.fit_transform(X_kmeans.reshape(-1, 1)).toarray()
             
         
+    # create hidden layer
+    def create_layer(self, scaled_X, n_features, W=None):        
+            
+        if (W is None):
+            if self.nodes_sim == 'sobol':
+                self.W = ns.generate_sobol(n_dims=n_features, 
+                                       n_points=self.n_hidden_features)
+            
+            if self.nodes_sim == 'hammersley':
+                self.W = ns.generate_hammersley(n_dims=n_features, 
+                                       n_points=self.n_hidden_features)
+                
+            if self.nodes_sim == 'uniform':
+                self.W = ns.generate_uniform(n_dims=n_features, 
+                                          n_points=self.n_hidden_features, 
+                                          seed = self.seed)
+            
+            if self.nodes_sim == 'halton':
+                self.W = ns.generate_halton(n_dims=n_features, 
+                                         n_points=self.n_hidden_features)
+            
+            return self.activation_func(np.dot(scaled_X, self.W))
+        else:
+            self.W = W
+            return self.activation_func(np.dot(scaled_X, W))
+        
+        
     # create new data for training set, with hidden layer, center the response    
     def preproc_training_set(self, y=None, X=None, W=None): 
         
@@ -183,18 +210,33 @@ class Base():
             self.nn_scaler = nn_scaler
             
             # construct the hidden layer
+#            if (W is None):
+#                if self.nodes_sim == 'sobol':
+#                    self.W = ns.generate_sobol(n_dims=n_features, 
+#                                           n_points=self.n_hidden_features)
+#                
+#                if self.nodes_sim == 'hammersley':
+#                    self.W = ns.generate_hammersley(n_dims=n_features, 
+#                                           n_points=self.n_hidden_features)
+#                    
+#                if self.nodes_sim == 'uniform':
+#                    self.W = ns.generate_uniform(n_dims=n_features, 
+#                                              n_points=self.n_hidden_features, 
+#                                              seed = self.seed)
+#                
+#                if self.nodes_sim == 'halton':
+#                    self.W = ns.generate_halton(n_dims=n_features, 
+#                                             n_points=self.n_hidden_features)
+#                
+#                Phi_X = self.activation_func(np.dot(scaled_X, self.W))
+#            else:
+#                self.W = W
+#                Phi_X = self.activation_func(np.dot(scaled_X, W))
+            
             if (W is None):
-                # Do other simulations here
-                # Do other simulations here
-                # Do other simulations here
-                # Do other simulations here
-                # Do other simulations here                
-                self.W = ns.generate_sobol(n_dims=n_features, 
-                                           n_points=self.n_hidden_features)                
-                Phi_X = self.activation_func(np.dot(scaled_X, self.W))
+                Phi_X = self.create_layer(scaled_X, n_features)
             else:
-                self.W = W
-                Phi_X = self.activation_func(np.dot(scaled_X, W))
+                Phi_X = self.create_layer(scaled_X, n_features, W=W)
             
             Z = mo.cbind(input_X, Phi_X)
             scaler.fit(Z)
@@ -211,18 +253,33 @@ class Base():
             self.nn_scaler = nn_scaler
             
             # construct the hidden layer
+#            if (W is None):
+#                if self.nodes_sim == 'sobol':
+#                    self.W = ns.generate_sobol(n_dims=n_features, 
+#                                           n_points=self.n_hidden_features)
+#                
+#                if self.nodes_sim == 'hammersley':
+#                    self.W = ns.generate_hammersley(n_dims=n_features, 
+#                                           n_points=self.n_hidden_features)
+#                    
+#                if self.nodes_sim == 'uniform':
+#                    self.W = ns.generate_uniform(n_dims=n_features, 
+#                                              n_points=self.n_hidden_features, 
+#                                              seed = self.seed)
+#                
+#                if self.nodes_sim == 'halton':
+#                    self.W = ns.generate_halton(n_dims=n_features, 
+#                                             n_points=self.n_hidden_features)
+#                
+#                Phi_X = self.activation_func(np.dot(scaled_X, self.W))
+#            else:
+#                self.W = W
+#                Phi_X = self.activation_func(np.dot(scaled_X, W))
+            
             if (W is None):
-                # Do other simulations here
-                # Do other simulations here
-                # Do other simulations here
-                # Do other simulations here
-                # Do other simulations here                
-                self.W = ns.generate_sobol(n_dims=n_features, 
-                                              n_points=self.n_hidden_features)                
-                Phi_X = self.activation_func(np.dot(scaled_X, self.W))
+                Phi_X = self.create_layer(scaled_X, n_features)
             else:
-                self.W = W
-                Phi_X = self.activation_func(np.dot(scaled_X, W))
+                Phi_X = self.create_layer(scaled_X, n_features, W=W)
             
             Z = mo.cbind(augmented_X, Phi_X)
             scaler.fit(Z)
@@ -259,34 +316,34 @@ class Base():
             return self.scaler.transform(mo.cbind(augmented_X, Phi_X))
             
     
-if __name__ == '__main__':
-
-    from sklearn import datasets   
-    
-    # Example 1 -----
-    
-    n_features = 4
-    n_samples = 10
-    X, y = datasets.make_regression(n_features=n_features, 
-                       n_samples=n_samples, 
-                       random_state=0)
-
-    fit_obj = Base(n_hidden_features=3, 
-                 activation_name='relu', 
-                 n_clusters=2)
-    
-    centered_y, scaled_Z = fit_obj.preproc_training_set(y=y, X=X)
-
-    print(centered_y.shape)
-    print(scaled_Z.shape)
-    print(centered_y.mean())
-    print(scaled_Z.mean(axis = 0))
-    print(np.sqrt(scaled_Z.var(axis = 0)))
-    
-    fit_obj.fit(X, y) 
-    print(fit_obj.beta)
-    print(len(fit_obj.beta))
-    print(fit_obj.predict(X))
+#if __name__ == '__main__':
+#
+#    from sklearn import datasets   
+#    
+#    # Example 1 -----
+#    
+#    n_features = 4
+#    n_samples = 10
+#    X, y = datasets.make_regression(n_features=n_features, 
+#                       n_samples=n_samples, 
+#                       random_state=0)
+#
+#    fit_obj = Base(n_hidden_features=3, 
+#                 activation_name='relu', 
+#                 n_clusters=2)
+#    
+#    centered_y, scaled_Z = fit_obj.preproc_training_set(y=y, X=X)
+#
+#    print(centered_y.shape)
+#    print(scaled_Z.shape)
+#    print(centered_y.mean())
+#    print(scaled_Z.mean(axis = 0))
+#    print(np.sqrt(scaled_Z.var(axis = 0)))
+#    
+#    fit_obj.fit(X, y) 
+#    print(fit_obj.beta)
+#    print(len(fit_obj.beta))
+#    print(fit_obj.predict(X))
     
  
 #    # Example 2 -----
