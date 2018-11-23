@@ -8,7 +8,16 @@ from ..simulation import nodesimulation as ns
 # do DOCSTRINGS
 # do GCV
 class Base(object):
-    
+    """Base model with direct link and nonlinear activation
+        
+           Parameters
+           ----------
+           n_hidden_features: int
+               number of nodes in the hidden layer
+           activation_name: str
+               activation function: 'relu', 'tanh' or 'sigmoid'
+    """
+        
     
     # construct the object -----
     
@@ -17,15 +26,6 @@ class Base(object):
                  nodes_sim='sobol',
                  n_clusters=None,
                  seed = 123):
-        """Base RVFL model with no regularization
-        
-           Parameters
-           ----------
-           n_hidden_features: int
-               number of nodes in the hidden layer
-           activation_name: str
-               activation function: 'relu', 'tanh' or 'sigmoid'
-        """
         
         activation_options = {
             'relu': lambda x: np.maximum(x, 0),
@@ -91,7 +91,20 @@ class Base(object):
     # fit -----
     
     def fit(self, X, y):
-
+        """Fit training data (X, y).
+        Parameters
+        ----------
+        X : {array-like}, shape = [n_samples, n_features]
+            Training vectors, where n_samples
+            is the number of samples and
+        n_features is the number of features.
+           y : array-like, shape = [n_samples]
+               Target values.
+           Returns
+           -------
+           self : object
+         """
+        
         centered_y, scaled_Z = self.preproc_training_set(y = y, X = X)
         self.beta = la.lstsq(scaled_Z, centered_y)[0]
         
