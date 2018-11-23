@@ -208,31 +208,7 @@ class Base(object):
             nn_scaler.fit(input_X)
             scaled_X = nn_scaler.transform(input_X)
             self.nn_scaler = nn_scaler
-            
-            # construct the hidden layer
-#            if (W is None):
-#                if self.nodes_sim == 'sobol':
-#                    self.W = ns.generate_sobol(n_dims=n_features, 
-#                                           n_points=self.n_hidden_features)
-#                
-#                if self.nodes_sim == 'hammersley':
-#                    self.W = ns.generate_hammersley(n_dims=n_features, 
-#                                           n_points=self.n_hidden_features)
-#                    
-#                if self.nodes_sim == 'uniform':
-#                    self.W = ns.generate_uniform(n_dims=n_features, 
-#                                              n_points=self.n_hidden_features, 
-#                                              seed = self.seed)
-#                
-#                if self.nodes_sim == 'halton':
-#                    self.W = ns.generate_halton(n_dims=n_features, 
-#                                             n_points=self.n_hidden_features)
-#                
-#                Phi_X = self.activation_func(np.dot(scaled_X, self.W))
-#            else:
-#                self.W = W
-#                Phi_X = self.activation_func(np.dot(scaled_X, W))
-            
+                        
             if (W is None):
                 Phi_X = self.create_layer(scaled_X, n_features)
             else:
@@ -251,30 +227,6 @@ class Base(object):
             nn_scaler.fit(augmented_X)
             scaled_X = nn_scaler.transform(augmented_X)           
             self.nn_scaler = nn_scaler
-            
-            # construct the hidden layer
-#            if (W is None):
-#                if self.nodes_sim == 'sobol':
-#                    self.W = ns.generate_sobol(n_dims=n_features, 
-#                                           n_points=self.n_hidden_features)
-#                
-#                if self.nodes_sim == 'hammersley':
-#                    self.W = ns.generate_hammersley(n_dims=n_features, 
-#                                           n_points=self.n_hidden_features)
-#                    
-#                if self.nodes_sim == 'uniform':
-#                    self.W = ns.generate_uniform(n_dims=n_features, 
-#                                              n_points=self.n_hidden_features, 
-#                                              seed = self.seed)
-#                
-#                if self.nodes_sim == 'halton':
-#                    self.W = ns.generate_halton(n_dims=n_features, 
-#                                             n_points=self.n_hidden_features)
-#                
-#                Phi_X = self.activation_func(np.dot(scaled_X, self.W))
-#            else:
-#                self.W = W
-#                Phi_X = self.activation_func(np.dot(scaled_X, W))
             
             if (W is None):
                 Phi_X = self.create_layer(scaled_X, n_features)
