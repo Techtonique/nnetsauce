@@ -1,3 +1,3 @@
-from .sklearnCustom import sklearnCustom
+from .Custom import Custom
 
-__all__= ["sklearnCustom"]
+__all__= ["Custom"]
