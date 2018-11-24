@@ -1,7 +1,7 @@
 from ..base import Base
 
 
-class sklearnCustom(Base):
+class CustomSklearn(Base):
     """Custom sklearn model derived from class Base
     
        Parameters
