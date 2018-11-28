@@ -9,7 +9,7 @@ from ..simulation import nodesimulation as ns
 # do DOCSTRINGS
 # do GCV
 class Base(object):
-    """Base model with direct link and nonlinear activation
+    """Base model with direct link and nonlinear activation.
         
        Parameters
        ----------
@@ -17,6 +17,12 @@ class Base(object):
            number of nodes in the hidden layer
        activation_name: str
            activation function: 'relu', 'tanh' or 'sigmoid'
+       nodes_sim: str
+           type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 'uniform'
+       n_clusters: int
+           number of clusters in k-means clustering (could be 0)
+       seed: int 
+           reproducibility seed for nodes_sim='uniform'
     """
         
     
@@ -96,16 +102,17 @@ class Base(object):
         
         Parameters
         ----------
-        X : {array-like}, shape = [n_samples, n_features]
+        X: {array-like}, shape = [n_samples, n_features]
             Training vectors, where n_samples
             is the number of samples and
         n_features is the number of features.
-           y : array-like, shape = [n_samples]
+        
+        y: array-like, shape = [n_samples]
                Target values.
                
         Returns
         -------
-        self : object
+        self: object
         """
         
         centered_y, scaled_Z = self.preproc_training_set(y = y, X = X)
@@ -117,11 +124,20 @@ class Base(object):
     # predict -----
     
     def predict(self, X):
-    
-        # convert X to np.array with 
-        # 2 dimensions if it's a vector 
-        # convert X to np.array with 
-        # 2 dimensions if it's a vector 
+        """Predict test data X.
+        
+        Parameters
+        ----------
+        X: {array-like}, shape = [n_samples, n_features]
+            Training vectors, where n_samples
+            is the number of samples and
+        n_features is the number of features.
+               
+        Returns
+        -------
+        model predictions: {array-like}
+        """
+        
         if len(X.shape) == 1:
             n_features = X.shape[0]
             new_X = mo.rbind(X.reshape(1, n_features), 
@@ -138,10 +154,9 @@ class Base(object):
     # preprocessing methods to be inherited -----
     
     
-    # create new covariates with kmeans clustering
     def encode_kmeans(self, X=None, predict=False, 
                       **kwargs):
-        
+        """ Create new covariates with kmeans clustering. """
         if (X is None):
             X = self.X
                 
@@ -171,8 +186,8 @@ class Base(object):
             return mo.one_hot_encode(X_kmeans, self.n_clusters)
             
         
-    # create hidden layer
     def create_layer(self, scaled_X, n_features, W=None):        
+        """ Create hidden layer. """
         
         assert scaled_X.shape[1] == n_features
         
@@ -203,8 +218,8 @@ class Base(object):
             return self.activation_func(np.dot(scaled_X, W))
         
         
-    # create new data for training set, with hidden layer, center the response    
     def preproc_training_set(self, y=None, X=None, W=None): 
+        """ Create new data for training set, with hidden layer, center the response. """ 
         
         # either X and y are stored or not 
         #assert ((y is None) & (X is None)) | ((y is not None) & (X is not None))
@@ -287,8 +302,8 @@ class Base(object):
         return centered_y, self.scaler.transform(Z) 
     
     
-    # transform data from test set, with hidden layers
     def preproc_test_set(self, X):
+        """ Transform data from test set, with hidden layers. """
                 
         # 1 - data without clustering: self.n_clusters is None -----      
         if self.n_clusters <= 0: 
