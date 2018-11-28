@@ -1,9 +1,10 @@
 import numpy as np
 from numpy import linalg as la
 from sklearn.cluster import KMeans
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import StandardScaler
 from ..utils import matrixops as mo
 from ..simulation import nodesimulation as ns
+
 
 # do DOCSTRINGS
 # do GCV
@@ -119,47 +120,55 @@ class Base(object):
     
         # convert X to np.array with 
         # 2 dimensions if it's a vector 
+        # convert X to np.array with 
+        # 2 dimensions if it's a vector 
         if len(X.shape) == 1:
-            X = mo.to_np_array(X)
+            n_features = X.shape[0]
+            new_X = mo.rbind(X.reshape(1, n_features), 
+                             np.ones(n_features).reshape(1, n_features))        
             
-        return self.y_mean + np.dot(self.preproc_test_set(X), 
+            return (self.y_mean + np.dot(self.preproc_test_set(new_X), 
+                                        self.beta))[0]
+        else:
+            
+            return self.y_mean + np.dot(self.preproc_test_set(X), 
                                         self.beta)
-
+        
+        
     # preprocessing methods to be inherited -----
     
     
     # create new covariates with kmeans clustering
-    def encode_kmeans(self, X=None, n_clusters=2, 
-                      predict=False, **kwargs):
+    def encode_kmeans(self, X=None, predict=False, 
+                      **kwargs):
         
         if (X is None):
-            input_X = self.X
-        else:
-            input_X = X
+            X = self.X
                 
         if predict == False: # encode training set 
             
-            # scale input 
+            # scale input data
             scaler = StandardScaler(copy=True, 
                                     with_mean=True, 
                                     with_std=True)  
-            scaler.fit(input_X)        
-            scaled_X = scaler.transform(input_X)
+            scaler.fit(X)        
+            scaled_X = scaler.transform(X)
             self.kmeans_scaler = scaler
     
             # do kmeans + one-hot encoding
-            kmeans = KMeans(n_clusters=n_clusters)
+            kmeans = KMeans(n_clusters=self.n_clusters, 
+                            **kwargs)
             kmeans.fit(scaled_X)
             X_kmeans = kmeans.predict(scaled_X)
             self.kmeans = kmeans
-            self.encoder = OneHotEncoder(**kwargs)
-    
-            return self.encoder.fit_transform(X_kmeans.reshape(-1, 1)).toarray()
+            
+            return mo.one_hot_encode(X_kmeans, self.n_clusters)
             
         else: # if predict == True, encode test set
             
             X_kmeans = self.kmeans.predict(self.kmeans_scaler.transform(X))
-            return self.encoder.fit_transform(X_kmeans.reshape(-1, 1)).toarray()
+            
+            return mo.one_hot_encode(X_kmeans, self.n_clusters)
             
         
     # create hidden layer
@@ -223,7 +232,7 @@ class Base(object):
             input_X = X
         
         # 1 - data without clustering: self.n_clusters is None -----      
-        if (self.n_clusters == 0): 
+        if (self.n_clusters <= 0): 
             
             n_features = input_X.shape[1]
             
@@ -252,8 +261,7 @@ class Base(object):
         else: 
             
             n_features = input_X.shape[1] + self.n_clusters 
-            augmented_X = mo.cbind(input_X, self.encode_kmeans(X = input_X, 
-                                                  n_clusters = self.n_clusters))
+            augmented_X = mo.cbind(input_X, self.encode_kmeans(X = input_X))
             
             if self.n_hidden_features > 0:
                 
@@ -281,12 +289,7 @@ class Base(object):
     
     # transform data from test set, with hidden layers
     def preproc_test_set(self, X):
-        
-        # convert X to np.array with 
-        # 2 dimensions if it's a vector 
-        if len(X.shape) == 1:
-            X = mo.to_np_array(X)
-        
+                
         # 1 - data without clustering: self.n_clusters is None -----      
         if self.n_clusters <= 0: 
             
@@ -302,29 +305,33 @@ class Base(object):
         # 2 - data with clustering: self.n_clusters is None -----      
         else:
             
-            augmented_X = mo.cbind(X, self.encode_kmeans(X = X, 
-                                                  n_clusters = self.n_clusters, 
-                                                  predict = True))
+            predicted_kmeans = self.encode_kmeans(X = X, 
+                                                  predict = True)
             
-            
-            if self.n_hidden_features > 0:
+            if predicted_kmeans.shape[1] < self.n_clusters:                
+                augm_predicted_kmeans = mo.cbind(predicted_kmeans, 
+                                            np.zeros((predicted_kmeans.shape[0], 
+                                                     self.n_clusters - predicted_kmeans.shape[1])))
+                augmented_X = mo.cbind(X, augm_predicted_kmeans)
+            else:
+                 augmented_X = mo.cbind(X, predicted_kmeans)
                 
+            if self.n_hidden_features > 0:
                 scaled_X = self.nn_scaler.transform(augmented_X)    
                 Phi_X = self.activation_func(np.dot(scaled_X, self.W))
-                
                 return self.scaler.transform(mo.cbind(augmented_X, Phi_X))
             else:
                 return self.scaler.transform(augmented_X)
             
     
 #if __name__ == '__main__':
-#
-    from sklearn import datasets   
-#    
+##
+#    from sklearn import datasets   
+##    
 #    # Example 1 -----
 #    
-#    n_features = 4
-#    n_samples = 10
+#    n_features = 5
+#    n_samples = 100
 #    X, y = datasets.make_regression(n_features=n_features, 
 #                       n_samples=n_samples, 
 #                       random_state=0)
@@ -345,23 +352,23 @@ class Base(object):
 #    print(fit_obj.beta)
 #    print(len(fit_obj.beta))
 #    print(fit_obj.predict(X))
-    
+#    
  
 #    # Example 2 -----
     
-    diabetes = datasets.load_diabetes()
-    
-    # data snippet
-    diabetes.feature_names
-    
-    # shape 
-    diabetes.data.shape
-    diabetes.target.shape
-    
-    # define X and y
-    X = diabetes.data 
-    y = diabetes.target
+#    diabetes = datasets.load_diabetes()
 #    
+#    # data snippet
+#    diabetes.feature_names
+#    
+#    # shape 
+#    diabetes.data.shape
+#    diabetes.target.shape
+#    
+#    # define X and y
+#    X = diabetes.data 
+#    y = diabetes.target
+    
 #    fit_obj = rvflBase(n_hidden_features=3, 
 #                       activation_name='relu', 
 #                       n_clusters=2)

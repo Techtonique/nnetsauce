@@ -1,8 +1,9 @@
+import numpy as np
 from ..base import Base
-
+from ..utils import matrixops as mo
 
 class Custom(Base):
-    """Custom sklearn model derived from class Base
+    """Custom sklearn (or else) model class derived from class Base
     
        Parameters
        ----------
@@ -18,7 +19,7 @@ class Custom(Base):
                  n_hidden_features=5, 
                  activation_name='relu',
                  nodes_sim='sobol',
-                 n_clusters=None,
+                 n_clusters=2,
                  seed = 123):
                 
         super().__init__(n_hidden_features, activation_name,
@@ -33,7 +34,7 @@ class Custom(Base):
     
     def set_params(self, n_hidden_features=5, 
                    activation_name='relu', nodes_sim='sobol',
-                   n_clusters=None, seed = 123):
+                   n_clusters=2, seed = 123):
         
         super().set_params(n_hidden_features=n_hidden_features, 
              activation_name=activation_name, nodes_sim=nodes_sim, 
@@ -50,6 +51,16 @@ class Custom(Base):
     
     def predict(self, X, **kwargs):
         
-        return self.y_mean + self.regr.predict(self.preproc_test_set(X), 
+        if len(X.shape) == 1:
+            n_features = X.shape[0]
+            new_X = mo.rbind(X.reshape(1, n_features), 
+                             np.ones(n_features).reshape(1, n_features))        
+            
+            return (self.y_mean + self.regr.predict(self.preproc_test_set(new_X), 
+                                               **kwargs))[0]
+        else:
+            return self.y_mean + self.regr.predict(self.preproc_test_set(X), 
                                                **kwargs)
+        
+        
 

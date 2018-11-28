@@ -7,12 +7,6 @@ def cbind(x, y):
                           axis = 1)
 
 
-# column bind
-def rbind(x, y):
-    return np.concatenate((x, y), 
-                          axis = 0)
-
-
 # computes t(x)%*%y
 def crossprod(x, y = None):
     # assert on dimensions
@@ -22,9 +16,29 @@ def crossprod(x, y = None):
         return np.dot(x.transpose(), y)
 
 
+# one-hot encoding 
+def one_hot_encode(x_clusters, n_clusters):
+    
+    assert max(x_clusters) <= n_clusters
+    
+    n_obs = len(x_clusters)
+    res = np.zeros((n_obs, n_clusters))
+    
+    for i in range(n_obs):
+        res[i, x_clusters[i]] = 1
+            
+    return res 
+
+
+# column bind
+def rbind(x, y):
+    return np.concatenate((x, y), 
+                          axis = 0)
+
+    
 # scale matrix
 def scale_matrix(X, x_means=None, x_vars=None):
-        
+    
     if ((x_means is None) & (x_vars is None)):
         x_means = X.mean(axis = 0)
         x_vars = X.var(axis = 0)
