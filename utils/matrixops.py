@@ -3,8 +3,13 @@ import numpy as np
 
 # column bind
 def cbind(x, y):
-    return np.concatenate((x, y), 
-                          axis = 1)
+    
+    if len(x.shape) == 1 or len(y.shape) == 1: 
+        return np.column_stack((x, y))
+    else:
+        return np.concatenate((x, y), 
+                              axis = 1)
+        
 
 
 # computes t(x)%*%y
@@ -30,9 +35,13 @@ def one_hot_encode(x_clusters, n_clusters):
     return res 
 
 
-# column bind
+# row bind
 def rbind(x, y):
-    return np.concatenate((x, y), 
+    
+    if len(x.shape) == 1 or len(y.shape) == 1: 
+        return np.row_stack((x, y))
+    else: 
+        return np.concatenate((x, y), 
                           axis = 0)
 
     

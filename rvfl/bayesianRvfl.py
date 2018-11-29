@@ -21,11 +21,9 @@ class bayesianRvfl(Base):
                  n_clusters=None,
                  seed = 123,
                  s_beta = 0.1,
-                 s_Phi = 0.1,
                  sigma = 0.5):
                 
         super().__init__(n_hidden_features, activation_name,
                          nodes_sim, n_clusters, seed)
         self.s_beta = s_beta
-        self.s_Phi = s_Phi
         self.sigma = sigma

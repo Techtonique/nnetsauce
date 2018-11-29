@@ -1,6 +1,7 @@
 import numpy as np
 from numpy import linalg as la
 from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import StandardScaler
 from ..utils import matrixops as mo
 from ..simulation import nodesimulation as ns
@@ -19,10 +20,14 @@ class Base(object):
            activation function: 'relu', 'tanh' or 'sigmoid'
        nodes_sim: str
            type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 'uniform'
+       bias: boolean
+           indicates if the hidden layer contains a bias term or not
+       type_clust: str
+           type of clustering method: k-means ('kmeans') or Gaussian Mixture Model ('gmm')
        n_clusters: int
-           number of clusters in k-means clustering (could be 0)
+           number of clusters for 'kmeans' or 'gmm' clustering (could be 0: no clustering)
        seed: int 
-           reproducibility seed for nodes_sim='uniform'
+           reproducibility seed for nodes_sim=='uniform'
     """
         
     
@@ -31,6 +36,8 @@ class Base(object):
     def __init__(self, n_hidden_features=5, 
                  activation_name='relu',
                  nodes_sim='sobol',
+                 bias = True,
+                 type_clust = 'kmeans',
                  n_clusters=2,
                  seed = 123):
         
@@ -43,10 +50,13 @@ class Base(object):
         self.activation_name = activation_name
         self.activation_func = activation_options[activation_name]
         self.nodes_sim = nodes_sim
+        self.bias = bias
         self.seed = seed
+        self.type_clust = type_clust
         self.n_clusters = n_clusters
         self.kmeans = None
-        self.kmeans_scaler = None
+        self.gmm = None
+        self.clustering_scaler = None
         self.nn_scaler = None
         self.scaler = None
         self.encoder = None
@@ -70,8 +80,7 @@ class Base(object):
                 'nn_scaler': self.nn_scaler,  
                 'scaler': self.scaler,  
                 'W': self.W, 
-                'y_mean': self.y_mean,                
-                'beta': self.beta}
+                'y_mean': self.y_mean}
     
     
     # setter -----
@@ -79,6 +88,7 @@ class Base(object):
     def set_params(self, n_hidden_features=5, 
                    activation_name='relu', 
                    nodes_sim='sobol',
+                   bias = True,
                    n_clusters=None,
                    seed=123):
         
@@ -91,6 +101,7 @@ class Base(object):
         self.activation_name = activation_name
         self.activation_func = activation_options[activation_name]
         self.nodes_sim = nodes_sim
+        self.bias = bias
         self.n_clusters = n_clusters
         self.seed = seed
     
@@ -151,12 +162,11 @@ class Base(object):
                                         self.beta)
         
         
-    # preprocessing methods to be inherited -----
+    # "preprocessing" methods to be inherited -----
     
     
-    def encode_kmeans(self, X=None, predict=False, 
-                      **kwargs):
-        """ Create new covariates with kmeans clustering. """
+    def encode_clusters(self, X=None, predict=False, **kwargs): # additional parameters to be passed to KMeans or GMM
+        """ Create new covariates with kmeans or GMM clustering. """
         if (X is None):
             X = self.X
                 
@@ -168,54 +178,102 @@ class Base(object):
                                     with_std=True)  
             scaler.fit(X)        
             scaled_X = scaler.transform(X)
-            self.kmeans_scaler = scaler
-    
-            # do kmeans + one-hot encoding
-            kmeans = KMeans(n_clusters=self.n_clusters, 
-                            **kwargs)
-            kmeans.fit(scaled_X)
-            X_kmeans = kmeans.predict(scaled_X)
-            self.kmeans = kmeans
+            self.clustering_scaler = scaler
             
-            return mo.one_hot_encode(X_kmeans, self.n_clusters)
+            if self.type_clust == 'kmeans':
+            
+                # do kmeans + one-hot encoding
+                kmeans = KMeans(n_clusters=self.n_clusters, 
+                                **kwargs)
+                kmeans.fit(scaled_X)
+                X_kmeans = kmeans.predict(scaled_X)
+                self.kmeans = kmeans
+                
+                return mo.one_hot_encode(X_kmeans, self.n_clusters)
+            
+            else:
+                # pass **kwargs to it
+                return 0 
             
         else: # if predict == True, encode test set
             
-            X_kmeans = self.kmeans.predict(self.kmeans_scaler.transform(X))
+            if self.type_clust == 'kmeans':
             
-            return mo.one_hot_encode(X_kmeans, self.n_clusters)
+                X_kmeans = self.kmeans.predict(self.clustering_scaler.transform(X))
+                
+                return mo.one_hot_encode(X_kmeans, self.n_clusters)
+            
+            else:
+                
+                return 0 
             
         
-    def create_layer(self, scaled_X, n_features, W=None):        
+    def create_layer(self, scaled_X, W=None):        
         """ Create hidden layer. """
         
-        assert scaled_X.shape[1] == n_features
+        n_features = scaled_X.shape[1]
         
-        if (W is None):
+        if self.bias != True: # no bias term in the hidden layer
             
-            if self.nodes_sim == 'sobol':
-                self.W = ns.generate_sobol(n_dims=n_features, 
-                                       n_points=self.n_hidden_features)
+            if (W is None):
             
-            if self.nodes_sim == 'hammersley':
-                self.W = ns.generate_hammersley(n_dims=n_features, 
-                                       n_points=self.n_hidden_features)
+                if self.nodes_sim == 'sobol':
+                    self.W = ns.generate_sobol(n_dims=n_features, 
+                                           n_points=self.n_hidden_features)
                 
-            if self.nodes_sim == 'uniform':
-                self.W = ns.generate_uniform(n_dims=n_features, 
-                                          n_points=self.n_hidden_features, 
-                                          seed = self.seed)
-            
-            if self.nodes_sim == 'halton':
-                self.W = ns.generate_halton(n_dims=n_features, 
-                                         n_points=self.n_hidden_features)
-            
-            return self.activation_func(np.dot(scaled_X, self.W))
+                if self.nodes_sim == 'hammersley':
+                    self.W = ns.generate_hammersley(n_dims=n_features, 
+                                           n_points=self.n_hidden_features)
+                    
+                if self.nodes_sim == 'uniform':
+                    self.W = ns.generate_uniform(n_dims=n_features, 
+                                              n_points=self.n_hidden_features, 
+                                              seed = self.seed)
+                
+                if self.nodes_sim == 'halton':
+                    self.W = ns.generate_halton(n_dims=n_features, 
+                                             n_points=self.n_hidden_features)
+                
+                return self.activation_func(np.dot(scaled_X, self.W))
         
-        else:
+            else:
             
-            self.W = W
-            return self.activation_func(np.dot(scaled_X, W))
+                #self.W = W
+                return self.activation_func(np.dot(scaled_X, W))    
+        
+        else: # with bias term in the hidden layer
+            
+            if (W is None):
+            
+                n_features_1 = n_features + 1 
+                
+                if self.nodes_sim == 'sobol':
+                    self.W = ns.generate_sobol(n_dims=n_features_1, 
+                                           n_points=self.n_hidden_features)
+                
+                if self.nodes_sim == 'hammersley':
+                    self.W = ns.generate_hammersley(n_dims=n_features_1, 
+                                           n_points=self.n_hidden_features)
+                    
+                if self.nodes_sim == 'uniform':
+                    self.W = ns.generate_uniform(n_dims=n_features_1, 
+                                              n_points=self.n_hidden_features, 
+                                              seed = self.seed)
+                
+                if self.nodes_sim == 'halton':
+                    self.W = ns.generate_halton(n_dims=n_features_1, 
+                                             n_points=self.n_hidden_features)
+            
+                return self.activation_func(np.dot(mo.cbind(np.ones(scaled_X.shape[0]), 
+                                                                   scaled_X), 
+                                                   self.W))
+        
+            else:
+            
+                #self.W = W
+                return self.activation_func(np.dot(mo.cbind(np.ones(scaled_X.shape[0]), 
+                                                                   scaled_X), 
+                                                   W))
         
         
     def preproc_training_set(self, y=None, X=None, W=None): 
@@ -223,7 +281,8 @@ class Base(object):
         
         # either X and y are stored or not 
         #assert ((y is None) & (X is None)) | ((y is not None) & (X is not None))
-        if self.n_hidden_features > 0:            
+
+        if self.n_hidden_features > 0: # has a hidden layer           
             nn_scaler = StandardScaler(copy=True, 
                                         with_mean=True, 
                                         with_std=True)
@@ -246,21 +305,19 @@ class Base(object):
         else:
             input_X = X
         
-        # 1 - data without clustering: self.n_clusters is None -----      
-        if (self.n_clusters <= 0): 
+        
+        if (self.n_clusters <= 0): # data without any clustering: self.n_clusters is None -----      
             
-            n_features = input_X.shape[1]
-            
-            if self.n_hidden_features > 0:            
+            if self.n_hidden_features > 0: # with hidden layer          
                 
                 nn_scaler.fit(input_X)
                 scaled_X = nn_scaler.transform(input_X)
                 self.nn_scaler = nn_scaler
             
                 if (W is None):
-                    Phi_X = self.create_layer(scaled_X, n_features)
+                    Phi_X = self.create_layer(scaled_X)
                 else:
-                    Phi_X = self.create_layer(scaled_X, n_features, W=W)
+                    Phi_X = self.create_layer(scaled_X, W=W) # beware: if there is a bias and W is provided
                 
                 Z = mo.cbind(input_X, Phi_X)
                 scaler.fit(Z)
@@ -271,23 +328,21 @@ class Base(object):
                 Z = input_X
                 scaler.fit(Z)
                 self.scaler = scaler 
-                
-        # 2 - data with clustering: self.n_clusters is not None -----  
-        else: 
+        
+        else: # data with clustering: self.n_clusters is not None -----  
             
-            n_features = input_X.shape[1] + self.n_clusters 
-            augmented_X = mo.cbind(input_X, self.encode_kmeans(X = input_X))
+            augmented_X = mo.cbind(input_X, self.encode_clusters(input_X))
             
-            if self.n_hidden_features > 0:
+            if self.n_hidden_features > 0: # with hidden layer          
                 
                 nn_scaler.fit(augmented_X)
                 scaled_X = nn_scaler.transform(augmented_X)           
                 self.nn_scaler = nn_scaler
             
                 if (W is None):
-                    Phi_X = self.create_layer(scaled_X, n_features)
+                    Phi_X = self.create_layer(scaled_X)
                 else:
-                    Phi_X = self.create_layer(scaled_X, n_features, W=W)
+                    Phi_X = self.create_layer(scaled_X, W=W)
                 
                 Z = mo.cbind(augmented_X, Phi_X)
                 scaler.fit(Z)
@@ -304,53 +359,51 @@ class Base(object):
     
     def preproc_test_set(self, X):
         """ Transform data from test set, with hidden layers. """
-                
-        # 1 - data without clustering: self.n_clusters is None -----      
-        if self.n_clusters <= 0: 
+        
+        if self.n_clusters <= 0: # data without clustering: self.n_clusters is None -----      
             
-            if self.n_hidden_features > 0:
+            if self.n_hidden_features > 0: # if hidden layer
                 
                 scaled_X = self.nn_scaler.transform(X)
-                Phi_X = self.activation_func(np.dot(scaled_X, self.W))
+                #Phi_X = self.activation_func(np.dot(scaled_X, self.W))
+                Phi_X = self.create_layer(scaled_X, self.W)
                
                 return self.scaler.transform(mo.cbind(X, Phi_X))
-            else:
-                return self.scaler.transform(X)
             
-        # 2 - data with clustering: self.n_clusters is None -----      
-        else:
-            
-            predicted_kmeans = self.encode_kmeans(X = X, 
-                                                  predict = True)
-            
-            if predicted_kmeans.shape[1] < self.n_clusters:                
-                augm_predicted_kmeans = mo.cbind(predicted_kmeans, 
-                                            np.zeros((predicted_kmeans.shape[0], 
-                                                     self.n_clusters - predicted_kmeans.shape[1])))
-                augmented_X = mo.cbind(X, augm_predicted_kmeans)
-            else:
-                 augmented_X = mo.cbind(X, predicted_kmeans)
+            else: # if no hidden layer
                 
-            if self.n_hidden_features > 0:
+                return self.scaler.transform(X)
+        
+        else: # data with clustering: self.n_clusters is None -----      
+            
+            predicted_clusters = self.encode_clusters(X = X, predict = True)
+            augmented_X = mo.cbind(X, predicted_clusters)
+                
+            if self.n_hidden_features > 0: # if hidden layer
+                
                 scaled_X = self.nn_scaler.transform(augmented_X)    
-                Phi_X = self.activation_func(np.dot(scaled_X, self.W))
+                #Phi_X = self.activation_func(np.dot(scaled_X, self.W))
+                Phi_X = self.create_layer(scaled_X, self.W)
+                
                 return self.scaler.transform(mo.cbind(augmented_X, Phi_X))
-            else:
+            
+            else: # if no hidden layer
+                
                 return self.scaler.transform(augmented_X)
             
     
 #if __name__ == '__main__':
 ##
-#    from sklearn import datasets   
+    from sklearn import datasets   
 ##    
 #    # Example 1 -----
 #    
-#    n_features = 5
-#    n_samples = 100
-#    X, y = datasets.make_regression(n_features=n_features, 
-#                       n_samples=n_samples, 
-#                       random_state=0)
-#
+    n_features = 5
+    n_samples = 100
+    X, y = datasets.make_regression(n_features=n_features, 
+                       n_samples=n_samples, 
+                       random_state=0)
+
 #    fit_obj = Base(n_hidden_features=3, 
 #                 activation_name='relu', 
 #                 n_clusters=2)
