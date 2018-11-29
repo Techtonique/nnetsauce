@@ -2,6 +2,7 @@ import numpy as np
 from ..base import Base
 from ..utils import matrixops as mo
 
+
 class Custom(Base):
     """Custom sklearn (or else) model class derived from class Base
     
@@ -19,11 +20,14 @@ class Custom(Base):
                  n_hidden_features=5, 
                  activation_name='relu',
                  nodes_sim='sobol',
+                 bias = True,
+                 type_clust = 'kmeans',
                  n_clusters=2,
                  seed = 123):
                 
         super().__init__(n_hidden_features, activation_name,
-                         nodes_sim, n_clusters, seed)
+                         nodes_sim, bias, type_clust, 
+                         n_clusters, seed)
         self.regr = regr
 
         

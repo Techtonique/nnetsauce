@@ -4,13 +4,12 @@ import numpy as np
 # column bind
 def cbind(x, y):
     
-    if len(x.shape) == 1 or len(y.shape) == 1: 
+    #if len(x.shape) == 1 or len(y.shape) == 1: 
         return np.column_stack((x, y))
-    else:
-        return np.concatenate((x, y), 
-                              axis = 1)
+    #else:
+    #    return np.concatenate((x, y), 
+    #                          axis = 1)
         
-
 
 # computes t(x)%*%y
 def crossprod(x, y = None):
@@ -38,11 +37,11 @@ def one_hot_encode(x_clusters, n_clusters):
 # row bind
 def rbind(x, y):
     
-    if len(x.shape) == 1 or len(y.shape) == 1: 
+    #if len(x.shape) == 1 or len(y.shape) == 1: 
         return np.row_stack((x, y))
-    else: 
-        return np.concatenate((x, y), 
-                          axis = 0)
+    #else: 
+    #    return np.concatenate((x, y), 
+    #                      axis = 0)
 
     
 # scale matrix

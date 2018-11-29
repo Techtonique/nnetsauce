@@ -23,7 +23,7 @@ class Base(object):
        bias: boolean
            indicates if the hidden layer contains a bias term or not
        type_clust: str
-           type of clustering method: k-means ('kmeans') or Gaussian Mixture Model ('gmm')
+           type of clustering method: currently k-means ('kmeans') or Gaussian Mixture Model ('gmm')
        n_clusters: int
            number of clusters for 'kmeans' or 'gmm' clustering (could be 0: no clustering)
        seed: int 
@@ -54,8 +54,7 @@ class Base(object):
         self.seed = seed
         self.type_clust = type_clust
         self.n_clusters = n_clusters
-        self.kmeans = None
-        self.gmm = None
+        self.clustering_obj = None
         self.clustering_scaler = None
         self.nn_scaler = None
         self.scaler = None
@@ -75,7 +74,9 @@ class Base(object):
                 'activation_name': self.activation_name, 
                 'activation_func': self.activation_func,
                 'nodes_sim': self.nodes_sim,
+                'bias': self.bias,
                 'seed': self.seed,
+                'type_clust': self.type_clust,
                 'n_clusters': self.n_clusters,
                 'nn_scaler': self.nn_scaler,  
                 'scaler': self.scaler,  
@@ -165,8 +166,26 @@ class Base(object):
     # "preprocessing" methods to be inherited -----
     
     
-    def encode_clusters(self, X=None, predict=False, **kwargs): # additional parameters to be passed to KMeans or GMM
-        """ Create new covariates with kmeans or GMM clustering. """
+    def encode_clusters(self, X=None, predict=False, **kwargs): # 
+        """ Create new covariates with kmeans or GMM clustering. 
+
+        Parameters
+        ----------
+        X: {array-like}, shape = [n_samples, n_features]
+            Training vectors, where n_samples
+            is the number of samples and
+        n_features is the number of features.
+        
+        predict: boolean
+            is False on training set and True on test set
+        
+        **kwargs: 
+            additional parameters to be passed to clustering method  
+            
+        Returns
+        -------
+        clusters' matrix, one-hot encoded: {array-like}        
+        """
         if (X is None):
             X = self.X
                 
@@ -187,26 +206,26 @@ class Base(object):
                                 **kwargs)
                 kmeans.fit(scaled_X)
                 X_kmeans = kmeans.predict(scaled_X)
-                self.kmeans = kmeans
+                self.clustering_obj = kmeans
                 
                 return mo.one_hot_encode(X_kmeans, self.n_clusters)
             
-            else:
-                # pass **kwargs to it
-                return 0 
+            if self.type_clust == 'gmm':
+                
+                gmm = GaussianMixture(n_components=self.n_clusters, 
+                                      **kwargs)
+                gmm.fit(scaled_X)
+                X_gmm = gmm.predict(scaled_X)
+                self.clustering_obj = gmm
+                
+                return mo.one_hot_encode(X_gmm, self.n_clusters) 
             
         else: # if predict == True, encode test set
             
-            if self.type_clust == 'kmeans':
+            X_clustered = self.clustering_obj.predict(self.clustering_scaler.transform(X))
             
-                X_kmeans = self.kmeans.predict(self.clustering_scaler.transform(X))
-                
-                return mo.one_hot_encode(X_kmeans, self.n_clusters)
-            
-            else:
-                
-                return 0 
-            
+            return mo.one_hot_encode(X_clustered, self.n_clusters)
+                        
         
     def create_layer(self, scaled_X, W=None):        
         """ Create hidden layer. """
@@ -358,14 +377,13 @@ class Base(object):
     
     
     def preproc_test_set(self, X):
-        """ Transform data from test set, with hidden layers. """
+        """ Transform data from test set, with hidden layer. """
         
         if self.n_clusters <= 0: # data without clustering: self.n_clusters is None -----      
             
             if self.n_hidden_features > 0: # if hidden layer
                 
                 scaled_X = self.nn_scaler.transform(X)
-                #Phi_X = self.activation_func(np.dot(scaled_X, self.W))
                 Phi_X = self.create_layer(scaled_X, self.W)
                
                 return self.scaler.transform(mo.cbind(X, Phi_X))
@@ -382,7 +400,6 @@ class Base(object):
             if self.n_hidden_features > 0: # if hidden layer
                 
                 scaled_X = self.nn_scaler.transform(augmented_X)    
-                #Phi_X = self.activation_func(np.dot(scaled_X, self.W))
                 Phi_X = self.create_layer(scaled_X, self.W)
                 
                 return self.scaler.transform(mo.cbind(augmented_X, Phi_X))
@@ -424,7 +441,7 @@ class Base(object):
  
 #    # Example 2 -----
     
-#    diabetes = datasets.load_diabetes()
+    diabetes = datasets.load_diabetes()
 #    
 #    # data snippet
 #    diabetes.feature_names
@@ -434,8 +451,8 @@ class Base(object):
 #    diabetes.target.shape
 #    
 #    # define X and y
-#    X = diabetes.data 
-#    y = diabetes.target
+    X = diabetes.data 
+    y = diabetes.target
     
 #    fit_obj = rvflBase(n_hidden_features=3, 
 #                       activation_name='relu', 
