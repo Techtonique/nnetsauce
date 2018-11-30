@@ -12,6 +12,18 @@ class Custom(Base):
            number of nodes in the hidden layer
        activation_name: str
            activation function: 'relu', 'tanh' or 'sigmoid'
+       nodes_sim: str
+           type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 'uniform'
+       bias: boolean
+           indicates if the hidden layer contains a bias term (True) or not (False)
+       direct_link: boolean
+           indicates if the original predictors are included (True) in model's fitting or not (False)
+       n_clusters: int
+           number of clusters for 'kmeans' or 'gmm' clustering (could be 0: no clustering)
+       type_clust: str
+           type of clustering method: currently k-means ('kmeans') or Gaussian Mixture Model ('gmm')
+       seed: int 
+           reproducibility seed for nodes_sim=='uniform'
     """
     
     # construct the object -----
@@ -27,8 +39,8 @@ class Custom(Base):
                  seed=123):
                 
         super().__init__(n_hidden_features, activation_name,
-                         nodes_sim, bias, direct_link, type_clust, 
-                         n_clusters, seed)
+                         nodes_sim, bias, direct_link,
+                         n_clusters, type_clust, seed)
         self.regr = regr
 
         

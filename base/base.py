@@ -7,8 +7,6 @@ from ..utils import matrixops as mo
 from ..simulation import nodesimulation as ns
 
 
-# do DOCSTRINGS
-# do GCV
 class Base(object):
     """Base model with direct link and nonlinear activation.
         
@@ -21,11 +19,13 @@ class Base(object):
        nodes_sim: str
            type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 'uniform'
        bias: boolean
-           indicates if the hidden layer contains a bias term or not
-       type_clust: str
-           type of clustering method: currently k-means ('kmeans') or Gaussian Mixture Model ('gmm')
+           indicates if the hidden layer contains a bias term (True) or not (False)
+       direct_link: boolean
+           indicates if the original predictors are included (True) in model's fitting or not (False)
        n_clusters: int
            number of clusters for 'kmeans' or 'gmm' clustering (could be 0: no clustering)
+       type_clust: str
+           type of clustering method: currently k-means ('kmeans') or Gaussian Mixture Model ('gmm')
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
     """
@@ -78,6 +78,7 @@ class Base(object):
                 'activation_func': self.activation_func,
                 'nodes_sim': self.nodes_sim,
                 'bias': self.bias,
+                'direct_link': self.direct_link,
                 'seed': self.seed,
                 'type_clust': self.type_clust,
                 'n_clusters': self.n_clusters,
@@ -93,7 +94,9 @@ class Base(object):
                    activation_name='relu', 
                    nodes_sim='sobol',
                    bias = True,
+                   direct_link=True,
                    n_clusters=None,
+                   type_clust='kmeans',
                    seed=123):
         
         activation_options = {
@@ -106,7 +109,9 @@ class Base(object):
         self.activation_func = activation_options[activation_name]
         self.nodes_sim = nodes_sim
         self.bias = bias
+        self.direct_link = direct_link
         self.n_clusters = n_clusters
+        self.type_clust = type_clust
         self.seed = seed
     
     
@@ -298,7 +303,7 @@ class Base(object):
                                                    W))
         
         
-    def preproc_training_set(self, y=None, X=None, W=None): 
+    def preproc_training_set(self, y=None, X=None, W=None, **kwargs): 
         """ Create new data for training set, with hidden layer, center the response. """ 
         
         # either X and y are stored or not 
@@ -357,7 +362,7 @@ class Base(object):
         
         else: # data with clustering: self.n_clusters is not None -----  
             
-            augmented_X = mo.cbind(input_X, self.encode_clusters(input_X))
+            augmented_X = mo.cbind(input_X, self.encode_clusters(input_X, **kwargs))
             
             if self.n_hidden_features > 0: # with hidden layer          
                 
@@ -387,7 +392,7 @@ class Base(object):
         return centered_y, self.scaler.transform(Z) 
     
     
-    def preproc_test_set(self, X):
+    def preproc_test_set(self, X, **kwargs):
         """ Transform data from test set, with hidden layer. """
         
         if self.n_clusters <= 0: # data without clustering: self.n_clusters is None -----      
@@ -408,7 +413,7 @@ class Base(object):
         
         else: # data with clustering: self.n_clusters is None -----      
             
-            predicted_clusters = self.encode_clusters(X = X, predict = True)
+            predicted_clusters = self.encode_clusters(X = X, predict = True, **kwargs)
             augmented_X = mo.cbind(X, predicted_clusters)
                 
             if self.n_hidden_features > 0: # if hidden layer
@@ -424,68 +429,3 @@ class Base(object):
             else: # if no hidden layer
                 
                 return self.scaler.transform(augmented_X)
-            
-    
-#if __name__ == '__main__':
-##
- #   from sklearn import datasets   
-##    
-#    # Example 1 -----
-#    
-#    n_features = 5
-#    n_samples = 100
-#    X, y = datasets.make_regression(n_features=n_features, 
-#                       n_samples=n_samples, 
-#                       random_state=0)
-
-#    fit_obj = Base(n_hidden_features=3, 
-#                 activation_name='relu', 
-#                 n_clusters=2)
-#    
-#    centered_y, scaled_Z = fit_obj.preproc_training_set(y=y, X=X)
-#
-#    print(centered_y.shape)
-#    print(scaled_Z.shape)
-#    print(centered_y.mean())
-#    print(scaled_Z.mean(axis = 0))
-#    print(np.sqrt(scaled_Z.var(axis = 0)))
-#    
-#    fit_obj.fit(X, y) 
-#    print(fit_obj.beta)
-#    print(len(fit_obj.beta))
-#    print(fit_obj.predict(X))
-#    
- 
-#    # Example 2 -----
-    
-#    diabetes = datasets.load_diabetes()
-#    
-#    # data snippet
-#    diabetes.feature_names
-#    
-#    # shape 
-#    diabetes.data.shape
-#    diabetes.target.shape
-#    
-#    # define X and y
-#    X = diabetes.data 
-#    y = diabetes.target
-    
-#    fit_obj = rvflBase(n_hidden_features=3, 
-#                       activation_name='relu', 
-#                       n_clusters=2)
-#    
-#    centered_y, scaled_Z = fit_obj.preproc_training_set(y=y, X=X)
-#
-#    print(centered_y.shape)
-#    print(scaled_Z.shape)
-#    print(centered_y.mean())
-#    print(scaled_Z.mean(axis = 0))
-#    print(np.sqrt(scaled_Z.var(axis = 0)))
-#    
-#    fit_obj.fit(X, y)    
-#    z = fit_obj.predict(X) - y
-#    print(fit_obj.predict(X))
-#    print(y)
-#    print(z.mean())
-#
