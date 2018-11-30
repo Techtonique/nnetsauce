@@ -33,10 +33,12 @@ class Base(object):
     
     # construct the object -----
     
-    def __init__(self, n_hidden_features=5, 
+    def __init__(self, 
+                 n_hidden_features=5, 
                  activation_name='relu',
                  nodes_sim='sobol',
                  bias = True,
+                 direct_link = True, # TODO TODO TODO
                  type_clust = 'kmeans',
                  n_clusters=2,
                  seed = 123):
@@ -52,6 +54,7 @@ class Base(object):
         self.nodes_sim = nodes_sim
         self.bias = bias
         self.seed = seed
+        self.direct_link = direct_link
         self.type_clust = type_clust
         self.n_clusters = n_clusters
         self.clustering_obj = None
@@ -336,9 +339,13 @@ class Base(object):
                 if (W is None):
                     Phi_X = self.create_layer(scaled_X)
                 else:
-                    Phi_X = self.create_layer(scaled_X, W=W) # beware: if there is a bias and W is provided
+                    Phi_X = self.create_layer(scaled_X, W=W) 
                 
-                Z = mo.cbind(input_X, Phi_X)
+                if self.direct_link == True:
+                    Z = mo.cbind(input_X, Phi_X)
+                else:
+                    Z = Phi_X
+                    
                 scaler.fit(Z)
                 self.scaler = scaler 
                 
@@ -363,7 +370,11 @@ class Base(object):
                 else:
                     Phi_X = self.create_layer(scaled_X, W=W)
                 
-                Z = mo.cbind(augmented_X, Phi_X)
+                if self.direct_link == True:
+                    Z = mo.cbind(augmented_X, Phi_X)
+                else:
+                    Z = Phi_X
+                    
                 scaler.fit(Z)
                 self.scaler = scaler 
             
@@ -386,7 +397,10 @@ class Base(object):
                 scaled_X = self.nn_scaler.transform(X)
                 Phi_X = self.create_layer(scaled_X, self.W)
                
-                return self.scaler.transform(mo.cbind(X, Phi_X))
+                if self.direct_link == True:
+                    return self.scaler.transform(mo.cbind(X, Phi_X))
+                else:
+                    return self.scaler.transform(Phi_X)
             
             else: # if no hidden layer
                 
@@ -402,7 +416,10 @@ class Base(object):
                 scaled_X = self.nn_scaler.transform(augmented_X)    
                 Phi_X = self.create_layer(scaled_X, self.W)
                 
-                return self.scaler.transform(mo.cbind(augmented_X, Phi_X))
+                if self.direct_link == True:
+                    return self.scaler.transform(mo.cbind(augmented_X, Phi_X))
+                else:
+                    return self.scaler.transform(Phi_X)
             
             else: # if no hidden layer
                 
@@ -411,15 +428,15 @@ class Base(object):
     
 #if __name__ == '__main__':
 ##
-    from sklearn import datasets   
+ #   from sklearn import datasets   
 ##    
 #    # Example 1 -----
 #    
-    n_features = 5
-    n_samples = 100
-    X, y = datasets.make_regression(n_features=n_features, 
-                       n_samples=n_samples, 
-                       random_state=0)
+#    n_features = 5
+#    n_samples = 100
+#    X, y = datasets.make_regression(n_features=n_features, 
+#                       n_samples=n_samples, 
+#                       random_state=0)
 
 #    fit_obj = Base(n_hidden_features=3, 
 #                 activation_name='relu', 
@@ -441,7 +458,7 @@ class Base(object):
  
 #    # Example 2 -----
     
-    diabetes = datasets.load_diabetes()
+#    diabetes = datasets.load_diabetes()
 #    
 #    # data snippet
 #    diabetes.feature_names
@@ -451,8 +468,8 @@ class Base(object):
 #    diabetes.target.shape
 #    
 #    # define X and y
-    X = diabetes.data 
-    y = diabetes.target
+#    X = diabetes.data 
+#    y = diabetes.target
     
 #    fit_obj = rvflBase(n_hidden_features=3, 
 #                       activation_name='relu', 
