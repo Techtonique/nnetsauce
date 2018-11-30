@@ -4,10 +4,12 @@ from ..utils import matrixops as mo
 
 
 class Custom(Base):
-    """Custom sklearn (or else) model class derived from class Base
+    """Custom model class derived from class Base
     
        Parameters
        ----------
+       obj: object
+           any object containing a method fit (obj.fit()) and a method predict (obj.predict())
        n_hidden_features: int
            number of nodes in the hidden layer
        activation_name: str
@@ -28,7 +30,7 @@ class Custom(Base):
     
     # construct the object -----
     
-    def __init__(self, regr,
+    def __init__(self, obj,
                  n_hidden_features=5, 
                  activation_name='relu',
                  nodes_sim='sobol',
@@ -41,7 +43,7 @@ class Custom(Base):
         super().__init__(n_hidden_features, activation_name,
                          nodes_sim, bias, direct_link,
                          n_clusters, type_clust, seed)
-        self.regr = regr
+        self.obj = obj
 
         
     def get_params(self):
@@ -61,7 +63,7 @@ class Custom(Base):
     def fit(self, X, y, **kwargs):
         
         centered_y, scaled_Z = self.preproc_training_set(y = y, X = X)
-        self.regr.fit(scaled_Z, centered_y, **kwargs)
+        self.obj.fit(scaled_Z, centered_y, **kwargs)
         
         return self
 
@@ -73,10 +75,10 @@ class Custom(Base):
             new_X = mo.rbind(X.reshape(1, n_features), 
                              np.ones(n_features).reshape(1, n_features))        
             
-            return (self.y_mean + self.regr.predict(self.preproc_test_set(new_X), 
+            return (self.y_mean + self.obj.predict(self.preproc_test_set(new_X), 
                                                **kwargs))[0]
         else:
-            return self.y_mean + self.regr.predict(self.preproc_test_set(X), 
+            return self.y_mean + self.obj.predict(self.preproc_test_set(X), 
                                                **kwargs)
         
         

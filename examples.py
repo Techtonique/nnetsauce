@@ -80,7 +80,7 @@ plt.scatter(x = x, y = y[350:442], color='black')
 plt.plot(x, fit_obj.predict(X[350:442,:]), color='red')
 plt.plot(x, fit_obj2.predict(X[350:442,:]), color='blue')
 plt.plot(x, fit_obj3.predict(X[350:442,:]), color='green')
-plt.title('preds vs obs')
+plt.title('preds vs test set obs')
 plt.xlabel('x')
 plt.ylabel('preds')
 plt.show()
@@ -98,7 +98,7 @@ fit_obj = ns.Custom(regr = regr, n_hidden_features=100,
 
 fit_obj2 = ns.Custom(regr = regr2, n_hidden_features=500, 
                     direct_link=True, bias=False,
-                    activation_name='tanh', n_clusters=0)
+                    activation_name='relu', n_clusters=0)
 
 # fit training set 
 fit_obj.fit(X[0:350,:], y[0:350])
@@ -109,7 +109,7 @@ x = np.linspace(351, 442, num = 442-351+1)
 plt.scatter(x = x, y = y[350:442], color='black')
 plt.plot(x, fit_obj.predict(X[350:442,:]), color='red')
 plt.plot(x, fit_obj2.predict(X[350:442,:]), color='blue')
-plt.title('preds vs obs')
+plt.title('preds vs test set obs')
 plt.xlabel('x')
 plt.ylabel('preds')
 plt.show()
