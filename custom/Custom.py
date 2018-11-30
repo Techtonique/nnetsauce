@@ -20,13 +20,14 @@ class Custom(Base):
                  n_hidden_features=5, 
                  activation_name='relu',
                  nodes_sim='sobol',
-                 bias = True,
-                 type_clust = 'kmeans',
+                 bias=True,
+                 direct_link=True, 
                  n_clusters=2,
-                 seed = 123):
+                 type_clust='kmeans',
+                 seed=123):
                 
         super().__init__(n_hidden_features, activation_name,
-                         nodes_sim, bias, type_clust, 
+                         nodes_sim, bias, direct_link, type_clust, 
                          n_clusters, seed)
         self.regr = regr
 

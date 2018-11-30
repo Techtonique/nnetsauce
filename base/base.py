@@ -37,11 +37,11 @@ class Base(object):
                  n_hidden_features=5, 
                  activation_name='relu',
                  nodes_sim='sobol',
-                 bias = True,
-                 direct_link = True, # TODO TODO TODO
-                 type_clust = 'kmeans',
+                 bias=True,
+                 direct_link=True,
                  n_clusters=2,
-                 seed = 123):
+                 type_clust='kmeans',
+                 seed=123):
         
         activation_options = {
             'relu': lambda x: np.maximum(x, 0),
