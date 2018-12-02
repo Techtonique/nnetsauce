@@ -4,6 +4,7 @@ import matrixops as mo
 import misc as mx
 import lmfuncs as lmf 
 from sklearn import datasets
+import matplotlib.pyplot as plt  
 
 # Basic tests
 
@@ -64,14 +65,49 @@ print("\n")
 
 # 4 - psd_check -----
 
-n_features = 4
-n_samples = 10
-X, y = datasets.make_regression(n_features=n_features, 
-                       n_samples=n_samples, 
-                       random_state=0)
+diabetes = datasets.load_diabetes()
+
+# define X and y
+X = diabetes.data 
+y = diabetes.target
+
 print("lmf.beta_hat(X, y, lam = 0.1)")
 print(lmf.beta_hat(X, y, lam = 0.1))
 print("\n")
 print("lmf.inv_penalized_cov(X, lam = 0.1)")
 print(lmf.inv_penalized_cov(X, lam = 0.1))
 print("\n")
+
+
+# fit training set 
+
+#n_samples = 442
+#sigma = 0.1 
+#s = 0.1
+#
+## without intercept
+#
+#y_mean = y.mean()
+#
+#beta, Sigma = lmf.beta_Sigma_hat_rvfl(X, y-y_mean, 
+#                                      s = s, sigma = sigma, 
+#                                      return_cov = True)
+#y_hat = y.mean() + np.dot(X, beta)
+#
+#Sigma_hat = np.dot(X, mo.tcrossprod(Sigma, X)) + \
+#(sigma**2)*np.eye(n_samples)
+#
+#ci_std = np.sqrt(np.diag(Sigma_hat))
+#
+## predict on test set 
+#x = np.linspace(1, n_samples, num = n_samples)
+##plt.scatter(x, logy, color='black')
+#plt.fill_between(x, y_hat - 1.96*ci_std,  
+#                 y_hat + 1.96*ci_std, 
+#                 color = 'gray', 
+#                 alpha = 0.4)
+#
+#plt.title('fits vs obs')
+#plt.xlabel('x')
+#plt.ylabel('fits')
+#plt.show()
