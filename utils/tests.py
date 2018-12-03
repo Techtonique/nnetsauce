@@ -78,36 +78,133 @@ print("lmf.inv_penalized_cov(X, lam = 0.1)")
 print(lmf.inv_penalized_cov(X, lam = 0.1))
 print("\n")
 
+# 5 - lm_funcs -----
 
 # fit training set 
 
-#n_samples = 442
-#sigma = 0.1 
-#s = 0.1
-#
+import numpy as np
+
+sigma = 0.3 
+s = 0.1
+n_points = 25 
+
+np.random.seed(1223)
+x = np.linspace(1, 25, num=n_points)
+y = 20*np.random.rand(n_points) - 10
+
+print("4 - Bayesian Ridge ----- \n")
+
+print('----- beta_Sigma_hat: fit_intercept = True, return_cov = True')
+print("\n")
+print(lmf.beta_Sigma_hat_rvfl(x = x, y = y,
+                              s = s, sigma = sigma,
+                              fit_intercept = True,
+                              return_cov = True))
+print("\n")
+
+print('----- beta_Sigma_hat: fit_intercept = True, return_cov = False')
+print("\n")
+print(lmf.beta_Sigma_hat_rvfl(x = x, y = y,
+                              s = s, sigma = sigma,
+                              fit_intercept = True,
+                              return_cov = False))
+print("\n")
+
+print('----- beta_Sigma_hat: fit_intercept = False, return_cov = False')
+print("\n")
+print(lmf.beta_Sigma_hat_rvfl(x = x, y = y,
+                              s = s, sigma = sigma,
+                              fit_intercept = False,
+                              return_cov = False))
+print("\n")
+
+print('----- beta_Sigma_hat: fit_intercept = False, return_cov = True')
+print("\n")
+print(lmf.beta_Sigma_hat_rvfl(x = x, y = y,
+                              s = s, sigma = sigma,
+                              fit_intercept = False,
+                              return_cov = True))
+print("\n")
+
+print('----- beta_Sigma_hat: fit_intercept = True, return_cov = True, x_star')
+print("\n")
+print(lmf.beta_Sigma_hat_rvfl(x = x, y = y, x_star = x,
+                              s = s, sigma = sigma,
+                              fit_intercept = True,
+                              return_cov = True))
+print("\n")
+
+print('----- beta_Sigma_hat: fit_intercept = True, return_cov = False, x_star')
+print("\n")
+print(lmf.beta_Sigma_hat_rvfl(x = x, y = y, x_star = x,
+                              s = s, sigma = sigma,
+                              fit_intercept = True,
+                              return_cov = False))
+print("\n")
+
+print('----- beta_Sigma_hat: fit_intercept = False, return_cov = False, x_star')
+print("\n")
+print(lmf.beta_Sigma_hat_rvfl(x = x, y = y, x_star = x,
+                              s = s, sigma = sigma,
+                              fit_intercept = False,
+                              return_cov = False))
+print("\n")
+
+print('----- beta_Sigma_hat:  fit_intercept = False, return_cov = True, x_star')
+print("\n")
+print(lmf.beta_Sigma_hat_rvfl(x = x, y = y, x_star = x,
+                              s = s, sigma = sigma,
+                              fit_intercept = False,
+                              return_cov = True))
+print("\n")
+
 ## without intercept
-#
-#y_mean = y.mean()
-#
-#beta, Sigma = lmf.beta_Sigma_hat_rvfl(X, y-y_mean, 
-#                                      s = s, sigma = sigma, 
-#                                      return_cov = True)
-#y_hat = y.mean() + np.dot(X, beta)
-#
-#Sigma_hat = np.dot(X, mo.tcrossprod(Sigma, X)) + \
-#(sigma**2)*np.eye(n_samples)
-#
-#ci_std = np.sqrt(np.diag(Sigma_hat))
-#
-## predict on test set 
-#x = np.linspace(1, n_samples, num = n_samples)
-##plt.scatter(x, logy, color='black')
-#plt.fill_between(x, y_hat - 1.96*ci_std,  
-#                 y_hat + 1.96*ci_std, 
-#                 color = 'gray', 
-#                 alpha = 0.4)
-#
-#plt.title('fits vs obs')
-#plt.xlabel('x')
-#plt.ylabel('fits')
-#plt.show()
+
+fit_obj = lmf.beta_Sigma_hat_rvfl(x = x, y = y, x_star = x,
+                                  s = s, sigma = sigma,
+                                  fit_intercept = False,
+                                  return_cov = True)
+
+y_hat = fit_obj['preds']
+y_std = fit_obj['std']
+
+plt.scatter(x, y, color='black')
+plt.fill_between(x, y_hat - 1.96*y_std,  
+                 y_hat + 1.96*y_std, 
+                 color = 'gray', 
+                 alpha = 0.4)
+plt.plot(x, y_hat)
+plt.title('fits vs obs')
+plt.xlabel('x')
+plt.ylabel('fits')
+plt.show()
+
+# 5 - lm_funcs -----
+
+diabetes = datasets.load_diabetes()
+
+# define X and y
+X = diabetes.data 
+y = diabetes.target
+
+fit_obj = lmf.beta_Sigma_hat_rvfl(x = X[0:350,:], y = y[0:350], 
+                                  x_star = X[350:442,:],
+                                  s = s, sigma = sigma,
+                                  fit_intercept = True,
+                                  return_cov = True)
+
+y_hat = fit_obj['preds']
+y_std = fit_obj['std']
+
+x = range(92)
+
+plt.scatter(x, y[350:442], color='black')
+plt.fill_between(x, y_hat - 1.96*y_std,  
+                 y_hat + 1.96*y_std, 
+                 color = 'gray', 
+                 alpha = 0.4)
+plt.plot(x, y_hat)
+plt.title('fits vs obs')
+plt.xlabel('x')
+plt.ylabel('fits')
+plt.show()
