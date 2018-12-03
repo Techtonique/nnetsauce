@@ -85,7 +85,7 @@ print("\n")
 import numpy as np
 
 sigma = 0.3 
-s = 0.1
+s = 4
 n_points = 25 
 
 np.random.seed(1223)
@@ -158,7 +158,6 @@ print(lmf.beta_Sigma_hat_rvfl(x = x, y = y, x_star = x,
                               return_cov = True))
 print("\n")
 
-## without intercept
 
 fit_obj = lmf.beta_Sigma_hat_rvfl(x = x, y = y, x_star = x,
                                   s = s, sigma = sigma,
@@ -166,7 +165,27 @@ fit_obj = lmf.beta_Sigma_hat_rvfl(x = x, y = y, x_star = x,
                                   return_cov = True)
 
 y_hat = fit_obj['preds']
-y_std = fit_obj['std']
+y_std = fit_obj['preds_std']
+
+plt.scatter(x, y, color='black')
+plt.fill_between(x, y_hat - 1.96*y_std,  
+                 y_hat + 1.96*y_std, 
+                 color = 'gray', 
+                 alpha = 0.4)
+plt.plot(x, y_hat)
+plt.title('fits vs obs')
+plt.xlabel('x')
+plt.ylabel('fits')
+plt.show()
+
+
+fit_obj = lmf.beta_Sigma_hat_rvfl2(x = x, y = y, x_star = x,
+                                  sigma = sigma,
+                                  fit_intercept = False,
+                                  return_cov = True)
+
+y_hat = fit_obj['preds']
+y_std = fit_obj['preds_std']
 
 plt.scatter(x, y, color='black')
 plt.fill_between(x, y_hat - 1.96*y_std,  
@@ -194,7 +213,30 @@ fit_obj = lmf.beta_Sigma_hat_rvfl(x = X[0:350,:], y = y[0:350],
                                   return_cov = True)
 
 y_hat = fit_obj['preds']
-y_std = fit_obj['std']
+y_std = fit_obj['preds_std']
+
+x = range(92)
+
+plt.scatter(x, y[350:442], color='black')
+plt.fill_between(x, y_hat - 1.96*y_std,  
+                 y_hat + 1.96*y_std, 
+                 color = 'gray', 
+                 alpha = 0.4)
+plt.plot(x, y_hat)
+plt.title('fits vs obs')
+plt.xlabel('x')
+plt.ylabel('fits')
+plt.show()
+
+
+fit_obj = lmf.beta_Sigma_hat_rvfl2(x = X[0:350,:], y = y[0:350], 
+                                  x_star = X[350:442,:],
+                                  sigma = sigma,
+                                  fit_intercept = True,
+                                  return_cov = True)
+
+y_hat = fit_obj['preds']
+y_std = fit_obj['preds_std']
 
 x = range(92)
 
