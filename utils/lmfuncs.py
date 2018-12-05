@@ -90,7 +90,6 @@ def beta_Sigma_hat_rvfl(X, y,
 def beta_Sigma_hat_rvfl2(X, y, 
                          Sigma=None, 
                          sigma=0.05,
-                         s1 = , s2 = ,
                          fit_intercept=False,
                          X_star=None, # check when dim = 1 # check when dim = 1
                          return_cov=True):
