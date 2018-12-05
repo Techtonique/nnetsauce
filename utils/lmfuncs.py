@@ -22,68 +22,96 @@ def inv_penalized_cov(x, lam = 0.1):
     
 # beta and Sigma in Bayesian Ridge Regression 1 
 # without intercept! without intercept! without intercept!        
-def beta_Sigma_hat_rvfl(X, y, 
+def beta_Sigma_hat_rvfl(X=None, y=None, 
                         s=0.1, sigma=0.05, 
                         fit_intercept=False,
-                        X_star=None, # check when dim = 1 # check when dim = 1
-                        return_cov=True):
+                        X_star=None, # for preds 
+                        return_cov=True, # confidence interval required for preds?
+                        beta_hat_=None, # for prediction only (X_star is not None)
+                        Sigma_hat_=None): # for prediction only (X_star is not None)
     
-    if len(X.shape) == 1:
-        X = X.reshape(-1, 1)
+    if (X is not None) & (y is not None): # fit
     
-    if (X_star is not None):
-        if (len(X_star.shape) == 1):
-            X_star = X_star.reshape(-1, 1)
-    
-    n, p = X.shape
-    
-    if fit_intercept == True:
-        X = mo.cbind(np.ones(n), X)
-        if X_star is not None:
-            X_star = mo.cbind(np.ones(X_star.shape[0]), 
-                                      X_star)
+        if len(X.shape) == 1:
+            X = X.reshape(-1, 1)
         
-    s2 = s**2
-    lambda_ = (sigma**2)/s2
-    
-    if return_cov == True:
+        if (X_star is not None):
+            if (len(X_star.shape) == 1):
+                X_star = X_star.reshape(-1, 1)
         
-        Cn = inv_penalized_cov(X, lam = lambda_)
-        beta_hat_ = np.dot(Cn, mo.crossprod(X, y))
-        Sigma_hat_ = s2*(np.eye(X.shape[1]) - np.dot(Cn, mo.crossprod(X))) 
+        n, p = X.shape
         
-        if X_star is None:
+        if fit_intercept == True:
+            X = mo.cbind(np.ones(n), X)
+            if X_star is not None:
+                X_star = mo.cbind(np.ones(X_star.shape[0]), 
+                                          X_star)
             
-            return {'beta_hat': beta_hat_, 
-                    'Sigma_hat': Sigma_hat_}
-
-        else:
+        s2 = s**2
+        lambda_ = (sigma**2)/s2
+        
+        if return_cov == True:
             
-            return {'beta_hat': beta_hat_, 
-                    'Sigma_hat': Sigma_hat_,
-                    'preds': np.dot(X_star, beta_hat_),
+            Cn = inv_penalized_cov(X, lam = lambda_)
+            
+            if X_star is None:
+                
+                beta_hat_ = np.dot(Cn, mo.crossprod(X, y))
+                Sigma_hat_ = s2*(np.eye(X.shape[1]) - np.dot(Cn, mo.crossprod(X))) 
+                
+                return {'beta_hat': beta_hat_, 
+                        'Sigma_hat': Sigma_hat_}
+    
+            else:
+                
+                if beta_hat_ is None:
+                    beta_hat_ = np.dot(Cn, mo.crossprod(X, y))
+                
+                if Sigma_hat_ is None:    
+                    Sigma_hat_ = s2*(np.eye(X.shape[1]) - np.dot(Cn, mo.crossprod(X))) 
+    
+                return {'beta_hat': beta_hat_, 
+                        'Sigma_hat': Sigma_hat_,
+                        'preds': np.dot(X_star, beta_hat_),
+                        'preds_std': np.sqrt(np.diag(np.dot(X_star, 
+                                             mo.tcrossprod(Sigma_hat_, X_star)) + \
+                                            (sigma**2)*np.eye(X_star.shape[0])))
+                        }
+                        
+        else: # return_cov == False
+            
+            if X_star is None:
+                
+                return {'beta_hat': beta_hat(X, y, 
+                                             lam = lambda_)}
+                
+            else:
+                
+                if beta_hat_ is None:
+                    beta_hat_ = beta_hat(X, y, 
+                                    lam = lambda_)
+                
+                return {'beta_hat': beta_hat_, 
+                        'preds': np.dot(X_star, 
+                                            beta_hat_)
+                        }   
+    else: # X is None | y is None  # predict
+        
+        assert (beta_hat_ is not None) & (X_star is not None)
+        
+        if return_cov == True:
+            
+            assert Sigma_hat_ is not None 
+            
+            return {'preds': np.dot(X_star, beta_hat_),
                     'preds_std': np.sqrt(np.diag(np.dot(X_star, 
-                                         mo.tcrossprod(Sigma_hat_, X_star)) + \
-                                        (sigma**2)*np.eye(X_star.shape[0])))
-                    }
+                                             mo.tcrossprod(Sigma_hat_, X_star)) + \
+                                            (sigma**2)*np.eye(X_star.shape[0])))} 
                     
-    else: # return_cov == False
-        
-        if X_star is None:
-            
-            return {'beta_hat': beta_hat(X, y, 
-                                         lam = lambda_)}
-            
         else:
             
-            beta_hat_ = beta_hat(X, y, 
-                                lam = lambda_)
-            
-            return {'beta_hat': beta_hat_, 
-                    'preds_std': np.dot(X_star, 
-                                        beta_hat_)
-                    }
-            
+            return {'preds': np.dot(X_star, beta_hat_)}
+        
             
 # beta and Sigma in Bayesian Ridge Regression 2
 # without intercept! without intercept! without intercept!
@@ -92,69 +120,94 @@ def beta_Sigma_hat_rvfl2(X, y,
                          sigma=0.05,
                          fit_intercept=False,
                          X_star=None, # check when dim = 1 # check when dim = 1
-                         return_cov=True):
+                         return_cov=True,
+                         beta_hat_=None, # for prediction only (X_star is not None)
+                         Sigma_hat_=None): # for prediction only (X_star is not None)
     
-    if len(X.shape) == 1:
-        X = X.reshape(-1, 1)
-   
-    n, p = X.shape
+    if (X is not None) & (y is not None):
     
-    if Sigma is None:
+        if len(X.shape) == 1:
+            X = X.reshape(-1, 1)
+       
+        n, p = X.shape
+        
+        if Sigma is None:
+            if fit_intercept == True:
+                Sigma = np.eye(p + 1)
+            else: 
+                Sigma = np.eye(p)
+        
+        if (X_star is not None):
+            if (len(X_star.shape) == 1):
+                X_star = X_star.reshape(-1, 1)
+        
         if fit_intercept == True:
-            Sigma = np.eye(p + 1)
-        else: 
-            Sigma = np.eye(p)
-    
-    if (X_star is not None):
-        if (len(X_star.shape) == 1):
-            X_star = X_star.reshape(-1, 1)
-    
-    if fit_intercept == True:
-        
-        X = mo.cbind(np.ones(n), X)
-        Cn = la.inv(np.dot(Sigma, mo.crossprod(X)) + \
-                (sigma**2)*np.eye(p + 1))
-        
-        if X_star is not None:
-            X_star = mo.cbind(np.ones(X_star.shape[0]), 
-                                      X_star)
-    else:
-        
-        Cn = la.inv(np.dot(Sigma, mo.crossprod(X)) + \
-                (sigma**2)*np.eye(p))
-        
-    temp = np.dot(Cn, mo.tcrossprod(Sigma, X))
-    
-    if return_cov == True:
-        
-        if X_star is None:       
             
-            return {'beta_hat': np.dot(temp, y), 
-                    'Sigma_hat': Sigma - np.dot(temp, np.dot(X, Sigma))}
+            X = mo.cbind(np.ones(n), X)
+            Cn = la.inv(np.dot(Sigma, mo.crossprod(X)) + \
+                    (sigma**2)*np.eye(p + 1))
+            
+            if X_star is not None:
+                X_star = mo.cbind(np.ones(X_star.shape[0]), 
+                                          X_star)
+        else:
+            
+            Cn = la.inv(np.dot(Sigma, mo.crossprod(X)) + \
+                    (sigma**2)*np.eye(p))
+            
+        temp = np.dot(Cn, mo.tcrossprod(Sigma, X))
+        
+        if return_cov == True:
+            
+            if X_star is None:       
+                
+                return {'beta_hat': np.dot(temp, y), 
+                        'Sigma_hat': Sigma - np.dot(temp, np.dot(X, Sigma))}
+                
+            else:
+                
+                if beta_hat_ is None:
+                    beta_hat_ = np.dot(temp, y)
+                
+                if Sigma_hat_ is None:    
+                    Sigma_hat_ = Sigma - np.dot(temp, np.dot(X, Sigma))
+                
+                return {'beta_hat': beta_hat_, 
+                        'Sigma_hat': Sigma_hat_,
+                        'preds': np.dot(X_star, beta_hat_), 
+                        'preds_std': np.sqrt(np.diag(np.dot(X_star, 
+                                     mo.tcrossprod(Sigma_hat_, X_star)) + \
+                                     (sigma**2)*np.eye(X_star.shape[0])))
+                        } 
             
         else:
             
-            beta_hat_ = np.dot(temp, y)
-            Sigma_hat_ = Sigma - np.dot(temp, np.dot(X, Sigma))
+            if X_star is None:       
+                
+                return {'beta_hat': np.dot(temp, y)}
             
-            return {'beta_hat': beta_hat_, 
-                    'Sigma_hat': Sigma_hat_,
-                    'preds': np.dot(X_star, beta_hat_), 
+            else:
+                
+                if beta_hat_ is None:
+                    beta_hat_ = np.dot(temp, y)
+                
+                return {'beta_hat': beta_hat_,
+                        'preds': np.dot(X_star, beta_hat_)
+                        }
+    
+    else: #(X is None) | (y is None)
+        
+        assert (beta_hat_ is not None) & (X_star is not None)
+        
+        if return_cov == True:
+            
+            assert Sigma_hat_ is not None 
+            
+            return {'preds': np.dot(X_star, beta_hat_),
                     'preds_std': np.sqrt(np.diag(np.dot(X_star, 
-                                 mo.tcrossprod(Sigma_hat_, X_star)) + \
-                                 (sigma**2)*np.eye(X_star.shape[0])))
-                    } 
-        
-    else:
-        
-        if X_star is None:       
-            
-            return {'beta_hat': np.dot(temp, y)}
-        
+                                             mo.tcrossprod(Sigma_hat_, X_star)) + \
+                                            (sigma**2)*np.eye(X_star.shape[0])))} 
+                    
         else:
             
-            beta_hat_ = np.dot(temp, y)
-            
-            return {'beta_hat': beta_hat_,
-                    'preds': np.dot(X_star, beta_hat_)
-                    }
+            return {'preds': np.dot(X_star, beta_hat_)}
