@@ -52,17 +52,25 @@ class Custom(Base):
 
     
     def set_params(self, n_hidden_features=5, 
-                   activation_name='relu', nodes_sim='sobol',
-                   n_clusters=2, seed = 123):
+                   activation_name='relu', 
+                   nodes_sim='sobol',
+                   bias=True,
+                   direct_link=True,
+                   n_clusters=None,
+                   type_clust='kmeans',
+                   seed=123):
         
         super().set_params(n_hidden_features=n_hidden_features, 
-             activation_name=activation_name, nodes_sim=nodes_sim, 
-             n_clusters=n_clusters, seed=seed)
+                           activation_name=activation_name, nodes_sim=nodes_sim,
+                           bias=bias, direct_link=direct_link, 
+                           n_clusters=n_clusters, type_clust=type_clust, 
+                           seed=seed)
  
     
     def fit(self, X, y, **kwargs):
         
-        centered_y, scaled_Z = self.preproc_training_set(y = y, X = X)
+        centered_y, scaled_Z = self.cook_training_set(y = y, X = X, 
+                                                         **kwargs)
         self.obj.fit(scaled_Z, centered_y, **kwargs)
         
         return self
@@ -75,10 +83,12 @@ class Custom(Base):
             new_X = mo.rbind(X.reshape(1, n_features), 
                              np.ones(n_features).reshape(1, n_features))        
             
-            return (self.y_mean + self.obj.predict(self.preproc_test_set(new_X), 
+            return (self.y_mean + self.obj.predict(self.cook_test_set(new_X, 
+                                                                         **kwargs), 
                                                **kwargs))[0]
         else:
-            return self.y_mean + self.obj.predict(self.preproc_test_set(X), 
+            return self.y_mean + self.obj.predict(self.cook_test_set(X, 
+                                                                        **kwargs), 
                                                **kwargs)
         
         

@@ -1,3 +1,3 @@
-from .bayesianRvfl import bayesianRvfl
+from .bayesianrvfl import BayesianRVFL
 
-__all__ = ["bayesianRvfl"]
+__all__ = ["BayesianRVFL"]

@@ -1,7 +1,7 @@
 import numpy as np
 from numpy import linalg as la
-import matrixops as mo
-
+#import .matrixops as mo
+from . import matrixops as mo
 
 # in alphabetical order
 # computes beta_hat = (t(x)%*%x + lam*I)^{-1}%*%t(x)%*%y    

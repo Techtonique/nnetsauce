@@ -1,8 +1,9 @@
 from .base import Base 
 from .custom import Custom
+from .rvfl.bayesianrvfl import BayesianRVFL
 
 
-__all__=["Base", "Custom"]
+__all__=["Base", "BayesianRVFL", "Custom"]
 
 
 

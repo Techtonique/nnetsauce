@@ -4,6 +4,7 @@ from ..utils import misc as mx
 from ..utils import matrixops as mo
 from ..utils import lmfuncs as lmf
 
+
 class BayesianRVFL(Base):
     """Bayesian RVFL model class derived from class Base
     
@@ -94,12 +95,12 @@ class BayesianRVFL(Base):
     
     def fit(self, X, y, **kwargs):
         
-        centered_y, scaled_Z = self.preproc_training_set(y = y, X = X, 
-                                                         **kwargs)
+        centered_y, scaled_Z = self.cook_training_set(y = y, X = X, **kwargs)
         
         fit_obj = lmf.beta_Sigma_hat_rvfl(X = scaled_Z, 
                                           y = centered_y, 
-                                          s = self.s, sigma = self.sigma,
+                                          s = self.s, 
+                                          sigma = self.sigma,
                                           fit_intercept = False,
                                           return_cov = self.return_std)
         
@@ -122,18 +123,19 @@ class BayesianRVFL(Base):
             
             if len(X.shape) == 1:
             
-                return (self.y_mean + np.dot(self.preproc_test_set(new_X, **kwargs), 
+                return (self.y_mean + np.dot(self.cook_test_set(new_X, 
+                                                                **kwargs), 
                                          self.beta))[0]
             else:
                 
-                return (self.y_mean + np.dot(self.preproc_test_set(X, **kwargs), 
+                return (self.y_mean + np.dot(self.cook_test_set(X, **kwargs), 
                                          self.beta))
             
         else: # confidence interval required for preds?
             
             if len(X.shape) == 1:
             
-                Z = self.preproc_test_set(new_X, **kwargs)
+                Z = self.cook_test_set(new_X, **kwargs)
                 
                 pred_obj = lmf.beta_Sigma_hat_rvfl(s = self.s, 
                                                    sigma = self.sigma, 
@@ -147,7 +149,7 @@ class BayesianRVFL(Base):
 
             else:
                 
-                Z = self.preproc_test_set(X, **kwargs)
+                Z = self.cook_test_set(X, **kwargs)
                 
                 pred_obj = lmf.beta_Sigma_hat_rvfl(s = self.s, 
                                                    sigma = self.sigma, 
@@ -158,3 +160,4 @@ class BayesianRVFL(Base):
                 
                 return (self.y_mean + pred_obj['preds'], 
                         pred_obj['preds_std']) 
+   

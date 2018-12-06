@@ -117,7 +117,7 @@ class Base(object):
     
     # fit -----
     
-    def fit(self, X, y):
+    def fit(self, X, y, **kwargs):
         """Fit training data (X, y).
         
         Parameters
@@ -135,7 +135,7 @@ class Base(object):
         self: object
         """
         
-        centered_y, scaled_Z = self.preproc_training_set(y = y, X = X)
+        centered_y, scaled_Z = self.cook_training_set(y = y, X = X, **kwargs)
         self.beta = la.lstsq(scaled_Z, centered_y)[0]
         
         return self            
@@ -143,7 +143,7 @@ class Base(object):
     
     # predict -----
     
-    def predict(self, X):
+    def predict(self, X, **kwargs):
         """Predict test data X.
         
         Parameters
@@ -163,11 +163,11 @@ class Base(object):
             new_X = mo.rbind(X.reshape(1, n_features), 
                              np.ones(n_features).reshape(1, n_features))        
             
-            return (self.y_mean + np.dot(self.preproc_test_set(new_X), 
+            return (self.y_mean + np.dot(self.cook_test_set(new_X, **kwargs), 
                                         self.beta))[0]
         else:
             
-            return self.y_mean + np.dot(self.preproc_test_set(X), 
+            return self.y_mean + np.dot(self.cook_test_set(X, **kwargs), 
                                         self.beta)
         
         
@@ -303,7 +303,7 @@ class Base(object):
                                                    W))
         
         
-    def preproc_training_set(self, y=None, X=None, W=None, **kwargs): 
+    def cook_training_set(self, y=None, X=None, W=None, **kwargs): 
         """ Create new data for training set, with hidden layer, center the response. """ 
         
         # either X and y are stored or not 
@@ -392,7 +392,7 @@ class Base(object):
         return centered_y, self.scaler.transform(Z) 
     
     
-    def preproc_test_set(self, X, **kwargs):
+    def cook_test_set(self, X, **kwargs):
         """ Transform data from test set, with hidden layer. """
         
         if self.n_clusters <= 0: # data without clustering: self.n_clusters is None -----      
@@ -413,7 +413,8 @@ class Base(object):
         
         else: # data with clustering: self.n_clusters is None -----      
             
-            predicted_clusters = self.encode_clusters(X = X, predict = True, **kwargs)
+            predicted_clusters = self.encode_clusters(X = X, predict = True, 
+                                                      **kwargs)
             augmented_X = mo.cbind(X, predicted_clusters)
                 
             if self.n_hidden_features > 0: # if hidden layer
