@@ -46,6 +46,17 @@ plt.xlabel('x')
 plt.ylabel('preds')
 plt.show()
 
+print("fit_obj RMSE")
+print( np.sqrt(((fit_obj.predict(X[350:442,:]) - y[350:442])**2).mean()))
+print("\n")
+
+print("fit_obj2 RMSE")
+print( np.sqrt(((fit_obj2.predict(X[350:442,:]) - y[350:442])**2).mean()))
+print("\n")
+
+print("fit_obj3 RMSE")
+print( np.sqrt(((fit_obj3.predict(X[350:442,:]) - y[350:442])**2).mean()))
+print("\n")
 
 ## Example 2 - Base - n_hidden_features=5 -----
 
@@ -84,6 +95,17 @@ plt.xlabel('x')
 plt.ylabel('preds')
 plt.show()
 
+print("fit_obj RMSE")
+print( np.sqrt(((fit_obj.predict(X[350:442,:]) - y[350:442])**2).mean()))
+print("\n")
+
+print("fit_obj2 RMSE")
+print( np.sqrt(((fit_obj2.predict(X[350:442,:]) - y[350:442])**2).mean()))
+print("\n")
+
+print("fit_obj3 RMSE")
+print( np.sqrt(((fit_obj3.predict(X[350:442,:]) - y[350:442])**2).mean()))
+print("\n")
 
 ## Example 3 - Custom - n_hidden_features=100, 500 -----
 
@@ -112,6 +134,14 @@ plt.title('preds vs test set obs')
 plt.xlabel('x')
 plt.ylabel('preds')
 plt.show()
+
+print("fit_obj RMSE")
+print( np.sqrt(((fit_obj.predict(X[350:442,:]) - y[350:442])**2).mean()))
+print("\n")
+
+print("fit_obj2 RMSE")
+print( np.sqrt(((fit_obj2.predict(X[350:442,:]) - y[350:442])**2).mean()))
+print("\n")
 
 
 ## Example 4 - BayesianRVFL - n_hidden_features=5 -----
@@ -148,6 +178,17 @@ plt.xlabel('x')
 plt.ylabel('preds')
 plt.show()
 
+print("fit_obj RMSE")
+print( np.sqrt(((fit_obj.predict(X[350:442,:])[0] - y[350:442])**2).mean()))
+print("\n")
+
+print("fit_obj2 RMSE")
+print( np.sqrt(((fit_obj2.predict(X[350:442,:])[0] - y[350:442])**2).mean()))
+print("\n")
+
+print("fit_obj3 RMSE")
+print( np.sqrt(((fit_obj3.predict(X[350:442,:])[0] - y[350:442])**2).mean()))
+print("\n")
 
 ## Example 5 - BayesianRVFL - n_hidden_features=5 -----
 
@@ -176,12 +217,25 @@ fit_obj2.fit(X[0:350,:], y[0:350])
 fit_obj3.fit(X[0:350,:], y[0:350])
 
 # predict on test set 
-x = np.linspace(351, 442, num = 442-351+1)
-plt.scatter(x = x, y = y[350:442], color='black')
-plt.plot(x, fit_obj.predict(X[350:442,:])[0], color='red')
-plt.plot(x, fit_obj2.predict(X[350:442,:])[0], color='blue')
-plt.plot(x, fit_obj3.predict(X[350:442,:])[0], color='green')
+x = np.linspace(351, 375, num = 375-351+1)
+plt.scatter(x = x, y = y[350:375], color='black')
+plt.plot(x, fit_obj.predict(X[350:375,:])[0], color='red')
+plt.plot(x, fit_obj2.predict(X[350:375,:])[0], color='blue')
+plt.plot(x, fit_obj3.predict(X[350:375,:])[0], color='green')
 plt.title('preds vs test set obs')
 plt.xlabel('x')
 plt.ylabel('preds')
 plt.show()
+
+
+print("fit_obj RMSE")
+print( np.sqrt(((fit_obj.predict(X[350:442,:])[0] - y[350:442])**2).mean()))
+print("\n")
+
+print("fit_obj2 RMSE")
+print( np.sqrt(((fit_obj2.predict(X[350:442,:])[0] - y[350:442])**2).mean()))
+print("\n")
+
+print("fit_obj3 RMSE")
+print( np.sqrt(((fit_obj3.predict(X[350:442,:])[0] - y[350:442])**2).mean()))
+print("\n")
