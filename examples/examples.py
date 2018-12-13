@@ -297,10 +297,17 @@ fit_obj3 = ns.BayesianRVFL2(n_hidden_features=5,
                    activation_name='tanh', 
                    n_clusters=3)    
 
+fit_obj4 = ns.BayesianRVFL2(n_hidden_features=5, 
+                   direct_link=False,
+                   bias=False,
+                   activation_name='tanh', 
+                   n_clusters=3)    
+
 # fit training set 
 fit_obj.fit(X[0:350,:], y[0:350])
 fit_obj2.fit(X[0:350,:], y[0:350])
 fit_obj3.fit(X[0:350,:], y[0:350])
+fit_obj4.fit(X[0:350,:], y[0:350])
 
 # predict on test set 
 x = np.linspace(351, 442, num = 442-351+1)
@@ -308,6 +315,7 @@ plt.scatter(x = x, y = y[350:442], color='black')
 plt.plot(x, fit_obj.predict(X[350:442,:])[0], color='red')
 plt.plot(x, fit_obj2.predict(X[350:442,:])[0], color='blue')
 plt.plot(x, fit_obj3.predict(X[350:442,:])[0], color='green')
+plt.plot(x, fit_obj4.predict(X[350:442,:])[0], color='yellow')
 plt.title('preds vs obs')
 plt.xlabel('x')
 plt.ylabel('preds')
@@ -328,6 +336,10 @@ print("\n")
 
 print("fit_obj3 RMSE")
 print( np.sqrt(((fit_obj3.predict(X[350:442,:])[0] - y[350:442])**2).mean()))
+print("\n")
+
+print("fit_obj4 RMSE")
+print( np.sqrt(((fit_obj4.predict(X[350:442,:])[0] - y[350:442])**2).mean()))
 print("\n")
 
 ## Example 5 - BayesianRVFL2 - n_hidden_features=5 -----

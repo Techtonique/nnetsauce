@@ -149,14 +149,7 @@ def beta_Sigma_hat_rvfl2(X=None, y=None,
                 X_star = mo.cbind(np.ones(X_star.shape[0]), 
                                           X_star)
         else:
-            
-            print("Sigma.shape")
-            print(Sigma.shape)
-            print("\n")                
-            print("X.shape")        
-            print(X.shape)
-            print("\n")                
-        
+          
             Cn = la.inv(np.dot(Sigma, mo.crossprod(X)) + (sigma**2)*np.eye(p))
         
         temp = np.dot(Cn, mo.tcrossprod(Sigma, X))
