@@ -53,9 +53,13 @@ class BayesianRVFL(Base):
                  beta=None, Sigma=None,
                  return_std = True):
                 
-        super().__init__(n_hidden_features, activation_name,
-                         nodes_sim, bias, direct_link,
-                         n_clusters, type_clust, seed)
+        super().__init__(n_hidden_features = n_hidden_features, 
+                         activation_name = activation_name,
+                         nodes_sim = nodes_sim, 
+                         bias = bias, direct_link = direct_link,
+                         n_clusters = n_clusters, 
+                         type_clust = type_clust, 
+                         seed = seed)
         self.s = s 
         self.sigma = sigma
         self.beta = beta
@@ -79,15 +83,14 @@ class BayesianRVFL(Base):
                    n_clusters=None,
                    type_clust='kmeans',
                    seed=123, 
-                   s=0.1, sigma=0.05,
-                   return_std = True):
+                   s=0.1, sigma=0.05):
         
         super().set_params(n_hidden_features = n_hidden_features, 
                            activation_name = activation_name, 
                            nodes_sim = nodes_sim,
                            bias = bias, direct_link = direct_link, 
                            n_clusters = n_clusters, type_clust = type_clust, 
-                           seed = seed, return_std = return_std)
+                           seed = seed)
         self.s = s
         self.sigma = sigma
         self.return_std = return_std

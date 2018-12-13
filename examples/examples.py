@@ -1,17 +1,20 @@
 from sklearn import datasets, linear_model
 import matplotlib.pyplot as plt  
 import numpy as np 
-import nnetsauce as ns
+#import nnetsauce as ns
 
 ## 0 - Data -----
 
-diabetes = datasets.load_diabetes()
+# define X and y
+X, y = datasets.make_regression(n_samples=10, 
+                                n_features=4)
 
 # define X and y
+diabetes = datasets.load_diabetes()
 X = diabetes.data 
 y = diabetes.target
 
- 
+
 ## Example 1 - Base - n_hidden_features=5 -----
 
 # create object Base 
@@ -45,6 +48,10 @@ plt.title('preds vs obs')
 plt.xlabel('x')
 plt.ylabel('preds')
 plt.show()
+
+print("\n")
+print("----- Example 1: Base ------")
+print("\n")
 
 print("fit_obj RMSE")
 print( np.sqrt(((fit_obj.predict(X[350:442,:]) - y[350:442])**2).mean()))
@@ -95,6 +102,11 @@ plt.xlabel('x')
 plt.ylabel('preds')
 plt.show()
 
+print("\n")
+print("----- Example 2: Base ------")
+print("\n")
+
+
 print("fit_obj RMSE")
 print( np.sqrt(((fit_obj.predict(X[350:442,:]) - y[350:442])**2).mean()))
 print("\n")
@@ -135,6 +147,11 @@ plt.xlabel('x')
 plt.ylabel('preds')
 plt.show()
 
+print("\n")
+print("----- Example 3: Custom ------")
+print("\n")
+
+
 print("fit_obj RMSE")
 print( np.sqrt(((fit_obj.predict(X[350:442,:]) - y[350:442])**2).mean()))
 print("\n")
@@ -144,20 +161,20 @@ print( np.sqrt(((fit_obj2.predict(X[350:442,:]) - y[350:442])**2).mean()))
 print("\n")
 
 
-## Example 4 - BayesianRVFL - n_hidden_features=5 -----
+## Example 4 - BayesianRVFL2 - n_hidden_features=5 -----
 
-# create object BayesianRVFL 
-fit_obj = ns.BayesianRVFL(n_hidden_features=5, 
+# create object BayesianRVFL2 
+fit_obj = ns.BayesianRVFL2(n_hidden_features=5, 
                   direct_link=False,
                   activation_name='tanh', 
                   n_clusters=3)
 
-fit_obj2 = ns.BayesianRVFL(n_hidden_features=5, 
+fit_obj2 = ns.BayesianRVFL2(n_hidden_features=5, 
                   direct_link=True,
                   activation_name='relu', 
                   n_clusters=3)
 
-fit_obj3 = ns.BayesianRVFL(n_hidden_features=5, 
+fit_obj3 = ns.BayesianRVFL2(n_hidden_features=5, 
                    direct_link=True,
                    activation_name='tanh', 
                    n_clusters=3)    
@@ -178,6 +195,11 @@ plt.xlabel('x')
 plt.ylabel('preds')
 plt.show()
 
+print("\n")
+print("----- Example 4: BayesianRVFL ------")
+print("\n")
+
+
 print("fit_obj RMSE")
 print( np.sqrt(((fit_obj.predict(X[350:442,:])[0] - y[350:442])**2).mean()))
 print("\n")
@@ -193,7 +215,7 @@ print("\n")
 ## Example 5 - BayesianRVFL - n_hidden_features=5 -----
 
 # create object BayesianRVFL 
-fit_obj = ns.BayesianRVFL(n_hidden_features=100, 
+fit_obj = ns.BayesianRVFL(n_hidden_features=5, 
                   direct_link=False,
                   bias=False,
                   activation_name='tanh', 
@@ -227,6 +249,10 @@ plt.xlabel('x')
 plt.ylabel('preds')
 plt.show()
 
+print("\n")
+print("----- Example 5: BayesianRVFL ------")
+print("\n")
+
 
 print("fit_obj RMSE")
 print( np.sqrt(((fit_obj.predict(X[350:442,:])[0] - y[350:442])**2).mean()))
@@ -239,3 +265,133 @@ print("\n")
 print("fit_obj3 RMSE")
 print( np.sqrt(((fit_obj3.predict(X[350:442,:])[0] - y[350:442])**2).mean()))
 print("\n")
+
+
+# predict on test set 
+x = np.linspace(351, 375, num = 375-351+1)
+plt.scatter(x = x, y = y[350:375], color='black')
+plt.plot(x, fit_obj.predict(X[350:375,:])[0], color='red')
+plt.plot(x, fit_obj2.predict(X[350:375,:])[0], color='blue')
+plt.plot(x, fit_obj3.predict(X[350:375,:])[0], color='green')
+plt.title('preds vs test set obs')
+plt.xlabel('x')
+plt.ylabel('preds')
+plt.show()
+
+
+## Example 6 - BayesianRVFL2 - n_hidden_features=5 -----
+
+# create object BayesianRVFL2 
+fit_obj = ns.BayesianRVFL2(n_hidden_features=5, 
+                  direct_link=False,
+                  activation_name='tanh', 
+                  n_clusters=3)
+
+fit_obj2 = ns.BayesianRVFL2(n_hidden_features=5, 
+                  direct_link=True,
+                  activation_name='relu', 
+                  n_clusters=3)
+
+fit_obj3 = ns.BayesianRVFL2(n_hidden_features=5, 
+                   direct_link=True,
+                   activation_name='tanh', 
+                   n_clusters=3)    
+
+# fit training set 
+fit_obj.fit(X[0:350,:], y[0:350])
+fit_obj2.fit(X[0:350,:], y[0:350])
+fit_obj3.fit(X[0:350,:], y[0:350])
+
+# predict on test set 
+x = np.linspace(351, 442, num = 442-351+1)
+plt.scatter(x = x, y = y[350:442], color='black')
+plt.plot(x, fit_obj.predict(X[350:442,:])[0], color='red')
+plt.plot(x, fit_obj2.predict(X[350:442,:])[0], color='blue')
+plt.plot(x, fit_obj3.predict(X[350:442,:])[0], color='green')
+plt.title('preds vs obs')
+plt.xlabel('x')
+plt.ylabel('preds')
+plt.show()
+
+print("\n")
+print("----- Example 6: BayesianRVFL2 ------")
+print("\n")
+
+
+print("fit_obj RMSE")
+print( np.sqrt(((fit_obj.predict(X[350:442,:])[0] - y[350:442])**2).mean()))
+print("\n")
+
+print("fit_obj2 RMSE")
+print( np.sqrt(((fit_obj2.predict(X[350:442,:])[0] - y[350:442])**2).mean()))
+print("\n")
+
+print("fit_obj3 RMSE")
+print( np.sqrt(((fit_obj3.predict(X[350:442,:])[0] - y[350:442])**2).mean()))
+print("\n")
+
+## Example 5 - BayesianRVFL2 - n_hidden_features=5 -----
+
+# create object BayesianRVFL2 
+fit_obj = ns.BayesianRVFL2(n_hidden_features=5, 
+                  direct_link=False,
+                  bias=False,
+                  activation_name='tanh', 
+                  n_clusters=2)
+
+fit_obj2 = ns.BayesianRVFL2(n_hidden_features=10, 
+                  direct_link=True,
+                  bias=False,
+                  activation_name='relu', 
+                  n_clusters=2)
+
+fit_obj3 = ns.BayesianRVFL2(n_hidden_features=100, 
+                   direct_link=True,
+                   bias=False,
+                   activation_name='tanh', 
+                   n_clusters=2)    
+
+# fit training set 
+fit_obj.fit(X[0:350,:], y[0:350])
+fit_obj2.fit(X[0:350,:], y[0:350])
+fit_obj3.fit(X[0:350,:], y[0:350])
+
+# predict on test set 
+x = np.linspace(351, 375, num = 375-351+1)
+plt.scatter(x = x, y = y[350:375], color='black')
+plt.plot(x, fit_obj.predict(X[350:375,:])[0], color='red')
+plt.plot(x, fit_obj2.predict(X[350:375,:])[0], color='blue')
+plt.plot(x, fit_obj3.predict(X[350:375,:])[0], color='green')
+plt.title('preds vs test set obs')
+plt.xlabel('x')
+plt.ylabel('preds')
+plt.show()
+
+print("\n")
+print("----- Example 7: BayesianRVFL2 ------")
+print("\n")
+
+
+print("fit_obj RMSE")
+print( np.sqrt(((fit_obj.predict(X[350:442,:])[0] - y[350:442])**2).mean()))
+print("\n")
+
+print("fit_obj2 RMSE")
+print( np.sqrt(((fit_obj2.predict(X[350:442,:])[0] - y[350:442])**2).mean()))
+print("\n")
+
+print("fit_obj3 RMSE")
+print( np.sqrt(((fit_obj3.predict(X[350:442,:])[0] - y[350:442])**2).mean()))
+print("\n")
+
+
+# predict on test set 
+x = np.linspace(351, 375, num = 375-351+1)
+plt.scatter(x = x, y = y[350:375], color='black')
+plt.plot(x, fit_obj.predict(X[350:375,:])[0], color='red')
+plt.plot(x, fit_obj2.predict(X[350:375,:])[0], color='blue')
+plt.plot(x, fit_obj3.predict(X[350:375,:])[0], color='green')
+plt.title('preds vs test set obs')
+plt.xlabel('x')
+plt.ylabel('preds')
+plt.show()
