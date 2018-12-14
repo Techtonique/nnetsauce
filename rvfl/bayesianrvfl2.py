@@ -15,7 +15,9 @@ class BayesianRVFL2(Base):
        n_hidden_features: int
            number of nodes in the hidden layer
        activation_name: str
-           activation function: 'relu', 'tanh' or 'sigmoid'
+           activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
+       a: float
+           hyperparameter for 'prelu' or 'elu' activation function
        nodes_sim: str
            type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 'uniform'
        bias: boolean
@@ -35,7 +37,7 @@ class BayesianRVFL2(Base):
        sigma: float
            std. dev. of residuals in Bayesian Ridge Regression
        beta: array-like
-           fitted parameters of the Regression 
+           regression's fitted parameters 
        Sigma: array-like
            covariance of the distribution of fitted parameters
     """
@@ -45,6 +47,7 @@ class BayesianRVFL2(Base):
     def __init__(self,
                  n_hidden_features=5, 
                  activation_name='relu',
+                 a=0.01,
                  nodes_sim='sobol',
                  bias=True,
                  direct_link=True, 
@@ -56,12 +59,13 @@ class BayesianRVFL2(Base):
                  return_std = True):
                 
         super().__init__(n_hidden_features = n_hidden_features, 
-                         activation_name = activation_name,
+                         activation_name = activation_name, a = a,
                          nodes_sim = nodes_sim, 
                          bias = bias, direct_link = direct_link,
                          n_clusters = n_clusters, 
                          type_clust = type_clust, 
                          seed = seed)
+        
         self.s1 = s1 
         self.s2 = s2         
         self.sigma = sigma

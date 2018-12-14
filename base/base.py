@@ -15,27 +15,35 @@ class Base(object):
        n_hidden_features: int
            number of nodes in the hidden layer
        activation_name: str
-           activation function: 'relu', 'tanh' or 'sigmoid'
+           activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
+       a: float
+           hyperparameter for 'prelu' or 'elu' activation function
        nodes_sim: str
-           type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 'uniform'
+           type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+           'uniform'
        bias: boolean
-           indicates if the hidden layer contains a bias term (True) or not (False)
+           indicates if the hidden layer contains a bias term (True) or 
+           not (False)
        direct_link: boolean
-           indicates if the original predictors are included (True) in model's fitting or not (False)
+           indicates if the original predictors are included (True) in model's 
+           fitting or not (False)
        n_clusters: int
-           number of clusters for 'kmeans' or 'gmm' clustering (could be 0: no clustering)
+           number of clusters for type_clust='kmeans' or type_clust='gmm' 
+           clustering (could be 0: no clustering)
        type_clust: str
-           type of clustering method: currently k-means ('kmeans') or Gaussian Mixture Model ('gmm')
+           type of clustering method: currently k-means ('kmeans') or Gaussian 
+           Mixture Model ('gmm')
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
     """
         
     
-    # construct the object -----
+    # construct the object -----   
     
     def __init__(self, 
                  n_hidden_features=5, 
                  activation_name='relu',
+                 a=0.01,
                  nodes_sim='sobol',
                  bias=True,
                  direct_link=True,
@@ -43,10 +51,33 @@ class Base(object):
                  type_clust='kmeans',
                  seed=123):
         
+        # activation function -----     
+        
+        def prelu(x, a):
+            n, p = x.shape
+            y = x.copy()
+            for i in range(n):
+                for j in range(p):
+                    if x[i, j] < 0:
+                        y[i, j] = a*x[i, j]
+            return y
+            
+        def elu(x, a):
+            n, p = x.shape
+            y = x.copy()
+            for i in range(n):
+                for j in range(p):
+                    if x[i, j] < 0:
+                        y[i, j] = a*(np.exp(x[i, j]) - 1)
+            return y
+        
         activation_options = {
             'relu': lambda x: np.maximum(x, 0),
             'tanh': lambda x: np.tanh(x),
-            'sigmoid': lambda x: 1/(1+np.exp(-x))}
+            'sigmoid': lambda x: 1/(1+np.exp(-x)),
+            'prelu': lambda x: prelu(x, a = a), 
+            'elu': lambda x: elu(x, a = a)
+            } 
         
         self.n_hidden_features = n_hidden_features
         self.activation_name = activation_name
@@ -69,27 +100,25 @@ class Base(object):
         self.beta = None
 
     
-    # getter -----
-    
+    # getter -----    
     def get_params(self):
         
         return {'n_hidden_features': self.n_hidden_features, 
                 'activation_name': self.activation_name, 
-                'activation_func': self.activation_func,
                 'nodes_sim': self.nodes_sim,
                 'bias': self.bias,
                 'direct_link': self.direct_link,
                 'seed': self.seed,
                 'type_clust': self.type_clust,
                 'n_clusters': self.n_clusters,
+                'clustering_scaler': self.clustering_scaler,
                 'nn_scaler': self.nn_scaler,  
                 'scaler': self.scaler,  
                 'W': self.W, 
                 'y_mean': self.y_mean}
     
     
-    # setter -----
-    
+    # setter -----    
     def set_params(self, n_hidden_features=5, 
                    activation_name='relu', 
                    nodes_sim='sobol',
@@ -115,20 +144,20 @@ class Base(object):
         self.seed = seed
     
     
-    # fit -----
-    
     def fit(self, X, y, **kwargs):
         """Fit training data (X, y).
         
         Parameters
         ----------
         X: {array-like}, shape = [n_samples, n_features]
-            Training vectors, where n_samples
-            is the number of samples and
-        n_features is the number of features.
+            Training vectors, where n_samples is the number 
+            of samples and n_features is the number of features.
         
         y: array-like, shape = [n_samples]
                Target values.
+    
+        **kwargs: additional parameters to be passed to 
+                  self.cook_training_set
                
         Returns
         -------
@@ -141,17 +170,17 @@ class Base(object):
         return self            
         
     
-    # predict -----
-    
     def predict(self, X, **kwargs):
         """Predict test data X.
         
         Parameters
         ----------
         X: {array-like}, shape = [n_samples, n_features]
-            Training vectors, where n_samples
-            is the number of samples and
-        n_features is the number of features.
+            Training vectors, where n_samples is the number 
+            of samples and n_features is the number of features.
+        
+        **kwargs: additional parameters to be passed to 
+                  self.cook_test_set
                
         Returns
         -------
@@ -180,20 +209,21 @@ class Base(object):
         Parameters
         ----------
         X: {array-like}, shape = [n_samples, n_features]
-            Training vectors, where n_samples
-            is the number of samples and
-        n_features is the number of features.
+            Training vectors, where n_samples is the number 
+            of samples and n_features is the number of features.
         
         predict: boolean
             is False on training set and True on test set
         
         **kwargs: 
-            additional parameters to be passed to clustering method  
+            additional parameters to be passed to the 
+            clustering method  
             
         Returns
         -------
         clusters' matrix, one-hot encoded: {array-like}        
         """
+        
         if (X is None):
             X = self.X
                 
