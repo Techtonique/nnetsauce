@@ -153,14 +153,17 @@ def beta_Sigma_hat_rvfl2(X=None, y=None,
           
             Cn = la.inv(np.dot(Sigma, mo.crossprod(X)) + (sigma**2)*np.eye(p))
         
-        temp = np.dot(Cn, mo.tcrossprod(Sigma, X))
+        temp = np.dot(Cn, mo.tcrossprod(Sigma, X))        
+        smoothing_matrix = np.dot(X, temp)        
+        y_hat = np.dot(smoothing_matrix, y)
         
         if return_cov == True:
             
             if X_star is None:       
                 
                 return {'beta_hat': np.dot(temp, y), 
-                        'Sigma_hat': Sigma - np.dot(temp, np.dot(X, Sigma))}
+                        'Sigma_hat': Sigma - np.dot(temp, np.dot(X, Sigma)),
+                        'GCV': np.mean(((y - y_hat)/(1 - np.trace(smoothing_matrix)/n))**2)}
                 
             else:
                 
@@ -172,17 +175,19 @@ def beta_Sigma_hat_rvfl2(X=None, y=None,
                 
                 return {'beta_hat': beta_hat_, 
                         'Sigma_hat': Sigma_hat_,
+                        'GCV': np.mean(((y - y_hat)/(1 - np.trace(smoothing_matrix)/n))**2),
                         'preds': np.dot(X_star, beta_hat_), 
                         'preds_std': np.sqrt(np.diag(np.dot(X_star, 
                                      mo.tcrossprod(Sigma_hat_, X_star)) + \
                                      (sigma**2)*np.eye(X_star.shape[0])))
                         } 
             
-        else:
+        else: # return_cov == False
             
             if X_star is None:       
                 
-                return {'beta_hat': np.dot(temp, y)}
+                return {'beta_hat': np.dot(temp, y),
+                        'GCV': np.mean(((y - y_hat)/(1 - np.trace(smoothing_matrix)/n))**2)}
             
             else:
                 
@@ -190,6 +195,7 @@ def beta_Sigma_hat_rvfl2(X=None, y=None,
                     beta_hat_ = np.dot(temp, y)
                 
                 return {'beta_hat': beta_hat_,
+                        'GCV': np.mean(((y - y_hat)/(1 - np.trace(smoothing_matrix)/n))**2),
                         'preds': np.dot(X_star, beta_hat_)
                         }
     

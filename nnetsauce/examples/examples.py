@@ -40,12 +40,14 @@ fit_obj3.fit(X[0:350,:], y[0:350])
 
 # predict on test set 
 x = np.linspace(351, 442, num = 442-351+1)
-plt.scatter(x = x, y = y[350:442], color='black')
-plt.plot(x, fit_obj.predict(X[350:442,:]), color='red')
-plt.plot(x, fit_obj2.predict(X[350:442,:]), color='blue')
-plt.plot(x, fit_obj3.predict(X[350:442,:]), color='green')
-plt.title('preds vs obs')
-plt.xlabel('x')
+
+plt.scatter(y[350:442], fit_obj.predict(X[350:442,:]), color='red')
+plt.scatter(y[350:442], fit_obj2.predict(X[350:442,:]), color='blue')
+plt.scatter(y[350:442], fit_obj3.predict(X[350:442,:]), color='green')
+plt.scatter(x = np.sort(y[350:442]), y = np.sort(y[350:442]), 
+         color='black')
+plt.title('actual vs preds')
+plt.xlabel('actual')
 plt.ylabel('preds')
 plt.show()
 
@@ -225,13 +227,13 @@ fit_obj2 = ns.BayesianRVFL(n_hidden_features=100,
                   direct_link=True,
                   bias=False,
                   activation_name='relu', 
-                  n_clusters=2)
+                  n_clusters=3)
 
 fit_obj3 = ns.BayesianRVFL(n_hidden_features=100, 
                    direct_link=True,
                    bias=False,
                    activation_name='tanh', 
-                   n_clusters=2)    
+                   n_clusters=5)    
 
 # fit training set 
 fit_obj.fit(X[0:350,:], y[0:350])
@@ -363,10 +365,17 @@ fit_obj3 = ns.BayesianRVFL2(n_hidden_features=100,
                    activation_name='tanh', 
                    n_clusters=2)    
 
+fit_obj4 = ns.BayesianRVFL2(n_hidden_features=50, 
+                  direct_link=False,
+                  bias=False,
+                  activation_name='tanh', 
+                  n_clusters=4)
+
 # fit training set 
 fit_obj.fit(X[0:350,:], y[0:350])
 fit_obj2.fit(X[0:350,:], y[0:350])
 fit_obj3.fit(X[0:350,:], y[0:350])
+fit_obj4.fit(X[0:350,:], y[0:350])
 
 # predict on test set 
 x = np.linspace(351, 375, num = 375-351+1)
@@ -374,6 +383,7 @@ plt.scatter(x = x, y = y[350:375], color='black')
 plt.plot(x, fit_obj.predict(X[350:375,:])[0], color='red')
 plt.plot(x, fit_obj2.predict(X[350:375,:])[0], color='blue')
 plt.plot(x, fit_obj3.predict(X[350:375,:])[0], color='green')
+plt.plot(x, fit_obj4.predict(X[350:375,:])[0], color='green')
 plt.title('preds vs test set obs')
 plt.xlabel('x')
 plt.ylabel('preds')

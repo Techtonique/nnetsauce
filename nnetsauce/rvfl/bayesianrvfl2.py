@@ -83,15 +83,15 @@ class BayesianRVFL2(Base):
                                    "return_std": self.return_std})
 
     
-    def set_params(self, n_hidden_features=5, 
+    def set_params(self, n_hidden_features=5, # optim
                    activation_name='relu', 
                    nodes_sim='sobol',
                    bias=True,
                    direct_link=True,
-                   n_clusters=None,
+                   n_clusters=None, # optim
                    type_clust='kmeans',
                    seed=123, 
-                   s1=0.1, s2=0.1, sigma=0.05,
+                   s1=0.1, s2=0.1, sigma=0.05, # optim
                    return_std = True):
         
         super().set_params(n_hidden_features = n_hidden_features, 
