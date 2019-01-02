@@ -1,3 +1,9 @@
+"""Random Vector Functional Link Network regression with 2 regularization parameters."""
+
+# Authors: Thierry Moudiki <thierry.moudiki@gmail.com>
+#
+# License: MIT
+
 import numpy as np
 from ..base import Base
 from ..utils import misc as mx
@@ -10,8 +16,6 @@ class BayesianRVFL2(Base):
     
        Parameters
        ----------
-       obj: object
-           any object containing a method fit (obj.fit()) and a method predict (obj.predict())
        n_hidden_features: int
            number of nodes in the hidden layer
        activation_name: str
