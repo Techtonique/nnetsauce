@@ -1,4 +1,4 @@
-from sklearn import datasets, linear_model
+from sklearn import datasets, linear_model, gaussian_process
 import matplotlib.pyplot as plt  
 import numpy as np 
 #import nnetsauce as ns

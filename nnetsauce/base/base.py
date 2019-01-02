@@ -1,9 +1,17 @@
+"""Random Vector Functional Link Network regression."""
+
+# Authors: Thierry Moudiki <thierry.moudiki@gmail.com>
+#
+# License: MIT
+
 import numpy as np
+import sklearn.metrics as skm
 from numpy import linalg as la
 from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import StandardScaler
 from ..utils import matrixops as mo
+from ..utils import misc as mx
 from ..simulation import nodesimulation as ns
 
 
@@ -145,7 +153,7 @@ class Base(object):
     
     
     def fit(self, X, y, **kwargs):
-        """Fit training data (X, y).
+        """Fit RVFL to training data (X, y).
         
         Parameters
         ----------
@@ -163,9 +171,15 @@ class Base(object):
         -------
         self: object
         """
+        if mx.is_factor(y):
         
-        centered_y, scaled_Z = self.cook_training_set(y = y, X = X, **kwargs)
-        self.beta = la.lstsq(scaled_Z, centered_y)[0]
+            centered_y, scaled_Z = self.cook_training_set(y = y, X = X, **kwargs)
+            self.beta = la.lstsq(scaled_Z, centered_y)[0]
+        
+        else:
+            
+            centered_y, scaled_Z = self.cook_training_set(y = y, X = X, **kwargs)
+            self.beta = la.lstsq(scaled_Z, centered_y)[0]
         
         return self            
         
@@ -188,17 +202,56 @@ class Base(object):
         """
         
         if len(X.shape) == 1:
+
             n_features = X.shape[0]
             new_X = mo.rbind(X.reshape(1, n_features), 
                              np.ones(n_features).reshape(1, n_features))        
             
             return (self.y_mean + np.dot(self.cook_test_set(new_X, **kwargs), 
-                                        self.beta))[0]
+                                            self.beta))[0]
+            
         else:
             
             return self.y_mean + np.dot(self.cook_test_set(X, **kwargs), 
                                         self.beta)
+                
+            
         
+    def score(self, X, y, scoring=None):
+        """ Score the model on covariates X and response y. """
+        
+        preds = self.predict(X)
+        
+        if mx.is_factor(y): # classification
+            
+            scoring_options = {
+                'accuracy': skm.accuracy_score,
+                'average_precision': skm.average_precision_score,
+                'brier_score_loss': skm.brier_score_loss,
+                'f1': skm.f1_score,
+                'f1_micro': skm.f1_score,
+                'f1_macro': skm.f1_score,
+                'f1_weighted': skm.f1_score,
+                'f1_samples': skm.f1_score,
+                'neg_log_loss': skm.log_loss,
+                'precision': skm.precision_score,
+                'recall': skm.recall_score,
+                'roc_auc': skm.roc_auc_score
+            } 
+            
+        else: # regression
+            
+            scoring_options = {
+                'explained_variance': skm.explained_variance_score,
+                'neg_mean_absolute_error': skm.median_absolute_error,
+                'neg_mean_squared_error': skm.mean_squared_error,
+                'neg_mean_squared_log_error': skm.mean_squared_log_error, 
+                'neg_median_absolute_error': skm.median_absolute_error,
+                'r2': skm.r2_score
+                } 
+            
+        return scoring_options[scoring](y, preds)
+
         
     # "preprocessing" methods to be inherited -----
     
@@ -332,7 +385,7 @@ class Base(object):
                                                                    scaled_X), 
                                                    W))
         
-        
+    
     def cook_training_set(self, y=None, X=None, W=None, **kwargs): 
         """ Create new data for training set, with hidden layer, center the response. """ 
         
@@ -349,13 +402,14 @@ class Base(object):
                                     with_std=True)  
             
         # center y
-        if (y is None):
-            y_mean = self.y.mean()
-            centered_y = self.y - y_mean
-        else:
-            y_mean = y.mean()
-            self.y_mean = y_mean
-            centered_y = y - y_mean
+        if (mx.is_factor(y) == False): # regression
+            if (y is None):
+                y_mean = self.y.mean()
+                centered_y = self.y - y_mean
+            else:
+                y_mean = y.mean()
+                self.y_mean = y_mean
+                centered_y = y - y_mean
             
         if (X is None):
             input_X = self.X
@@ -418,8 +472,14 @@ class Base(object):
                 Z = augmented_X
                 scaler.fit(Z)
                 self.scaler = scaler 
-
-        return centered_y, self.scaler.transform(Z) 
+                
+        if (mx.is_factor(y) == False): # regression
+            
+            return centered_y, self.scaler.transform(Z) 
+        
+        else: # classification
+            
+            return self.scaler.transform(Z) 
     
     
     def cook_test_set(self, X, **kwargs):
