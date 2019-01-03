@@ -42,7 +42,7 @@ class Base(object):
            type of clustering method: currently k-means ('kmeans') or Gaussian 
            Mixture Model ('gmm')
        seed: int 
-           reproducibility seed for nodes_sim=='uniform'
+           reproducibility seed for nodes_sim=='uniform' and for clustering
     """
         
     
@@ -222,6 +222,9 @@ class Base(object):
         
         preds = self.predict(X)
         
+        if type(preds) == tuple: # if there are std. devs in the predictions
+            preds = preds[0]    
+        
         if mx.is_factor(y): # classification
             
             scoring_options = {
@@ -249,7 +252,9 @@ class Base(object):
                 'neg_median_absolute_error': skm.median_absolute_error,
                 'r2': skm.r2_score
                 } 
-            
+        
+        print(scoring_options[scoring])
+        
         return scoring_options[scoring](y, preds)
 
         
@@ -293,6 +298,7 @@ class Base(object):
             if self.type_clust == 'kmeans':
             
                 # do kmeans + one-hot encoding
+                np.random.seed(self.seed)
                 kmeans = KMeans(n_clusters=self.n_clusters, 
                                 **kwargs)
                 kmeans.fit(scaled_X)
@@ -303,6 +309,7 @@ class Base(object):
             
             if self.type_clust == 'gmm':
                 
+                np.random.seed(self.seed)
                 gmm = GaussianMixture(n_components=self.n_clusters, 
                                       **kwargs)
                 gmm.fit(scaled_X)

@@ -171,4 +171,3 @@ class BayesianRVFL(Base):
                 
                 return (self.y_mean + pred_obj['preds'], 
                         pred_obj['preds_std']) 
-   

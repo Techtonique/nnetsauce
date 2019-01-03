@@ -60,7 +60,7 @@ class BayesianRVFL2(Base):
                  seed=123, 
                  s1=0.1, s2=0.1, sigma=0.05, 
                  beta=None, Sigma=None,
-                 return_std = True):
+                 GCV=None, return_std = True):
                 
         super().__init__(n_hidden_features = n_hidden_features, 
                          activation_name = activation_name, a = a,
@@ -75,6 +75,7 @@ class BayesianRVFL2(Base):
         self.sigma = sigma
         self.beta = beta
         self.Sigma = Sigma
+        self.GCV = GCV
         self.return_std = return_std
     
     
@@ -146,6 +147,8 @@ class BayesianRVFL2(Base):
         
         if self.return_std == True: 
             self.Sigma = fit_obj['Sigma_hat']
+            
+        self.GCV = fit_obj['GCV']
         
         return self
 
