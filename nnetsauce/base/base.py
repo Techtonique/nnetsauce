@@ -253,8 +253,6 @@ class Base(object):
                 'r2': skm.r2_score
                 } 
         
-        print(scoring_options[scoring])
-        
         return scoring_options[scoring](y, preds)
 
         

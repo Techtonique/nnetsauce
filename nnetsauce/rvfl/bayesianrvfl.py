@@ -120,6 +120,8 @@ class BayesianRVFL(Base):
         if self.return_std == True: 
             self.Sigma = fit_obj['Sigma_hat']
         
+        self.GCV = fit_obj['GCV']
+        
         return self
 
     
