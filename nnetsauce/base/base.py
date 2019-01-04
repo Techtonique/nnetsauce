@@ -12,6 +12,7 @@ from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import StandardScaler
 from ..utils import matrixops as mo
 from ..utils import misc as mx
+from ..utils import lmfuncs as lmf
 from ..simulation import nodesimulation as ns
 
 
@@ -171,16 +172,13 @@ class Base(object):
         -------
         self: object
         """
-        if mx.is_factor(y):
+        centered_y, scaled_Z = self.cook_training_set(y = y, X = X, **kwargs)
+        fit_obj = lmf.beta_Sigma_hat(X = scaled_Z, y = centered_y)
         
-            centered_y, scaled_Z = self.cook_training_set(y = y, X = X, **kwargs)
-            self.beta = la.lstsq(scaled_Z, centered_y)[0]
+        self.beta = fit_obj['beta_hat']
         
-        else:
-            
-            centered_y, scaled_Z = self.cook_training_set(y = y, X = X, **kwargs)
-            self.beta = la.lstsq(scaled_Z, centered_y)[0]
-        
+        self.GCV = fit_obj['GCV']
+                
         return self            
         
     
@@ -218,7 +216,7 @@ class Base(object):
             
         
     def score(self, X, y, scoring=None):
-        """ Score the model on covariates X and response y. """
+        """ Score the model on test set covariates X and response y. """
         
         preds = self.predict(X)
         
