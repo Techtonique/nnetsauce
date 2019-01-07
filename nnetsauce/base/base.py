@@ -6,7 +6,6 @@
 
 import numpy as np
 import sklearn.metrics as skm
-from numpy import linalg as la
 from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import StandardScaler
@@ -59,6 +58,18 @@ class Base(object):
                  n_clusters=2,
                  type_clust='kmeans',
                  seed=123):
+        
+        # input checks ----- 
+        
+        assert activation_name in ('relu', 'tanh', 'sigmoid', 'prelu', 'elu'), \
+        "'activation_name' should be in ('relu', 'tanh', 'sigmoid','prelu', 'elu')"
+        
+        assert nodes_sim in ('sobol', 'hammersley', 'uniform', 'halton'), \
+        "'nodes_sim' should be in ('sobol', 'hammersley', 'uniform', 'halton')"
+        
+        assert type_clust in ("kmeans", "gmm"), \
+        "'type_clust' should be in ('kmeans', 'gmm')"
+        
         
         # activation function -----     
         
@@ -127,9 +138,11 @@ class Base(object):
                 'y_mean': self.y_mean}
     
     
-    # setter -----    
+    # setter -----  
+    
     def set_params(self, n_hidden_features=5, 
                    activation_name='relu', 
+                   a=0.01,
                    nodes_sim='sobol',
                    bias = True,
                    direct_link=True,
@@ -137,10 +150,32 @@ class Base(object):
                    type_clust='kmeans',
                    seed=123):
         
+        # activation function -----   
+        
+        def prelu(x, a):
+            n, p = x.shape
+            y = x.copy()
+            for i in range(n):
+                for j in range(p):
+                    if x[i, j] < 0:
+                        y[i, j] = a*x[i, j]
+            return y
+            
+        def elu(x, a):
+            n, p = x.shape
+            y = x.copy()
+            for i in range(n):
+                for j in range(p):
+                    if x[i, j] < 0:
+                        y[i, j] = a*(np.exp(x[i, j]) - 1)
+            return y
+        
         activation_options = {
             'relu': lambda x: np.maximum(x, 0),
             'tanh': lambda x: np.tanh(x),
-            'sigmoid': lambda x: 1/(1+np.exp(-x))}
+            'sigmoid': lambda x: 1/(1+np.exp(-x)),
+            'prelu': lambda x: prelu(x, a = a), 
+            'elu': lambda x: elu(x, a = a)}
         
         self.n_hidden_features = n_hidden_features
         self.activation_name = activation_name
@@ -224,6 +259,18 @@ class Base(object):
             preds = preds[0]    
         
         if mx.is_factor(y): # classification
+        
+            # check inputs 
+            assert scoring in ('accuracy', 'average_precision', 
+                               'brier_score_loss', 'f1', 'f1_micro',
+                               'f1_macro', 'f1_weighted',  'f1_samples',
+                               'neg_log_loss', 'precision', 'recall',
+                               'roc_auc'), \
+                               "'activation_name' should be in ('accuracy', 'average_precision', \
+                               'brier_score_loss', 'f1', 'f1_micro', \
+                               'f1_macro', 'f1_weighted',  'f1_samples', \
+                               'neg_log_loss', 'precision', 'recall', \
+                               'roc_auc')"
             
             scoring_options = {
                 'accuracy': skm.accuracy_score,
@@ -241,6 +288,14 @@ class Base(object):
             } 
             
         else: # regression
+            
+            # check inputs 
+            assert scoring in ('explained_variance', 'neg_mean_absolute_error', 
+                               'neg_mean_squared_error', 'neg_mean_squared_log_error', 
+                               'neg_median_absolute_error', 'r2'), \
+                               "'scoring' should be in ('explained_variance', 'neg_mean_absolute_error', \
+                               'neg_mean_squared_error', 'neg_mean_squared_log_error', \
+                               'neg_median_absolute_error', 'r2')"
             
             scoring_options = {
                 'explained_variance': skm.explained_variance_score,
