@@ -126,6 +126,7 @@ class Base(object):
         
         return {'n_hidden_features': self.n_hidden_features, 
                 'activation_name': self.activation_name, 
+                'a': self.a,
                 'nodes_sim': self.nodes_sim,
                 'bias': self.bias,
                 'direct_link': self.direct_link,

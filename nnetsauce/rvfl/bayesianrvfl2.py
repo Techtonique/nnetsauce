@@ -90,6 +90,7 @@ class BayesianRVFL2(Base):
     
     def set_params(self, n_hidden_features=5, # optim
                    activation_name='relu', 
+                   a=0.01,
                    nodes_sim='sobol',
                    bias=True,
                    direct_link=True,
@@ -101,11 +102,9 @@ class BayesianRVFL2(Base):
         
         super().set_params(n_hidden_features = n_hidden_features, 
                            activation_name = activation_name, 
-                           nodes_sim = nodes_sim,
-                           bias = bias, direct_link = direct_link, 
-                           n_clusters = n_clusters, 
-                           type_clust = type_clust, 
-                           seed = seed)
+                           a = a, nodes_sim = nodes_sim, bias = bias, 
+                           direct_link = direct_link, n_clusters = n_clusters, 
+                           type_clust = type_clust, seed = seed)
         self.s1 = s1
         self.s2 = s2        
         self.sigma = sigma
