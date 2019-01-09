@@ -95,7 +95,7 @@ class Custom(Base):
  
     
     def fit(self, X, y, **kwargs):
-        """Fit training data (X, y).
+        """Fit custom model to training data (X, y).
         
         Parameters
         ----------

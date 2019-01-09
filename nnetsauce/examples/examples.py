@@ -14,6 +14,9 @@ diabetes = datasets.load_diabetes()
 X = diabetes.data 
 y = diabetes.target
 
+breast_cancer = datasets.load_breast_cancer()
+Z = breast_cancer.data
+t = breast_cancer.target
 
 ## Example 1 - Base - n_hidden_features=5 -----
 
@@ -125,6 +128,7 @@ print("\n")
 
 regr = linear_model.BayesianRidge()
 regr2 = linear_model.ElasticNet()
+regr3 = gaussian_process.GaussianProcessClassifier()
 
 # create object Base 
 fit_obj = ns.Custom(obj = regr, n_hidden_features=100, 
@@ -135,9 +139,14 @@ fit_obj2 = ns.Custom(obj = regr2, n_hidden_features=500,
                     direct_link=True, bias=False,
                     activation_name='relu', n_clusters=0)
 
+fit_obj3 = ns.Custom(obj = regr3, n_hidden_features=100, 
+                    direct_link=True, bias=True,
+                    activation_name='relu', n_clusters=0)
+
 # fit training set 
 fit_obj.fit(X[0:350,:], y[0:350])
 fit_obj2.fit(X[0:350,:], y[0:350])
+fit_obj3.fit(Z[0:455,:], t[0:455])
 
 # predict on test set 
 x = np.linspace(351, 442, num = 442-351+1)
@@ -148,6 +157,9 @@ plt.title('preds vs test set obs')
 plt.xlabel('x')
 plt.ylabel('preds')
 plt.show()
+
+
+fit_obj3.predict(Z[456:569,:])
 
 print("\n")
 print("----- Example 3: Custom ------")

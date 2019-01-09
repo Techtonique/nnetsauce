@@ -106,6 +106,24 @@ class BayesianRVFL(Base):
         
     
     def fit(self, X, y, **kwargs):
+        """Fit regularized RVFL to training data (X, y).
+        
+        Parameters
+        ----------
+        X: {array-like}, shape = [n_samples, n_features]
+            Training vectors, where n_samples is the number 
+            of samples and n_features is the number of features.
+        
+        y: array-like, shape = [n_samples]
+               Target values.
+    
+        **kwargs: additional parameters to be passed to 
+                  self.cook_training_set
+               
+        Returns
+        -------
+        self: object
+        """
         
         centered_y, scaled_Z = self.cook_training_set(y = y, X = X, **kwargs)
         
@@ -127,6 +145,21 @@ class BayesianRVFL(Base):
 
     
     def predict(self, X, **kwargs):
+        """Predict test data X.
+        
+        Parameters
+        ----------
+        X: {array-like}, shape = [n_samples, n_features]
+            Training vectors, where n_samples is the number 
+            of samples and n_features is the number of features.
+        
+        **kwargs: additional parameters to be passed to 
+                  self.cook_test_set
+               
+        Returns
+        -------
+        model predictions: {array-like}
+        """
         
         if len(X.shape) == 1: # one observation in the test set only
             n_features = X.shape[0]

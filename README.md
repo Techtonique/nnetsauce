@@ -3,7 +3,7 @@
 This package does Machine Learning by using various -- advanced -- combinations of single layer neural networks. Every model in the `nnetsauce` is based on the component $g(XW + b)$, where:
 
 - $X$ is a matrix containing the explanatory variables and (optional) clustering information about the individuals. The clustering methods available are the _k-means_ and a _Gaussian Mixture Model_; they help in taking into account data's heterogeneity
-- $W$ constructs the nodes in the hidden layer from $X$
+- $W$ derives the nodes in the hidden layer from $X$
 - $b$ is an optional bias parameter
 - $g$ is an activation function such as the hyperbolic tangent (among others), which creates new, nonlinear explanatory variables  
 
@@ -98,11 +98,13 @@ Example with `BayesianRVFL` model (one regularization parameter):
 ````
 # create object BayesianRVFL  
 # regularization is controlled by 's' and 'sigma'
-fit_obj = ns.BayesianRVFL(n_hidden_features=100, 
-                  direct_link=True,
-                  bias=False,
-                  activation_name='relu', 
-                  n_clusters=3, s=0.01, sigma=0.1)
+# here, nodes_sim='halton' is used
+fit_obj = ns.BayesianRVFL(n_hidden_features=100,
+                          nodes_sim='halton', 
+                          direct_link=True,
+                          bias=False,
+                          activation_name='relu', 
+                          n_clusters=3, s=0.01, sigma=0.1)
 
 # fit training set 
 fit_obj.fit(X[0:350,:], y[0:350])
@@ -141,7 +143,7 @@ plt.ylabel('preds')
 plt.show()
 ````
 
-Example with `Custom` models, using `scikit-learn`:
+Example of `Custom` models, using `scikit-learn`:
 
 ````
 from sklearn import linear_model, gaussian_process
@@ -227,7 +229,7 @@ fit_obj = ns.Custom(obj=regr, n_hidden_features=100,
                     direct_link=True, bias=True,
                     activation_name='tanh', n_clusters=2)
 
-fit_obj3 = ns.Custom(obj = regr3, n_hidden_features=100, 
+fit_obj3 = ns.Custom(obj=regr3, n_hidden_features=100, 
                      direct_link=True, bias=True,
                      activation_name='relu', n_clusters=0)
 

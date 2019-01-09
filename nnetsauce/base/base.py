@@ -120,7 +120,8 @@ class Base(object):
         self.beta = None
 
     
-    # getter -----    
+    # getter -----   
+    
     def get_params(self):
         
         return {'n_hidden_features': self.n_hidden_features, 
