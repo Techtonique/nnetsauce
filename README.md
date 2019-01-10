@@ -2,8 +2,8 @@
 
 This package does Machine Learning by using various -- advanced -- combinations of single layer neural networks. Every model in the `nnetsauce` is based on the component $g(XW + b)$, where:
 
-- $X$ is a matrix containing the explanatory variables and (optional) clustering information about the individuals. The clustering methods available are the _k-means_ and a _Gaussian Mixture Model_; they help in taking into account data's heterogeneity
-- $W$ derives the nodes in the hidden layer from $X$
+- $X$ is a matrix containing the explanatory variables and (optional) clustering information about the individuals. The clustering methods available are _k-means_ and a _Gaussian Mixture Model_; they help in taking into account data's heterogeneity
+- $W$ derives the nodes in the hidden layer from $X$. It can be drawn from various random and quasirandom sequences
 - $b$ is an optional bias parameter
 - $g$ is an activation function such as the hyperbolic tangent (among others), which creates new, nonlinear explanatory variables  
 
@@ -12,7 +12,7 @@ This package does Machine Learning by using various -- advanced -- combinations 
 
 - __1st method__: from Github
 
-```
+```bash
 git clone https://github.com/thierrymoudiki/nnetsauce.git
 cd nnetsauce
 python setup.py install
@@ -20,7 +20,7 @@ python setup.py install
 
 - __2nd method__: by using `pip`
 
-```
+```bash
 TODO
 ```
 
@@ -39,14 +39,14 @@ __Currently__, $4$ models are implemented in the `nnetsauce`. If your response v
 - `Base` adjusts a linear regression to $y$, as a function of $X$ (optional) and $g(XW + b)$; without regularization of the regression coefficients. 
 - `BayesianRVFL` adds a ridge regularization parameter to the regression coefficients of `Base`, which prevents overfitting. Confidence intervals around the prediction can also be obtained.  
 - `BayesianRVFL2` adds $2$ regularization parameters to `Base`. As with `BayesianRVFL`, confidence intervals around the prediction can be obtained.
-- `Custom` works with any object `fit_obj` possessing methods `fit_obj.fit()` and `fit_obj.predict()`. Notably, the model can be applied to any `scikit-learn`'s regression or classification model. It adjusts `fit_obj` to $y$, as a function of $X$ (optional) and $g(XW + b)$.
+- `Custom` works with any object `fit_obj` possessing methods `fit_obj.fit()` and `fit_obj.predict()`. Notably, the model can be applied to any [`scikit-learn`](https://scikit-learn.org)'s regression or classification model. It adjusts `fit_obj` to $y$, as a function of $X$ (optional) and $g(XW + b)$.
 
 
 ## Short demo
 
 Here, we present examples of use of `Base`, `BayesianRVFL`, `BayesianRVFL2`, and an example of `Custom` model using `scikit-learn`. We start by importing the packages and datasets necessary for the demo:
 
-````
+````python
 import nnetsauce as ns
 import numpy as np      
 import matplotlib.pyplot as plt
@@ -63,7 +63,7 @@ t = breast_cancer.target
 
 Example with `Base` model (no regularization):
 
-````
+````python
 # create object Base 
 
 # X is not used directly, but only g(XW+b) ('direct_link')
@@ -95,7 +95,7 @@ plt.show()
 
 Example with `BayesianRVFL` model (one regularization parameter):
 
-````
+````python
 # create object BayesianRVFL  
 # regularization is controlled by 's' and 'sigma'
 # here, nodes_sim='halton' is used
@@ -121,7 +121,7 @@ plt.show()
 
 Example with `BayesianRVFL2` model (two regularization parameters):
 
-````
+````python
 # create object BayesianRVFL2 
 # regularization is controlled by 's1', 's2' and 'sigma'
 fit_obj = ns.BayesianRVFL2(n_hidden_features=100, 
@@ -145,7 +145,7 @@ plt.show()
 
 Example of `Custom` models, using `scikit-learn`:
 
-````
+````python
 from sklearn import linear_model, gaussian_process
 
 regr = linear_model.BayesianRidge()
@@ -190,7 +190,7 @@ Currently, a method `score` is available for all the models in the `nnetsauce`. 
 performance on a given testing set $(X, y)$. The `scoring` options are the same 
 as `scikit-learn`'s. Using the previous code snippet, we have: 
 
-````
+````python
 # RMSE of BayesianRidge on test set (X[350:360,:], y[350:360])
 print(np.sqrt(fit_obj.score(X[350:360,:], y[350:360], 
         scoring="neg_mean_squared_error")))
@@ -206,7 +206,7 @@ print(fit_obj3.score(Z[456:569,:], t[456:569], scoring="accuracy"))
 For `BayesianRVFL` and `BayesianRVFL2` we also have the Generalized Cross-Validation (GCV) 
 error calculated right after the model is fitted:
 
-````
+````python
 fit_obj = ns.BayesianRVFL2(n_hidden_features=100, 
                   direct_link=True,
                   activation_name='tanh', 
@@ -220,7 +220,7 @@ print(fit_obj.GCV)
 
 For `Custom`, in addition to the method `score`, we have a cross-validation method `cross_val_score` similar to `scikit-learn` 's `cross_val_score`: 
 
-````
+````python
 regr = linear_model.BayesianRidge()
 regr3 = gaussian_process.GaussianProcessClassifier()
 
