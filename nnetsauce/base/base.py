@@ -268,7 +268,7 @@ class Base(object):
                                'f1_macro', 'f1_weighted',  'f1_samples',
                                'neg_log_loss', 'precision', 'recall',
                                'roc_auc'), \
-                               "'activation_name' should be in ('accuracy', 'average_precision', \
+                               "'scoring' should be in ('accuracy', 'average_precision', \
                                'brier_score_loss', 'f1', 'f1_micro', \
                                'f1_macro', 'f1_weighted',  'f1_samples', \
                                'neg_log_loss', 'precision', 'recall', \
