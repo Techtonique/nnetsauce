@@ -23,3 +23,6 @@ def is_factor(y):
                           range(n)))) == n) 
     
     return cond0 or cond1 or cond2 or cond3
+
+# flatten list of lists
+flatten = lambda l: [item for sublist in l for item in sublist]
