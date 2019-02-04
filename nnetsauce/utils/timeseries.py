@@ -4,11 +4,7 @@
 #
 # License: MIT
 
-
 import numpy as np
-from functools import reduce
-from ..utils import misc as mx
-
 
 # create inputs for training from MTS (envisage other regressors in X)
 # X in decreasing order (!)   
@@ -16,21 +12,20 @@ from ..utils import misc as mx
 # create_train_inputs(a, 2)
 def create_train_inputs(X, k):
 
-    n = X.shape[0]
-    n_k = n - k 
+    n_k = X.shape[0] - k 
     
     z = [X[i:n_k+i, :] for i in range(1, (k+1))]
     
     return (X[0:n_k, :], 
-            reduce(lambda x, y: np.column_stack((x, y)), z))
-    
+            np.column_stack(z))    
+
 
 # reformat response in prediction loop
+# a = np.reshape(range(0, 24), (8, 3))
+# reformat_response(a, 2)
 def reformat_response(X, k):
     
-    return mx.flatten(list(map(lambda i: X[i,:], 
-                   range(k))))
-
+    return np.concatenate([X[i,:] for i in range(k)])
     
 # create k lags for series x 
 #def create_lags(x, k):
