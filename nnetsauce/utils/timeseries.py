@@ -12,13 +12,14 @@ from ..utils import misc as mx
 
 # create inputs for training from MTS (envisage other regressors in X)
 # X in decreasing order (!)   
+# a = np.reshape(range(0, 24), (8, 3))
+# create_train_inputs(a, 2)
 def create_train_inputs(X, k):
 
     n = X.shape[0]
     n_k = n - k 
     
-    z = list(map(lambda i: X[i:n_k+i, :], 
-                 range(1, (k+1))))
+    z = [X[i:n_k+i, :] for i in range(1, (k+1))]
     
     return (X[0:n_k, :], 
             reduce(lambda x, y: np.column_stack((x, y)), z))
