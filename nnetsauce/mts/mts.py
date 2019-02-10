@@ -5,14 +5,12 @@
 # License: MIT
 
 import numpy as np
-import sklearn.model_selection as skm
-from ..base import Base
-from ..utils import matrixops as mo
+from ..custom import Custom
 from ..utils import misc as mx
 from ..utils import timeseries as ts
 
 
-class MTS(Base):
+class MTS(Custom):
     """MTS model class derived from class Base
     
        Parameters
@@ -50,7 +48,7 @@ class MTS(Base):
     """
     
     # construct the object -----
-    
+        
     def __init__(self, obj,
                  n_hidden_features=5, 
                  activation_name='relu',
@@ -63,7 +61,7 @@ class MTS(Base):
                  seed=123, 
                  lags = 1): 
                 
-        super().__init__(n_hidden_features = n_hidden_features, 
+        super().__init__(obj, n_hidden_features = n_hidden_features, 
                          activation_name = activation_name, a = a,
                          nodes_sim = nodes_sim, bias = bias, 
                          direct_link = direct_link,
@@ -71,7 +69,6 @@ class MTS(Base):
                          type_clust = type_clust, 
                          seed = seed)
         
-        self.obj = obj
         self.lags = lags
         self.fit_objs = {}
 
@@ -124,19 +121,14 @@ class MTS(Base):
         assert np.int(lags) == lags, "parameter 'lags' should be an integer"
 
         n, p = X.shape
-        y = np.repeat(1, n)
         
-        scaled_Z = self.cook_training_set(y = y, X = X, 
-                                          **kwargs)
+        mts_input = ts.create_train_inputs(X, lags)
         
-        # create lags
-        mts_input = ts.create_train_inputs(scaled_Z, lags)
+        mts_input_y = mts_input[0]
         
-        mts_input_Z = mts_input[0]
+        mts_input_X = mts_input[1]
         
-        mts_input_y = mts_input[1]
-                
-        self.fit_objs = {i: self.obj.fit(mts_input_Z, 
+        self.fit_objs = {i: super(MTS, self).fit(mts_input_X, 
                          mts_input_y[:, i], **kwargs) for i in range(p)}
         
         return self

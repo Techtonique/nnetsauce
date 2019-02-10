@@ -429,3 +429,10 @@ plt.title('preds vs test set obs')
 plt.xlabel('x')
 plt.ylabel('preds')
 plt.show()
+
+## Example 6 - MTS -----
+
+X = np.random.rand(10, 2)
+regr4 = gaussian_process.GaussianProcessRegressor()
+obj_MTS = ns.MTS(regr4)
+obj_MTS.fit(X)
