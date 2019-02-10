@@ -1,5 +1,11 @@
 """Random Vector Functional Link Network regression."""
 
+# add type_scaling
+# add type_scaling
+# add type_scaling
+# add type_scaling
+# add type_scaling
+
 # Authors: Thierry Moudiki <thierry.moudiki@gmail.com>
 #
 # License: MIT
@@ -8,7 +14,7 @@ import numpy as np
 import sklearn.metrics as skm
 from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 from ..utils import lmfuncs as lmf
@@ -41,6 +47,9 @@ class Base(object):
        type_clust: str
            type of clustering method: currently k-means ('kmeans') or Gaussian 
            Mixture Model ('gmm')
+       type_scaling: str
+           type of scaling for inputs: currently standardization ('std') or 
+           MinMax scaling ('minmax')
        seed: int 
            reproducibility seed for nodes_sim=='uniform' and for clustering
     """
@@ -57,6 +66,7 @@ class Base(object):
                  direct_link=True,
                  n_clusters=2,
                  type_clust='kmeans',
+                 type_scaling = 'std',
                  seed=123):
         
         # input checks ----- 
@@ -451,12 +461,21 @@ class Base(object):
         
         # either X and y are stored or not 
         #assert ((y is None) & (X is None)) | ((y is not None) & (X is not None))
+        
+        scaling_options = {
+            'std': StandardScaler(copy=True, 
+                                        with_mean=True, 
+                                        with_std=True),
+            'minmax': MinMaxScaler()
+            } 
 
-        if self.n_hidden_features > 0: # has a hidden layer           
+        if self.n_hidden_features > 0: # has a hidden layer  
+            # search in 'scaling options' hash
             nn_scaler = StandardScaler(copy=True, 
                                         with_mean=True, 
                                         with_std=True)
-            
+        
+        # search in 'scaling options' hash
         scaler = StandardScaler(copy=True, 
                                     with_mean=True, 
                                     with_std=True)  

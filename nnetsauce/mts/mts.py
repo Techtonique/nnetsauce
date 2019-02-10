@@ -43,8 +43,10 @@ class MTS(Base):
            Mixture Model ('gmm')
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
-       type_fit: str
-           'regression' or 'classification'
+       lags: int
+           number of lags for the time series 
+       fit_objs: dict
+           a dictionary containing objects fitted with obj, one for each time series
     """
     
     # construct the object -----
@@ -58,7 +60,8 @@ class MTS(Base):
                  direct_link=True, 
                  n_clusters=2,
                  type_clust='kmeans',
-                 seed=123): 
+                 seed=123, 
+                 lags = 1): 
                 
         super().__init__(n_hidden_features = n_hidden_features, 
                          activation_name = activation_name, a = a,
@@ -69,13 +72,14 @@ class MTS(Base):
                          seed = seed)
         
         self.obj = obj
-        self.response = None
-        self.lags = None
+        self.lags = lags
+        self.fit_objs = {}
 
 
     def get_params(self):
         
-        return super().get_params()
+        return mx.merge_two_dicts(super().get_params(), 
+                                  {'lags': self.lags})
 
     
     def set_params(self, n_hidden_features=5, 
@@ -86,16 +90,17 @@ class MTS(Base):
                    direct_link=True,
                    n_clusters=None,
                    type_clust='kmeans',
-                   seed=123):
+                   seed=123, 
+                   lags = 1):
         
         super().set_params(n_hidden_features = n_hidden_features, 
                            activation_name = activation_name, a = a,
                            nodes_sim = nodes_sim, bias = bias, 
                            direct_link = direct_link, n_clusters = n_clusters, 
-                           type_clust = type_clust, seed = seed)
+                           type_clust = type_clust, seed = seed, lags = lags)
  
     
-    def fit(self, X, **kwargs):
+    def fit(self, X, lags = 1, **kwargs):
         """Fit MTS model to training data (X, y).
         
         Parameters
@@ -103,6 +108,7 @@ class MTS(Base):
         X: {array-like}, shape = [n_samples, n_features]
             Training vectors, where n_samples is the number 
             of samples and n_features is the number of features.
+            X must be in decreasing order (most recent observations first)
         
         y: array-like, shape = [n_samples]
                Target values.
@@ -115,10 +121,23 @@ class MTS(Base):
         self: object
         """
         
+        assert np.int(lags) == lags, "parameter 'lags' should be an integer"
+
+        n, p = X.shape
+        y = np.repeat(1, n)
+        
         scaled_Z = self.cook_training_set(y = y, X = X, 
                                           **kwargs)
         
-        self.obj.fit(scaled_Z, y, **kwargs)
+        # create lags
+        mts_input = ts.create_train_inputs(scaled_Z, lags)
+        
+        mts_input_Z = mts_input[0]
+        
+        mts_input_y = mts_input[1]
+                
+        self.fit_objs = {i: self.obj.fit(mts_input_Z, 
+                         mts_input_y[:, i], **kwargs) for i in range(p)}
         
         return self
 
@@ -138,24 +157,20 @@ class MTS(Base):
         -------
         model predictions for a horizon = h: {array-like}
         """
+        return 0 
         
-        if len(X.shape) == 1:
+#        if len(X.shape) == 1:
             
-            n_features = X.shape[0]
-            new_X = mo.rbind(X.reshape(1, n_features), 
-                             np.ones(n_features).reshape(1, n_features))        
-            
-            if self.type_fit == "regression":
+#            n_features = X.shape[0]
+#            new_X = mo.rbind(X.reshape(1, n_features), 
+#                             np.ones(n_features).reshape(1, n_features))        
+#            
+#            return (self.y_mean + self.obj.predict(self.cook_test_set(new_X, **kwargs), 
+#                                                   **kwargs))[0]
                 
-                return (self.y_mean + self.obj.predict(self.cook_test_set(new_X, 
-                                                                             **kwargs), 
-                                                   **kwargs))[0]
-                
-        else:
+#        else:
             
-            if self.type_fit == "regression":
-            
-                return self.y_mean + self.obj.predict(self.cook_test_set(X, 
-                                                                        **kwargs), 
-                                               **kwargs)         
+#                return self.y_mean + self.obj.predict(self.cook_test_set(X, 
+#                                                                        **kwargs), 
+#                                               **kwargs)         
         

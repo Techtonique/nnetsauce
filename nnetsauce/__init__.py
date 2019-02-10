@@ -1,12 +1,11 @@
 from .base import Base 
 from .custom import Custom
+from .mts import MTS
 from .rvfl.bayesianrvfl import BayesianRVFL
 from .rvfl.bayesianrvfl2 import BayesianRVFL2 
 
 
-__all__=["Base", "BayesianRVFL", "BayesianRVFL2", "Custom"]
-
-
+__all__=["Base", "BayesianRVFL", "BayesianRVFL2", "Custom", "MTS"]
 
 
 #from . import base

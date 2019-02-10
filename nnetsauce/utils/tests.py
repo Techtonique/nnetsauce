@@ -2,7 +2,8 @@ import numpy as np
 import psdcheck as psdx
 import matrixops as mo
 import misc as mx
-import lmfuncs as lmf 
+import lmfuncs as lmf
+import timeseries as ts 
 from sklearn import datasets
 import matplotlib.pyplot as plt  
 
@@ -269,3 +270,10 @@ plt.title('fits vs obs')
 plt.xlabel('x')
 plt.ylabel('fits')
 plt.show()
+
+# 6 - time series -----
+
+X = np.random.rand(10, 2)
+print(X)
+print(ts.create_train_inputs(X, 2))
+print(ts.reformat_response(X, 2))
