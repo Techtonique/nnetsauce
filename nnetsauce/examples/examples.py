@@ -434,5 +434,5 @@ plt.show()
 
 X = np.random.rand(10, 2)
 regr4 = gaussian_process.GaussianProcessRegressor()
-obj_MTS = ns.MTS(regr4)
+obj_MTS = ns.MTS(regr4, lags = 2)
 obj_MTS.fit(X)
