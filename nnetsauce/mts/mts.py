@@ -4,15 +4,27 @@
 #
 # License: MIT
 
+# case with confidence intervals on predictions for obj (ex. Gaussian process)
+# case with confidence intervals on predictions for obj (ex. Gaussian process)
+# case with confidence intervals on predictions for obj (ex. Gaussian process)
+# case with confidence intervals on predictions for obj (ex. Gaussian process)
+# case with confidence intervals on predictions for obj (ex. Gaussian process)
+
+# PCA 
+# PCA 
+# PCA 
+# PCA 
+# PCA 
+
 import numpy as np
-from ..custom import Custom
+from ..base import Base
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 from ..utils import timeseries as ts
 
 
-class MTS(Custom):
-    """MTS model class derived from class Custom
+class MTS(Base):
+    """MTS model class derived from class Base
     
        Parameters
        ----------
@@ -50,21 +62,16 @@ class MTS(Custom):
     
     # construct the object -----
         
-    def __init__(self, obj,
-                 n_hidden_features=5, 
-                 activation_name='relu',
-                 a=0.01,
-                 nodes_sim='sobol',
-                 bias=True,
-                 direct_link=True, 
-                 n_clusters=2,
-                 type_clust='kmeans',
-                 seed=123, 
-                 lags = 1): 
-
+    def __init__(self, obj, n_hidden_features=5, 
+                 activation_name='relu', a=0.01,
+                 nodes_sim='sobol', bias=True,
+                 direct_link=True, n_clusters=2,
+                 type_clust='kmeans', seed=123, 
+                 lags = 1):
+        
         assert np.int(lags) == lags, "parameter 'lags' should be an integer"        
         
-        super().__init__(obj = obj, n_hidden_features = n_hidden_features, 
+        super().__init__(n_hidden_features = n_hidden_features, 
                          activation_name = activation_name, a = a,
                          nodes_sim = nodes_sim, bias = bias, 
                          direct_link = direct_link,
@@ -72,35 +79,37 @@ class MTS(Custom):
                          type_clust = type_clust, 
                          seed = seed)
         
+        self.obj = obj
+        self.n_series = None
         self.lags = lags
         self.fit_objs = {}
-        self.y = None # MTS responses 
+        self.y = None # MTS responses (most recent observations first)
         self.X = None # MTS lags
         self.y_means = []
+        self.preds = None
+        self.preds_std = []
 
 
     def get_params(self):
         
         return mx.merge_two_dicts(super().get_params(), 
-                                  {'lags': self.lags})
+                                  {'n_series': self.n_series, 
+                                   'lags': self.lags})
 
     
     def set_params(self, n_hidden_features=5, 
-                   activation_name='relu', 
-                   a=0.01,
-                   nodes_sim='sobol',
-                   bias=True,
-                   direct_link=True,
-                   n_clusters=None,
-                   type_clust='kmeans',
-                   seed=123, 
+                   activation_name='relu', a=0.01,
+                   nodes_sim='sobol', bias=True,
+                   direct_link=True, n_clusters=None,
+                   type_clust='kmeans', seed=123, 
                    lags = 1):
         
         super().set_params(n_hidden_features = n_hidden_features, 
                            activation_name = activation_name, a = a,
                            nodes_sim = nodes_sim, bias = bias, 
                            direct_link = direct_link, n_clusters = n_clusters, 
-                           type_clust = type_clust, seed = seed, lags = lags)
+                           type_clust = type_clust, seed = seed)
+        self.lags = lags
  
     
     def fit(self, X, **kwargs):
@@ -113,9 +122,6 @@ class MTS(Custom):
             of samples and n_features is the number of features.
             X must be in decreasing order (most recent observations first)
         
-        lag: int
-               Number of lags for the MTS.
-    
         **kwargs: additional parameters to be passed to 
                   self.cook_training_set
                
@@ -123,7 +129,16 @@ class MTS(Custom):
         -------
         self: object
         """
+        
+        self.y = None
+        
+        self.X = None
+        
         n, p = X.shape
+        
+        self.n_series = p
+        
+        self.y_means = np.zeros(p)
         
         mts_input = ts.create_train_inputs(X, self.lags)
         
@@ -131,13 +146,17 @@ class MTS(Custom):
         
         self.X = mts_input[1]
         
-        # calling fit method from class Custom
+        # avoids scaling X two times in the loop
+        scaled_Z = self.cook_training_set(y = np.repeat(1, self.n_series), 
+                                          X = self.X, **kwargs)
+        
+        # loop on all the time series and adjust self.obj.fit
         for i in range(p):
-            print(i)
-            print(self.y[:, i])
-            centered_y, scaled_Z = self.cook_training_set(y = self.y[:, i], 
-                                                          X = self.X, **kwargs)
-            self.y_means.append(self.y_mean)
+            y = self.y[:,i]
+            y_mean = np.mean(y)
+            self.y_mean = y_mean
+            centered_y = y - y_mean
+            self.y_means[i] = y_mean
             self.y_mean = None
             self.fit_objs[i] = self.obj.fit(scaled_Z, centered_y, **kwargs)
         
@@ -157,34 +176,57 @@ class MTS(Custom):
                
         Returns
         -------
-        model predictions for a horizon = h: {array-like}
+        model predictions for horizon = h: {array-like}
         """
+        
+        self.preds = None
+        
+        self.preds = self.y
+        
+        n_features = self.n_series*self.lags
+        
+        self.preds_std = np.zeros(h)
+        
+        # change this: put loop inside of if
+        # change this: put loop inside of if
+        # change this: put loop inside of if
+        # change this: put loop inside of if
+        # change this: put loop inside of if
         
         for i in range(h):
         
-            newx = ts.reformat_response(self.y, self.lags)
-                    
-            n_features = len(newx)
-            new_X = mo.rbind(newx.reshape(1, n_features), 
+            new_obs = ts.reformat_response(self.preds, self.lags)
+            
+            new_X = mo.rbind(new_obs.reshape(1, n_features), 
                              np.ones(n_features).reshape(1, n_features))        
                 
             cooked_new_X = self.cook_test_set(new_X, **kwargs)
             
             predicted_cooked_new_X = self.obj.predict(cooked_new_X, 
-                                                   **kwargs)
+                                                      **kwargs)
             
-            preds = np.array([(self.y_means[j] + predicted_cooked_new_X)[0] for j in range(self.y.shape[1])])
-    
-            print(preds)
-            
-            print(self.y)
-            
-            print(preds.shape)
-            
-            print(self.y.shape)
+            if isinstance(predicted_cooked_new_X, tuple) == False: # the std. dev. is returned
+                
+                preds = np.array([(self.y_means[j] + predicted_cooked_new_X[0]) for j in range(self.n_series)])
+                
+                self.preds = np.row_stack((preds, self.preds))
+                
+            else:
+                
+                preds = np.array([(self.y_means[j] + predicted_cooked_new_X[0][0]) for j in range(self.n_series)])
+                
+                self.preds = np.row_stack((preds, self.preds))
+                
+                self.preds_std[i] = predicted_cooked_new_X[1][0]
         
-            self.y = np.row_stack((preds, self.y))
+        res_preds = self.preds[0:h,:]
         
-        return(self.y)
+        if isinstance(predicted_cooked_new_X, tuple) == False: # the std. dev. is returned
+            return(res_preds)
+        else:
+            return(res_preds, 
+                   res_preds - self.preds_std.reshape(h, 1), 
+                   res_preds + self.preds_std.reshape(h, 1))
+            
                 
         

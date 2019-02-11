@@ -432,7 +432,13 @@ plt.show()
 
 ## Example 6 - MTS -----
 
-X = np.random.rand(10, 2)
+from sklearn import datasets, linear_model, gaussian_process
+import matplotlib.pyplot as plt  
+import numpy as np 
+
+X = np.random.rand(10, 3)
 regr4 = gaussian_process.GaussianProcessRegressor()
-obj_MTS = ns.MTS(regr4, lags = 2)
+obj_MTS = ns.MTS(regr4, lags = 1)
 obj_MTS.fit(X)
+print(obj_MTS.predict())
+print(obj_MTS.predict(return_std = True))
