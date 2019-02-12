@@ -4,17 +4,40 @@
 #
 # License: MIT
 
-# case with confidence intervals on predictions for obj (ex. Gaussian process)
-# case with confidence intervals on predictions for obj (ex. Gaussian process)
-# case with confidence intervals on predictions for obj (ex. Gaussian process)
-# case with confidence intervals on predictions for obj (ex. Gaussian process)
-# case with confidence intervals on predictions for obj (ex. Gaussian process)
+# use X[::-1]
+# use X[::-1]
+# use X[::-1]
+# use X[::-1]
+# use X[::-1]
 
 # PCA 
 # PCA 
 # PCA 
 # PCA 
 # PCA 
+
+# for additional (deterministic) regressors, 
+# modify the reformatting function
+# for additional (deterministic) regressors, 
+# modify the reformatting function
+# for additional (deterministic) regressors, 
+# modify the reformatting function
+# for additional (deterministic) regressors, 
+# modify the reformatting function
+# for additional (deterministic) regressors, 
+# modify the reformatting function
+
+# c.i. + simulations with obj having uniform hidden
+# c.i. + simulations with obj having uniform hidden
+# c.i. + simulations with obj having uniform hidden
+# c.i. + simulations with obj having uniform hidden
+# c.i. + simulations with obj having uniform hidden
+
+# ts objects with rpy2
+# ts objects with rpy2
+# ts objects with rpy2
+# ts objects with rpy2
+# ts objects with rpy2
 
 import numpy as np
 from ..base import Base
@@ -146,7 +169,7 @@ class MTS(Base):
         
         self.X = mts_input[1]
         
-        # avoids scaling X two times in the loop
+        # avoids scaling X p times in the loop
         scaled_Z = self.cook_training_set(y = np.repeat(1, self.n_series), 
                                           X = self.X, **kwargs)
         
@@ -163,13 +186,17 @@ class MTS(Base):
         return self
 
     
-    def predict(self, h = 5, **kwargs):
+    def predict(self, h = 5, level = 95, **kwargs):
         """Predict on horizon h.
         
         Parameters
         ----------
         h: {integer}
             Forecasting horizon
+        
+        level: {integer}
+            Level of confidence (if obj has option 'return_std' and the 
+            posterior is gaussian)
         
         **kwargs: additional parameters to be passed to 
                   self.cook_test_set
@@ -209,13 +236,13 @@ class MTS(Base):
                 
                 preds = np.array([(self.y_means[j] + predicted_cooked_new_X[0]) for j in range(self.n_series)])
                 
-                self.preds = np.row_stack((preds, self.preds))
+                self.preds = mo.rbind(preds, self.preds)
                 
             else:
                 
                 preds = np.array([(self.y_means[j] + predicted_cooked_new_X[0][0]) for j in range(self.n_series)])
                 
-                self.preds = np.row_stack((preds, self.preds))
+                self.preds = mo.rbind(preds, self.preds)
                 
                 self.preds_std[i] = predicted_cooked_new_X[1][0]
         
@@ -225,6 +252,7 @@ class MTS(Base):
             return(res_preds)
         else:
             return(res_preds, 
+                   self.preds_std,
                    res_preds - self.preds_std.reshape(h, 1), 
                    res_preds + self.preds_std.reshape(h, 1))
             

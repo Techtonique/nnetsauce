@@ -436,9 +436,36 @@ from sklearn import datasets, linear_model, gaussian_process
 import matplotlib.pyplot as plt  
 import numpy as np 
 
-X = np.random.rand(10, 3)
+X = np.random.rand(10, 4)
 regr4 = gaussian_process.GaussianProcessRegressor()
-obj_MTS = ns.MTS(regr4, lags = 1)
+obj_MTS = ns.MTS(regr4, lags = 1, n_hidden_features=5, 
+                 bias = False)
 obj_MTS.fit(X)
 print(obj_MTS.predict())
 print(obj_MTS.predict(return_std = True))
+
+regr5 = linear_model.BayesianRidge()
+obj_MTS2 = ns.MTS(regr5, lags = 1, n_hidden_features=7, 
+                 bias = True)
+obj_MTS2.fit(X)
+print(obj_MTS2.predict())
+print(obj_MTS2.predict(return_std = True))
+
+
+# change: return_std = True must be in method predict
+# change: return_std = True must be in method predict
+# change: return_std = True must be in method predict
+# change: return_std = True must be in method predict
+# change: return_std = True must be in method predict
+regr6 = ns.BayesianRVFL()
+obj_MTS3 = ns.MTS(regr6, lags = 1, n_hidden_features=3, 
+                 bias = True)
+obj_MTS3.fit(X)
+print(obj_MTS3.predict())
+print(obj_MTS3.predict(return_std = True))
+
+regr7 = ns.BayesianRVFL2()
+obj_MTS3 = ns.MTS(regr7, lags = 1)
+obj_MTS3.fit(X)
+print(obj_MTS3.predict())
+print(obj_MTS3.predict(return_std = True))
