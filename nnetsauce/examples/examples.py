@@ -430,6 +430,40 @@ plt.xlabel('x')
 plt.ylabel('preds')
 plt.show()
 
+
+# stacking layers - TODO - create function (?)
+# stacking layers - TODO - create function (?)
+# stacking layers - TODO - create function (?)
+# stacking layers - TODO - create function (?)
+# stacking layers - TODO - create function (?)
+# how to, with cross_val_score
+# how to, with cross_val_score
+# how to, with cross_val_score
+# how to, with cross_val_score
+# how to, with cross_val_score
+
+layer1_regr = linear_model.BayesianRidge()
+
+layer1_regr.fit(X, y)
+
+layer2_regr = ns.Custom(obj = layer1_regr, n_hidden_features=3, 
+                        direct_link=True, bias=True,
+                        activation_name='tanh', n_clusters=2)
+layer2_regr.fit(X, y)
+layer2_regr.predict(X)
+
+layer3_regr = ns.Custom(obj = layer2_regr, n_hidden_features=5, 
+                        direct_link=True, bias=True,
+                        activation_name='relu', n_clusters=3)
+layer3_regr.fit(X, y)
+layer3_regr.predict(X)
+
+# make sure that the same X and y are passed through the stack of calls
+# make sure that the same X and y are passed through the stack of calls
+# make sure that the same X and y are passed through the stack of calls
+# make sure that the same X and y are passed through the stack of calls
+# make sure that the same X and y are passed through the stack of calls
+
 ## Example 6 - MTS -----
 
 from sklearn import datasets, linear_model, gaussian_process

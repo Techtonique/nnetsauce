@@ -111,6 +111,7 @@ class Base(object):
         
         self.n_hidden_features = n_hidden_features
         self.activation_name = activation_name
+        self.a = a
         self.activation_func = activation_options[activation_name]
         self.nodes_sim = nodes_sim
         self.bias = bias
