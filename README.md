@@ -1,6 +1,6 @@
 # nnetsauce 
 
-This package does Machine Learning by using various -- advanced -- combinations of single layer neural networks. 
+This package does Machine Learning by using various -- advanced -- combinations of single layer 'neural' networks. 
 
 
 ## Installation 
