@@ -252,4 +252,4 @@ print(fit_obj3.cross_val_score(Z, t, cv = 5))
 
 ## License
 
-[BSD 3-Clause](LICENSE) © Thierry Moudiki, 2019. 
+[BSD 3-Clause](LICENSE.txt) © Thierry Moudiki, 2019. 
