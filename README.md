@@ -249,6 +249,9 @@ print(fit_obj3.cross_val_score(Z, t, cv = 5))
 - Jones E, Oliphant E, Peterson P, et al. SciPy: Open Source Scientific Tools for Python, 2001-, http://www.scipy.org/ [Online; accessed 2019-01-04]
 - Scikit-learn: Machine Learning in Python, Pedregosa et al., JMLR 12, pp. 2825-2830, 2011.
 
+## Contributing
+
+Please refer to the [Code of Conduct](CONTRIBUTING.md)
 
 ## License
 
