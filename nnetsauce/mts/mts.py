@@ -1,20 +1,9 @@
 """MTS model"""
 
-# Authors: Thierry Moudiki <thierry.moudiki@gmail.com>
+# Authors: Thierry Moudiki
 #
-# License: MIT
+# License: BSD 3
 
-# use X[::-1]
-# use X[::-1]
-# use X[::-1]
-# use X[::-1]
-# use X[::-1]
-
-# PCA 
-# PCA 
-# PCA 
-# PCA 
-# PCA 
 
 # for additional (deterministic) regressors, 
 # modify the reformatting function
@@ -26,6 +15,12 @@
 # modify the reformatting function
 # for additional (deterministic) regressors, 
 # modify the reformatting function
+
+# change: return_std = True must be in method predict
+# change: return_std = True must be in method predict
+# change: return_std = True must be in method predict
+# change: return_std = True must be in method predict
+# change: return_std = True must be in method predict
 
 # c.i. + simulations with obj having uniform hidden
 # c.i. + simulations with obj having uniform hidden
@@ -143,7 +138,7 @@ class MTS(Base):
         X: {array-like}, shape = [n_samples, n_features]
             Training time series, where n_samples is the number 
             of samples and n_features is the number of features.
-            X must be in decreasing order (most recent observations first)
+            X must be in increasing order (most recent observations last)
         
         **kwargs: additional parameters to be passed to 
                   self.cook_training_set
@@ -163,7 +158,7 @@ class MTS(Base):
         
         self.y_means = np.zeros(p)
         
-        mts_input = ts.create_train_inputs(X, self.lags)
+        mts_input = ts.create_train_inputs(X[::-1], self.lags)
         
         self.y = mts_input[0]
         
@@ -175,13 +170,11 @@ class MTS(Base):
         
         # loop on all the time series and adjust self.obj.fit
         for i in range(p):
-            y = self.y[:,i]
-            y_mean = np.mean(y)
-            self.y_mean = y_mean
-            centered_y = y - y_mean
+            y_mean = np.mean(self.y[:,i])
             self.y_means[i] = y_mean
-            self.y_mean = None
-            self.fit_objs[i] = self.obj.fit(scaled_Z, centered_y, **kwargs)
+            self.fit_objs[i] = self.obj.fit(scaled_Z, self.y[:,i] - y_mean, **kwargs)
+        
+        self.y_mean = None
         
         return self
 
@@ -214,12 +207,6 @@ class MTS(Base):
         
         self.preds_std = np.zeros(h)
         
-        # change this: put loop inside of if
-        # change this: put loop inside of if
-        # change this: put loop inside of if
-        # change this: put loop inside of if
-        # change this: put loop inside of if
-        
         for i in range(h):
         
             new_obs = ts.reformat_response(self.preds, self.lags)
@@ -232,29 +219,36 @@ class MTS(Base):
             predicted_cooked_new_X = self.obj.predict(cooked_new_X, 
                                                       **kwargs)
             
-            if isinstance(predicted_cooked_new_X, tuple) == False: # the std. dev. is returned
+            if isinstance(predicted_cooked_new_X, tuple) == False: # std. dev. is returned
                 
                 preds = np.array([(self.y_means[j] + predicted_cooked_new_X[0]) for j in range(self.n_series)])
                 
                 self.preds = mo.rbind(preds, self.preds)
                 
-            else:
+            else: # std. dev. is not returned
                 
                 preds = np.array([(self.y_means[j] + predicted_cooked_new_X[0][0]) for j in range(self.n_series)])
                 
                 self.preds = mo.rbind(preds, self.preds)
                 
-                self.preds_std[i] = predicted_cooked_new_X[1][0]
+                self.preds_std[i] = predicted_cooked_new_X[1][0]        
         
-        res_preds = self.preds[0:h,:]
+        # function's return
+        
+        self.preds = self.preds[0:h,:][::-1]
         
         if isinstance(predicted_cooked_new_X, tuple) == False: # the std. dev. is returned
-            return(res_preds)
+
+            return(self.preds)
+            
         else:
-            return(res_preds, 
+            
+            self.preds_std = self.preds_std[::-1].reshape(h, 1)
+            
+            return(self.preds, 
                    self.preds_std,
-                   res_preds - self.preds_std.reshape(h, 1), 
-                   res_preds + self.preds_std.reshape(h, 1))
+                   self.preds - self.preds_std, 
+                   self.preds + self.preds_std)
             
                 
         
