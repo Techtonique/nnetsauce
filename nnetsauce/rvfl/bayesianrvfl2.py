@@ -34,6 +34,9 @@ class BayesianRVFL2(Base):
            number of clusters for 'kmeans' or 'gmm' clustering (could be 0: no clustering)
        type_clust: str
            type of clustering method: currently k-means ('kmeans') or Gaussian Mixture Model ('gmm')
+       type_scaling: a tuple of 2 strings
+           scaling methods for inputs and hidden layen respectively. Currently  
+           available: standardization ('std') or MinMax scaling ('minmax')   
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
        s1: float
@@ -59,6 +62,7 @@ class BayesianRVFL2(Base):
                  direct_link=True, 
                  n_clusters=2,
                  type_clust='kmeans',
+                 type_scaling = ('std', 'std'),
                  seed=123, 
                  s1=0.1, s2=0.1, sigma=0.05, 
                  beta=None, Sigma=None,
@@ -70,6 +74,7 @@ class BayesianRVFL2(Base):
                          bias = bias, direct_link = direct_link,
                          n_clusters = n_clusters, 
                          type_clust = type_clust, 
+                         type_scaling = type_scaling,
                          seed = seed)
         
         self.s1 = s1 
@@ -98,6 +103,7 @@ class BayesianRVFL2(Base):
                    direct_link=True,
                    n_clusters=None, # optim
                    type_clust='kmeans',
+                   type_scaling = ('std', 'std'),
                    seed=123, 
                    s1=0.1, s2=0.1, sigma=0.05, # optim
                    return_std = True):
@@ -105,8 +111,9 @@ class BayesianRVFL2(Base):
         super().set_params(n_hidden_features = n_hidden_features, 
                            activation_name = activation_name, 
                            a = a, nodes_sim = nodes_sim, bias = bias, 
-                           direct_link = direct_link, n_clusters = n_clusters, 
-                           type_clust = type_clust, seed = seed)
+                           direct_link = direct_link, n_clusters = n_clusters,
+                           type_clust = type_clust, type_scaling = type_scaling, 
+                           seed = seed)
         self.s1 = s1
         self.s2 = s2        
         self.sigma = sigma

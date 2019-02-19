@@ -34,12 +34,26 @@ fit_obj2 = ns.Base(n_hidden_features=5,
 fit_obj3 = ns.Base(n_hidden_features=5, 
                    direct_link=True,
                    activation_name='tanh', 
-                   n_clusters=3)    
+                   n_clusters=3)
+
+fit_obj4 = ns.Base(n_hidden_features=5, 
+                   direct_link=True,
+                   activation_name='tanh', 
+                   n_clusters=3, 
+                   type_scaling = ("minmax", "std"))
+
+fit_obj5 = ns.Base(n_hidden_features=5, 
+                   direct_link=True,
+                   activation_name='tanh', 
+                   n_clusters=3, 
+                   type_scaling = ("std", "minmax"))
 
 # fit training set 
 fit_obj.fit(X[0:350,:], y[0:350])
 fit_obj2.fit(X[0:350,:], y[0:350])
 fit_obj3.fit(X[0:350,:], y[0:350])
+fit_obj4.fit(X[0:350,:], y[0:350])
+fit_obj5.fit(X[0:350,:], y[0:350])
 
 # predict on test set 
 x = np.linspace(351, 442, num = 442-351+1)
@@ -47,6 +61,8 @@ x = np.linspace(351, 442, num = 442-351+1)
 plt.scatter(y[350:442], fit_obj.predict(X[350:442,:]), color='red')
 plt.scatter(y[350:442], fit_obj2.predict(X[350:442,:]), color='blue')
 plt.scatter(y[350:442], fit_obj3.predict(X[350:442,:]), color='green')
+plt.scatter(y[350:442], fit_obj4.predict(X[350:442,:]), color='black')
+plt.scatter(y[350:442], fit_obj5.predict(X[350:442,:]), color='magenta')
 plt.scatter(x = np.sort(y[350:442]), y = np.sort(y[350:442]), 
          color='black')
 plt.title('actual vs preds')
@@ -471,7 +487,7 @@ from sklearn import datasets, linear_model, gaussian_process
 import matplotlib.pyplot as plt  
 import numpy as np 
 
-X = np.random.rand(10, 4)
+X = np.random.rand(10, 2)
 regr4 = gaussian_process.GaussianProcessRegressor()
 obj_MTS = ns.MTS(regr4, lags = 1, n_hidden_features=5, 
                  bias = False)
@@ -486,12 +502,31 @@ obj_MTS2.fit(X)
 print(obj_MTS2.predict())
 print(obj_MTS2.predict(return_std = True))
 
+regr6 = linear_model.BayesianRidge()
+obj_MTS3 = ns.MTS(regr6, lags = 2, n_hidden_features=2, 
+                 bias = True, type_scaling = ('minmax', 'minmax'))
+obj_MTS3.fit(X)
+print(obj_MTS3.predict())
 
-# change: return_std = True must be in method predict
-# change: return_std = True must be in method predict
-# change: return_std = True must be in method predict
-# change: return_std = True must be in method predict
-# change: return_std = True must be in method predict
+regr7 = linear_model.BayesianRidge()
+obj_MTS4 = ns.MTS(regr6, lags = 2, n_hidden_features=2, 
+                 bias = True, type_scaling = ('minmax', 'std'))
+obj_MTS4.fit(X)
+print(obj_MTS4.predict())
+
+regr8 = linear_model.BayesianRidge()
+obj_MTS4 = ns.MTS(regr6, lags = 2, n_hidden_features=2, 
+                 bias = True, type_scaling = ('std', 'minmax'))
+obj_MTS4.fit(X)
+print(obj_MTS4.predict())
+
+
+
+# change: return_std = True must be in method predict (everywhere)
+# change: return_std = True must be in method predict (everywhere)
+# change: return_std = True must be in method predict (everywhere)
+# change: return_std = True must be in method predict (everywhere)
+# change: return_std = True must be in method predict (everywhere)
 regr6 = ns.BayesianRVFL()
 obj_MTS3 = ns.MTS(regr6, lags = 1, n_hidden_features=3, 
                  bias = True)

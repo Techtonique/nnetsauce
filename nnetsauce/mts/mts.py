@@ -70,6 +70,9 @@ class MTS(Base):
        type_clust: str
            type of clustering method: currently k-means ('kmeans') or Gaussian 
            Mixture Model ('gmm')
+       type_scaling: a tuple of 2 strings
+           scaling methods for inputs and hidden layen respectively. Currently  
+           available: standardization ('std') or MinMax scaling ('minmax')   
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
        lags: int
@@ -84,7 +87,9 @@ class MTS(Base):
                  activation_name='relu', a=0.01,
                  nodes_sim='sobol', bias=True,
                  direct_link=True, n_clusters=2,
-                 type_clust='kmeans', seed=123, 
+                 type_clust='kmeans', 
+                 type_scaling = ('std', 'std'),
+                 seed=123, 
                  lags = 1):
         
         assert np.int(lags) == lags, "parameter 'lags' should be an integer"        
@@ -95,6 +100,7 @@ class MTS(Base):
                          direct_link = direct_link,
                          n_clusters = n_clusters, 
                          type_clust = type_clust, 
+                         type_scaling = type_scaling,
                          seed = seed)
         
         self.obj = obj
@@ -119,14 +125,17 @@ class MTS(Base):
                    activation_name='relu', a=0.01,
                    nodes_sim='sobol', bias=True,
                    direct_link=True, n_clusters=None,
-                   type_clust='kmeans', seed=123, 
+                   type_clust='kmeans', 
+                   type_scaling = ('std', 'std'),
+                   seed=123, 
                    lags = 1):
         
         super().set_params(n_hidden_features = n_hidden_features, 
                            activation_name = activation_name, a = a,
                            nodes_sim = nodes_sim, bias = bias, 
                            direct_link = direct_link, n_clusters = n_clusters, 
-                           type_clust = type_clust, seed = seed)
+                           type_clust = type_clust, type_scaling = type_scaling, 
+                           seed = seed)
         self.lags = lags
  
     
