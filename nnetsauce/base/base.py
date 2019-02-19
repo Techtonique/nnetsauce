@@ -6,9 +6,9 @@
 # add type_scaling
 # add type_scaling
 
-# Authors: Thierry Moudiki <thierry.moudiki@gmail.com>
+# Authors: Thierry Moudiki 
 #
-# License: MIT
+# License: BSD 3
 
 import numpy as np
 import sklearn.metrics as skm
@@ -259,7 +259,8 @@ class Base(object):
                 
             
         
-    def score(self, X, y, scoring=None):
+    def score(self, X, y, 
+              scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
         
         preds = self.predict(X)
@@ -315,7 +316,7 @@ class Base(object):
                 'r2': skm.r2_score
                 } 
         
-        return scoring_options[scoring](y, preds)
+        return scoring_options[scoring](y, preds, **kwargs)
 
         
     # "preprocessing" methods to be inherited -----

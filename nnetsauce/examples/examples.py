@@ -1,4 +1,4 @@
-from sklearn import datasets, linear_model, gaussian_process
+from sklearn import datasets, linear_model, gaussian_process, metrics
 import matplotlib.pyplot as plt  
 import numpy as np 
 #import nnetsauce as ns
@@ -436,33 +436,34 @@ plt.show()
 # stacking layers - TODO - create function (?)
 # stacking layers - TODO - create function (?)
 # stacking layers - TODO - create function (?)
-# how to, with cross_val_score
-# how to, with cross_val_score
-# how to, with cross_val_score
-# how to, with cross_val_score
-# how to, with cross_val_score
 
+
+# layer 1 (base layer) ----
 layer1_regr = linear_model.BayesianRidge()
+layer1_regr.fit(X[0:100,:], y[0:100])
+# RMSE
+np.sqrt(metrics.mean_squared_error(y[100:125], layer1_regr.predict(X[100:125,:])))
 
-layer1_regr.fit(X, y)
 
+# layer 2 ----
 layer2_regr = ns.Custom(obj = layer1_regr, n_hidden_features=3, 
-                        direct_link=True, bias=True,
-                        activation_name='tanh', n_clusters=2)
-layer2_regr.fit(X, y)
-layer2_regr.predict(X)
+                        direct_link=True, bias=True, 
+                        nodes_sim='sobol', activation_name='tanh', 
+                        n_clusters=2)
+layer2_regr.fit(X[0:100,:], y[0:100])
 
+# RMSE
+np.sqrt(layer2_regr.score(X[100:125,:], y[100:125]))
+
+# layer 3 ----
 layer3_regr = ns.Custom(obj = layer2_regr, n_hidden_features=5, 
-                        direct_link=True, bias=True,
-                        activation_name='relu', n_clusters=3)
-layer3_regr.fit(X, y)
-layer3_regr.predict(X)
+                        direct_link=True, bias=True, 
+                        nodes_sim='hammersley', activation_name='sigmoid', 
+                        n_clusters=2)
+layer3_regr.fit(X[0:100,:], y[0:100])
 
-# make sure that the same X and y are passed through the stack of calls
-# make sure that the same X and y are passed through the stack of calls
-# make sure that the same X and y are passed through the stack of calls
-# make sure that the same X and y are passed through the stack of calls
-# make sure that the same X and y are passed through the stack of calls
+# RMSE
+np.sqrt(layer3_regr.score(X[100:125,:], y[100:125]))
 
 ## Example 6 - MTS -----
 

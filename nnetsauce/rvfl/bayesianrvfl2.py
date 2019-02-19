@@ -1,10 +1,12 @@
 """Random Vector Functional Link Network regression with 2 regularization parameters."""
 
-# Authors: Thierry Moudiki <thierry.moudiki@gmail.com>
+# Authors: Thierry Moudiki 
 #
-# License: MIT
+# License: BSD 3
 
 import numpy as np
+import sklearn.model_selection as skm
+import sklearn.metrics as skm2
 from ..base import Base
 from ..utils import misc as mx
 from ..utils import matrixops as mo
@@ -230,3 +232,69 @@ class BayesianRVFL2(Base):
                 
                 return (self.y_mean + pred_obj['preds'], 
                         pred_obj['preds_std']) 
+        
+        
+    def score(self, X, y, 
+              scoring=None, **kwargs):
+        """ Score the model on test set covariates X and response y. """
+        
+        preds = self.predict(X)
+        
+        if type(preds) == tuple: # if there are std. devs in the predictions
+            preds = preds[0]    
+        
+        if mx.is_factor(y): # classification
+            
+            if scoring is None:
+                scoring = 'accuracy'
+            
+            # check inputs 
+            assert scoring in ('accuracy', 'average_precision', 
+                               'brier_score_loss', 'f1', 'f1_micro',
+                               'f1_macro', 'f1_weighted',  'f1_samples',
+                               'neg_log_loss', 'precision', 'recall',
+                               'roc_auc'), \
+                               "'scoring' should be in ('accuracy', 'average_precision', \
+                               'brier_score_loss', 'f1', 'f1_micro', \
+                               'f1_macro', 'f1_weighted',  'f1_samples', \
+                               'neg_log_loss', 'precision', 'recall', \
+                               'roc_auc')"
+            
+            scoring_options = {
+                'accuracy': skm2.accuracy_score,
+                'average_precision': skm2.average_precision_score,
+                'brier_score_loss': skm2.brier_score_loss,
+                'f1': skm2.f1_score,
+                'f1_micro': skm2.f1_score,
+                'f1_macro': skm2.f1_score,
+                'f1_weighted': skm2.f1_score,
+                'f1_samples': skm2.f1_score,
+                'neg_log_loss': skm2.log_loss,
+                'precision': skm2.precision_score,
+                'recall': skm2.recall_score,
+                'roc_auc': skm2.roc_auc_score
+            } 
+            
+        else: # regression
+            
+            if scoring is None:
+                scoring = 'neg_mean_squared_error'
+            
+            # check inputs 
+            assert scoring in ('explained_variance', 'neg_mean_absolute_error', 
+                               'neg_mean_squared_error', 'neg_mean_squared_log_error', 
+                               'neg_median_absolute_error', 'r2'), \
+                               "'scoring' should be in ('explained_variance', 'neg_mean_absolute_error', \
+                               'neg_mean_squared_error', 'neg_mean_squared_log_error', \
+                               'neg_median_absolute_error', 'r2')"
+            
+            scoring_options = {
+                'explained_variance': skm2.explained_variance_score,
+                'neg_mean_absolute_error': skm2.median_absolute_error,
+                'neg_mean_squared_error': skm2.mean_squared_error,
+                'neg_mean_squared_log_error': skm2.mean_squared_log_error, 
+                'neg_median_absolute_error': skm2.median_absolute_error,
+                'r2': skm2.r2_score
+                } 
+        
+        return scoring_options[scoring](y, preds, **kwargs)   

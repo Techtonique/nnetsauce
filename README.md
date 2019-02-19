@@ -19,14 +19,6 @@ python setup.py install
 TODO
 ```
 
-
-## Dependencies 
-
-- Numpy
-- Scipy
-- scikit-learn
-
-
 ## Package description
 
 Every model in the `nnetsauce` is based on the component __g(XW + b)__, where:
@@ -36,7 +28,7 @@ Every model in the `nnetsauce` is based on the component __g(XW + b)__, where:
 - __b__ is an optional bias parameter.
 - __g__ is an activation function such as the hyperbolic tangent (among others), which creates new, nonlinear explanatory variables.  
 
-__Currently__, 4 models are implemented in the `nnetsauce`. If your response variable is __y__, then:
+__Currently__, 4 models are implemented in the `nnetsauce`. If your response variable (the one that you want to explain) is __y__, then:
 
 - `Base` adjusts a linear regression to __y__, as a function of __X__ (optional) and __g(XW + b)__; without regularization of the regression coefficients. 
 - `BayesianRVFL` adds a ridge regularization parameter to the regression coefficients of `Base`, which prevents overfitting. Confidence intervals around the prediction can also be obtained.  
@@ -44,7 +36,7 @@ __Currently__, 4 models are implemented in the `nnetsauce`. If your response var
 - `Custom` works with any object `fit_obj` possessing methods `fit_obj.fit()` and `fit_obj.predict()`. Notably, the model can be applied to any [`scikit-learn`](https://scikit-learn.org)'s regression or classification model. It adjusts `fit_obj` to __y__, as a function of __X__ (optional) and __g(XW + b)__.
 
 
-## Short demo
+## Quick start
 
 Here, we present examples of use of `Base`, `BayesianRVFL`, `BayesianRVFL2`, and an example of `Custom` model using `scikit-learn`. We start by importing the packages and datasets necessary for the demo:
 
@@ -186,6 +178,8 @@ plt.show()
 print(fit_obj3.predict(Z[456:569,:]))
 ````
 
+There are certainly many other creative ways of combining these objects, that you can [contribute](CONTRIBUTING.md) (including **tests**)! (Put link to the directory, put link to the directory, put link to the directory)
+
 ## Model validation
 
 Currently, a method `score` is available for all models in the `nnetsauce`. It allows to measure the model's 
@@ -244,14 +238,23 @@ print(fit_obj3.cross_val_score(Z, t, cv = 5))
 ````
 
 
+## Dependencies 
+
+- Numpy
+- Scipy
+- scikit-learn
+
+
 ## References
 
 - Jones E, Oliphant E, Peterson P, et al. SciPy: Open Source Scientific Tools for Python, 2001-, http://www.scipy.org/ [Online; accessed 2019-01-04]
 - Scikit-learn: Machine Learning in Python, Pedregosa et al., JMLR 12, pp. 2825-2830, 2011.
 
+
 ## Contributing
 
-Please refer to the [Code of Conduct](CONTRIBUTING.md)
+Please refer to the [Code of Conduct](CONTRIBUTING.md).
+
 
 ## License
 
