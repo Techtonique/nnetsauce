@@ -41,9 +41,10 @@ class Custom(Base):
        type_clust: str
            type of clustering method: currently k-means ('kmeans') or Gaussian 
            Mixture Model ('gmm')
-       type_scaling: a tuple of 2 strings
-           scaling methods for inputs and hidden layen respectively. Currently  
-           available: standardization ('std') or MinMax scaling ('minmax')
+       type_scaling: a tuple of 3 strings
+           scaling methods for inputs, hidden layer, and clustering respectively
+           (and when relevant). 
+           Currently available: standardization ('std') or MinMax scaling ('minmax')
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
        type_fit: str
@@ -61,7 +62,7 @@ class Custom(Base):
                  direct_link=True, 
                  n_clusters=2,
                  type_clust='kmeans',
-                 type_scaling = ('std', 'std'),
+                 type_scaling = ('std', 'std', 'std'),
                  seed=123, 
                  type_fit=None): 
                 
@@ -91,7 +92,7 @@ class Custom(Base):
                    direct_link=True,
                    n_clusters=None,
                    type_clust='kmeans',
-                   type_scaling = ('std', 'std'),
+                   type_scaling = ('std', 'std', 'std'),
                    seed=123):
         
         super().set_params(n_hidden_features = n_hidden_features, 

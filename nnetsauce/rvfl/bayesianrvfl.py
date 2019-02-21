@@ -34,9 +34,10 @@ class BayesianRVFL(Base):
            number of clusters for 'kmeans' or 'gmm' clustering (could be 0: no clustering)
        type_clust: str
            type of clustering method: currently k-means ('kmeans') or Gaussian Mixture Model ('gmm')
-       type_scaling: a tuple of 2 strings
-           scaling methods for inputs and hidden layen respectively. Currently  
-           available: standardization ('std') or MinMax scaling ('minmax')
+       type_scaling: a tuple of 3 strings
+           scaling methods for inputs, hidden layer, and clustering respectively
+           (and when relevant). 
+           Currently available: standardization ('std') or MinMax scaling ('minmax')
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
        s: float
@@ -60,7 +61,7 @@ class BayesianRVFL(Base):
                  direct_link=True, 
                  n_clusters=2,
                  type_clust='kmeans',
-                 type_scaling = ('std', 'std'),
+                 type_scaling = ('std', 'std', 'std'),
                  seed=123, 
                  s=0.1, sigma=0.05, 
                  beta=None, Sigma=None,
@@ -98,7 +99,7 @@ class BayesianRVFL(Base):
                    direct_link=True,
                    n_clusters=None,
                    type_clust='kmeans',
-                   type_scaling = ('std', 'std'),
+                   type_scaling = ('std', 'std', 'std'),
                    seed=123, 
                    s=0.1, sigma=0.05,
                    return_std = True):

@@ -1,6 +1,6 @@
 # nnetsauce 
 
-This package does Machine Learning by using various -- advanced -- combinations of single layer 'neural' networks. 
+This package does Statistical/Machine Learning by using various -- advanced -- combinations of single layer 'neural' networks. 
 
 
 ## Installation 
@@ -24,21 +24,22 @@ TODO
 Every model in the `nnetsauce` is based on the component __g(XW + b)__, where:
 
 - __X__ is a matrix containing the explanatory variables and (optional) clustering information about the individuals. The clustering methods available are _k-means_ and a _Gaussian Mixture Model_; they help in taking into account data's heterogeneity.
-- __W__ derives the nodes in the hidden layer from __X__. It can be drawn from various random and quasirandom sequences.
+- __W__ creates new, additional explanatory variables from __X__. It can be drawn from various random and quasirandom sequences.
 - __b__ is an optional bias parameter.
-- __g__ is an activation function such as the hyperbolic tangent (among others), which creates new, nonlinear explanatory variables.  
+- __g__ is an _activation function_ such as the hyperbolic tangent or the sigmoid function (among others), that renders the combination of explanatory variables (through __W__) nonlinear.  
 
-__Currently__, 4 models are implemented in the `nnetsauce`. If your response variable (the one that you want to explain) is __y__, then:
+__Currently__, 5 models are implemented in the `nnetsauce`. If your response variable (the one that you want to explain) is __y__, then:
 
 - `Base` adjusts a linear regression to __y__, as a function of __X__ (optional) and __g(XW + b)__; without regularization of the regression coefficients. 
 - `BayesianRVFL` adds a ridge regularization parameter to the regression coefficients of `Base`, which prevents overfitting. Confidence intervals around the prediction can also be obtained.  
 - `BayesianRVFL2` adds 2 regularization parameters to `Base`. As with `BayesianRVFL`, confidence intervals around the prediction can be obtained.
 - `Custom` works with any object `fit_obj` possessing methods `fit_obj.fit()` and `fit_obj.predict()`. Notably, the model can be applied to any [`scikit-learn`](https://scikit-learn.org)'s regression or classification model. It adjusts `fit_obj` to __y__, as a function of __X__ (optional) and __g(XW + b)__.
+- `MTS` does multivariate time series forecasting. Like `Custom`, it works with any object `fit_obj` possessing methods `fit_obj.fit()` and `fit_obj.predict()`.
 
 
 ## Quick start
 
-Here, we present examples of use of `Base`, `BayesianRVFL`, `BayesianRVFL2`, and an example of `Custom` model using `scikit-learn`. We start by importing the packages and datasets necessary for the demo:
+Here, we present examples of use of `Base`, `BayesianRVFL`, `BayesianRVFL2`, an example of `Custom` model using `scikit-learn`, and an example of `MTS`. We start by importing the packages and datasets necessary for the demo:
 
 ````python
 import nnetsauce as ns
@@ -176,9 +177,77 @@ plt.show()
 
 # predict classes 
 print(fit_obj3.predict(Z[456:569,:]))
+
 ````
 
-There are certainly many other creative ways of combining these objects, that you can [contribute](CONTRIBUTING.md) (including **tests**)! (Put link to the directory, put link to the directory, put link to the directory)
+We can also combine these building blocks. In the following example, it increases the accuracy, as layers are added to the stack:
+
+````python
+
+# layer 1 (base layer) ----
+layer1_regr = linear_model.BayesianRidge()
+layer1_regr.fit(X[0:100,:], y[0:100])
+# RMSE score
+np.sqrt(metrics.mean_squared_error(y[100:125], layer1_regr.predict(X[100:125,:])))
+
+
+# layer 2 ----
+layer2_regr = ns.Custom(obj = layer1_regr, n_hidden_features=3, 
+                        direct_link=True, bias=True, 
+                        nodes_sim='sobol', activation_name='tanh', 
+                        n_clusters=2)
+layer2_regr.fit(X[0:100,:], y[0:100])
+
+# RMSE score
+np.sqrt(layer2_regr.score(X[100:125,:], y[100:125]))
+
+# layer 3 ----
+layer3_regr = ns.Custom(obj = layer2_regr, n_hidden_features=5, 
+                        direct_link=True, bias=True, 
+                        nodes_sim='hammersley', activation_name='sigmoid', 
+                        n_clusters=2)
+layer3_regr.fit(X[0:100,:], y[0:100])
+
+# RMSE score
+np.sqrt(layer3_regr.score(X[100:125,:], y[100:125]))
+
+````
+
+And to finish, an example of multivariate time series forecasting:
+
+````python
+X = np.random.rand(10, 3)
+X[:,0] = 10*X[:,0]
+X[:,2] = 25*X[:,2]
+print(X)
+
+regr4 = gaussian_process.GaussianProcessRegressor()
+obj_MTS = ns.MTS(regr4, lags = 1, n_hidden_features=5, 
+                 bias = False)
+obj_MTS.fit(X)
+print(obj_MTS.predict())
+
+# Choosing different scalings for the input variables (first input
+# of tuple 'type_scaling') and hidden layer (second input
+# of tuple 'type_scaling'). This is also available for Base, Custom etc.
+
+# 'minmax' and 'minmax' scalings
+regr6 = linear_model.BayesianRidge()
+obj_MTS3 = ns.MTS(regr6, lags = 2, n_hidden_features=2, 
+                 bias = True, type_scaling = ('minmax', 'minmax'))
+obj_MTS3.fit(X)
+print(obj_MTS3.predict())
+
+# 'minmax' and 'standardization' scalings
+regr7 = linear_model.BayesianRidge()
+obj_MTS4 = ns.MTS(regr6, lags = 2, n_hidden_features=2, 
+                 bias = True, type_scaling = ('minmax', 'std'))
+obj_MTS4.fit(X)
+print(obj_MTS4.predict())
+
+````
+
+There are certainly many creative ways of combining these objects, that you can [contribute](CONTRIBUTING.md) (including **tests**)! (Put link to the directory containing tests, put link to the directory containing tests, put link to the directory containing tests)
 
 ## Model validation
 
@@ -238,6 +307,18 @@ print(fit_obj3.cross_val_score(Z, t, cv = 5))
 ````
 
 
+## Contributing
+
+Please, read the [Code of Conduct](CONTRIBUTING.md) first.
+
+A few things that we could explore are:
+
+- Creating a great documentation on [readthedocs.org](https://readthedocs.org/) 
+- Combine `Custom` objects with your fertile imagination (and provide with tests in directory - provide links)
+- blah blah 1
+- blah blah 2
+
+
 ## Dependencies 
 
 - Numpy
@@ -249,11 +330,6 @@ print(fit_obj3.cross_val_score(Z, t, cv = 5))
 
 - Jones E, Oliphant E, Peterson P, et al. SciPy: Open Source Scientific Tools for Python, 2001-, http://www.scipy.org/ [Online; accessed 2019-01-04]
 - Scikit-learn: Machine Learning in Python, Pedregosa et al., JMLR 12, pp. 2825-2830, 2011.
-
-
-## Contributing
-
-Please refer to the [Code of Conduct](CONTRIBUTING.md).
 
 
 ## License

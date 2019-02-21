@@ -22,12 +22,6 @@
 # change: return_std = True must be in method predict
 # change: return_std = True must be in method predict
 
-# c.i. + simulations with obj having uniform hidden
-# c.i. + simulations with obj having uniform hidden
-# c.i. + simulations with obj having uniform hidden
-# c.i. + simulations with obj having uniform hidden
-# c.i. + simulations with obj having uniform hidden
-
 # ts objects with rpy2
 # ts objects with rpy2
 # ts objects with rpy2
@@ -70,9 +64,10 @@ class MTS(Base):
        type_clust: str
            type of clustering method: currently k-means ('kmeans') or Gaussian 
            Mixture Model ('gmm')
-       type_scaling: a tuple of 2 strings
-           scaling methods for inputs and hidden layen respectively. Currently  
-           available: standardization ('std') or MinMax scaling ('minmax')   
+       type_scaling: a tuple of 3 strings
+           scaling methods for inputs, hidden layer, and clustering respectively
+           (and when relevant). 
+           Currently available: standardization ('std') or MinMax scaling ('minmax')
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
        lags: int
@@ -88,7 +83,7 @@ class MTS(Base):
                  nodes_sim='sobol', bias=True,
                  direct_link=True, n_clusters=2,
                  type_clust='kmeans', 
-                 type_scaling = ('std', 'std'),
+                 type_scaling = ('std', 'std', 'std'),
                  seed=123, 
                  lags = 1):
         
@@ -126,7 +121,7 @@ class MTS(Base):
                    nodes_sim='sobol', bias=True,
                    direct_link=True, n_clusters=None,
                    type_clust='kmeans', 
-                   type_scaling = ('std', 'std'),
+                   type_scaling = ('std', 'std', 'std'),
                    seed=123, 
                    lags = 1):
         

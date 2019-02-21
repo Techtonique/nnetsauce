@@ -40,13 +40,13 @@ fit_obj4 = ns.Base(n_hidden_features=5,
                    direct_link=True,
                    activation_name='tanh', 
                    n_clusters=3, 
-                   type_scaling = ("minmax", "std"))
+                   type_scaling = ("minmax", "std", "std"))
 
 fit_obj5 = ns.Base(n_hidden_features=5, 
                    direct_link=True,
                    activation_name='tanh', 
                    n_clusters=3, 
-                   type_scaling = ("std", "minmax"))
+                   type_scaling = ("std", "minmax", "std"))
 
 # fit training set 
 fit_obj.fit(X[0:350,:], y[0:350])
@@ -487,7 +487,11 @@ from sklearn import datasets, linear_model, gaussian_process
 import matplotlib.pyplot as plt  
 import numpy as np 
 
-X = np.random.rand(10, 2)
+X = np.random.rand(10, 3)
+X[:,0] = 10*X[:,0]
+X[:,2] = 25*X[:,2]
+print(X)
+
 regr4 = gaussian_process.GaussianProcessRegressor()
 obj_MTS = ns.MTS(regr4, lags = 1, n_hidden_features=5, 
                  bias = False)
@@ -500,23 +504,25 @@ obj_MTS2 = ns.MTS(regr5, lags = 1, n_hidden_features=7,
                  bias = True)
 obj_MTS2.fit(X)
 print(obj_MTS2.predict())
-print(obj_MTS2.predict(return_std = True))
 
+# choosing different scalings for the input variables (first input
+# of tuple 'type_scaling') and hidden layer (second input
+# of tuple 'type_scaling') is also available for Base, Custom etc.
 regr6 = linear_model.BayesianRidge()
 obj_MTS3 = ns.MTS(regr6, lags = 2, n_hidden_features=2, 
-                 bias = True, type_scaling = ('minmax', 'minmax'))
+                 bias = True, type_scaling = ('minmax', 'minmax', 'std'))
 obj_MTS3.fit(X)
 print(obj_MTS3.predict())
 
 regr7 = linear_model.BayesianRidge()
 obj_MTS4 = ns.MTS(regr6, lags = 2, n_hidden_features=2, 
-                 bias = True, type_scaling = ('minmax', 'std'))
+                 bias = True, type_scaling = ('minmax', 'std', 'minmax'))
 obj_MTS4.fit(X)
 print(obj_MTS4.predict())
 
 regr8 = linear_model.BayesianRidge()
 obj_MTS4 = ns.MTS(regr6, lags = 2, n_hidden_features=2, 
-                 bias = True, type_scaling = ('std', 'minmax'))
+                 bias = True, type_scaling = ('std', 'minmax', 'std'))
 obj_MTS4.fit(X)
 print(obj_MTS4.predict())
 

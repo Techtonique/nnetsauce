@@ -41,9 +41,10 @@ class Base(object):
        type_clust: str
            type of clustering method: currently k-means ('kmeans') or Gaussian 
            Mixture Model ('gmm')
-       type_scaling: a tuple of 2 strings
-           scaling methods for inputs and hidden layen respectively. Currently  
-           available: standardization ('std') or MinMax scaling ('minmax')
+       type_scaling: a tuple of 3 strings
+           scaling methods for inputs, hidden layer, and clustering respectively
+           (and when relevant). 
+           Currently available: standardization ('std') or MinMax scaling ('minmax')
        seed: int 
            reproducibility seed for nodes_sim=='uniform' and for clustering
     """
@@ -60,7 +61,7 @@ class Base(object):
                  direct_link=True,
                  n_clusters=2,
                  type_clust='kmeans',
-                 type_scaling = ('std', 'std'),
+                 type_scaling = ('std', 'std', 'std'),
                  seed=123):
         
         # input checks ----- 
@@ -73,6 +74,9 @@ class Base(object):
         
         assert type_clust in ("kmeans", "gmm"), \
         "'type_clust' should be in ('kmeans', 'gmm')"
+        
+        assert (len(type_scaling) == 3) & all(type_scaling[i] in ('minmax', 'std') for i in range(len(type_scaling))), \
+        "'type_scaling' must have length 3, and available scaling methods are 'minmax' scaling and standardization ('std')"
         
         
         # activation function -----     
@@ -152,7 +156,7 @@ class Base(object):
                    direct_link=True,
                    n_clusters=None,
                    type_clust='kmeans',
-                   type_scaling = ('std', 'std'),
+                   type_scaling = ('std', 'std', 'std'),
                    seed=123):
         
         # activation function -----   
@@ -345,10 +349,15 @@ class Base(object):
                 
         if predict == False: # encode training set 
             
-            # scale input data
-            scaler = StandardScaler(copy=True, 
-                                    with_mean=True, 
-                                    with_std=True)  
+            scaling_options = {
+            'std': StandardScaler(copy=True, 
+                                        with_mean=True, 
+                                        with_std=True),
+            'minmax': MinMaxScaler()}
+
+            # scale input data before clustering             
+            scaler = scaling_options[self.type_scaling[2]]
+            
             scaler.fit(X)        
             scaled_X = scaler.transform(X)
             self.clustering_scaler = scaler
@@ -464,6 +473,9 @@ class Base(object):
         }
 
         if self.n_hidden_features > 0: # has a hidden layer  
+            
+            assert len(self.type_scaling) >= 2, ""
+            
             nn_scaling_options = {
             'std': StandardScaler(copy=True, 
                                         with_mean=True, 
