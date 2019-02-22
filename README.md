@@ -45,7 +45,7 @@ Here, we present examples of use of `Base`, `BayesianRVFL`, `BayesianRVFL2`, an 
 import nnetsauce as ns
 import numpy as np      
 import matplotlib.pyplot as plt
-from sklearn import datasets
+from sklearn import datasets, metrics
 
 diabetes = datasets.load_diabetes()
 X = diabetes.data 
@@ -216,33 +216,35 @@ np.sqrt(layer3_regr.score(X[100:125,:], y[100:125]))
 To finish, an example of multivariate time series forecasting with `MTS`:
 
 ````python
-X = np.random.rand(10, 3)
-X[:,0] = 10*X[:,0]
-X[:,2] = 25*X[:,2]
-print(X)
+M = np.random.rand(10, 3)
+M[:,0] = 10*M[:,0]
+M[:,2] = 25*M[:,2]
+print(M)
 
 regr4 = gaussian_process.GaussianProcessRegressor()
 obj_MTS = ns.MTS(regr4, lags = 1, n_hidden_features=5, 
                  bias = False)
-obj_MTS.fit(X)
+obj_MTS.fit(M)
 print(obj_MTS.predict())
 
 # Choosing different scalings for the input variables (first input
-# of tuple 'type_scaling') and hidden layer (second input
-# of tuple 'type_scaling'). This is also available for Base, Custom etc.
+# of tuple 'type_scaling') , hidden layer (second input
+# of tuple 'type_scaling'), and clustering (third input
+# of tuple 'type_scaling'). 
+# This is also available for models Base, Custom etc.
 
-# 'minmax' and 'minmax' scalings
+# 'minmax', 'minmax', 'std' scalings
 regr6 = linear_model.BayesianRidge()
-obj_MTS3 = ns.MTS(regr6, lags = 2, n_hidden_features=2, 
+obj_MTS3 = ns.MTS(regr6, lags = 1, n_hidden_features=2, 
                  bias = True, type_scaling = ('minmax', 'minmax', 'std'))
-obj_MTS3.fit(X)
+obj_MTS3.fit(M)
 print(obj_MTS3.predict())
 
-# 'minmax' and 'standardization' scalings
+# 'minmax', 'standardization', 'minmax' scalings
 regr7 = linear_model.BayesianRidge()
-obj_MTS4 = ns.MTS(regr6, lags = 2, n_hidden_features=2, 
+obj_MTS4 = ns.MTS(regr6, lags = 1, n_hidden_features=2, 
                  bias = True, type_scaling = ('minmax', 'std', 'minmax'))
-obj_MTS4.fit(X)
+obj_MTS4.fit(M)
 print(obj_MTS4.predict())
 
 ````
