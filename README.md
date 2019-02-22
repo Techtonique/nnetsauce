@@ -39,7 +39,7 @@ __Currently__, 5 models are implemented in the `nnetsauce`. If your response var
 
 ## Quick start
 
-Here, we present examples of use of `Base`, `BayesianRVFL`, `BayesianRVFL2`, an example of `Custom` model using `scikit-learn`, and an example of `MTS`. We start by importing the packages and datasets necessary for the demo:
+Here, we present examples of use of `Base`, `BayesianRVFL`, `BayesianRVFL2`, an example of `Custom` model using `scikit-learn`, and an example of `MTS` forecasting. We start by importing the packages and datasets necessary for the demo:
 
 ````python
 import nnetsauce as ns
@@ -61,11 +61,11 @@ Example with `Base` model (no regularization):
 ````python
 # create object Base 
 
-# X is not used directly, but only g(XW+b) ('direct_link')
-# W is drawn from a deterministic Sobol sequence ('nodes_sim')
-# b is equal to 0 ('bias')
-# The activation function g is the hyperbolic tangent ('activation_name')
-# The data in X is clustered: 2 clusters are obtained with k-means before fitting the model ('type_clust', 'n_clusters')
+# X is not used directly, but only g(XW+b) ('direct_link' parameter)
+# W is drawn from a deterministic Sobol sequence ('nodes_sim' parameter)
+# b is equal to 0 ('bias' parameter)
+# The activation function g is the hyperbolic tangent ('activation_name' parameter)
+# The data in X is clustered: 2 clusters are obtained with k-means before fitting the model ('type_clust', 'n_clusters' parameters)
 
 fit_obj = ns.Base(n_hidden_features=100, 
                   direct_link=False,
@@ -180,7 +180,7 @@ print(fit_obj3.predict(Z[456:569,:]))
 
 ````
 
-We can also combine these building blocks. In the following example, it increases the accuracy, as layers are added to the stack:
+We can also __combine `Custom` building blocks__. In the following example, doing that increases the accuracy, as new layers are added to the stack:
 
 ````python
 
@@ -191,7 +191,7 @@ layer1_regr.fit(X[0:100,:], y[0:100])
 np.sqrt(metrics.mean_squared_error(y[100:125], layer1_regr.predict(X[100:125,:])))
 
 
-# layer 2 ----
+# layer 2 using layer 1 ----
 layer2_regr = ns.Custom(obj = layer1_regr, n_hidden_features=3, 
                         direct_link=True, bias=True, 
                         nodes_sim='sobol', activation_name='tanh', 
@@ -201,7 +201,7 @@ layer2_regr.fit(X[0:100,:], y[0:100])
 # RMSE score
 np.sqrt(layer2_regr.score(X[100:125,:], y[100:125]))
 
-# layer 3 ----
+# layer 3 using layer 2 ----
 layer3_regr = ns.Custom(obj = layer2_regr, n_hidden_features=5, 
                         direct_link=True, bias=True, 
                         nodes_sim='hammersley', activation_name='sigmoid', 
@@ -213,7 +213,7 @@ np.sqrt(layer3_regr.score(X[100:125,:], y[100:125]))
 
 ````
 
-And to finish, an example of multivariate time series forecasting:
+To finish, an example of multivariate time series forecasting with `MTS`:
 
 ````python
 X = np.random.rand(10, 3)
@@ -234,20 +234,20 @@ print(obj_MTS.predict())
 # 'minmax' and 'minmax' scalings
 regr6 = linear_model.BayesianRidge()
 obj_MTS3 = ns.MTS(regr6, lags = 2, n_hidden_features=2, 
-                 bias = True, type_scaling = ('minmax', 'minmax'))
+                 bias = True, type_scaling = ('minmax', 'minmax', 'std'))
 obj_MTS3.fit(X)
 print(obj_MTS3.predict())
 
 # 'minmax' and 'standardization' scalings
 regr7 = linear_model.BayesianRidge()
 obj_MTS4 = ns.MTS(regr6, lags = 2, n_hidden_features=2, 
-                 bias = True, type_scaling = ('minmax', 'std'))
+                 bias = True, type_scaling = ('minmax', 'std', 'minmax'))
 obj_MTS4.fit(X)
 print(obj_MTS4.predict())
 
 ````
 
-There are certainly many creative ways of combining these objects, that you can [contribute](CONTRIBUTING.md) (including **tests**)! (Put link to the directory containing tests, put link to the directory containing tests, put link to the directory containing tests)
+__There are certainly many other creative ways of combining these objects__, that you can [contribute](CONTRIBUTING.md) (including **tests**)! (Put link to the directory containing tests, put link to the directory containing tests, put link to the directory containing tests)
 
 ## Model validation
 
@@ -315,8 +315,8 @@ A few things that we could explore are:
 
 - Creating a great documentation on [readthedocs.org](https://readthedocs.org/) 
 - Combine `Custom` objects with your fertile imagination (and provide with tests in directory - provide links)
-- blah blah 1
-- blah blah 2
+- Better manage the dates for MTS objects
+- Dealing with additional deterministic regressors (DO IT)
 
 
 ## Dependencies 
