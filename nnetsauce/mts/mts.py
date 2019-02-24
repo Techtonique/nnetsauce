@@ -33,7 +33,7 @@ from ..base import Base
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 from ..utils import timeseries as ts
-
+import sklearn.metrics as skm2
 
 class MTS(Base):
     """MTS model class derived from class Base
@@ -255,4 +255,47 @@ class MTS(Base):
                    self.preds + self.preds_std)
             
                 
+    def score(self, X, 
+              training_index, testing_index, 
+              scoring=None, **kwargs):
+        """ Train on training_index, score on testing_index. """
+
+        # Dimensions        
+        n, p = X.shape
         
+        # Training and testing sets 
+        X_train = X[training_index,:]        
+        X_test = X[testing_index,:]
+
+        # Horizon 
+        h = len(testing_index)        
+        assert (len(training_index) + h) <= n, "Please check lengths of training and testing windows"
+
+        # Fit and predict 
+        self.fit(X_train, **kwargs)        
+        preds = self.predict(h = h, **kwargs)
+        
+        if type(preds) == tuple: # if there are std. devs in the predictions
+            preds = preds[0] # take the mean prediction only
+            
+        if scoring is None:
+            scoring = 'neg_mean_squared_error'
+            
+        # check inputs 
+        assert scoring in ('explained_variance', 'neg_mean_absolute_error', 
+                               'neg_mean_squared_error', 'neg_mean_squared_log_error', 
+                               'neg_median_absolute_error', 'r2'), \
+                               "'scoring' should be in ('explained_variance', 'neg_mean_absolute_error', \
+                               'neg_mean_squared_error', 'neg_mean_squared_log_error', \
+                               'neg_median_absolute_error', 'r2')"
+            
+        scoring_options = {
+                'explained_variance': skm2.explained_variance_score,
+                'neg_mean_absolute_error': skm2.mean_absolute_error,
+                'neg_mean_squared_error': skm2.mean_squared_error,
+                'neg_mean_squared_log_error': skm2.mean_squared_log_error, 
+                'neg_median_absolute_error': skm2.median_absolute_error,
+                'r2': skm2.r2_score
+                } 
+        
+        return tuple([scoring_options[scoring](X_test[:,i], preds[:,i], **kwargs) for i in range(p)])

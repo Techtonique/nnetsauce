@@ -499,6 +499,9 @@ obj_MTS.fit(X)
 print(obj_MTS.predict())
 print(obj_MTS.predict(return_std = True))
 
+# scoring
+np.sqrt(obj_MTS.score(X, range(15), range(15, 20)))
+
 regr5 = linear_model.BayesianRidge()
 obj_MTS2 = ns.MTS(regr5, lags = 1, n_hidden_features=7, 
                  bias = True)

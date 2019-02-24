@@ -298,7 +298,7 @@ class BayesianRVFL2(Base):
             
             scoring_options = {
                 'explained_variance': skm2.explained_variance_score,
-                'neg_mean_absolute_error': skm2.median_absolute_error,
+                'neg_mean_absolute_error': skm2.mean_absolute_error,
                 'neg_mean_squared_error': skm2.mean_squared_error,
                 'neg_mean_squared_log_error': skm2.mean_squared_log_error, 
                 'neg_median_absolute_error': skm2.median_absolute_error,
