@@ -499,9 +499,6 @@ obj_MTS.fit(X)
 print(obj_MTS.predict())
 print(obj_MTS.predict(return_std = True))
 
-# scoring
-np.sqrt(obj_MTS.score(X, range(15), range(15, 20)))
-
 regr5 = linear_model.BayesianRidge()
 obj_MTS2 = ns.MTS(regr5, lags = 1, n_hidden_features=7, 
                  bias = True)
@@ -529,6 +526,17 @@ obj_MTS4 = ns.MTS(regr6, lags = 2, n_hidden_features=2,
 obj_MTS4.fit(X)
 print(obj_MTS4.predict())
 
+
+# scoring
+Y = np.random.rand(20, 3)
+Y[:,0] = 10*Y[:,0]
+Y[:,2] = 25*Y[:,2]
+regr4 = linear_model.BayesianRidge()
+obj_MTS = ns.MTS(regr4, lags = 1, n_hidden_features=2, 
+                 bias = True)
+obj_MTS.fit(Y)
+print(obj_MTS.predict())
+np.sqrt(obj_MTS.score(Y, range(15), range(15, 20)))
 
 
 # change: return_std = True must be in method predict (everywhere)

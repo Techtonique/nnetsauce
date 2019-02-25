@@ -260,6 +260,8 @@ class MTS(Base):
               scoring=None, **kwargs):
         """ Train on training_index, score on testing_index. """
 
+        assert bool(set(training_index).intersection(set(testing_index))) == False, "Non-overlapping 'training_index' and 'testing_index' required"
+        
         # Dimensions        
         n, p = X.shape
         
