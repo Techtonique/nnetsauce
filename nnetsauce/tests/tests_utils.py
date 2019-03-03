@@ -47,7 +47,7 @@ class TestUtils(ut.TestCase):
                       [ 3,  4]])
         B = np.array([[ 4,  3],
                       [ 2,  1]])         
-        self.assertTrue(np.allclose(mo.cbind(A, B), 
+        self.assertTrue(np.allclose(mo.rbind(A, B), 
                                 np.array([[1, 2], 
                                           [3, 4],
                                           [4, 3], 
@@ -108,89 +108,89 @@ class TestUtils(ut.TestCase):
     def test_MTS_reformat_response(self):
         np.random.seed(123)
         X = np.random.rand(5, 2)
-        self.assertEqual(ts.reformat_response(X, 2)[1], 
+        self.assertAlmostEqual(ts.reformat_response(X, 2)[1], 
                          0.28613933495)
-        
+
+if __name__=='__main__':
+    ut.main()        
     
 # 5 - lm_funcs -----
 
-# fit training set 
-
-sigma = 0.3 
-s = 4
-
-print("4 - Bayesian Ridge ----- \n")
-
-print('----- beta_Sigma_hat: fit_intercept = True, return_cov = True')
-print("\n")
-print(lmf.beta_Sigma_hat_rvfl(X = X, y = y,
-                              s = s, sigma = sigma,
-                              fit_intercept = True,
-                              return_cov = True))
-print("\n")
-
-print('----- beta_Sigma_hat: fit_intercept = True, return_cov = False')
-print("\n")
-print(lmf.beta_Sigma_hat_rvfl(X = X, y = y,
-                              s = s, sigma = sigma,
-                              fit_intercept = True,
-                              return_cov = False))
-print("\n")
-
-print('----- beta_Sigma_hat: fit_intercept = False, return_cov = False')
-print("\n")
-print(lmf.beta_Sigma_hat_rvfl(X = X, y = y,
-                              s = s, sigma = sigma,
-                              fit_intercept = False,
-                              return_cov = False))
-print("\n")
-
-print('----- beta_Sigma_hat: fit_intercept = False, return_cov = True')
-print("\n")
-print(lmf.beta_Sigma_hat_rvfl(X = X, y = y,
-                              s = s, sigma = sigma,
-                              fit_intercept = False,
-                              return_cov = True))
-print("\n")
-
-print('----- beta_Sigma_hat: fit_intercept = True, return_cov = True, X_star')
-print("\n")
-print(lmf.beta_Sigma_hat_rvfl(X = X, y = y, X_star = X,
-                              s = s, sigma = sigma,
-                              fit_intercept = True,
-                              return_cov = True))
-print("\n")
-
-print('----- beta_Sigma_hat: fit_intercept = True, return_cov = False, X_star')
-print("\n")
-print(lmf.beta_Sigma_hat_rvfl(X = X, y = y, X_star = X,
-                              s = s, sigma = sigma,
-                              fit_intercept = True,
-                              return_cov = False))
-print("\n")
-
-print('----- beta_Sigma_hat: fit_intercept = False, return_cov = False, X_star')
-print("\n")
-print(lmf.beta_Sigma_hat_rvfl(X = X, y = y, X_star = X,
-                              s = s, sigma = sigma,
-                              fit_intercept = False,
-                              return_cov = False))
-print("\n")
-
-print('----- beta_Sigma_hat:  fit_intercept = False, return_cov = True, X_star')
-print("\n")
-print(lmf.beta_Sigma_hat_rvfl(X = X, y = y, X_star = X,
-                              s = s, sigma = sigma,
-                              fit_intercept = False,
-                              return_cov = True))
-print("\n")
-
-
-
-fit_obj = lmf.beta_Sigma_hat_rvfl2(X = x, y = y, X_star = x,
-                                  sigma = sigma,
-                                  fit_intercept = True,
-                                  return_cov = True)
-
-# 6 - time series -----
-
+## fit training set 
+#
+#sigma = 0.3 
+#s = 4
+#
+#print("4 - Bayesian Ridge ----- \n")
+#
+#print('----- beta_Sigma_hat: fit_intercept = True, return_cov = True')
+#print("\n")
+#print(lmf.beta_Sigma_hat_rvfl(X = X, y = y,
+#                              s = s, sigma = sigma,
+#                              fit_intercept = True,
+#                              return_cov = True))
+#print("\n")
+#
+#print('----- beta_Sigma_hat: fit_intercept = True, return_cov = False')
+#print("\n")
+#print(lmf.beta_Sigma_hat_rvfl(X = X, y = y,
+#                              s = s, sigma = sigma,
+#                              fit_intercept = True,
+#                              return_cov = False))
+#print("\n")
+#
+#print('----- beta_Sigma_hat: fit_intercept = False, return_cov = False')
+#print("\n")
+#print(lmf.beta_Sigma_hat_rvfl(X = X, y = y,
+#                              s = s, sigma = sigma,
+#                              fit_intercept = False,
+#                              return_cov = False))
+#print("\n")
+#
+#print('----- beta_Sigma_hat: fit_intercept = False, return_cov = True')
+#print("\n")
+#print(lmf.beta_Sigma_hat_rvfl(X = X, y = y,
+#                              s = s, sigma = sigma,
+#                              fit_intercept = False,
+#                              return_cov = True))
+#print("\n")
+#
+#print('----- beta_Sigma_hat: fit_intercept = True, return_cov = True, X_star')
+#print("\n")
+#print(lmf.beta_Sigma_hat_rvfl(X = X, y = y, X_star = X,
+#                              s = s, sigma = sigma,
+#                              fit_intercept = True,
+#                              return_cov = True))
+#print("\n")
+#
+#print('----- beta_Sigma_hat: fit_intercept = True, return_cov = False, X_star')
+#print("\n")
+#print(lmf.beta_Sigma_hat_rvfl(X = X, y = y, X_star = X,
+#                              s = s, sigma = sigma,
+#                              fit_intercept = True,
+#                              return_cov = False))
+#print("\n")
+#
+#print('----- beta_Sigma_hat: fit_intercept = False, return_cov = False, X_star')
+#print("\n")
+#print(lmf.beta_Sigma_hat_rvfl(X = X, y = y, X_star = X,
+#                              s = s, sigma = sigma,
+#                              fit_intercept = False,
+#                              return_cov = False))
+#print("\n")
+#
+#print('----- beta_Sigma_hat:  fit_intercept = False, return_cov = True, X_star')
+#print("\n")
+#print(lmf.beta_Sigma_hat_rvfl(X = X, y = y, X_star = X,
+#                              s = s, sigma = sigma,
+#                              fit_intercept = False,
+#                              return_cov = True))
+#print("\n")
+#
+#
+#
+#fit_obj = lmf.beta_Sigma_hat_rvfl2(X = x, y = y, X_star = x,
+#                                  sigma = sigma,
+#                                  fit_intercept = True,
+#                                  return_cov = True)
+#
