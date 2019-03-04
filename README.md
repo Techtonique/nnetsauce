@@ -316,7 +316,7 @@ Contributions are welcome. Please, make sure to __read__ the [Code of Conduct](C
 A few things that we could explore are:
 
 - Creating a great documentation on [readthedocs.org](https://readthedocs.org/) 
-- Combine `Custom` objects with your fertile imagination (and provide with tests in directory - provide links)
+- Combine `Custom` objects with your fertile imagination (with [tests](/tests))
 - Better management of dates for MTS objects
 - Dealing with additional deterministic regressors in MTS objects
 - Make package available on PyPI (for those who want)
