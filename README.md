@@ -33,7 +33,7 @@ __Currently__, 5 models are implemented in the `nnetsauce`. If your response var
 - `Base` adjusts a linear regression to __y__, as a function of __X__ (optional) and __g(XW + b)__; without regularization of the regression coefficients. 
 - `BayesianRVFL` adds a ridge regularization parameter to the regression coefficients of `Base`, which prevents overfitting. Confidence intervals around the prediction can also be obtained.  
 - `BayesianRVFL2` adds 2 regularization parameters to `Base`. As with `BayesianRVFL`, confidence intervals around the prediction can be obtained.
-- `Custom` works with any object `fit_obj` possessing methods `fit_obj.fit()` and `fit_obj.predict()`. Notably, the model can be applied to any [`scikit-learn`](https://scikit-learn.org)'s regression or classification model. It adjusts `fit_obj` to __y__, as a function of __X__ (optional) and __g(XW + b)__.
+- `Custom` works with any object `fit_obj` possessing methods `fit_obj.fit()` and `fit_obj.predict()`. Notably, the model can be applied to any [`scikit-learn`](https://scikit-learn.org)'s regression or classification model. It adjusts `fit_obj` to __y__, as a function of __X__ (optional) and __g(XW + b)__. `Custom` objects can also be combined to form __deeper learning architectures__, as it will be shown in the next section. 
 - `MTS` does multivariate time series forecasting. Like `Custom`, it works with any object `fit_obj` possessing methods `fit_obj.fit()` and `fit_obj.predict()`.
 
 
@@ -311,14 +311,16 @@ print(fit_obj3.cross_val_score(Z, t, cv = 5))
 
 ## Contributing
 
-Please, read the [Code of Conduct](CONTRIBUTING.md) first.
+Contributions are welcome. Please, make sure to __read__ the [Code of Conduct](CONTRIBUTING.md) first.
 
 A few things that we could explore are:
 
 - Creating a great documentation on [readthedocs.org](https://readthedocs.org/) 
 - Combine `Custom` objects with your fertile imagination (and provide with tests in directory - provide links)
-- Better manage the dates for MTS objects
-- Dealing with additional deterministic regressors (DO IT)
+- Better management of dates for MTS objects
+- Dealing with additional deterministic regressors in MTS objects
+- Make package available on PyPI (for those who want)
+- Enrich the tests (if necessary)
 
 
 ## Dependencies 
