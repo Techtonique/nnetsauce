@@ -249,7 +249,7 @@ print(obj_MTS4.predict())
 
 ````
 
-__There are certainly many other creative ways of combining these objects__, that you can [contribute](CONTRIBUTING.md) (including **tests**)! (Put link to the directory containing tests, put link to the directory containing tests, put link to the directory containing tests)
+__There are certainly many other creative ways of combining these objects__, that you can [contribute](CONTRIBUTING.md) (including **[tests](/tests)**)! (Put link to the directory containing tests, put link to the directory containing tests, put link to the directory containing tests)
 
 ## Model validation
 
