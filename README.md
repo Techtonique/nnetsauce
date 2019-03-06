@@ -321,7 +321,7 @@ print(fit_obj3.cross_val_score(Z, t, cv = 5))
 
 ## Contributing
 
-Contributions are welcome. Please, make sure to __read__ the [Code of Conduct](CONTRIBUTING.md) first.
+Contributions are welcome, and valuable. Please, make sure to __read__ the [Code of Conduct](CONTRIBUTING.md) first.
 
 A few things that we could explore are:
 
@@ -331,7 +331,7 @@ A few things that we could explore are:
 - Dealing with additional deterministic regressors in MTS objects (with [tests](/tests))
 - Make package available on PyPI (for those who want)
 - Enrich the tests (if necessary)
-- Make `nnetsauce` available to R users (using [rpy2](https://rpy2.readthedocs.io/en/version_2.8.x/))
+- Make `nnetsauce` available to R users (using [rpy2](https://rpy2.readthedocs.io/en/version_2.8.x/) for example, or any other tool that you'd suggest)
 
 
 ## Dependencies 
