@@ -216,6 +216,8 @@ np.sqrt(layer3_regr.score(X[100:125,:], y[100:125]))
 To finish, an example of multivariate time series forecasting with `MTS`:
 
 ````python
+np.random.seed(123)
+
 M = np.random.rand(10, 3)
 M[:,0] = 10*M[:,0]
 M[:,2] = 25*M[:,2]
@@ -226,6 +228,14 @@ obj_MTS = ns.MTS(regr4, lags = 1, n_hidden_features=5,
                  bias = False)
 obj_MTS.fit(M)
 print(obj_MTS.predict())
+
+
+# With a deep stack of 'Custom' objects (from previous snippet)
+obj_MTS2 = ns.MTS(layer3_regr, lags = 1, n_hidden_features=5, 
+                 bias = False)
+obj_MTS2.fit(M)
+print(obj_MTS2.predict())
+
 
 # Choosing different scalings for the input variables (first input
 # of tuple 'type_scaling') , hidden layer (second input
@@ -317,8 +327,8 @@ A few things that we could explore are:
 
 - Creating a great documentation on [readthedocs.org](https://readthedocs.org/) 
 - Combine `Custom` objects with your fertile imagination (with [tests](/tests))
-- Better management of dates for MTS objects
-- Dealing with additional deterministic regressors in MTS objects
+- Better management of dates for MTS objects (with [tests](/tests))
+- Dealing with additional deterministic regressors in MTS objects (with [tests](/tests))
 - Make package available on PyPI (for those who want)
 - Enrich the tests (if necessary)
 
