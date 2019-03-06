@@ -500,8 +500,8 @@ print(obj_MTS.predict())
 print(obj_MTS.predict(return_std = True))
 
 regr5 = linear_model.BayesianRidge()
-obj_MTS2 = ns.MTS(regr5, lags = 1, n_hidden_features=7, 
-                 bias = True)
+obj_MTS2 = ns.MTS(regr5, lags = 1, n_hidden_features=2, 
+                 bias = True, n_clusters=2)
 obj_MTS2.fit(X)
 print(obj_MTS2.predict())
 
