@@ -331,6 +331,7 @@ A few things that we could explore are:
 - Dealing with additional deterministic regressors in MTS objects (with [tests](/tests))
 - Make package available on PyPI (for those who want)
 - Enrich the tests (if necessary)
+- Make `nnetsauce` available to R users (using [rpy2](https://rpy2.readthedocs.io/en/version_2.8.x/))
 
 
 ## Dependencies 
