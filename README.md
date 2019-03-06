@@ -259,7 +259,7 @@ print(obj_MTS4.predict())
 
 ````
 
-__There are certainly many other creative ways of combining these objects__, that you can [contribute](CONTRIBUTING.md) (including **[tests](/tests)**)! (Put link to the directory containing tests, put link to the directory containing tests, put link to the directory containing tests)
+__There are certainly many other creative ways of combining these objects__, that you can [contribute](CONTRIBUTING.md) (including **[tests](/tests)**)! 
 
 ## Model validation
 
@@ -332,6 +332,7 @@ A few things that we could explore are:
 - Make package available on PyPI (for those who want)
 - Enrich the tests (if necessary)
 - Make `nnetsauce` available to R users (using [rpy2](https://rpy2.readthedocs.io/en/version_2.8.x/) for example, or any other tool that you'd suggest)
+- Any benchmarking of `nnetsauce` models (notebooks, files, etc.) can be stored in [demo](/nnetsauce/demo)
 
 
 ## Dependencies 
