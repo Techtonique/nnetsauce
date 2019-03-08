@@ -62,5 +62,21 @@ class TestBase(ut.TestCase):
                         np.allclose(rmse3, 297.48121295592665) & \
                         np.allclose(rmse4, 528.74597543402103))
         
+        
+    def test_score(self):
+        
+        np.random.seed(123)
+        X, y = datasets.make_regression(n_samples=100, 
+                                n_features=3)
+        
+        fit_obj = ns.Base(n_hidden_features=5, 
+                          direct_link=True, bias=True,
+                          nodes_sim='sobol',
+                          activation_name='relu', n_clusters=2)
+        fit_obj.fit(X, y)
+        
+        self.assertTrue(np.allclose(fit_obj.score(X, y, scoring='neg_mean_squared_error'), 
+                                    8.8932331540758209))
+        
 if __name__=='__main__':
     ut.main()       
