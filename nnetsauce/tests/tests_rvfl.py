@@ -65,6 +65,33 @@ class TestRVFL(ut.TestCase):
                         np.allclose(rmse2, 17.278090150613096) & \
                         np.allclose(rmse3, 32.582378601766486) & \
                         np.allclose(rmse4, 53.052553013478331))
+
+    def test_score(self):
         
+        np.random.seed(123)
+        X, y = datasets.make_regression(n_samples=100, 
+                                n_features=3)
+        
+        fit_obj = ns.BayesianRVFL(n_hidden_features=10, 
+                            direct_link=False, bias=False,
+                            nodes_sim='sobol',
+                            type_scaling = ('std', 'minmax', 'std'),
+                            activation_name='relu', n_clusters=0)
+        
+        fit_obj2 = ns.BayesianRVFL2(n_hidden_features=9, 
+                            direct_link=False, bias=True,
+                            nodes_sim='halton',
+                            type_scaling = ('std', 'minmax', 'minmax'),
+                            activation_name='sigmoid', n_clusters=2)
+        
+        fit_obj.fit(X, y)
+        fit_obj2.fit(X, y)
+        
+        self.assertTrue(np.allclose(fit_obj.score(X, y, scoring='neg_mean_squared_error'), 
+                                    0.023104115093245361) & \
+        np.allclose(fit_obj2.score(X, y, scoring='neg_mean_squared_error'), 
+                                    51.485414634058536)) 
+        
+
 if __name__=='__main__':
     ut.main()       
