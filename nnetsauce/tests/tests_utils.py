@@ -96,6 +96,7 @@ class TestUtils(ut.TestCase):
         self.assertTrue(np.allclose(lmf.beta_hat(X, y, lam = 0.1), 
                          np.array([ 43.30170911,   5.68353528])))
     
+    
     # 5 - MTS  
     
     def test_MTS_train_inputs(self):        
@@ -112,6 +113,131 @@ class TestUtils(ut.TestCase):
                          0.28613933495)
 
 
+    # 6 - lm_funcs
+    
+    def test_beta_Sigma_hat_rvfl(self):
+        
+        sigma = 0.3 
+        s = 4
+        np.random.seed(123)
+        X, y = datasets.make_regression(n_samples=10, 
+                                n_features=3)
+        
+        fit1 = lmf.beta_Sigma_hat_rvfl(X = X, y = y,
+                              s = s, sigma = sigma,
+                              fit_intercept = True,
+                              return_cov = True)
+        
+        fit2 = lmf.beta_Sigma_hat_rvfl(X = X, y = y,
+                              s = s, sigma = sigma,
+                              fit_intercept = True,
+                              return_cov = False)
+        
+        fit3 = lmf.beta_Sigma_hat_rvfl(X = X, y = y,
+                              s = s, sigma = sigma,
+                              fit_intercept = False,
+                              return_cov = True)
+        
+        fit4 = lmf.beta_Sigma_hat_rvfl(X = X, y = y,
+                              s = s, sigma = sigma,
+                              fit_intercept = False,
+                              return_cov = False)
+        
+        fit5 = lmf.beta_Sigma_hat_rvfl(X = X, y = y,
+                                       X_star = X,
+                              s = s, sigma = sigma,
+                              fit_intercept = True,
+                              return_cov = True)
+        
+        fit6 = lmf.beta_Sigma_hat_rvfl(X = X, y = y,
+                                       X_star = X,
+                              s = s, sigma = sigma,
+                              fit_intercept = True,
+                              return_cov = False)
+        
+        fit7 = lmf.beta_Sigma_hat_rvfl(X = X, y = y,
+                                       X_star = X,
+                              s = s, sigma = sigma,
+                              fit_intercept = False,
+                              return_cov = True)
+        
+        fit8 = lmf.beta_Sigma_hat_rvfl(X = X, y = y,
+                                       X_star = X,
+                              s = s, sigma = sigma,
+                              fit_intercept = False,
+                              return_cov = False)
+        
+        self.assertTrue(np.allclose(fit1['GCV'], fit2['GCV']) & \
+                        np.allclose(fit3['GCV'], fit4['GCV']) & \
+                        np.allclose(fit1['Sigma_hat'][2, 2], 0.011838759073782512) & \
+                        np.allclose(fit3['Sigma_hat'][2, 2], 0.0051354540166315132) & \
+                        np.allclose(fit5['beta_hat'], fit6['beta_hat']) & \
+                        np.allclose(fit7['beta_hat'], fit8['beta_hat']) & \
+                        np.allclose(fit5['preds_std'][0], 0.35014483) & \
+                        np.allclose(fit7['preds_std'][0], 0.34927927))
+        
+        
+    def test_beta_Sigma_hat_rvfl2(self):
+        
+        sigma = 0.3 
+        np.random.seed(123)
+        X, y = datasets.make_regression(n_samples=10, 
+                                n_features=3)
+        
+        fit1 = lmf.beta_Sigma_hat_rvfl2(X = X, y = y,
+                               sigma = sigma,
+                              fit_intercept = True,
+                              return_cov = True)
+        
+        fit2 = lmf.beta_Sigma_hat_rvfl2(X = X, y = y,
+                               sigma = sigma,
+                              fit_intercept = True,
+                              return_cov = False)
+        
+        fit3 = lmf.beta_Sigma_hat_rvfl2(X = X, y = y,
+                               sigma = sigma,
+                              fit_intercept = False,
+                              return_cov = True)
+        
+        fit4 = lmf.beta_Sigma_hat_rvfl2(X = X, y = y,
+                               sigma = sigma,
+                              fit_intercept = False,
+                              return_cov = False)
+        
+        fit5 = lmf.beta_Sigma_hat_rvfl2(X = X, y = y,
+                                       X_star = X,
+                               sigma = sigma,
+                              fit_intercept = True,
+                              return_cov = True)
+        
+        fit6 = lmf.beta_Sigma_hat_rvfl2(X = X, y = y,
+                                       X_star = X,
+                               sigma = sigma,
+                              fit_intercept = True,
+                              return_cov = False)
+        
+        fit7 = lmf.beta_Sigma_hat_rvfl2(X = X, y = y,
+                                       X_star = X,
+                               sigma = sigma,
+                              fit_intercept = False,
+                              return_cov = True)
+        
+        fit8 = lmf.beta_Sigma_hat_rvfl2(X = X, y = y,
+                                       X_star = X,
+                               sigma = sigma,
+                              fit_intercept = False,
+                              return_cov = False)
+        
+        self.assertTrue(np.allclose(fit1['GCV'], fit2['GCV']) & \
+                        np.allclose(fit3['GCV'], fit4['GCV']) & \
+                        np.allclose(fit1['Sigma_hat'][2, 2], 0.011681492315826048) & \
+                        np.allclose(fit3['Sigma_hat'][2, 2], 0.005107143375482126) & \
+                        np.allclose(fit5['beta_hat'], fit6['beta_hat']) & \
+                        np.allclose(fit7['beta_hat'], fit8['beta_hat']) & \
+                        np.allclose(fit5['preds_std'][0], 0.34971076802716183) & \
+                        np.allclose(fit7['preds_std'][0], 0.34893270739680532))
+
+    
 if __name__=='__main__':
     ut.main()        
     
