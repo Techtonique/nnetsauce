@@ -259,7 +259,7 @@ print(obj_MTS4.predict())
 
 ````
 
-__There are certainly many other creative ways of combining these objects__, that you can [contribute](CONTRIBUTING.md) (including **[tests](/tests)**)! 
+__There are certainly many other creative ways of combining these objects__, that you can (including **[tests](#Tests)**) [contribute](CONTRIBUTING.md) !
 
 ## Model validation
 
@@ -321,19 +321,48 @@ print(fit_obj3.cross_val_score(Z, t, cv = 5))
 
 ## Contributing
 
-Contributions are welcome, and valuable. Please, make sure to __read__ the [Code of Conduct](CONTRIBUTING.md) first.
+Your contributions are welcome, and valuable. Please, make sure to __read__ the [Code of Conduct](CONTRIBUTING.md) first.
 
 A few things that we could explore are:
 
 - Creating a great documentation on [readthedocs.org](https://readthedocs.org/) 
-- Combine `Custom` objects with your fertile imagination (with [tests](/tests))
+- Find other ways to combine `Custom` objects, using your fertile imagination (with [tests](/tests), see section [Tests](#Tests) below)
 - Better management of dates for MTS objects (with [tests](/tests))
-- Dealing with additional deterministic regressors in MTS objects (with [tests](/tests))
+- Dealing with additional deterministic regressors in MTS objects (with [tests](#Tests))
 - Make package available on PyPI (for those who want)
 - Enrich the tests (if necessary)
 - Make `nnetsauce` available to R users (using [rpy2](https://rpy2.readthedocs.io/en/version_2.8.x/) for example, or any other tool that you'd suggest)
 - Any benchmarking of `nnetsauce` models (notebooks, files, etc.) can be stored in [demo](/nnetsauce/demo)
 
+
+## Tests
+
+Tests of `nnetsauce`'s features are located [here](/tests). In order to run them and see the coverage (using [`nose2`](https://nose2.readthedocs.io/en/latest/)), do: 
+
+- Install packages required for testing: 
+
+```bash
+pip install coverage
+pip install nose2
+```
+
+- Run tests and print coverage
+
+```bash
+nose2 --with-coverage
+```
+
+- Obtain coverage reports:
+
+```bash
+coverage report -m
+```
+
+or an html report:
+
+```bash
+coverage html
+```
 
 ## Dependencies 
 

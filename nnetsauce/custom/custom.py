@@ -125,7 +125,7 @@ class Custom(Base):
         if mx.is_factor(y) == False: 
             
             if self.type_fit is None: 
-                self.type_fit = "regression"
+                self.type_fit = "regression"    
                 
             centered_y, scaled_Z = self.cook_training_set(y = y, X = X, 
                                                           **kwargs)

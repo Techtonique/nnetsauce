@@ -33,6 +33,11 @@ class TestBase(ut.TestCase):
                             direct_link=True, bias=True,
                             nodes_sim='hammersley',
                             activation_name='elu', n_clusters=4)
+        
+        fit_obj5 = ns.Base(n_hidden_features=2, 
+                            direct_link=True, bias=True,
+                            nodes_sim='hammersley',
+                            activation_name='prelu', n_clusters=0)
                         
         index_train = range(20)
         index_test = range(20, 25)
@@ -57,10 +62,15 @@ class TestBase(ut.TestCase):
         err4 = fit_obj4.predict(X_test) - y_test
         rmse4 = np.sqrt(np.mean(err4**2))
         
-        self.assertTrue(np.allclose(rmse, 276.97286264381154) & \
+        fit_obj5.fit(X_train, y_train)
+        err5 = fit_obj5.predict(X_test) - y_test
+        rmse5 = np.sqrt(np.mean(err5**2))
+        
+        self.assertTrue(np.allclose(rmse, 276.97286264381154)  & \
                         np.allclose(rmse2, 19.404919470812349) & \
                         np.allclose(rmse3, 297.48121295592665) & \
-                        np.allclose(rmse4, 528.74597543402103))
+                        np.allclose(rmse4, 528.74597543402103) & \
+                        np.allclose(rmse5, 5.4594298062878736e-13)) 
         
         
     def test_score(self):

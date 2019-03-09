@@ -271,6 +271,9 @@ class Base(object):
         
         if mx.is_factor(y): # classification
         
+            if scoring is None:
+                scoring = 'accuracy'
+            
             # check inputs 
             assert scoring in ('accuracy', 'average_precision', 
                                'brier_score_loss', 'f1', 'f1_micro',
@@ -299,6 +302,9 @@ class Base(object):
             } 
             
         else: # regression
+            
+            if scoring is None:
+                scoring = 'neg_mean_squared_error'
             
             # check inputs 
             assert scoring in ('explained_variance', 'neg_mean_absolute_error', 
