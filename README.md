@@ -326,8 +326,8 @@ Your contributions are welcome, and valuable. Please, make sure to __read__ the 
 A few things that we could explore are:
 
 - Creating a great documentation on [readthedocs.org](https://readthedocs.org/) 
-- Find other ways to combine `Custom` objects, using your fertile imagination (with [tests](/tests), see section [Tests](#Tests) below)
-- Better management of dates for MTS objects (with [tests](/tests))
+- Find other ways to combine `Custom` objects, using your fertile imagination (with [tests](/nnetsauce/tests), see section [Tests](#Tests) below)
+- Better management of dates for MTS objects (with [tests](/nnetsauce/tests))
 - Dealing with additional deterministic regressors in MTS objects (with [tests](#Tests))
 - Make package available on PyPI (for those who want)
 - Enrich the tests (if necessary)
@@ -337,7 +337,7 @@ A few things that we could explore are:
 
 ## Tests
 
-Tests of `nnetsauce`'s features are located [here](/tests). In order to run them and see the coverage (using [`nose2`](https://nose2.readthedocs.io/en/latest/)), do: 
+Tests of `nnetsauce`'s features are located [here](nnetsauce/tests). In order to run them and see the coverage (using [`nose2`](https://nose2.readthedocs.io/en/latest/)), do: 
 
 - Install packages required for testing: 
 
