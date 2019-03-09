@@ -259,7 +259,7 @@ print(obj_MTS4.predict())
 
 ````
 
-__There are certainly many other creative ways of combining these objects__, that you can (including **[tests](#Tests)**) [contribute](CONTRIBUTING.md) !
+__There are certainly many other creative ways of combining these objects__, that you can (including **[tests](#Tests)**) [contribute](#Contributing) !
 
 ## Model validation
 
