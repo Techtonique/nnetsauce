@@ -338,7 +338,7 @@ A few things that we could explore are:
 - Make package available on PyPI (for those who want)
 - Enrich the [tests](#Tests)
 - Make `nnetsauce` available to `R` users (using [rpy2](https://rpy2.readthedocs.io/en/version_2.8.x/) for example, or any other tool that you'd suggest)
-- Any benchmarking of `nnetsauce` models (notebooks, files, etc.) can be stored in [demo](/nnetsauce/demo), with the naming convention:  `yourgithubname_ddmmyy_shortdescription.[py|ipynb]`
+- Any benchmarking of `nnetsauce` models (notebooks, files, etc.) can be stored in [demo](/nnetsauce/demo), with the following naming convention:  `yourgithubname_ddmmyy_shortdescriptionofdemo.[py|ipynb]`
 
 
 ## Tests
