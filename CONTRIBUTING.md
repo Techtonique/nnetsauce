@@ -12,7 +12,7 @@ We invite all those who participate in, to help us create safe and positive expe
 
 A supplemental goal of this Code of Conduct is to encourage participants to recognize and strengthen the relationships between our actions and their effects on other participants.
 
-Communities mirror the societies in which they exist and positive action is essential to counteract the many forms of inequality and abuses of power that exist in society.
+Communities mirror the societies in which they exist, and positive action is essential to counteract the many forms of inequality and abuses of power that exist in society.
 
 ## 3. Expected Behavior
 
