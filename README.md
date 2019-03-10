@@ -180,7 +180,7 @@ print(fit_obj3.predict(Z[456:569,:]))
 
 ````
 
-We can also __combine `Custom` building blocks__. In the following example, doing that increases the accuracy, as new layers are added to the stack:
+We can also __combine `Custom` building blocks__. __In the following example, doing that increases the accuracy__, as new layers are added to the stack:
 
 ````python
 
@@ -213,7 +213,7 @@ np.sqrt(layer3_regr.score(X[100:125,:], y[100:125]))
 
 ````
 
-To finish, an example of multivariate time series forecasting with `MTS`:
+To finish, an example of multivariate time series forecasting model with `MTS`:
 
 ````python
 np.random.seed(123)
@@ -264,7 +264,7 @@ __There are certainly many other creative ways of combining these objects__, tha
 ## Model validation
 
 Currently, a method `score` is available for all models in the `nnetsauce`. It allows to measure the model's 
-performance on a given testing set __(X, y)__. The `scoring` options are the same 
+performance on a given testing set __(X, y)__. `scoring` options are the same 
 as `scikit-learn`'s. Using the previous code snippet, we have: 
 
 ````python
@@ -296,7 +296,7 @@ fit_obj.fit(X[0:350,:], y[0:350])
 print(fit_obj.GCV)
 ````
 
-For `Custom`, in addition to the method `score`, we have a cross-validation method `cross_val_score` similar to `scikit-learn` 's `cross_val_score`: 
+For `Custom` objects, in addition to the method `score`, we have a cross-validation method `cross_val_score` similar to `scikit-learn` 's `cross_val_score`: 
 
 ````python
 regr = linear_model.BayesianRidge()
@@ -326,39 +326,43 @@ Your contributions are welcome, and valuable. Please, make sure to __read__ the 
 A few things that we could explore are:
 
 - Creating a great documentation on [readthedocs.org](https://readthedocs.org/) 
-- Find other ways to combine `Custom` objects, using your fertile imagination (with [tests](/nnetsauce/tests), see section [Tests](#Tests) below)
-- Better management of dates for MTS objects (with [tests](/nnetsauce/tests))
-- Dealing with additional deterministic regressors in MTS objects (with [tests](#Tests))
+- Find other ways to combine `Custom` objects, using your fertile imagination (including [tests](#Tests))
+- Better management of dates for MTS objects (including [tests](#Tests))
+- Dealing with additional deterministic regressors in MTS objects (including [tests](#Tests))
 - Make package available on PyPI (for those who want)
-- Enrich the tests (if necessary)
+- Enrich the [tests](#Tests)
 - Make `nnetsauce` available to R users (using [rpy2](https://rpy2.readthedocs.io/en/version_2.8.x/) for example, or any other tool that you'd suggest)
-- Any benchmarking of `nnetsauce` models (notebooks, files, etc.) can be stored in [demo](/nnetsauce/demo)
+- Any benchmarking of `nnetsauce` models (notebooks, files, etc.) can be stored in [demo](/nnetsauce/demo), with the naming convention:  `yourgithubname_ddmmyy_shortdescription.[py|ipynb]`.
 
 
 ## Tests
 
-Tests of `nnetsauce`'s features are located [here](nnetsauce/tests). In order to run them and see the coverage (using [`nose2`](https://nose2.readthedocs.io/en/latest/)), do: 
+Tests of `nnetsauce`'s features are located [here](nnetsauce/tests). In order to run them and obtain tests' coverage (using [`nose2`](https://nose2.readthedocs.io/en/latest/)), do: 
 
 - Install packages required for testing: 
 
 ```bash
-pip install coverage
 pip install nose2
+pip install coverage
 ```
 
-- Run tests and print coverage
+- Run tests and print coverage:
 
 ```bash
+git clone https://github.com/thierrymoudiki/nnetsauce.git
+cd nnetsauce
 nose2 --with-coverage
 ```
 
 - Obtain coverage reports:
 
+At the command line:
+
 ```bash
 coverage report -m
 ```
 
-or an html report:
+  or an html report:
 
 ```bash
 coverage html
