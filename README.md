@@ -23,7 +23,7 @@ TODO
 
 Every model in the `nnetsauce` is based on the component __g(XW + b)__, where:
 
-- __X__ is a matrix containing the explanatory variables and (optional) clustering information about the individuals. The clustering methods available are _k-means_ and a _Gaussian Mixture Model_; they help in taking into account data's heterogeneity.
+- __X__ is a matrix containing the explanatory variables and (optional) clustering information. The clustering methods available are _k-means_ and a _Gaussian Mixture Model_; they help in taking into account input data's heterogeneity.
 - __W__ creates new, additional explanatory variables from __X__. It can be drawn from various random and quasirandom sequences.
 - __b__ is an optional bias parameter.
 - __g__ is an _activation function_ such as the hyperbolic tangent or the sigmoid function (among others), that renders the combination of explanatory variables (through __W__) nonlinear.  
@@ -93,7 +93,7 @@ Example with `BayesianRVFL` model (one regularization parameter):
 ````python
 # create object BayesianRVFL  
 # regularization is controlled by 's' and 'sigma'
-# here, nodes_sim='halton' is used
+# here, nodes_sim='halton' is used in the hidden layer
 fit_obj = ns.BayesianRVFL(n_hidden_features=100,
                           nodes_sim='halton', 
                           direct_link=True,
@@ -323,7 +323,7 @@ print(fit_obj3.cross_val_score(Z, t, cv = 5))
 
 Your contributions are welcome, and valuable. Please, make sure to __read__ the [Code of Conduct](CONTRIBUTING.md) first.
 
-For Pull Requests, let's strive to use `black` for formatting. Like this: 
+For Pull Requests, let's strive to use [`black`](https://black.readthedocs.io/en/stable/) for formatting. Like this: 
 ```bash
 pip install black
 black --line-length=60 file_submitted_for_pr.py
@@ -337,13 +337,13 @@ A few things that we could explore are:
 - Dealing with additional deterministic regressors in MTS objects (including [tests](#Tests))
 - Make package available on PyPI (for those who want)
 - Enrich the [tests](#Tests)
-- Make `nnetsauce` available to R users (using [rpy2](https://rpy2.readthedocs.io/en/version_2.8.x/) for example, or any other tool that you'd suggest)
-- Any benchmarking of `nnetsauce` models (notebooks, files, etc.) can be stored in [demo](/nnetsauce/demo), with the naming convention:  `yourgithubname_ddmmyy_shortdescription.[py|ipynb]`.
+- Make `nnetsauce` available to `R` users (using [rpy2](https://rpy2.readthedocs.io/en/version_2.8.x/) for example, or any other tool that you'd suggest)
+- Any benchmarking of `nnetsauce` models (notebooks, files, etc.) can be stored in [demo](/nnetsauce/demo), with the naming convention:  `yourgithubname_ddmmyy_shortdescription.[py|ipynb]`
 
 
 ## Tests
 
-Tests of `nnetsauce`'s features are located [here](nnetsauce/tests). In order to run them and obtain tests' coverage (using [`nose2`](https://nose2.readthedocs.io/en/latest/)), do: 
+Tests for `nnetsauce`'s features are located [here](nnetsauce/tests). In order to run them and obtain tests' coverage (using [`nose2`](https://nose2.readthedocs.io/en/latest/)), do: 
 
 - Install packages required for testing: 
 
