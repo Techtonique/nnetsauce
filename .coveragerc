@@ -12,5 +12,6 @@ ignore_errors = True
 omit =
     nnetsauce/__init__.py	
     nnetsauce/demo/*
+    nnetsauce/tests/*
     setup.py	
 	

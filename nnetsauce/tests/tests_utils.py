@@ -29,7 +29,10 @@ class TestUtils(ut.TestCase):
                       [ 2,  1]])         
         self.assertTrue(np.allclose(mo.tcrossprod(A, B), 
                          np.array([[10,  4],
-                                   [24, 10]]))) 
+                                   [24, 10]])) & \
+                        np.allclose(mo.tcrossprod(A), 
+                         np.array([[5,  11],
+                                   [11, 25]]))) 
 
     
     def test_cbind(self): 
@@ -76,7 +79,6 @@ class TestUtils(ut.TestCase):
         self.assertTrue(np.allclose(psdx.nearestPD(A),
                         np.array([[ 1.31461828,  2.32186616],
                                   [ 2.32186616,  4.10085767]])))  
-
     
     # 4 - lm
     
@@ -86,7 +88,9 @@ class TestUtils(ut.TestCase):
                                 random_state=123)
         self.assertTrue(np.allclose(lmf.inv_penalized_cov(X, lam = 0.1), 
                          np.array([[0.1207683,  0.04333116],
-                                   [0.04333116, 0.15787413]])))
+                                   [0.04333116, 0.15787413]])) & np.allclose(lmf.inv_penalized_cov(X), 
+                                    np.array([[0.12244009,  0.04456527],
+                                              [0.04456527, 0.16060273]])))
     
     
     def test_lmf_beta_hat(self):
@@ -94,7 +98,8 @@ class TestUtils(ut.TestCase):
                                 n_features=2,
                                 random_state=123)
         self.assertTrue(np.allclose(lmf.beta_hat(X, y, lam = 0.1), 
-                         np.array([ 43.30170911,   5.68353528])))
+                         np.array([ 43.30170911,   5.68353528])) & np.allclose(lmf.beta_hat(X, y), 
+                         np.array([ 43.85722447,   5.96778966])))
     
     
     # 5 - MTS  

@@ -104,7 +104,7 @@ class BayesianRVFL2(Base):
                    direct_link=True,
                    n_clusters=None, # optim
                    type_clust='kmeans',
-                   type_scaling = ('std', 'std'),
+                   type_scaling = ('std', 'std', 'std'),
                    seed=123, 
                    s1=0.1, s2=0.1, sigma=0.05, # optim
                    return_std = True):

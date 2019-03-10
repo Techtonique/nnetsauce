@@ -68,6 +68,33 @@ class TestMTS(ut.TestCase):
                         np.allclose(rmse4, 10.677585029352571))
         
         
+    def test_get_set(self):
+        
+        np.random.seed(123)
+        X = np.random.rand(25, 3)
+        X[:,0] = 100*X[:,0]
+        X[:,2] = 25*X[:,2]
+        
+        regr = linear_model.BayesianRidge()
+        
+        fit_obj = ns.MTS(regr, n_hidden_features=10, 
+                            direct_link=False, bias=False,
+                            nodes_sim='sobol',
+                            type_scaling = ('std', 'minmax', 'std'),
+                            activation_name='relu', n_clusters=0)
+        
+        fit_obj.set_params(n_hidden_features=5, 
+                   activation_name='relu', a=0.01,
+                   nodes_sim='sobol', bias=True,
+                   direct_link=True, n_clusters=None,
+                   type_clust='kmeans', 
+                   type_scaling = ('std', 'std', 'std'),
+                   seed=123, 
+                   lags = 1)
+        
+        self.assertTrue((fit_obj.get_params()['lags'] == 1) & (fit_obj.get_params()['type_scaling'] == ('std', 'std', 'std')))
+        
+        
     def test_score(self):
         
         np.random.seed(123)
