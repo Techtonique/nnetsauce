@@ -323,6 +323,12 @@ print(fit_obj3.cross_val_score(Z, t, cv = 5))
 
 Your contributions are welcome, and valuable. Please, make sure to __read__ the [Code of Conduct](CONTRIBUTING.md) first.
 
+For Pull Requests, let's strive to use `black` for formatting. Like this: 
+```bash
+pip install black
+black --line-length=60 file_submitted_for_pr.py
+```
+
 A few things that we could explore are:
 
 - Creating a great documentation on [readthedocs.org](https://readthedocs.org/) 

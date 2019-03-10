@@ -1,3 +1,3 @@
 from .custom import Custom
 
-__all__= ["Custom"]
+__all__ = ["Custom"]

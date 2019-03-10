@@ -1,11 +1,12 @@
 """Random Vector Functional Link Network regression with regularization."""
 
-# Authors: Thierry Moudiki 
+# Authors: Thierry Moudiki
 #
 # License: BSD 3
 
 import numpy as np
-#import sklearn.model_selection as skm
+
+# import sklearn.model_selection as skm
 import sklearn.metrics as skm2
 from ..base import Base
 from ..utils import misc as mx
@@ -49,72 +50,92 @@ class BayesianRVFL(Base):
        Sigma: array-like
            covariance of the distribution of fitted parameters
     """
-    
+
     # construct the object -----
-    
-    def __init__(self,
-                 n_hidden_features=5, 
-                 activation_name='relu',
-                 a=0.01,
-                 nodes_sim='sobol',
-                 bias=True,
-                 direct_link=True, 
-                 n_clusters=2,
-                 type_clust='kmeans',
-                 type_scaling = ('std', 'std', 'std'),
-                 seed=123, 
-                 s=0.1, sigma=0.05, 
-                 beta=None, Sigma=None,
-                 GCV=None, return_std = True):
-                
-        super().__init__(n_hidden_features = n_hidden_features, 
-                         activation_name = activation_name, a = a,
-                         nodes_sim = nodes_sim, 
-                         bias = bias, direct_link = direct_link,
-                         n_clusters = n_clusters, 
-                         type_clust = type_clust, 
-                         type_scaling = type_scaling,
-                         seed = seed)
-        self.s = s 
+
+    def __init__(
+        self,
+        n_hidden_features=5,
+        activation_name="relu",
+        a=0.01,
+        nodes_sim="sobol",
+        bias=True,
+        direct_link=True,
+        n_clusters=2,
+        type_clust="kmeans",
+        type_scaling=("std", "std", "std"),
+        seed=123,
+        s=0.1,
+        sigma=0.05,
+        beta=None,
+        Sigma=None,
+        GCV=None,
+        return_std=True,
+    ):
+
+        super().__init__(
+            n_hidden_features=n_hidden_features,
+            activation_name=activation_name,
+            a=a,
+            nodes_sim=nodes_sim,
+            bias=bias,
+            direct_link=direct_link,
+            n_clusters=n_clusters,
+            type_clust=type_clust,
+            type_scaling=type_scaling,
+            seed=seed,
+        )
+        self.s = s
         self.sigma = sigma
         self.beta = beta
         self.Sigma = Sigma
         self.GCV = GCV
         self.return_std = return_std
-    
-    
-    def get_params(self):
-        
-        return mx.merge_two_dicts(super().get_params(), 
-                                  {"s": self.s, 
-                                   "sigma": self.sigma,
-                                   "return_std": self.return_std})
 
-    
-    def set_params(self, n_hidden_features=5, 
-                   activation_name='relu', 
-                   a=0.01,
-                   nodes_sim='sobol',
-                   bias=True,
-                   direct_link=True,
-                   n_clusters=None,
-                   type_clust='kmeans',
-                   type_scaling = ('std', 'std', 'std'),
-                   seed=123, 
-                   s=0.1, sigma=0.05,
-                   return_std = True):
-        
-        super().set_params(n_hidden_features = n_hidden_features, 
-                           activation_name = activation_name, a = a,
-                           nodes_sim = nodes_sim, bias = bias, 
-                           direct_link = direct_link, n_clusters = n_clusters, 
-                           type_clust = type_clust, type_scaling = type_scaling, 
-                           seed = seed)
+    def get_params(self):
+
+        return mx.merge_two_dicts(
+            super().get_params(),
+            {
+                "s": self.s,
+                "sigma": self.sigma,
+                "return_std": self.return_std,
+            },
+        )
+
+    def set_params(
+        self,
+        n_hidden_features=5,
+        activation_name="relu",
+        a=0.01,
+        nodes_sim="sobol",
+        bias=True,
+        direct_link=True,
+        n_clusters=None,
+        type_clust="kmeans",
+        type_scaling=("std", "std", "std"),
+        seed=123,
+        s=0.1,
+        sigma=0.05,
+        return_std=True,
+    ):
+
+        super().set_params(
+            n_hidden_features=n_hidden_features,
+            activation_name=activation_name,
+            a=a,
+            nodes_sim=nodes_sim,
+            bias=bias,
+            direct_link=direct_link,
+            n_clusters=n_clusters,
+            type_clust=type_clust,
+            type_scaling=type_scaling,
+            seed=seed,
+        )
         self.s = s
         self.sigma = sigma
         self.return_std = return_std
-        
-    
+
     def fit(self, X, y, **kwargs):
         """Fit regularized RVFL to training data (X, y).
         
@@ -134,26 +155,29 @@ class BayesianRVFL(Base):
         -------
         self: object
         """
-        
-        centered_y, scaled_Z = self.cook_training_set(y = y, X = X, **kwargs)
-        
-        fit_obj = lmf.beta_Sigma_hat_rvfl(X = scaled_Z, 
-                                          y = centered_y, 
-                                          s = self.s, 
-                                          sigma = self.sigma,
-                                          fit_intercept = False,
-                                          return_cov = self.return_std)
-        
-        self.beta = fit_obj['beta_hat']
-        
-        if self.return_std == True: 
-            self.Sigma = fit_obj['Sigma_hat']
-        
-        self.GCV = fit_obj['GCV']
-        
+
+        centered_y, scaled_Z = self.cook_training_set(
+            y=y, X=X, **kwargs
+        )
+
+        fit_obj = lmf.beta_Sigma_hat_rvfl(
+            X=scaled_Z,
+            y=centered_y,
+            s=self.s,
+            sigma=self.sigma,
+            fit_intercept=False,
+            return_cov=self.return_std,
+        )
+
+        self.beta = fit_obj["beta_hat"]
+
+        if self.return_std == True:
+            self.Sigma = fit_obj["Sigma_hat"]
+
+        self.GCV = fit_obj["GCV"]
+
         return self
 
-    
     def predict(self, X, **kwargs):
         """Predict test data X.
         
@@ -170,116 +194,146 @@ class BayesianRVFL(Base):
         -------
         model predictions: {array-like}
         """
-        
-        if len(X.shape) == 1: # one observation in the test set only
+
+        if (
+            len(X.shape) == 1
+        ):  # one observation in the test set only
             n_features = X.shape[0]
-            new_X = mo.rbind(X.reshape(1, n_features), 
-                             np.ones(n_features).reshape(1, n_features))        
-        
+            new_X = mo.rbind(
+                X.reshape(1, n_features),
+                np.ones(n_features).reshape(1, n_features),
+            )
+
         if self.return_std == False:
-            
+
             if len(X.shape) == 1:
-            
-                return (self.y_mean + np.dot(self.cook_test_set(new_X, 
-                                                                **kwargs), 
-                                         self.beta))[0]
+
+                return (
+                    self.y_mean
+                    + np.dot(
+                        self.cook_test_set(new_X, **kwargs),
+                        self.beta,
+                    )
+                )[0]
             else:
-                
-                return (self.y_mean + np.dot(self.cook_test_set(X, **kwargs), 
-                                         self.beta))
-            
-        else: # confidence interval required for preds?
-            
+
+                return self.y_mean + np.dot(
+                    self.cook_test_set(X, **kwargs),
+                    self.beta,
+                )
+
+        else:  # confidence interval required for preds?
+
             if len(X.shape) == 1:
-            
+
                 Z = self.cook_test_set(new_X, **kwargs)
-                
-                pred_obj = lmf.beta_Sigma_hat_rvfl(s = self.s, 
-                                                   sigma = self.sigma, 
-                                                   X_star = Z, 
-                                                   return_cov = True, 
-                                                   beta_hat_ = self.beta, 
-                                                   Sigma_hat_ = self.Sigma) 
-                
-                return (self.y_mean + pred_obj['preds'][0], 
-                        pred_obj['preds_std'][0]) 
+
+                pred_obj = lmf.beta_Sigma_hat_rvfl(
+                    s=self.s,
+                    sigma=self.sigma,
+                    X_star=Z,
+                    return_cov=True,
+                    beta_hat_=self.beta,
+                    Sigma_hat_=self.Sigma,
+                )
+
+                return (
+                    self.y_mean + pred_obj["preds"][0],
+                    pred_obj["preds_std"][0],
+                )
 
             else:
-                
+
                 Z = self.cook_test_set(X, **kwargs)
-                
-                pred_obj = lmf.beta_Sigma_hat_rvfl(s = self.s, 
-                                                   sigma = self.sigma, 
-                                                   X_star = Z, 
-                                                   return_cov = True,
-                                                   beta_hat_ = self.beta, 
-                                                   Sigma_hat_ = self.Sigma) 
-                
-                return (self.y_mean + pred_obj['preds'], 
-                        pred_obj['preds_std']) 
-        
-        
-    def score(self, X, y, 
-              scoring=None, **kwargs):
+
+                pred_obj = lmf.beta_Sigma_hat_rvfl(
+                    s=self.s,
+                    sigma=self.sigma,
+                    X_star=Z,
+                    return_cov=True,
+                    beta_hat_=self.beta,
+                    Sigma_hat_=self.Sigma,
+                )
+
+                return (
+                    self.y_mean + pred_obj["preds"],
+                    pred_obj["preds_std"],
+                )
+
+    def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
-        
+
         preds = self.predict(X)
-        
-        if type(preds) == tuple: # if there are std. devs in the predictions
-            preds = preds[0]    
-        
-        if mx.is_factor(y): # classification
-            
+
+        if (
+            type(preds) == tuple
+        ):  # if there are std. devs in the predictions
+            preds = preds[0]
+
+        if mx.is_factor(y):  # classification
+
             if scoring is None:
-                scoring = 'accuracy'
-            
-            # check inputs 
-            assert scoring in ('accuracy', 'average_precision', 
-                               'brier_score_loss', 'f1', 'f1_micro',
-                               'f1_macro', 'f1_weighted',  'f1_samples',
-                               'neg_log_loss', 'precision', 'recall',
-                               'roc_auc'), \
-                               "'scoring' should be in ('accuracy', 'average_precision', \
+                scoring = "accuracy"
+
+            # check inputs
+            assert scoring in (
+                "accuracy",
+                "average_precision",
+                "brier_score_loss",
+                "f1",
+                "f1_micro",
+                "f1_macro",
+                "f1_weighted",
+                "f1_samples",
+                "neg_log_loss",
+                "precision",
+                "recall",
+                "roc_auc",
+            ), "'scoring' should be in ('accuracy', 'average_precision', \
                                'brier_score_loss', 'f1', 'f1_micro', \
                                'f1_macro', 'f1_weighted',  'f1_samples', \
                                'neg_log_loss', 'precision', 'recall', \
                                'roc_auc')"
-            
+
             scoring_options = {
-                'accuracy': skm2.accuracy_score,
-                'average_precision': skm2.average_precision_score,
-                'brier_score_loss': skm2.brier_score_loss,
-                'f1': skm2.f1_score,
-                'f1_micro': skm2.f1_score,
-                'f1_macro': skm2.f1_score,
-                'f1_weighted': skm2.f1_score,
-                'f1_samples': skm2.f1_score,
-                'neg_log_loss': skm2.log_loss,
-                'precision': skm2.precision_score,
-                'recall': skm2.recall_score,
-                'roc_auc': skm2.roc_auc_score
-            } 
-            
-        else: # regression
-            
+                "accuracy": skm2.accuracy_score,
+                "average_precision": skm2.average_precision_score,
+                "brier_score_loss": skm2.brier_score_loss,
+                "f1": skm2.f1_score,
+                "f1_micro": skm2.f1_score,
+                "f1_macro": skm2.f1_score,
+                "f1_weighted": skm2.f1_score,
+                "f1_samples": skm2.f1_score,
+                "neg_log_loss": skm2.log_loss,
+                "precision": skm2.precision_score,
+                "recall": skm2.recall_score,
+                "roc_auc": skm2.roc_auc_score,
+            }
+
+        else:  # regression
+
             if scoring is None:
-                scoring = 'neg_mean_squared_error'
-            
-            # check inputs 
-            assert scoring in ('explained_variance', 'neg_mean_absolute_error', 
-                               'neg_mean_squared_error', 'neg_mean_squared_log_error', 
-                               'neg_median_absolute_error', 'r2'), \
-                               "'scoring' should be in ('explained_variance', 'neg_mean_absolute_error', \
+                scoring = "neg_mean_squared_error"
+
+            # check inputs
+            assert scoring in (
+                "explained_variance",
+                "neg_mean_absolute_error",
+                "neg_mean_squared_error",
+                "neg_mean_squared_log_error",
+                "neg_median_absolute_error",
+                "r2",
+            ), "'scoring' should be in ('explained_variance', 'neg_mean_absolute_error', \
                                'neg_mean_squared_error', 'neg_mean_squared_log_error', \
                                'neg_median_absolute_error', 'r2')"
-            
+
             scoring_options = {
-                'explained_variance': skm2.explained_variance_score,
-                'neg_mean_absolute_error': skm2.mean_absolute_error,
-                'neg_mean_squared_error': skm2.mean_squared_error,
-                'neg_mean_squared_log_error': skm2.mean_squared_log_error, 
-                'neg_median_absolute_error': skm2.median_absolute_error,
-                'r2': skm2.r2_score
-                } 
-        
-        return scoring_options[scoring](y, preds, **kwargs) 
+                "explained_variance": skm2.explained_variance_score,
+                "neg_mean_absolute_error": skm2.mean_absolute_error,
+                "neg_mean_squared_error": skm2.mean_squared_error,
+                "neg_mean_squared_log_error": skm2.mean_squared_log_error,
+                "neg_median_absolute_error": skm2.median_absolute_error,
+                "r2": skm2.r2_score,
+            }
+
+        return scoring_options[scoring](y, preds, **kwargs)
