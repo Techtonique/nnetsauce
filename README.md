@@ -56,7 +56,7 @@ Z = breast_cancer.data
 t = breast_cancer.target
 ````
 
-Example with `Base` model (no regularization):
+`Base` (no regularization):
 
 ````python
 # create object Base 
@@ -88,7 +88,7 @@ plt.ylabel('preds')
 plt.show()
 ````
 
-Example with `BayesianRVFL` model (one regularization parameter):
+`BayesianRVFL` (one regularization parameter):
 
 ````python
 # create object BayesianRVFL  
@@ -114,7 +114,7 @@ plt.ylabel('preds')
 plt.show()
 ````
 
-Example with `BayesianRVFL2` model (two regularization parameters):
+`BayesianRVFL2` (two regularization parameters):
 
 ````python
 # create object BayesianRVFL2 
@@ -138,7 +138,7 @@ plt.ylabel('preds')
 plt.show()
 ````
 
-Example of `Custom` models, using `scikit-learn`:
+`Custom` (using `scikit-learn`):
 
 ````python
 from sklearn import linear_model, gaussian_process
@@ -213,7 +213,7 @@ np.sqrt(layer3_regr.score(X[100:125,:], y[100:125]))
 
 ````
 
-To finish, an example of multivariate time series forecasting model with `MTS`:
+`MTS` (multivariate time series forecasting):
 
 ````python
 np.random.seed(123)
@@ -323,7 +323,7 @@ print(fit_obj3.cross_val_score(Z, t, cv = 5))
 
 Your contributions are welcome, and valuable. Please, make sure to __read__ the [Code of Conduct](CONTRIBUTING.md) first.
 
-In Pull Requests, let's strive to use [`black`](https://black.readthedocs.io/en/stable/) for formatting. Like this: 
+In Pull Requests, let's strive to use [`black`](https://black.readthedocs.io/en/stable/) for formatting: 
 ```bash
 pip install black
 black --line-length=60 file_submitted_for_pr.py
@@ -337,7 +337,7 @@ A few things that we could explore are:
 - Dealing with additional deterministic regressors in MTS objects (including [tests](#Tests))
 - Make package available on PyPI (for those who want)
 - Enrich the [tests](#Tests)
-- Make `nnetsauce` available to `R` users (using [rpy2](https://rpy2.readthedocs.io/en/version_2.8.x/) for example, or any other tool that you'd suggest)
+- Make `nnetsauce` available to `R` users 
 - Any benchmarking of `nnetsauce` models (notebooks, files, etc.) can be stored in [demo](/nnetsauce/demo), with the following naming convention:  `yourgithubname_ddmmyy_shortdescriptionofdemo.[py|ipynb]`
 
 
