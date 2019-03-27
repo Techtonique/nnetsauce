@@ -98,22 +98,32 @@ class Base(object):
         # activation function -----
 
         def prelu(x, a):
-            n, p = x.shape
-            y = x.copy()
-            for i in range(n):
-                for j in range(p):
-                    if x[i, j] < 0:
-                        y[i, j] = a * x[i, j]
+            y = x.copy() # vectorize
+            index = x < 0
+            y[index] = a*x[index]
+
             return y
+#            n, p = x.shape
+#            y = x.copy() # vectorize
+#            for i in range(n):
+#                for j in range(p):
+#                    if x[i, j] < 0:
+#                        y[i, j] = a * x[i, j]
+#            return y
 
         def elu(x, a):
-            n, p = x.shape
-            y = x.copy()
-            for i in range(n):
-                for j in range(p):
-                    if x[i, j] < 0:
-                        y[i, j] = a * (np.exp(x[i, j]) - 1)
+            y = x.copy() # vectorize
+            index = x < 0
+            y[index] = a * (np.exp(x[index]) - 1)
+
             return y
+#            n, p = x.shape
+#            y = x.copy() # vectorize
+#            for i in range(n):
+#                for j in range(p):
+#                    if x[i, j] < 0:
+#                        y[i, j] = a * (np.exp(x[i, j]) - 1)
+#            return y
 
         activation_options = {
             "relu": lambda x: np.maximum(x, 0),
