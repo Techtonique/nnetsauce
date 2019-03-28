@@ -32,6 +32,9 @@ class Custom(Base):
        bias: boolean
            indicates if the hidden layer contains a bias term (True) or not 
            (False)
+       dropout: float
+           regularization parameter; (random) percentage of nodes dropped out 
+           of the training
        direct_link: boolean
            indicates if the original predictors are included (True) in model's 
            fitting or not (False)
@@ -61,6 +64,7 @@ class Custom(Base):
         a=0.01,
         nodes_sim="sobol",
         bias=True,
+        dropout=0,
         direct_link=True,
         n_clusters=2,
         type_clust="kmeans",
@@ -75,6 +79,7 @@ class Custom(Base):
             a=a,
             nodes_sim=nodes_sim,
             bias=bias,
+            dropout=dropout,
             direct_link=direct_link,
             n_clusters=n_clusters,
             type_clust=type_clust,
@@ -96,8 +101,9 @@ class Custom(Base):
         a=0.01,
         nodes_sim="sobol",
         bias=True,
+        dropout = 0,
         direct_link=True,
-        n_clusters=None,
+        n_clusters=0,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         seed=123,
@@ -109,6 +115,7 @@ class Custom(Base):
             a=a,
             nodes_sim=nodes_sim,
             bias=bias,
+            dropout=dropout,
             direct_link=direct_link,
             n_clusters=n_clusters,
             type_clust=type_clust,

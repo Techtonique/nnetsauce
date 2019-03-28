@@ -5,7 +5,6 @@
 # License: BSD 3
 
 import numpy as np
-import sklearn.model_selection as skm
 import sklearn.metrics as skm2
 from ..base import Base
 from ..utils import misc as mx
@@ -28,6 +27,9 @@ class BayesianRVFL2(Base):
            type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 'uniform'
        bias: boolean
            indicates if the hidden layer contains a bias term (True) or not (False)
+       dropout: float
+           regularization parameter; (random) percentage of nodes dropped out 
+           of the training
        direct_link: boolean
            indicates if the original predictors are included (True) in model's fitting or not (False)
        n_clusters: int
@@ -61,8 +63,9 @@ class BayesianRVFL2(Base):
         a=0.01,
         nodes_sim="sobol",
         bias=True,
+        dropout=0,
         direct_link=True,
-        n_clusters=2,
+        n_clusters=0,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         seed=123,
@@ -81,6 +84,7 @@ class BayesianRVFL2(Base):
             a=a,
             nodes_sim=nodes_sim,
             bias=bias,
+            dropout=dropout,
             direct_link=direct_link,
             n_clusters=n_clusters,
             type_clust=type_clust,
@@ -115,6 +119,7 @@ class BayesianRVFL2(Base):
         a=0.01,
         nodes_sim="sobol",
         bias=True,
+        dropout = 0,
         direct_link=True,
         n_clusters=None,  # optim
         type_clust="kmeans",
@@ -131,7 +136,8 @@ class BayesianRVFL2(Base):
             activation_name=activation_name,
             a=a,
             nodes_sim=nodes_sim,
-            bias=bias,
+            bias=bias, 
+            dropout = dropout,
             direct_link=direct_link,
             n_clusters=n_clusters,
             type_clust=type_clust,

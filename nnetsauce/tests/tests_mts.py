@@ -60,6 +60,18 @@ class TestMTS(ut.TestCase):
             activation_name="elu",
             n_clusters=4,
         )
+        
+        fit_obj5 = ns.MTS(
+            regr,
+            n_hidden_features=7,
+            direct_link=True,
+            bias=True,
+            dropout=0.5,
+            nodes_sim="hammersley",
+            type_scaling=("minmax", "minmax", "minmax"),
+            activation_name="elu",
+            n_clusters=4,
+        )
 
         index_train = range(20)
         index_test = range(20, 25)
@@ -81,12 +93,17 @@ class TestMTS(ut.TestCase):
         fit_obj4.fit(X_train)
         err4 = fit_obj4.predict() - X_test
         rmse4 = np.sqrt(np.mean(err4 ** 2))
+        
+        fit_obj5.fit(X_train)
+        err5 = fit_obj5.predict() - X_test
+        rmse5 = np.sqrt(np.mean(err5 ** 2))
 
         self.assertTrue(
             np.allclose(rmse, 10.396062391967684)
             & np.allclose(rmse2, 10.395489235411796)
             & np.allclose(rmse3, 10.395986434438191)
             & np.allclose(rmse4, 10.677585029352571)
+            & np.allclose(rmse5, 10.360814075763624)
         )
 
     def test_get_set(self):

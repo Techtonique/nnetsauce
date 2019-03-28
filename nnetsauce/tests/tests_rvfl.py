@@ -135,6 +135,7 @@ class TestRVFL(ut.TestCase):
             a=0.01,
             nodes_sim="sobol",
             bias=True,
+            dropout = 0.5,
             direct_link=True,
             n_clusters=None,  # optim
             type_clust="kmeans",
@@ -156,6 +157,7 @@ class TestRVFL(ut.TestCase):
                     "bias": True,
                     "clustering_scaler": None,
                     "direct_link": True,
+                    "dropout": 0,
                     "n_clusters": None,
                     "n_hidden_features": 5,
                     "nn_scaler": None,
@@ -183,6 +185,7 @@ class TestRVFL(ut.TestCase):
                     "bias": True,
                     "clustering_scaler": None,
                     "direct_link": True,
+                    "dropout": 0.5,
                     "n_clusters": None,
                     "n_hidden_features": 4,
                     "nn_scaler": None,
@@ -230,9 +233,33 @@ class TestRVFL(ut.TestCase):
             activation_name="sigmoid",
             n_clusters=2,
         )
+        
+        fit_obj3 = ns.BayesianRVFL2(
+            n_hidden_features=9,
+            direct_link=True,
+            bias=True,
+            dropout=0.3,
+            nodes_sim="halton",
+            type_scaling=("std", "minmax", "minmax"),
+            activation_name="sigmoid",
+            n_clusters=2,
+        )
+        
+        fit_obj4 = ns.BayesianRVFL2(
+            n_hidden_features=9,
+            direct_link=True,
+            bias=True,
+            dropout=0.5,
+            nodes_sim="halton",
+            type_scaling=("std", "minmax", "minmax"),
+            activation_name="sigmoid",
+            n_clusters=2,
+        )
 
         fit_obj.fit(X, y)
         fit_obj2.fit(X, y)
+        fit_obj3.fit(X, y)
+        fit_obj4.fit(X, y)
 
         self.assertTrue(
             np.allclose(
@@ -252,6 +279,12 @@ class TestRVFL(ut.TestCase):
             )
             & np.allclose(
                 fit_obj2.score(X, y), 51.485414634058536
+            )
+            & np.allclose(
+                fit_obj3.score(X, y), 0.20023262498412012
+            )
+            & np.allclose(
+                fit_obj4.score(X, y), 0.17517631177933579
             )
         )
 

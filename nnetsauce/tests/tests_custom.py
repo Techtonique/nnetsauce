@@ -81,9 +81,9 @@ class TestCustom(ut.TestCase):
         rmse4 = np.sqrt(np.mean(err4 ** 2))
 
         self.assertTrue(
-            np.allclose(rmse, 64.933610490495667)
-            & np.allclose(rmse2, 12.968755131423396)
-            & np.allclose(rmse3, 26.716371782298673)
+            np.allclose(rmse, 64.933610490495667) \
+            & np.allclose(rmse2, 12.968755131423396) \
+            & np.allclose(rmse3, 26.716371782298673) \
             & np.allclose(rmse4, 33.457280982445447)
         )
 
@@ -99,6 +99,7 @@ class TestCustom(ut.TestCase):
 
         regr = linear_model.BayesianRidge()
         regr2 = gaussian_process.GaussianProcessClassifier()
+        regr3 = gaussian_process.GaussianProcessClassifier()
 
         fit_obj = ns.Custom(
             obj=regr,
@@ -112,24 +113,44 @@ class TestCustom(ut.TestCase):
 
         fit_obj2 = ns.Custom(
             obj=regr2,
-            n_hidden_features=100,
+            n_hidden_features=10,
             direct_link=True,
+            dropout=0.1,
             bias=True,
             activation_name="relu",
-            n_clusters=0,
+            n_clusters=3,
+        )
+        
+        fit_obj3 = ns.Custom(
+            obj=regr,
+            n_hidden_features=100,
+            dropout=0.6,
+            direct_link=True,
+            bias=True,
+            nodes_sim="sobol",
+            activation_name="relu",
+            n_clusters=2,
         )
 
+        fit_obj4 = ns.Custom(
+            obj=regr3,
+            n_hidden_features=50,
+            dropout=0.5,
+            direct_link=True,
+            bias=True,
+            activation_name="tanh",
+            n_clusters=2,
+        )
+        
         fit_obj.fit(X, y)
         fit_obj2.fit(Z, t)
+        fit_obj3.fit(X, y)
+        fit_obj4.fit(Z, t)
 
-        self.assertTrue(
-            np.allclose(
-                fit_obj.score(X, y), 1.0219738235804167e-09
-            )
-            & np.allclose(
-                fit_obj2.score(Z, t), 0.99648506151142358
-            )
-        )
+        self.assertTrue(np.allclose(fit_obj.score(X, y), 4846.2057110929481)             
+            & np.allclose(fit_obj2.score(Z, t), 0.99648506151142358) \
+            & np.allclose(fit_obj3.score(X, y), 2.1668647954067132e-11) \
+            & np.allclose(fit_obj4.score(Z, t), 1.0))
 
     def test_crossval(self):
 

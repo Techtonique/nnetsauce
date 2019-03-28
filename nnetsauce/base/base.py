@@ -35,6 +35,9 @@ class Base(object):
        bias: boolean
            indicates if the hidden layer contains a bias term (True) or 
            not (False)
+       dropout: float
+           regularization parameter; (random) percentage of nodes dropped out 
+           of the training
        direct_link: boolean
            indicates if the original predictors are included (True) in model's 
            fitting or not (False)
@@ -49,7 +52,7 @@ class Base(object):
            (and when relevant). 
            Currently available: standardization ('std') or MinMax scaling ('minmax')
        seed: int 
-           reproducibility seed for nodes_sim=='uniform' and for clustering
+           reproducibility seed for nodes_sim=='uniform', clustering and dropout
     """
 
     # construct the object -----
@@ -61,6 +64,7 @@ class Base(object):
         a=0.01,
         nodes_sim="sobol",
         bias=True,
+        dropout=0,
         direct_link=True,
         n_clusters=2,
         type_clust="kmeans",
@@ -98,32 +102,18 @@ class Base(object):
         # activation function -----
 
         def prelu(x, a):
-            y = x.copy() # vectorize
+            y = x.copy() 
             index = x < 0
             y[index] = a*x[index]
 
             return y
-#            n, p = x.shape
-#            y = x.copy() # vectorize
-#            for i in range(n):
-#                for j in range(p):
-#                    if x[i, j] < 0:
-#                        y[i, j] = a * x[i, j]
-#            return y
 
         def elu(x, a):
-            y = x.copy() # vectorize
+            y = x.copy() 
             index = x < 0
             y[index] = a * (np.exp(x[index]) - 1)
 
             return y
-#            n, p = x.shape
-#            y = x.copy() # vectorize
-#            for i in range(n):
-#                for j in range(p):
-#                    if x[i, j] < 0:
-#                        y[i, j] = a * (np.exp(x[i, j]) - 1)
-#            return y
 
         activation_options = {
             "relu": lambda x: np.maximum(x, 0),
@@ -142,6 +132,7 @@ class Base(object):
         self.nodes_sim = nodes_sim
         self.bias = bias
         self.seed = seed
+        self.dropout = dropout
         self.direct_link = direct_link
         self.type_clust = type_clust
         self.type_scaling = type_scaling
@@ -167,6 +158,7 @@ class Base(object):
             "a": self.a,
             "nodes_sim": self.nodes_sim,
             "bias": self.bias,
+            "dropout": self.dropout,
             "direct_link": self.direct_link,
             "seed": self.seed,
             "type_clust": self.type_clust,
@@ -188,8 +180,9 @@ class Base(object):
         a=0.01,
         nodes_sim="sobol",
         bias=True,
+        dropout = 0,
         direct_link=True,
-        n_clusters=None,
+        n_clusters=0,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         seed=123,
@@ -198,21 +191,17 @@ class Base(object):
         # activation function -----
 
         def prelu(x, a):
-            n, p = x.shape
-            y = x.copy()
-            for i in range(n):
-                for j in range(p):
-                    if x[i, j] < 0:
-                        y[i, j] = a * x[i, j]
+            y = x.copy() 
+            index = x < 0
+            y[index] = a*x[index]
+
             return y
 
         def elu(x, a):
-            n, p = x.shape
-            y = x.copy()
-            for i in range(n):
-                for j in range(p):
-                    if x[i, j] < 0:
-                        y[i, j] = a * (np.exp(x[i, j]) - 1)
+            y = x.copy() 
+            index = x < 0
+            y[index] = a * (np.exp(x[index]) - 1)
+
             return y
 
         activation_options = {
@@ -230,11 +219,13 @@ class Base(object):
         ]
         self.nodes_sim = nodes_sim
         self.bias = bias
+        self.dropout = dropout
         self.direct_link = direct_link
         self.n_clusters = n_clusters
         self.type_clust = type_clust
         self.type_scaling = type_scaling
         self.seed = seed
+
 
     def fit(self, X, y, **kwargs):
         """Fit RVFL to training data (X, y).
@@ -267,6 +258,7 @@ class Base(object):
         self.GCV = fit_obj["GCV"]
 
         return self
+
 
     def predict(self, X, **kwargs):
         """Predict test data X.
@@ -306,6 +298,7 @@ class Base(object):
             return self.y_mean + np.dot(
                 self.cook_test_set(X, **kwargs), self.beta
             )
+
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
@@ -468,6 +461,7 @@ class Base(object):
                 X_clustered, self.n_clusters
             )
 
+
     def create_layer(self, scaled_X, W=None):
         """ Create hidden layer. """
 
@@ -504,16 +498,16 @@ class Base(object):
                         n_points=self.n_hidden_features,
                     )
 
-                return self.activation_func(
-                    np.dot(scaled_X, self.W)
-                )
+                return mo.dropout(x = self.activation_func(
+                    np.dot(scaled_X, self.W)), drop_prob = self.dropout, 
+                    seed = self.seed)
 
             else:
 
                 # self.W = W
-                return self.activation_func(
-                    np.dot(scaled_X, W)
-                )
+                return mo.dropout(x = self.activation_func(
+                    np.dot(scaled_X, W)), drop_prob = self.dropout, 
+                    seed = self.seed)
 
         else:  # with bias term in the hidden layer
 
@@ -546,7 +540,7 @@ class Base(object):
                         n_points=self.n_hidden_features,
                     )
 
-                return self.activation_func(
+                return mo.dropout(x = self.activation_func(
                     np.dot(
                         mo.cbind(
                             np.ones(scaled_X.shape[0]),
@@ -554,12 +548,13 @@ class Base(object):
                         ),
                         self.W,
                     )
-                )
+                ), drop_prob = self.dropout, 
+                    seed = self.seed)
 
             else:
 
                 # self.W = W
-                return self.activation_func(
+                return mo.dropout(x = self.activation_func(
                     np.dot(
                         mo.cbind(
                             np.ones(scaled_X.shape[0]),
@@ -567,7 +562,9 @@ class Base(object):
                         ),
                         W,
                     )
-                )
+                ), drop_prob = self.dropout, 
+                    seed = self.seed)
+
 
     def cook_training_set(
         self, y=None, X=None, W=None, **kwargs
@@ -687,6 +684,7 @@ class Base(object):
         else:  # classification
 
             return self.scaler.transform(Z)
+
 
     def cook_test_set(self, X, **kwargs):
         """ Transform data from test set, with hidden layer. """

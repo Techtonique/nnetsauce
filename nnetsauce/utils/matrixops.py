@@ -8,11 +8,6 @@ def cbind(x, y):
     return np.column_stack((x, y))
 
 
-# else:
-#    return np.concatenate((x, y),
-#                          axis = 1)
-
-
 # computes t(x)%*%y
 def crossprod(x, y=None):
     # assert on dimensions
@@ -20,6 +15,25 @@ def crossprod(x, y=None):
         return np.dot(x.transpose(), x)
     else:
         return np.dot(x.transpose(), y)
+
+
+# dropout
+def dropout(x, drop_prob = 0, seed = 123):
+    
+    assert 0 <= drop_prob <= 1
+    
+    n, p = x.shape 
+    
+    if drop_prob == 0:
+        return x
+    
+    if drop_prob == 1:
+       return np.zeros_like(x)
+    
+    np.random.seed(seed)
+    dropped_indices = np.random.rand(n, p) > drop_prob
+    
+    return dropped_indices*x/(1 - drop_prob)
 
 
 # one-hot encoding
