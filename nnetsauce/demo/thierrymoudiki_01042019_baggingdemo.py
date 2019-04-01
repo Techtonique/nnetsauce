@@ -44,5 +44,5 @@ eclf1.fit(X_train, y_train)
 # Ensemble score 
 print(eclf1.score(X_test, y_test))
 
-# Individual scores (# correct this, doesn't have to fit)
+# Individual scores
 [estimators[i][1].fit(X_train, y_train).score(X_test, y_test) for i in range(10)]
