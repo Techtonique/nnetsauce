@@ -6,13 +6,11 @@ Created on Fri Mar 29 19:05:12 2019
 @author: moudiki
 """
 
-import numpy as np
-from sklearn import datasets, linear_model, gaussian_process
-import unittest as ut
+from sklearn import datasets, gaussian_process
 import nnetsauce as ns
 from sklearn.ensemble import VotingClassifier
 
-def bag_custom(B = 10, dropout = 0.5):
+def bag_custom(B = 25, dropout = 0.5):
 
     regr = gaussian_process.GaussianProcessClassifier()
         
@@ -26,7 +24,7 @@ def bag_custom(B = 10, dropout = 0.5):
     return estimators    
 
 
-estimators = bag_custom(B = 10, dropout = 0.5)
+estimators = bag_custom(B = 25, dropout = 0.5)
 
 eclf1 = VotingClassifier(estimators)
 
@@ -42,4 +40,9 @@ X_test = X[index_test, :]
 y_test = y[index_test]
 
 eclf1.fit(X_train, y_train)
-print(eclf1.predict(X_test))
+
+# Ensemble score 
+print(eclf1.score(X_test, y_test))
+
+# Individual scores (# correct this, doesn't have to fit)
+[estimators[i][1].fit(X_train, y_train).score(X_test, y_test) for i in range(10)]
