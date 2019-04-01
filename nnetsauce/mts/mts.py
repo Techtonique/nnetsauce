@@ -31,12 +31,12 @@
 import numpy as np
 from ..base import Base
 from ..utils import matrixops as mo
-from ..utils import misc as mx
 from ..utils import timeseries as ts
+from sklearn.base import BaseEstimator
 import sklearn.metrics as skm2
 
 
-class MTS(Base):
+class MTS(Base, BaseEstimator):
     """MTS model class derived from class Base
     
        Parameters
@@ -129,43 +129,6 @@ class MTS(Base):
         self.preds = None
         self.preds_std = []
 
-    def get_params(self):
-
-        return mx.merge_two_dicts(
-            super().get_params(),
-            {"n_series": self.n_series, "lags": self.lags},
-        )
-
-    def set_params(
-        self,
-        n_hidden_features=5,
-        activation_name="relu",
-        a=0.01,
-        nodes_sim="sobol",
-        bias=True,
-        dropout=0,
-        direct_link=True,
-        n_clusters=0,
-        type_clust="kmeans",
-        type_scaling=("std", "std", "std"),
-        seed=123,
-        lags=1,
-    ):
-
-        super().set_params(
-            n_hidden_features=n_hidden_features,
-            activation_name=activation_name,
-            a=a,
-            nodes_sim=nodes_sim,
-            bias=bias, 
-            dropout=dropout,
-            direct_link=direct_link,
-            n_clusters=n_clusters,
-            type_clust=type_clust,
-            type_scaling=type_scaling,
-            seed=seed,
-        )
-        self.lags = lags
 
     def fit(self, X, **kwargs):
         """Fit MTS model to training data (X, y).

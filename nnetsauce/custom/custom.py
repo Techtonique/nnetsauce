@@ -5,6 +5,7 @@
 # License: BSD 3
 
 import numpy as np
+from sklearn.base import BaseEstimator
 import sklearn.model_selection as skm
 import sklearn.metrics as skm2
 from ..base import Base
@@ -12,7 +13,7 @@ from ..utils import matrixops as mo
 from ..utils import misc as mx
 
 
-class Custom(Base):
+class Custom(Base, BaseEstimator):
     """Custom model class derived from class Base
     
        Parameters
@@ -89,39 +90,7 @@ class Custom(Base):
 
         self.obj = obj
         self.type_fit = type_fit
-
-    def get_params(self):
-
-        return super().get_params()
-
-    def set_params(
-        self,
-        n_hidden_features=5,
-        activation_name="relu",
-        a=0.01,
-        nodes_sim="sobol",
-        bias=True,
-        dropout = 0,
-        direct_link=True,
-        n_clusters=0,
-        type_clust="kmeans",
-        type_scaling=("std", "std", "std"),
-        seed=123,
-    ):
-
-        super().set_params(
-            n_hidden_features=n_hidden_features,
-            activation_name=activation_name,
-            a=a,
-            nodes_sim=nodes_sim,
-            bias=bias,
-            dropout=dropout,
-            direct_link=direct_link,
-            n_clusters=n_clusters,
-            type_clust=type_clust,
-            type_scaling=type_scaling,
-            seed=seed,
-        )
+        
 
     def fit(self, X, y, **kwargs):
         """Fit custom model to training data (X, y).
@@ -165,6 +134,7 @@ class Custom(Base):
             self.obj.fit(scaled_Z, y, **kwargs)
 
         return self
+
 
     def predict(self, X, **kwargs):
         """Predict test data X.
@@ -301,6 +271,7 @@ class Custom(Base):
             }
 
         return scoring_options[scoring](y, preds, **kwargs)
+    
 
     def cross_val_score(
         self,

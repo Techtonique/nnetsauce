@@ -7,6 +7,7 @@
 import numpy as np
 
 # import sklearn.model_selection as skm
+from sklearn.base import BaseEstimator
 import sklearn.metrics as skm2
 from ..base import Base
 from ..utils import misc as mx
@@ -14,7 +15,7 @@ from ..utils import matrixops as mo
 from ..utils import lmfuncs as lmf
 
 
-class BayesianRVFL(Base):
+class BayesianRVFL(Base, BaseEstimator):
     """Bayesian RVFL model class derived from class Base
     
        Parameters
@@ -97,51 +98,6 @@ class BayesianRVFL(Base):
         self.GCV = GCV
         self.return_std = return_std
 
-    def get_params(self):
-
-        return mx.merge_two_dicts(
-            super().get_params(),
-            {
-                "s": self.s,
-                "sigma": self.sigma,
-                "return_std": self.return_std,
-            },
-        )
-
-    def set_params(
-        self,
-        n_hidden_features=5,
-        activation_name="relu",
-        a=0.01,
-        nodes_sim="sobol",
-        bias=True,
-        dropout = 0,
-        direct_link=True,
-        n_clusters=0,
-        type_clust="kmeans",
-        type_scaling=("std", "std", "std"),
-        seed=123,
-        s=0.1,
-        sigma=0.05,
-        return_std=True,
-    ):
-
-        super().set_params(
-            n_hidden_features=n_hidden_features,
-            activation_name=activation_name,
-            a=a,
-            nodes_sim=nodes_sim,
-            bias=bias,
-            dropout = dropout,
-            direct_link=direct_link,
-            n_clusters=n_clusters,
-            type_clust=type_clust,
-            type_scaling=type_scaling,
-            seed=seed,
-        )
-        self.s = s
-        self.sigma = sigma
-        self.return_std = return_std
 
     def fit(self, X, y, **kwargs):
         """Fit regularized RVFL to training data (X, y).
@@ -184,6 +140,7 @@ class BayesianRVFL(Base):
         self.GCV = fit_obj["GCV"]
 
         return self
+
 
     def predict(self, X, **kwargs):
         """Predict test data X.
@@ -266,6 +223,7 @@ class BayesianRVFL(Base):
                     self.y_mean + pred_obj["preds"],
                     pred_obj["preds_std"],
                 )
+
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
