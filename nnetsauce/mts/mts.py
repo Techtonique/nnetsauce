@@ -32,11 +32,10 @@ import numpy as np
 from ..base import Base
 from ..utils import matrixops as mo
 from ..utils import timeseries as ts
-from sklearn.base import BaseEstimator
 import sklearn.metrics as skm2
 
 
-class MTS(Base, BaseEstimator):
+class MTS(Base):
     """MTS model class derived from class Base
     
        Parameters

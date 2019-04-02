@@ -5,7 +5,6 @@
 # License: BSD 3
 
 import numpy as np
-from sklearn.base import BaseEstimator
 import sklearn.metrics as skm2
 from ..base import Base
 from ..utils import misc as mx
@@ -13,7 +12,7 @@ from ..utils import matrixops as mo
 from ..utils import lmfuncs as lmf
 
 
-class BayesianRVFL2(Base, BaseEstimator):
+class BayesianRVFL2(Base):
     """Bayesian RVFL model class derived from class Base, with parametrized covariance
     
        Parameters

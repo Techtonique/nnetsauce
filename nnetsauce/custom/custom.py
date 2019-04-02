@@ -5,7 +5,6 @@
 # License: BSD 3
 
 import numpy as np
-from sklearn.base import BaseEstimator
 import sklearn.model_selection as skm
 import sklearn.metrics as skm2
 from ..base import Base
@@ -13,7 +12,7 @@ from ..utils import matrixops as mo
 from ..utils import misc as mx
 
 
-class Custom(Base, BaseEstimator):
+class Custom(Base):
     """Custom model class derived from class Base
     
        Parameters

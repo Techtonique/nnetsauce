@@ -5,9 +5,6 @@
 # License: BSD 3
 
 import numpy as np
-
-# import sklearn.model_selection as skm
-from sklearn.base import BaseEstimator
 import sklearn.metrics as skm2
 from ..base import Base
 from ..utils import misc as mx
@@ -15,7 +12,7 @@ from ..utils import matrixops as mo
 from ..utils import lmfuncs as lmf
 
 
-class BayesianRVFL(Base, BaseEstimator):
+class BayesianRVFL(Base):
     """Bayesian RVFL model class derived from class Base
     
        Parameters
