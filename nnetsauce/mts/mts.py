@@ -325,11 +325,6 @@ class MTS(Base):
         self.fit(X_train, **kwargs)
         preds = self.predict(h=h, return_std = False, **kwargs)
 
-        if self.return_std == True:  # if there are std. devs in the predictions
-            preds = preds[
-                0
-            ]  # take the mean prediction only
-
         if scoring is None:
             scoring = "neg_mean_squared_error"
 
