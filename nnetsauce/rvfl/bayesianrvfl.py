@@ -5,8 +5,6 @@
 # License: BSD 3
 
 import numpy as np
-
-# import sklearn.model_selection as skm
 import sklearn.metrics as skm2
 from ..base import Base
 from ..utils import misc as mx
@@ -52,6 +50,8 @@ class BayesianRVFL(Base):
            regression's fitted parameters 
        Sigma: array-like
            covariance of the distribution of fitted parameters
+       GCV: float
+       return_std: boolean
     """
 
     # construct the object -----
@@ -97,51 +97,6 @@ class BayesianRVFL(Base):
         self.GCV = GCV
         self.return_std = return_std
 
-    def get_params(self):
-
-        return mx.merge_two_dicts(
-            super().get_params(),
-            {
-                "s": self.s,
-                "sigma": self.sigma,
-                "return_std": self.return_std,
-            },
-        )
-
-    def set_params(
-        self,
-        n_hidden_features=5,
-        activation_name="relu",
-        a=0.01,
-        nodes_sim="sobol",
-        bias=True,
-        dropout = 0,
-        direct_link=True,
-        n_clusters=0,
-        type_clust="kmeans",
-        type_scaling=("std", "std", "std"),
-        seed=123,
-        s=0.1,
-        sigma=0.05,
-        return_std=True,
-    ):
-
-        super().set_params(
-            n_hidden_features=n_hidden_features,
-            activation_name=activation_name,
-            a=a,
-            nodes_sim=nodes_sim,
-            bias=bias,
-            dropout = dropout,
-            direct_link=direct_link,
-            n_clusters=n_clusters,
-            type_clust=type_clust,
-            type_scaling=type_scaling,
-            seed=seed,
-        )
-        self.s = s
-        self.sigma = sigma
-        self.return_std = return_std
 
     def fit(self, X, y, **kwargs):
         """Fit regularized RVFL to training data (X, y).
@@ -185,7 +140,8 @@ class BayesianRVFL(Base):
 
         return self
 
-    def predict(self, X, **kwargs):
+
+    def predict(self, X, return_std = False, **kwargs):
         """Predict test data X.
         
         Parameters
@@ -193,7 +149,7 @@ class BayesianRVFL(Base):
         X: {array-like}, shape = [n_samples, n_features]
             Training vectors, where n_samples is the number 
             of samples and n_features is the number of features.
-        
+        return_std: {boolean}, standard dev. is returned or not
         **kwargs: additional parameters to be passed to 
                   self.cook_test_set
                
@@ -211,8 +167,10 @@ class BayesianRVFL(Base):
                 np.ones(n_features).reshape(1, n_features),
             )
 
+        self.return_std = return_std
+        
         if self.return_std == False:
-
+            
             if len(X.shape) == 1:
 
                 return (
@@ -267,14 +225,13 @@ class BayesianRVFL(Base):
                     pred_obj["preds_std"],
                 )
 
+
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
 
         preds = self.predict(X)
 
-        if (
-            type(preds) == tuple
-        ):  # if there are std. devs in the predictions
+        if self.return_std:  # if there are std. devs in the predictions
             preds = preds[0]
 
         if mx.is_factor(y):  # classification

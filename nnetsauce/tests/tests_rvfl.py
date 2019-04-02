@@ -63,24 +63,24 @@ class TestRVFL(ut.TestCase):
         y_test = y[index_test]
 
         fit_obj.fit(X_train, y_train)
-        err = fit_obj.predict(X_test)[0] - y_test
+        err = fit_obj.predict(X_test, return_std = True)[0] - y_test
         rmse = np.sqrt(np.mean(err ** 2))
 
         fit_obj2.fit(X_train, y_train)
-        err2 = fit_obj2.predict(X_test)[0] - y_test
+        err2 = fit_obj2.predict(X_test, return_std = True)[0] - y_test
         rmse2 = np.sqrt(np.mean(err2 ** 2))
 
         fit_obj3.fit(X_train, y_train)
-        err3 = fit_obj3.predict(X_test)[0] - y_test
+        err3 = fit_obj3.predict(X_test, return_std = True)[0] - y_test
         rmse3 = np.sqrt(np.mean(err3 ** 2))
 
         fit_obj4.fit(X_train, y_train)
-        err4 = fit_obj4.predict(X_test)[0] - y_test
+        err4 = fit_obj4.predict(X_test, return_std = True)[0] - y_test
         rmse4 = np.sqrt(np.mean(err4 ** 2))
 
-        pred1 = fit_obj.predict(X_test[0, :])[0]
+        pred1 = fit_obj.predict(X_test[0, :], return_std = True)[0]
 
-        pred2 = fit_obj2.predict(X_test[0, :])[0]
+        pred2 = fit_obj2.predict(X_test[0, :], return_std = True)[0]
 
         self.assertTrue(
             np.allclose(rmse, 0.81893186154747988)
@@ -150,60 +150,44 @@ class TestRVFL(ut.TestCase):
         self.assertTrue(
             (
                 fit_obj.get_params()
-                == {
-                    "W": None,
-                    "a": 0.01,
-                    "activation_name": "relu",
-                    "bias": True,
-                    "clustering_scaler": None,
-                    "direct_link": True,
-                    "dropout": 0,
-                    "n_clusters": None,
-                    "n_hidden_features": 5,
-                    "nn_scaler": None,
-                    "nodes_sim": "sobol",
-                    "return_std": True,
-                    "s": 0.1,
-                    "scaler": None,
-                    "seed": 123,
-                    "sigma": 0.05,
-                    "type_clust": "kmeans",
-                    "type_scaling": (
-                        "std",
-                        "minmax",
-                        "std",
-                    ),
-                    "y_mean": None,
-                }
+                == {'GCV': None,
+                     'Sigma': None,
+                     'a': 0.01,
+                     'activation_name': 'relu',
+                     'beta': None,
+                     'bias': True,
+                     'direct_link': True,
+                     'dropout': 0,
+                     'n_clusters': None,
+                     'n_hidden_features': 5,
+                     'nodes_sim': 'sobol',
+                     'return_std': True,
+                     's': 0.1,
+                     'seed': 123,
+                     'sigma': 0.05,
+                     'type_clust': 'kmeans',
+                     'type_scaling': ('std', 'minmax', 'std')}
             )
             & (
                 fit_obj2.get_params()
-                == {
-                    "W": None,
-                    "a": 0.01,
-                    "activation_name": "relu",
-                    "bias": True,
-                    "clustering_scaler": None,
-                    "direct_link": True,
-                    "dropout": 0.5,
-                    "n_clusters": None,
-                    "n_hidden_features": 4,
-                    "nn_scaler": None,
-                    "nodes_sim": "sobol",
-                    "return_std": True,
-                    "s1": 0.1,
-                    "s2": 0.1,
-                    "scaler": None,
-                    "seed": 123,
-                    "sigma": 0.05,
-                    "type_clust": "kmeans",
-                    "type_scaling": (
-                        "std",
-                        "std",
-                        "minmax",
-                    ),
-                    "y_mean": None,
-                }
+                == {'GCV': None,
+                     'Sigma': None,
+                     'a': 0.01,
+                     'activation_name': 'relu',
+                     'beta': None,
+                     'bias': True,
+                     'direct_link': True,
+                     'dropout': 0.5,
+                     'n_clusters': None,
+                     'n_hidden_features': 4,
+                     'nodes_sim': 'sobol',
+                     'return_std': True,
+                     's1': 0.1,
+                     's2': 0.1,
+                     'seed': 123,
+                     'sigma': 0.05,
+                     'type_clust': 'kmeans',
+                     'type_scaling': ('std', 'std', 'minmax')}
             )
         )
 

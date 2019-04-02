@@ -5,6 +5,7 @@
 # License: BSD 3
 
 import numpy as np
+from sklearn.base import BaseEstimator
 import sklearn.metrics as skm
 from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
@@ -18,7 +19,7 @@ from ..utils import lmfuncs as lmf
 from ..simulation import nodesimulation as ns
 
 
-class Base(object):
+class Base(BaseEstimator):
     """Base model with direct link and nonlinear activation.
         
        Parameters
@@ -147,84 +148,6 @@ class Base(object):
         self.y = None
         self.y_mean = None
         self.beta = None
-
-    # getter -----
-
-    def get_params(self):
-
-        return {
-            "n_hidden_features": self.n_hidden_features,
-            "activation_name": self.activation_name,
-            "a": self.a,
-            "nodes_sim": self.nodes_sim,
-            "bias": self.bias,
-            "dropout": self.dropout,
-            "direct_link": self.direct_link,
-            "seed": self.seed,
-            "type_clust": self.type_clust,
-            "type_scaling": self.type_scaling,
-            "n_clusters": self.n_clusters,
-            "clustering_scaler": self.clustering_scaler,
-            "nn_scaler": self.nn_scaler,
-            "scaler": self.scaler,
-            "W": self.W,
-            "y_mean": self.y_mean,
-        }
-
-    # setter -----
-
-    def set_params(
-        self,
-        n_hidden_features=5,
-        activation_name="relu",
-        a=0.01,
-        nodes_sim="sobol",
-        bias=True,
-        dropout = 0,
-        direct_link=True,
-        n_clusters=0,
-        type_clust="kmeans",
-        type_scaling=("std", "std", "std"),
-        seed=123,
-    ):
-
-        # activation function -----
-
-        def prelu(x, a):
-            y = x.copy() 
-            index = x < 0
-            y[index] = a*x[index]
-
-            return y
-
-        def elu(x, a):
-            y = x.copy() 
-            index = x < 0
-            y[index] = a * (np.exp(x[index]) - 1)
-
-            return y
-
-        activation_options = {
-            "relu": lambda x: np.maximum(x, 0),
-            "tanh": lambda x: np.tanh(x),
-            "sigmoid": lambda x: 1 / (1 + np.exp(-x)),
-            "prelu": lambda x: prelu(x, a=a),
-            "elu": lambda x: elu(x, a=a),
-        }
-
-        self.n_hidden_features = n_hidden_features
-        self.activation_name = activation_name
-        self.activation_func = activation_options[
-            activation_name
-        ]
-        self.nodes_sim = nodes_sim
-        self.bias = bias
-        self.dropout = dropout
-        self.direct_link = direct_link
-        self.n_clusters = n_clusters
-        self.type_clust = type_clust
-        self.type_scaling = type_scaling
-        self.seed = seed
 
 
     def fit(self, X, y, **kwargs):

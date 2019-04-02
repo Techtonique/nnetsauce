@@ -31,7 +31,6 @@
 import numpy as np
 from ..base import Base
 from ..utils import matrixops as mo
-from ..utils import misc as mx
 from ..utils import timeseries as ts
 import sklearn.metrics as skm2
 
@@ -76,8 +75,6 @@ class MTS(Base):
            reproducibility seed for nodes_sim=='uniform'
        lags: int
            number of lags for the time series 
-       fit_objs: dict
-           a dictionary containing objects fitted with obj, one for each time series
     """
 
     # construct the object -----
@@ -97,6 +94,7 @@ class MTS(Base):
         type_scaling=("std", "std", "std"),
         seed=123,
         lags=1,
+        return_std=False,
     ):
 
         assert (
@@ -127,45 +125,9 @@ class MTS(Base):
         self.X = None  # MTS lags
         self.y_means = []
         self.preds = None
+        self.return_std = return_std
         self.preds_std = []
 
-    def get_params(self):
-
-        return mx.merge_two_dicts(
-            super().get_params(),
-            {"n_series": self.n_series, "lags": self.lags},
-        )
-
-    def set_params(
-        self,
-        n_hidden_features=5,
-        activation_name="relu",
-        a=0.01,
-        nodes_sim="sobol",
-        bias=True,
-        dropout=0,
-        direct_link=True,
-        n_clusters=0,
-        type_clust="kmeans",
-        type_scaling=("std", "std", "std"),
-        seed=123,
-        lags=1,
-    ):
-
-        super().set_params(
-            n_hidden_features=n_hidden_features,
-            activation_name=activation_name,
-            a=a,
-            nodes_sim=nodes_sim,
-            bias=bias, 
-            dropout=dropout,
-            direct_link=direct_link,
-            n_clusters=n_clusters,
-            type_clust=type_clust,
-            type_scaling=type_scaling,
-            seed=seed,
-        )
-        self.lags = lags
 
     def fit(self, X, **kwargs):
         """Fit MTS model to training data (X, y).
@@ -222,6 +184,7 @@ class MTS(Base):
 
         return self
 
+
     def predict(self, h=5, level=95, **kwargs):
         """Predict on horizon h.
         
@@ -249,7 +212,10 @@ class MTS(Base):
         n_features = self.n_series * self.lags
 
         self.preds_std = np.zeros(h)
-
+        
+        if 'return_std' in kwargs:
+            self.return_std = kwargs['return_std']
+            
         for i in range(h):
 
             new_obs = ts.reformat_response(
@@ -269,11 +235,8 @@ class MTS(Base):
                 cooked_new_X, **kwargs
             )
 
-            if (
-                isinstance(predicted_cooked_new_X, tuple)
-                == False
-            ):  # std. dev. is returned
-
+            if (self.return_std == False):  # std. dev. is not returned
+                
                 preds = np.array(
                     [
                         (
@@ -286,7 +249,7 @@ class MTS(Base):
 
                 self.preds = mo.rbind(preds, self.preds)
 
-            else:  # std. dev. is not returned
+            else:  # std. dev. is returned
 
                 preds = np.array(
                     [
@@ -308,11 +271,8 @@ class MTS(Base):
 
         self.preds = self.preds[0:h, :][::-1]
 
-        if (
-            isinstance(predicted_cooked_new_X, tuple)
-            == False
-        ):  # the std. dev. is returned
-
+        if self.return_std == False:  # the std. dev. is returned
+            
             return self.preds
 
         else:
@@ -327,6 +287,7 @@ class MTS(Base):
                 self.preds - self.preds_std,
                 self.preds + self.preds_std,
             )
+
 
     def score(
         self,
@@ -362,14 +323,7 @@ class MTS(Base):
 
         # Fit and predict
         self.fit(X_train, **kwargs)
-        preds = self.predict(h=h, **kwargs)
-
-        if (
-            type(preds) == tuple
-        ):  # if there are std. devs in the predictions
-            preds = preds[
-                0
-            ]  # take the mean prediction only
+        preds = self.predict(h=h, return_std = False, **kwargs)
 
         if scoring is None:
             scoring = "neg_mean_squared_error"

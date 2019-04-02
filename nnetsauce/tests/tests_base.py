@@ -149,53 +149,31 @@ class TestBase(ut.TestCase):
             & np.allclose(rmse5, 5.4594298062878736e-13)
             & (
                 fit_obj6.get_params()
-                == {
-                    "W": None,
-                    "a": 0.01,
-                    "activation_name": "elu",
-                    "bias": False,
-                    "clustering_scaler": None,
-                    "direct_link": False,
-                    "dropout": 0,
-                    "n_clusters": 2,
-                    "n_hidden_features": 5,
-                    "nn_scaler": None,
-                    "nodes_sim": "sobol",
-                    "scaler": None,
-                    "seed": 123,
-                    "type_clust": "gmm",
-                    "type_scaling": (
-                        "std",
-                        "std",
-                        "minmax",
-                    ),
-                    "y_mean": None,
-                }
+                == {'a': 0.01,
+                     'activation_name': 'elu',
+                     'bias': False,
+                     'direct_link': False,
+                     'dropout': 0,
+                     'n_clusters': 2,
+                     'n_hidden_features': 5,
+                     'nodes_sim': 'sobol',
+                     'seed': 123,
+                     'type_clust': 'gmm',
+                     'type_scaling': ('std', 'std', 'minmax')}
             )
             & (
                 fit_obj7.get_params()
-                == {
-                    "W": None,
-                    "a": 0.01,
-                    "activation_name": "prelu",
-                    "bias": False,
-                    "dropout": 0,
-                    "clustering_scaler": None,
-                    "direct_link": False,
-                    "n_clusters": 2,
-                    "n_hidden_features": 5,
-                    "nn_scaler": None,
-                    "nodes_sim": "sobol",
-                    "scaler": None,
-                    "seed": 123,
-                    "type_clust": "gmm",
-                    "type_scaling": (
-                        "std",
-                        "std",
-                        "minmax",
-                    ),
-                    "y_mean": None,
-                }
+                == {'a': 0.01,
+                     'activation_name': 'prelu',
+                     'bias': False,
+                     'direct_link': False,
+                     'dropout': 0,
+                     'n_clusters': 2,
+                     'n_hidden_features': 5,
+                     'nodes_sim': 'sobol',
+                     'seed': 123,
+                     'type_clust': 'gmm',
+                     'type_scaling': ('std', 'std', 'minmax')}
             )
         )
 
