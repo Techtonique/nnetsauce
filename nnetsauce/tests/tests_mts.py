@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn import linear_model
+from sklearn import linear_model, gaussian_process
 import unittest as ut
 import nnetsauce as ns
 
@@ -16,6 +16,10 @@ class TestMTS(ut.TestCase):
         X[:, 2] = 25 * X[:, 2]
 
         regr = linear_model.BayesianRidge()
+        regr2 = gaussian_process.GaussianProcessRegressor()
+        regr3 = ns.BayesianRVFL(s=0.01)
+        regr4 = ns.BayesianRVFL2(s1 = 0.01, s2 = 0.01)
+        
 
         fit_obj = ns.MTS(
             regr,
@@ -70,9 +74,45 @@ class TestMTS(ut.TestCase):
             nodes_sim="hammersley",
             type_scaling=("minmax", "minmax", "minmax"),
             activation_name="elu",
-            n_clusters=4
+            n_clusters=4,
+        )
+        
+        fit_obj6 = ns.MTS(
+            regr2,
+            n_hidden_features=2,
+            direct_link=True,
+            bias=True,
+            dropout=0.5,
+            nodes_sim="hammersley",
+            type_scaling=("minmax", "minmax", "minmax"),
+            activation_name="elu",
+            n_clusters=4,
         )
 
+        fit_obj7 = ns.MTS(
+            regr3,
+            n_hidden_features=2,
+            direct_link=True,
+            bias=True,
+            dropout=0.5,
+            nodes_sim="hammersley",
+            type_scaling=("minmax", "minmax", "minmax"),
+            activation_name="elu",
+            n_clusters=4,
+        )
+        
+        fit_obj8 = ns.MTS(
+            regr4,
+            n_hidden_features=2,
+            direct_link=True,
+            bias=True,
+            dropout=0.5,
+            nodes_sim="hammersley",
+            type_scaling=("minmax", "minmax", "minmax"),
+            activation_name="elu",
+            n_clusters=4,
+        )
+            
         index_train = range(20)
         index_test = range(20, 25)
         X_train = X[index_train, :]
@@ -97,13 +137,26 @@ class TestMTS(ut.TestCase):
         fit_obj5.fit(X_train)
         err5 = fit_obj5.predict() - X_test
         rmse5 = np.sqrt(np.mean(err5 ** 2))
+        
+        fit_obj6.fit(X_train)        
+        preds = fit_obj6.predict(return_std = True)
+        
+        fit_obj7.fit(X_train)        
+        preds2 = fit_obj7.predict(return_std = True)
+        
+        fit_obj8.fit(X_train)        
+        preds3 = fit_obj8.predict(return_std = True)
+        
 
         self.assertTrue(
             np.allclose(rmse, 10.396062391967684) \
             & np.allclose(rmse2, 10.395489235411796) \
             & np.allclose(rmse3, 10.395986434438191) \
             & np.allclose(rmse4, 10.677585029352571) \
-            & np.allclose(rmse5, 10.360814075763624) 
+            & np.allclose(rmse5, 10.360814075763624) \
+            & np.allclose(preds[2][1, 0], 50.807297265972572) \
+            & np.allclose(preds2[2][1, 0], 50.164221564531182) \
+            & np.allclose(preds3[2][1, 0], 50.849381334431882) 
         )
 
     def test_get_set(self):

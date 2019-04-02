@@ -50,6 +50,8 @@ class BayesianRVFL(Base):
            regression's fitted parameters 
        Sigma: array-like
            covariance of the distribution of fitted parameters
+       GCV: float
+       return_std: boolean
     """
 
     # construct the object -----
@@ -139,7 +141,7 @@ class BayesianRVFL(Base):
         return self
 
 
-    def predict(self, X, **kwargs):
+    def predict(self, X, return_std = False, **kwargs):
         """Predict test data X.
         
         Parameters
@@ -147,7 +149,7 @@ class BayesianRVFL(Base):
         X: {array-like}, shape = [n_samples, n_features]
             Training vectors, where n_samples is the number 
             of samples and n_features is the number of features.
-        
+        return_std: {boolean}, standard dev. is returned or not
         **kwargs: additional parameters to be passed to 
                   self.cook_test_set
                
@@ -165,8 +167,10 @@ class BayesianRVFL(Base):
                 np.ones(n_features).reshape(1, n_features),
             )
 
+        self.return_std = return_std
+        
         if self.return_std == False:
-
+            
             if len(X.shape) == 1:
 
                 return (
@@ -227,9 +231,7 @@ class BayesianRVFL(Base):
 
         preds = self.predict(X)
 
-        if (
-            type(preds) == tuple
-        ):  # if there are std. devs in the predictions
+        if self.return_std:  # if there are std. devs in the predictions
             preds = preds[0]
 
         if mx.is_factor(y):  # classification
