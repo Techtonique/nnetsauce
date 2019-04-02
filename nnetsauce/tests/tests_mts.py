@@ -70,7 +70,7 @@ class TestMTS(ut.TestCase):
             nodes_sim="hammersley",
             type_scaling=("minmax", "minmax", "minmax"),
             activation_name="elu",
-            n_clusters=4,
+            n_clusters=4
         )
 
         index_train = range(20)
@@ -99,11 +99,11 @@ class TestMTS(ut.TestCase):
         rmse5 = np.sqrt(np.mean(err5 ** 2))
 
         self.assertTrue(
-            np.allclose(rmse, 10.396062391967684)
-            & np.allclose(rmse2, 10.395489235411796)
-            & np.allclose(rmse3, 10.395986434438191)
-            & np.allclose(rmse4, 10.677585029352571)
-            & np.allclose(rmse5, 10.360814075763624)
+            np.allclose(rmse, 10.396062391967684) \
+            & np.allclose(rmse2, 10.395489235411796) \
+            & np.allclose(rmse3, 10.395986434438191) \
+            & np.allclose(rmse4, 10.677585029352571) \
+            & np.allclose(rmse5, 10.360814075763624) 
         )
 
     def test_get_set(self):
@@ -139,13 +139,23 @@ class TestMTS(ut.TestCase):
             seed=123,
             lags=1,
         )
+        
+        fit_obj2 = ns.MTS(
+            regr,
+            n_hidden_features=10,
+            direct_link=False,
+            bias=False,
+            dropout=0.5,
+            nodes_sim="sobol",
+            type_scaling=("std", "minmax", "std"),
+            activation_name="relu",
+            n_clusters=0,
+        )
 
         self.assertTrue(
-            (fit_obj.get_params()["lags"] == 1)
-            & (
-                fit_obj.get_params()["type_scaling"]
-                == ("std", "std", "std")
-            )
+            (fit_obj.get_params()["lags"] == 1) \
+            & (fit_obj.get_params()["type_scaling"] == ("std", "std", "std")
+            ) & (fit_obj2.get_params()["obj__lambda_1"] == 1e-06)
         )
 
     def test_score(self):
