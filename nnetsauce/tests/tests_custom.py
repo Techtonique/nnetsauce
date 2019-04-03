@@ -22,7 +22,7 @@ class TestCustom(ut.TestCase):
         regr = linear_model.BayesianRidge()
         regr2 = gaussian_process.GaussianProcessClassifier()
 
-        fit_obj = ns.Custom(
+        fit_obj = ns.CustomRegressor(
             obj=regr,
             n_hidden_features=10,
             direct_link=False,
@@ -32,7 +32,7 @@ class TestCustom(ut.TestCase):
             n_clusters=0,
         )
 
-        fit_obj2 = ns.Custom(
+        fit_obj2 = ns.CustomRegressor(
             obj=regr,
             n_hidden_features=9,
             direct_link=False,
@@ -42,7 +42,7 @@ class TestCustom(ut.TestCase):
             n_clusters=2,
         )
 
-        fit_obj3 = ns.Custom(
+        fit_obj3 = ns.CustomRegressor(
             obj=regr,
             n_hidden_features=8,
             direct_link=True,
@@ -52,7 +52,7 @@ class TestCustom(ut.TestCase):
             n_clusters=3,
         )
 
-        fit_obj4 = ns.Custom(
+        fit_obj4 = ns.CustomRegressor(
             obj=regr,
             n_hidden_features=7,
             direct_link=True,
@@ -62,7 +62,7 @@ class TestCustom(ut.TestCase):
             n_clusters=4,
         )
         
-        fit_obj5 = ns.Custom(
+        fit_obj5 = ns.CustomClassifier(
             obj=regr2,
             n_hidden_features=3,
             direct_link=True,
@@ -124,7 +124,7 @@ class TestCustom(ut.TestCase):
         regr2 = gaussian_process.GaussianProcessClassifier()
         regr3 = gaussian_process.GaussianProcessClassifier()
 
-        fit_obj = ns.Custom(
+        fit_obj = ns.CustomRegressor(
             obj=regr,
             n_hidden_features=100,
             direct_link=True,
@@ -134,7 +134,7 @@ class TestCustom(ut.TestCase):
             n_clusters=2,
         )
 
-        fit_obj2 = ns.Custom(
+        fit_obj2 = ns.CustomClassifier(
             obj=regr2,
             n_hidden_features=10,
             direct_link=True,
@@ -144,7 +144,7 @@ class TestCustom(ut.TestCase):
             n_clusters=3,
         )
         
-        fit_obj3 = ns.Custom(
+        fit_obj3 = ns.CustomRegressor(
             obj=regr,
             n_hidden_features=100,
             dropout=0.6,
@@ -155,7 +155,7 @@ class TestCustom(ut.TestCase):
             n_clusters=2,
         )
 
-        fit_obj4 = ns.Custom(
+        fit_obj4 = ns.CustomClassifier(
             obj=regr3,
             n_hidden_features=50,
             dropout=0.5,
@@ -170,8 +170,7 @@ class TestCustom(ut.TestCase):
         fit_obj3.fit(X, y)
         fit_obj4.fit(Z, t)
 
-        self.assertTrue(np.allclose(fit_obj.score(X, y), 4846.2057110929481)             
-            & np.allclose(fit_obj2.score(Z, t), 0.99648506151142358) \
+        self.assertTrue(np.allclose(fit_obj.score(X, y), 4846.2057110929481) & np.allclose(fit_obj2.score(Z, t), 0.99648506151142358) \
             & np.allclose(fit_obj3.score(X, y), 2.1668647954067132e-11) \
             & np.allclose(fit_obj4.score(Z, t), 1.0))
 
@@ -189,7 +188,7 @@ class TestCustom(ut.TestCase):
         regr2 = linear_model.BayesianRidge()
 
         # create objects Custom
-        fit_obj = ns.Custom(
+        fit_obj = ns.CustomClassifier(
             obj=regr,
             n_hidden_features=100,
             direct_link=True,
@@ -199,7 +198,7 @@ class TestCustom(ut.TestCase):
         )
         
         # create objects Custom
-        fit_obj2 = ns.Custom(
+        fit_obj2 = ns.CustomRegressor(
             obj=regr2,
             n_hidden_features=10,
             direct_link=True,

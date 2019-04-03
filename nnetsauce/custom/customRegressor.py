@@ -7,17 +7,9 @@
 import numpy as np
 import sklearn.model_selection as skm
 import sklearn.metrics as skm2
-from . import Custom
+from .custom import Custom
 from ..utils import matrixops as mo
-from sklearn import RegressorMixin
-
-# ensure compatibility with 'score' methods
-# ensure compatibility with 'score' methods
-# ensure compatibility with 'score' methods
-
-# change tests
-# change tests
-# change tests
+from sklearn.base import RegressorMixin
 
 
 class CustomRegressor(Custom, RegressorMixin):
@@ -59,7 +51,7 @@ class CustomRegressor(Custom, RegressorMixin):
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
        type_fit: str
-           'regression' or 'classification'
+           'regression'
     """
 
     # construct the object -----
@@ -78,10 +70,11 @@ class CustomRegressor(Custom, RegressorMixin):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         seed=123,
-        type_fit=None,
+        type_fit="regression",
     ):
 
         super().__init__(
+            obj = obj,
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,
             a=a,
@@ -95,7 +88,6 @@ class CustomRegressor(Custom, RegressorMixin):
             seed=seed,
         )
 
-        self.obj = obj
         self.type_fit = type_fit
         
 
@@ -119,8 +111,7 @@ class CustomRegressor(Custom, RegressorMixin):
         self: object
         """
 
-        if self.type_fit is None:
-            self.type_fit = "regression"
+        self.type_fit = "regression"
 
         centered_y, scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs

@@ -7,17 +7,9 @@
 import numpy as np
 import sklearn.model_selection as skm
 import sklearn.metrics as skm2
-from . import Custom
+from .custom import Custom
 from ..utils import matrixops as mo
-from sklearn import ClassifierMixin
-
-# ensure compatibility with 'score' methods
-# ensure compatibility with 'score' methods
-# ensure compatibility with 'score' methods
-
-# change tests
-# change tests
-# change tests
+from sklearn.base import ClassifierMixin
 
 
 class CustomClassifier(Custom, ClassifierMixin):
@@ -59,7 +51,7 @@ class CustomClassifier(Custom, ClassifierMixin):
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
        type_fit: str
-           'regression' or 'classification'
+           'classification'
     """
 
     # construct the object -----
@@ -78,10 +70,11 @@ class CustomClassifier(Custom, ClassifierMixin):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         seed=123,
-        type_fit=None,
+        type_fit="classification"
     ):
 
         super().__init__(
+            obj = obj,
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,
             a=a,
@@ -95,7 +88,6 @@ class CustomClassifier(Custom, ClassifierMixin):
             seed=seed,
         )
 
-        self.obj = obj
         self.type_fit = type_fit
         
 
@@ -119,8 +111,7 @@ class CustomClassifier(Custom, ClassifierMixin):
         self: object
         """
         
-        if self.type_fit is None:
-            self.type_fit = "classification"
+        self.type_fit = "classification"
 
         scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs
@@ -243,9 +234,7 @@ class CustomClassifier(Custom, ClassifierMixin):
         """
 
         # classification
-
-        if self.type_fit is None:
-            self.type_fit = "classification"
+        self.type_fit = "classification"
 
         scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs
