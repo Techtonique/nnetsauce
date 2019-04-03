@@ -11,16 +11,6 @@ from ..base import Base
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 
-# split class in 2 classes:
-# CustomRegressor <- Custom, RegressorMixin
-# CustomClassifier <- Custom, ClassifierMixin
-# split class in 2 classes:
-# CustomRegressor <- Custom, RegressorMixin
-# CustomClassifier <- Custom, ClassifierMixin
-# split class in 2 classes:
-# CustomRegressor <- Custom, RegressorMixin
-# CustomClassifier <- Custom, ClassifierMixin
-
 # ensure compatibility with 'score' methods
 # ensure compatibility with 'score' methods
 # ensure compatibility with 'score' methods

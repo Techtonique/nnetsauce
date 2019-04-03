@@ -7,19 +7,9 @@
 import numpy as np
 import sklearn.model_selection as skm
 import sklearn.metrics as skm2
-from ..base import Base
+from . import Custom
 from ..utils import matrixops as mo
-from ..utils import misc as mx
-
-# split class in 2 classes:
-# CustomRegressor <- Custom, RegressorMixin
-# CustomClassifier <- Custom, ClassifierMixin
-# split class in 2 classes:
-# CustomRegressor <- Custom, RegressorMixin
-# CustomClassifier <- Custom, ClassifierMixin
-# split class in 2 classes:
-# CustomRegressor <- Custom, RegressorMixin
-# CustomClassifier <- Custom, ClassifierMixin
+from sklearn import RegressorMixin
 
 # ensure compatibility with 'score' methods
 # ensure compatibility with 'score' methods
@@ -30,8 +20,8 @@ from ..utils import misc as mx
 # change tests
 
 
-class Custom(Base):
-    """Custom model class derived from class Base
+class CustomRegressor(Custom, RegressorMixin):
+    """Custom Regression model class derived from class Custom
     
        Parameters
        ----------
@@ -128,27 +118,15 @@ class Custom(Base):
         -------
         self: object
         """
-        if mx.is_factor(y) == False:
 
-            if self.type_fit is None:
-                self.type_fit = "regression"
+        if self.type_fit is None:
+            self.type_fit = "regression"
 
-            centered_y, scaled_Z = self.cook_training_set(
-                y=y, X=X, **kwargs
-            )
+        centered_y, scaled_Z = self.cook_training_set(
+            y=y, X=X, **kwargs
+        )
 
-            self.obj.fit(scaled_Z, centered_y, **kwargs)
-
-        else:
-
-            if self.type_fit is None:
-                self.type_fit = "classification"
-
-            scaled_Z = self.cook_training_set(
-                y=y, X=X, **kwargs
-            )
-
-            self.obj.fit(scaled_Z, y, **kwargs)
+        self.obj.fit(scaled_Z, centered_y, **kwargs)
 
         return self
 
@@ -178,19 +156,9 @@ class Custom(Base):
                 np.ones(n_features).reshape(1, n_features),
             )
 
-            if self.type_fit == "regression":
-
-                return (
+            return (
                     self.y_mean
                     + self.obj.predict(
-                        self.cook_test_set(new_X, **kwargs),
-                        **kwargs
-                    )
-                )[0]
-            else:  # classification
-
-                return (
-                    self.obj.predict(
                         self.cook_test_set(new_X, **kwargs),
                         **kwargs
                     )
@@ -198,18 +166,11 @@ class Custom(Base):
 
         else:
 
-            if self.type_fit == "regression":
-
-                return self.y_mean + self.obj.predict(
-                    self.cook_test_set(X, **kwargs),
-                    **kwargs
-                )
-            else:  # classification
-
-                return self.obj.predict(
-                    self.cook_test_set(X, **kwargs),
-                    **kwargs
-                )
+            return self.y_mean + self.obj.predict(
+                self.cook_test_set(X, **kwargs),
+                **kwargs
+            )
+            
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
@@ -221,71 +182,29 @@ class Custom(Base):
         ):  # if there are std. devs in the predictions
             preds = preds[0]
 
-        if mx.is_factor(y):  # classification
+        if scoring is None:
+            scoring = "neg_mean_squared_error"
 
-            if scoring is None:
-                scoring = "accuracy"
+        # check inputs
+        assert scoring in (
+            "explained_variance",
+            "neg_mean_absolute_error",
+            "neg_mean_squared_error",
+            "neg_mean_squared_log_error",
+            "neg_median_absolute_error",
+            "r2",
+        ), "'scoring' should be in ('explained_variance', 'neg_mean_absolute_error', \
+                           'neg_mean_squared_error', 'neg_mean_squared_log_error', \
+                           'neg_median_absolute_error', 'r2')"
 
-            # check inputs
-            assert scoring in (
-                "accuracy",
-                "average_precision",
-                "brier_score_loss",
-                "f1",
-                "f1_micro",
-                "f1_macro",
-                "f1_weighted",
-                "f1_samples",
-                "neg_log_loss",
-                "precision",
-                "recall",
-                "roc_auc",
-            ), "'scoring' should be in ('accuracy', 'average_precision', \
-                               'brier_score_loss', 'f1', 'f1_micro', \
-                               'f1_macro', 'f1_weighted',  'f1_samples', \
-                               'neg_log_loss', 'precision', 'recall', \
-                               'roc_auc')"
-
-            scoring_options = {
-                "accuracy": skm2.accuracy_score,
-                "average_precision": skm2.average_precision_score,
-                "brier_score_loss": skm2.brier_score_loss,
-                "f1": skm2.f1_score,
-                "f1_micro": skm2.f1_score,
-                "f1_macro": skm2.f1_score,
-                "f1_weighted": skm2.f1_score,
-                "f1_samples": skm2.f1_score,
-                "neg_log_loss": skm2.log_loss,
-                "precision": skm2.precision_score,
-                "recall": skm2.recall_score,
-                "roc_auc": skm2.roc_auc_score,
-            }
-
-        else:  # regression
-
-            if scoring is None:
-                scoring = "neg_mean_squared_error"
-
-            # check inputs
-            assert scoring in (
-                "explained_variance",
-                "neg_mean_absolute_error",
-                "neg_mean_squared_error",
-                "neg_mean_squared_log_error",
-                "neg_median_absolute_error",
-                "r2",
-            ), "'scoring' should be in ('explained_variance', 'neg_mean_absolute_error', \
-                               'neg_mean_squared_error', 'neg_mean_squared_log_error', \
-                               'neg_median_absolute_error', 'r2')"
-
-            scoring_options = {
-                "explained_variance": skm2.explained_variance_score,
-                "neg_mean_absolute_error": skm2.mean_absolute_error,
-                "neg_mean_squared_error": skm2.mean_squared_error,
-                "neg_mean_squared_log_error": skm2.mean_squared_log_error,
-                "neg_median_absolute_error": skm2.median_absolute_error,
-                "r2": skm2.r2_score,
-            }
+        scoring_options = {
+            "explained_variance": skm2.explained_variance_score,
+            "neg_mean_absolute_error": skm2.mean_absolute_error,
+            "neg_mean_squared_error": skm2.mean_squared_error,
+            "neg_mean_squared_log_error": skm2.mean_squared_log_error,
+            "neg_median_absolute_error": skm2.median_absolute_error,
+            "r2": skm2.r2_score,
+        }
 
         return scoring_options[scoring](y, preds, **kwargs)
     
@@ -315,45 +234,26 @@ class Custom(Base):
         scores : array of float, shape=(len(list(cv)),)
             Array of scores of the estimator for each run of the cross validation.
         """
+        
+        # regression
 
-        if mx.is_factor(y) == False:  # regression
+        if self.type_fit is None:
+            self.type_fit = "regression"
 
-            if self.type_fit is None:
-                self.type_fit = "regression"
+        centered_y, scaled_Z = self.cook_training_set(
+            y=y, X=X, **kwargs
+        )
+        return skm.cross_val_score(
+            self.obj,
+            X=scaled_Z,
+            y=centered_y,
+            groups=groups,
+            scoring=scoring,
+            cv=cv,
+            n_jobs=n_jobs,
+            verbose=verbose,
+            fit_params=fit_params,
+            pre_dispatch=pre_dispatch,
+        )
 
-            centered_y, scaled_Z = self.cook_training_set(
-                y=y, X=X, **kwargs
-            )
-            return skm.cross_val_score(
-                self.obj,
-                X=scaled_Z,
-                y=centered_y,
-                groups=groups,
-                scoring=scoring,
-                cv=cv,
-                n_jobs=n_jobs,
-                verbose=verbose,
-                fit_params=fit_params,
-                pre_dispatch=pre_dispatch,
-            )
-
-        else:  # classification
-
-            if self.type_fit is None:
-                self.type_fit = "classification"
-
-            scaled_Z = self.cook_training_set(
-                y=y, X=X, **kwargs
-            )
-            return skm.cross_val_score(
-                self.obj,
-                X=scaled_Z,
-                y=y,
-                groups=groups,
-                scoring=scoring,
-                cv=cv,
-                n_jobs=n_jobs,
-                verbose=verbose,
-                fit_params=fit_params,
-                pre_dispatch=pre_dispatch,
-            )
+        
