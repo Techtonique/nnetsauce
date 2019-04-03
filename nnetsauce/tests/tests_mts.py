@@ -244,8 +244,18 @@ class TestMTS(ut.TestCase):
                     0.080854374885662481,
                     85.010283695384985,
                 ),
-            )
-        )
+            ) & np.allclose(
+                fit_obj.score(
+                    X,
+                    training_index=range(20),
+                    testing_index=range(20, 25)
+                ),
+                (
+                    239.14320170278387,
+                    0.080854374885662481,
+                    85.010283695384985,
+                )
+        ))
 
 
 if __name__ == "__main__":

@@ -14,8 +14,13 @@ class TestCustom(ut.TestCase):
         X, y = datasets.make_regression(
             n_samples=15, n_features=3
         )
+        
+        breast_cancer = datasets.load_breast_cancer()
+        Z = breast_cancer.data
+        t = breast_cancer.target
 
         regr = linear_model.BayesianRidge()
+        regr2 = gaussian_process.GaussianProcessClassifier()
 
         fit_obj = ns.Custom(
             obj=regr,
@@ -56,6 +61,16 @@ class TestCustom(ut.TestCase):
             activation_name="elu",
             n_clusters=4,
         )
+        
+        fit_obj5 = ns.Custom(
+            obj=regr2,
+            n_hidden_features=3,
+            direct_link=True,
+            bias=True,
+            nodes_sim="hammersley",
+            activation_name="elu",
+            n_clusters=4,
+        )
 
         index_train = range(10)
         index_test = range(10, 15)
@@ -79,12 +94,20 @@ class TestCustom(ut.TestCase):
         fit_obj4.fit(X_train, y_train)
         err4 = fit_obj4.predict(X_test) - y_test
         rmse4 = np.sqrt(np.mean(err4 ** 2))
-
+        
+        fit_obj5.fit(Z[0:100,:], t[0:100])
+        fit_obj5.predict(Z[105,:])
+        fit_obj5.predict(Z[106,:])
+        
         self.assertTrue(
             np.allclose(rmse, 64.933610490495667) \
             & np.allclose(rmse2, 12.968755131423396) \
             & np.allclose(rmse3, 26.716371782298673) \
-            & np.allclose(rmse4, 33.457280982445447)
+            & np.allclose(rmse4, 33.457280982445447) \
+            & np.allclose(fit_obj4.predict(X_test[0, :]), 
+                          127.70497052301884) \
+            & np.allclose(fit_obj5.predict(Z[105,:]), 0) \
+            & np.allclose(fit_obj5.predict(Z[106,:]), 1) \
         )
 
     def test_score(self):
@@ -157,13 +180,28 @@ class TestCustom(ut.TestCase):
         breast_cancer = datasets.load_breast_cancer()
         Z = breast_cancer.data
         t = breast_cancer.target
+        
+        diabetes = datasets.load_diabetes()
+        X = diabetes.data 
+        y = diabetes.target
 
         regr = gaussian_process.GaussianProcessClassifier()
+        regr2 = linear_model.BayesianRidge()
 
         # create objects Custom
         fit_obj = ns.Custom(
             obj=regr,
             n_hidden_features=100,
+            direct_link=True,
+            bias=True,
+            activation_name="relu",
+            n_clusters=0,
+        )
+        
+        # create objects Custom
+        fit_obj2 = ns.Custom(
+            obj=regr2,
+            n_hidden_features=10,
             direct_link=True,
             bias=True,
             activation_name="relu",
@@ -183,7 +221,18 @@ class TestCustom(ut.TestCase):
                         0.95575221,
                     ]
                 ),
-            )
+            ) & np.allclose(
+                fit_obj2.cross_val_score(X, y, cv=5),
+                np.array(
+                    [
+                        0.45479551,  
+                        0.5410207 ,  
+                        0.52001879,  
+                        0.44864878,  
+                        0.56238344
+                    ]
+                ),
+            ) 
         )
 
 
