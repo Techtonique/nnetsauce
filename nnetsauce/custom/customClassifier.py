@@ -50,8 +50,6 @@ class CustomClassifier(Custom, ClassifierMixin):
            Currently available: standardization ('std') or MinMax scaling ('minmax')
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
-       type_fit: str
-           'classification'
     """
 
     # construct the object -----
@@ -70,7 +68,6 @@ class CustomClassifier(Custom, ClassifierMixin):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         seed=123,
-        type_fit="classification"
     ):
 
         super().__init__(
@@ -88,7 +85,7 @@ class CustomClassifier(Custom, ClassifierMixin):
             seed=seed,
         )
 
-        self.type_fit = type_fit
+        self.type_fit = "classification"
         
 
     def fit(self, X, y, **kwargs):
@@ -111,8 +108,6 @@ class CustomClassifier(Custom, ClassifierMixin):
         self: object
         """
         
-        self.type_fit = "classification"
-
         scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs
         )
@@ -234,8 +229,7 @@ class CustomClassifier(Custom, ClassifierMixin):
         """
 
         # classification
-        self.type_fit = "classification"
-
+        
         scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs
         )

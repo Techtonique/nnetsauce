@@ -70,8 +70,7 @@ class CustomRegressor(Custom, RegressorMixin):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         seed=123,
-        type_fit="regression",
-    ):
+        ):
 
         super().__init__(
             obj = obj,
@@ -88,7 +87,7 @@ class CustomRegressor(Custom, RegressorMixin):
             seed=seed,
         )
 
-        self.type_fit = type_fit
+        self.type_fit = "regression"
         
 
     def fit(self, X, y, **kwargs):
@@ -110,9 +109,7 @@ class CustomRegressor(Custom, RegressorMixin):
         -------
         self: object
         """
-
-        self.type_fit = "regression"
-
+        
         centered_y, scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs
         )
@@ -227,9 +224,6 @@ class CustomRegressor(Custom, RegressorMixin):
         """
         
         # regression
-
-        if self.type_fit is None:
-            self.type_fit = "regression"
 
         centered_y, scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs

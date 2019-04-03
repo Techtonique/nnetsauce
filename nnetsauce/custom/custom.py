@@ -62,7 +62,7 @@ class Custom(Base):
         n_clusters=2,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
-        seed=123
+        seed=123,
     ):
 
         super().__init__(
