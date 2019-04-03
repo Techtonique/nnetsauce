@@ -96,8 +96,6 @@ class TestCustom(ut.TestCase):
         rmse4 = np.sqrt(np.mean(err4 ** 2))
         
         fit_obj5.fit(Z[0:100,:], t[0:100])
-        fit_obj5.predict(Z[105,:])
-        fit_obj5.predict(Z[106,:])
         
         self.assertTrue(
             np.allclose(rmse, 64.933610490495667) \
