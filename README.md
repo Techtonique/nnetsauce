@@ -33,7 +33,7 @@ __Currently__, 5 models are implemented in the `nnetsauce`. If your response var
 - `Base` adjusts a linear regression to __y__, as a function of __X__ (optional) and __g(XW + b)__; without regularization of the regression coefficients. 
 - `BayesianRVFL` adds a ridge regularization parameter to the regression coefficients of `Base`, which prevents overfitting. Confidence intervals around the prediction can also be obtained.  
 - `BayesianRVFL2` adds 2 regularization parameters to `Base`. As with `BayesianRVFL`, confidence intervals around the prediction can be obtained.
-- `Custom` works with any object `fit_obj` possessing methods `fit_obj.fit()` and `fit_obj.predict()`. Notably, the model can be applied to any [`scikit-learn`](https://scikit-learn.org)'s regression or classification model. It adjusts `fit_obj` to __y__, as a function of __X__ (optional) and __g(XW + b)__. `Custom` objects can also be combined to form __deeper learning architectures__, as it will be shown in the next section. 
+- `Custom` (`CustomRegressor` and `CustomClassifier`) works with any object `fit_obj` possessing methods `fit_obj.fit()` and `fit_obj.predict()`. Notably, the model can be applied to any [`scikit-learn`](https://scikit-learn.org)'s regression or classification model. It adjusts `fit_obj` to __y__, as a function of __X__ (optional) and __g(XW + b)__. `Custom` objects can also be combined to form __deeper learning architectures__, as it will be shown in the next section. 
 - `MTS` does multivariate time series forecasting. Like `Custom`, it works with any object `fit_obj` possessing methods `fit_obj.fit()` and `fit_obj.predict()`.
 
 
@@ -107,7 +107,7 @@ fit_obj.fit(X[0:350,:], y[0:350])
 # predict on test set 
 x = np.linspace(351, 375, num = 375-351+1)
 plt.scatter(x = x, y = y[350:375], color='black')
-plt.plot(x, fit_obj.predict(X[350:375,:])[0], color='blue')
+plt.plot(x, fit_obj.predict(X[350:375,:]), color='blue')
 plt.title('preds vs test set obs')
 plt.xlabel('x')
 plt.ylabel('preds')
@@ -131,7 +131,7 @@ fit_obj.fit(X[0:350,:], y[0:350])
 # predict on test set 
 x = np.linspace(351, 375, num = 375-351+1)
 plt.scatter(x = x, y = y[350:375], color='black')
-plt.plot(x, fit_obj.predict(X[350:375,:])[0], color='blue')
+plt.plot(x, fit_obj.predict(X[350:375,:]), color='blue')
 plt.title('preds vs test set obs')
 plt.xlabel('x')
 plt.ylabel('preds')
@@ -148,15 +148,15 @@ regr2 = linear_model.ElasticNet()
 regr3 = gaussian_process.GaussianProcessClassifier()
 
 # create object Custom 
-fit_obj = ns.Custom(obj=regr, n_hidden_features=100, 
+fit_obj = ns.CustomRegressor(obj=regr, n_hidden_features=100, 
                     direct_link=False, bias=True,
                     activation_name='tanh', n_clusters=2)
 
-fit_obj2 = ns.Custom(obj=regr2, n_hidden_features=500, 
+fit_obj2 = ns.CustomRegressor(obj=regr2, n_hidden_features=500, 
                     direct_link=True, bias=False,
                     activation_name='relu', n_clusters=0)
 
-fit_obj3 = ns.Custom(obj = regr3, n_hidden_features=100, 
+fit_obj3 = ns.CustomClassifier(obj = regr3, n_hidden_features=100, 
                     direct_link=True, bias=True,
                     activation_name='relu', n_clusters=0)
 
@@ -192,7 +192,7 @@ np.sqrt(metrics.mean_squared_error(y[100:125], layer1_regr.predict(X[100:125,:])
 
 
 # layer 2 using layer 1 ----
-layer2_regr = ns.Custom(obj = layer1_regr, n_hidden_features=3, 
+layer2_regr = ns.CustomRegressor(obj = layer1_regr, n_hidden_features=3, 
                         direct_link=True, bias=True, 
                         nodes_sim='sobol', activation_name='tanh', 
                         n_clusters=2)
@@ -202,7 +202,7 @@ layer2_regr.fit(X[0:100,:], y[0:100])
 np.sqrt(layer2_regr.score(X[100:125,:], y[100:125]))
 
 # layer 3 using layer 2 ----
-layer3_regr = ns.Custom(obj = layer2_regr, n_hidden_features=5, 
+layer3_regr = ns.CustomRegressor(obj = layer2_regr, n_hidden_features=5, 
                         direct_link=True, bias=True, 
                         nodes_sim='hammersley', activation_name='sigmoid', 
                         n_clusters=2)
@@ -303,11 +303,11 @@ regr = linear_model.BayesianRidge()
 regr3 = gaussian_process.GaussianProcessClassifier()
 
 # create objects Custom
-fit_obj = ns.Custom(obj=regr, n_hidden_features=100, 
+fit_obj = ns.CustomRegressor(obj=regr, n_hidden_features=100, 
                     direct_link=True, bias=True,
                     activation_name='tanh', n_clusters=2)
 
-fit_obj3 = ns.Custom(obj=regr3, n_hidden_features=100, 
+fit_obj3 = ns.CustomClassifier(obj=regr3, n_hidden_features=100, 
                      direct_link=True, bias=True,
                      activation_name='relu', n_clusters=0)
 
