@@ -76,7 +76,7 @@ class Custom(Base):
             n_clusters=n_clusters,
             type_clust=type_clust,
             type_scaling=type_scaling,
-            seed=seed
+            seed=seed,
         )
 
         self.obj = obj

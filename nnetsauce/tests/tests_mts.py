@@ -18,8 +18,9 @@ class TestMTS(ut.TestCase):
         regr = linear_model.BayesianRidge()
         regr2 = gaussian_process.GaussianProcessRegressor()
         regr3 = ns.BayesianRVFL(s=0.01)
-        regr4 = ns.BayesianRVFL2(s1 = 0.01, s2 = 0.01)
-        
+        regr4 = ns.BayesianRVFL2(
+            s1=0.01, s2=0.01, n_hidden_features=2
+        )
 
         fit_obj = ns.MTS(
             regr,
@@ -64,7 +65,7 @@ class TestMTS(ut.TestCase):
             activation_name="elu",
             n_clusters=4,
         )
-        
+
         fit_obj5 = ns.MTS(
             regr,
             n_hidden_features=7,
@@ -76,7 +77,7 @@ class TestMTS(ut.TestCase):
             activation_name="elu",
             n_clusters=4,
         )
-        
+
         fit_obj6 = ns.MTS(
             regr2,
             n_hidden_features=2,
@@ -100,10 +101,10 @@ class TestMTS(ut.TestCase):
             activation_name="elu",
             n_clusters=4,
         )
-        
+
         fit_obj8 = ns.MTS(
             regr4,
-            n_hidden_features=2,
+            n_hidden_features=0,
             direct_link=True,
             bias=True,
             dropout=0.5,
@@ -112,7 +113,7 @@ class TestMTS(ut.TestCase):
             activation_name="elu",
             n_clusters=4,
         )
-            
+
         index_train = range(20)
         index_test = range(20, 25)
         X_train = X[index_train, :]
@@ -133,30 +134,35 @@ class TestMTS(ut.TestCase):
         fit_obj4.fit(X_train)
         err4 = fit_obj4.predict() - X_test
         rmse4 = np.sqrt(np.mean(err4 ** 2))
-        
+
         fit_obj5.fit(X_train)
         err5 = fit_obj5.predict() - X_test
         rmse5 = np.sqrt(np.mean(err5 ** 2))
-        
-        fit_obj6.fit(X_train)        
-        preds = fit_obj6.predict(return_std = True)
-        
-        fit_obj7.fit(X_train)        
-        preds2 = fit_obj7.predict(return_std = True)
-        
-        fit_obj8.fit(X_train)        
-        preds3 = fit_obj8.predict(return_std = True)
-        
+
+        fit_obj6.fit(X_train)
+        preds = fit_obj6.predict(return_std=True)
+
+        fit_obj7.fit(X_train)
+        preds2 = fit_obj7.predict(return_std=True)
+
+        fit_obj8.fit(X_train)
+        preds3 = fit_obj8.predict(return_std=True)
 
         self.assertTrue(
-            np.allclose(rmse, 10.396062391967684) \
-            & np.allclose(rmse2, 10.395489235411796) \
-            & np.allclose(rmse3, 10.395986434438191) \
-            & np.allclose(rmse4, 10.677585029352571) \
-            & np.allclose(rmse5, 10.360814075763624) \
-            & np.allclose(preds[2][1, 0], 50.807297265972572) \
-            & np.allclose(preds2[2][1, 0], 50.164221564531182) \
-            & np.allclose(preds3[2][1, 0], 50.849381334431882) 
+            np.allclose(rmse, 10.396062391967684)
+            & np.allclose(rmse2, 10.395489235411796)
+            & np.allclose(rmse3, 10.395986434438191)
+            & np.allclose(rmse4, 10.677585029352571)
+            & np.allclose(rmse5, 10.360814075763624)
+            & np.allclose(
+                preds[2][1, 0], 49.895558528390268
+            )
+            & np.allclose(
+                preds2[2][1, 0], 50.085113393704411
+            )
+            & np.allclose(
+                preds3[2][1, 0], 50.442935176433764
+            )
         )
 
     def test_get_set(self):
@@ -192,7 +198,7 @@ class TestMTS(ut.TestCase):
             seed=123,
             lags=1,
         )
-        
+
         fit_obj2 = ns.MTS(
             regr,
             n_hidden_features=10,
@@ -206,9 +212,15 @@ class TestMTS(ut.TestCase):
         )
 
         self.assertTrue(
-            (fit_obj.get_params()["lags"] == 1) \
-            & (fit_obj.get_params()["type_scaling"] == ("std", "std", "std")
-            ) & (fit_obj2.get_params()["obj__lambda_1"] == 1e-06)
+            (fit_obj.get_params()["lags"] == 1)
+            & (
+                fit_obj.get_params()["type_scaling"]
+                == ("std", "std", "std")
+            )
+            & (
+                fit_obj2.get_params()["obj__lambda_1"]
+                == 1e-06
+            )
         )
 
     def test_score(self):
@@ -244,18 +256,20 @@ class TestMTS(ut.TestCase):
                     0.080854374885662481,
                     85.010283695384985,
                 ),
-            ) & np.allclose(
+            )
+            & np.allclose(
                 fit_obj.score(
                     X,
                     training_index=range(20),
-                    testing_index=range(20, 25)
+                    testing_index=range(20, 25),
                 ),
                 (
                     239.14320170278387,
                     0.080854374885662481,
                     85.010283695384985,
-                )
-        ))
+                ),
+            )
+        )
 
 
 if __name__ == "__main__":

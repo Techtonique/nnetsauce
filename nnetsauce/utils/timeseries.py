@@ -2,7 +2,7 @@
 
 # Authors: Thierry Moudiki <thierry.moudiki@gmail.com>
 #
-# License: MIT
+# License: BSD 3
 
 import numpy as np
 

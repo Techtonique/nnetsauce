@@ -70,10 +70,10 @@ class CustomRegressor(Custom, RegressorMixin):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         seed=123,
-        ):
+    ):
 
         super().__init__(
-            obj = obj,
+            obj=obj,
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,
             a=a,
@@ -88,7 +88,6 @@ class CustomRegressor(Custom, RegressorMixin):
         )
 
         self.type_fit = "regression"
-        
 
     def fit(self, X, y, **kwargs):
         """Fit custom model to training data (X, y).
@@ -109,7 +108,7 @@ class CustomRegressor(Custom, RegressorMixin):
         -------
         self: object
         """
-        
+
         centered_y, scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs
         )
@@ -117,7 +116,6 @@ class CustomRegressor(Custom, RegressorMixin):
         self.obj.fit(scaled_Z, centered_y, **kwargs)
 
         return self
-
 
     def predict(self, X, **kwargs):
         """Predict test data X.
@@ -145,20 +143,18 @@ class CustomRegressor(Custom, RegressorMixin):
             )
 
             return (
-                    self.y_mean
-                    + self.obj.predict(
-                        self.cook_test_set(new_X, **kwargs),
-                        **kwargs
-                    )
-                )[0]
+                self.y_mean
+                + self.obj.predict(
+                    self.cook_test_set(new_X, **kwargs),
+                    **kwargs
+                )
+            )[0]
 
         else:
 
             return self.y_mean + self.obj.predict(
-                self.cook_test_set(X, **kwargs),
-                **kwargs
+                self.cook_test_set(X, **kwargs), **kwargs
             )
-            
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
@@ -195,7 +191,6 @@ class CustomRegressor(Custom, RegressorMixin):
         }
 
         return scoring_options[scoring](y, preds, **kwargs)
-    
 
     def cross_val_score(
         self,
@@ -222,7 +217,7 @@ class CustomRegressor(Custom, RegressorMixin):
         scores : array of float, shape=(len(list(cv)),)
             Array of scores of the estimator for each run of the cross validation.
         """
-        
+
         # regression
 
         centered_y, scaled_Z = self.cook_training_set(
@@ -240,5 +235,3 @@ class CustomRegressor(Custom, RegressorMixin):
             fit_params=fit_params,
             pre_dispatch=pre_dispatch,
         )
-
-        

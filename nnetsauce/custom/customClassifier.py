@@ -71,7 +71,7 @@ class CustomClassifier(Custom, ClassifierMixin):
     ):
 
         super().__init__(
-            obj = obj,
+            obj=obj,
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,
             a=a,
@@ -86,7 +86,6 @@ class CustomClassifier(Custom, ClassifierMixin):
         )
 
         self.type_fit = "classification"
-        
 
     def fit(self, X, y, **kwargs):
         """Fit custom model to training data (X, y).
@@ -107,7 +106,7 @@ class CustomClassifier(Custom, ClassifierMixin):
         -------
         self: object
         """
-        
+
         scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs
         )
@@ -115,7 +114,6 @@ class CustomClassifier(Custom, ClassifierMixin):
         self.obj.fit(scaled_Z, y, **kwargs)
 
         return self
-
 
     def predict(self, X, **kwargs):
         """Predict test data X.
@@ -152,8 +150,7 @@ class CustomClassifier(Custom, ClassifierMixin):
         else:
 
             return self.obj.predict(
-                self.cook_test_set(X, **kwargs),
-                **kwargs
+                self.cook_test_set(X, **kwargs), **kwargs
             )
 
     def score(self, X, y, scoring=None, **kwargs):
@@ -198,9 +195,8 @@ class CustomClassifier(Custom, ClassifierMixin):
             "recall": skm2.recall_score,
             "roc_auc": skm2.roc_auc_score,
         }
-        
+
         return scoring_options[scoring](y, preds, **kwargs)
-    
 
     def cross_val_score(
         self,
@@ -229,7 +225,7 @@ class CustomClassifier(Custom, ClassifierMixin):
         """
 
         # classification
-        
+
         scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs
         )

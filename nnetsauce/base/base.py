@@ -103,14 +103,14 @@ class Base(BaseEstimator):
         # activation function -----
 
         def prelu(x, a):
-            y = x.copy() 
+            y = x.copy()
             index = x < 0
-            y[index] = a*x[index]
+            y[index] = a * x[index]
 
             return y
 
         def elu(x, a):
-            y = x.copy() 
+            y = x.copy()
             index = x < 0
             y[index] = a * (np.exp(x[index]) - 1)
 
@@ -149,7 +149,6 @@ class Base(BaseEstimator):
         self.y_mean = None
         self.beta = None
 
-
     def fit(self, X, y, **kwargs):
         """Fit RVFL to training data (X, y).
         
@@ -181,7 +180,6 @@ class Base(BaseEstimator):
         self.GCV = fit_obj["GCV"]
 
         return self
-
 
     def predict(self, X, **kwargs):
         """Predict test data X.
@@ -221,7 +219,6 @@ class Base(BaseEstimator):
             return self.y_mean + np.dot(
                 self.cook_test_set(X, **kwargs), self.beta
             )
-
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
@@ -384,7 +381,6 @@ class Base(BaseEstimator):
                 X_clustered, self.n_clusters
             )
 
-
     def create_layer(self, scaled_X, W=None):
         """ Create hidden layer. """
 
@@ -421,16 +417,24 @@ class Base(BaseEstimator):
                         n_points=self.n_hidden_features,
                     )
 
-                return mo.dropout(x = self.activation_func(
-                    np.dot(scaled_X, self.W)), drop_prob = self.dropout, 
-                    seed = self.seed)
+                return mo.dropout(
+                    x=self.activation_func(
+                        np.dot(scaled_X, self.W)
+                    ),
+                    drop_prob=self.dropout,
+                    seed=self.seed,
+                )
 
             else:
 
                 # self.W = W
-                return mo.dropout(x = self.activation_func(
-                    np.dot(scaled_X, W)), drop_prob = self.dropout, 
-                    seed = self.seed)
+                return mo.dropout(
+                    x=self.activation_func(
+                        np.dot(scaled_X, W)
+                    ),
+                    drop_prob=self.dropout,
+                    seed=self.seed,
+                )
 
         else:  # with bias term in the hidden layer
 
@@ -463,31 +467,36 @@ class Base(BaseEstimator):
                         n_points=self.n_hidden_features,
                     )
 
-                return mo.dropout(x = self.activation_func(
-                    np.dot(
-                        mo.cbind(
-                            np.ones(scaled_X.shape[0]),
-                            scaled_X,
-                        ),
-                        self.W,
-                    )
-                ), drop_prob = self.dropout, 
-                    seed = self.seed)
+                return mo.dropout(
+                    x=self.activation_func(
+                        np.dot(
+                            mo.cbind(
+                                np.ones(scaled_X.shape[0]),
+                                scaled_X,
+                            ),
+                            self.W,
+                        )
+                    ),
+                    drop_prob=self.dropout,
+                    seed=self.seed,
+                )
 
             else:
 
                 # self.W = W
-                return mo.dropout(x = self.activation_func(
-                    np.dot(
-                        mo.cbind(
-                            np.ones(scaled_X.shape[0]),
-                            scaled_X,
-                        ),
-                        W,
-                    )
-                ), drop_prob = self.dropout, 
-                    seed = self.seed)
-
+                return mo.dropout(
+                    x=self.activation_func(
+                        np.dot(
+                            mo.cbind(
+                                np.ones(scaled_X.shape[0]),
+                                scaled_X,
+                            ),
+                            W,
+                        )
+                    ),
+                    drop_prob=self.dropout,
+                    seed=self.seed,
+                )
 
     def cook_training_set(
         self, y=None, X=None, W=None, **kwargs
@@ -607,7 +616,6 @@ class Base(BaseEstimator):
         else:  # classification
 
             return self.scaler.transform(Z)
-
 
     def cook_test_set(self, X, **kwargs):
         """ Transform data from test set, with hidden layer. """

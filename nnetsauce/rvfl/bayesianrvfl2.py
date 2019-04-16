@@ -103,7 +103,6 @@ class BayesianRVFL2(Base, RegressorMixin):
         self.GCV = GCV
         self.return_std = return_std
 
-
     def fit(self, X, y, **kwargs):
         """Fit regularized RVFL to training data (X, y).
         
@@ -167,8 +166,7 @@ class BayesianRVFL2(Base, RegressorMixin):
 
         return self
 
-
-    def predict(self, X, return_std = False, **kwargs):
+    def predict(self, X, return_std=False, **kwargs):
         """Predict test data X.
         
         Parameters
@@ -185,15 +183,19 @@ class BayesianRVFL2(Base, RegressorMixin):
         model predictions: {array-like}
         """
 
-        if (len(X.shape) == 1):  # one observation in the test set only
+        if (
+            len(X.shape) == 1
+        ):  # one observation in the test set only
             n_features = X.shape[0]
-            new_X = mo.rbind(X.reshape(1, n_features),
-                             np.ones(n_features).reshape(1, n_features))
-            
+            new_X = mo.rbind(
+                X.reshape(1, n_features),
+                np.ones(n_features).reshape(1, n_features),
+            )
+
         self.return_std = return_std
 
         if self.return_std == False:
-            
+
             if len(X.shape) == 1:
 
                 return (
@@ -203,7 +205,7 @@ class BayesianRVFL2(Base, RegressorMixin):
                         self.beta,
                     )
                 )[0]
-                    
+
             else:
 
                 return self.y_mean + np.dot(
@@ -250,7 +252,9 @@ class BayesianRVFL2(Base, RegressorMixin):
 
         preds = self.predict(X)
 
-        if self.return_std:  # if there are std. devs in the predictions
+        if (
+            self.return_std
+        ):  # if there are std. devs in the predictions
             preds = preds[0]
 
         if mx.is_factor(y):  # classification

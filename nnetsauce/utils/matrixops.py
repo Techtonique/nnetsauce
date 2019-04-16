@@ -18,22 +18,22 @@ def crossprod(x, y=None):
 
 
 # dropout
-def dropout(x, drop_prob = 0, seed = 123):
-    
+def dropout(x, drop_prob=0, seed=123):
+
     assert 0 <= drop_prob <= 1
-    
-    n, p = x.shape 
-    
+
+    n, p = x.shape
+
     if drop_prob == 0:
         return x
-    
+
     if drop_prob == 1:
-       return np.zeros_like(x)
-    
+        return np.zeros_like(x)
+
     np.random.seed(seed)
     dropped_indices = np.random.rand(n, p) > drop_prob
-    
-    return dropped_indices*x/(1 - drop_prob)
+
+    return dropped_indices * x / (1 - drop_prob)
 
 
 # one-hot encoding

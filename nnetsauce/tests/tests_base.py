@@ -142,40 +142,58 @@ class TestBase(ut.TestCase):
         rmse5 = np.sqrt(np.mean(err5 ** 2))
 
         self.assertTrue(
-            np.allclose(rmse, 63.243819280710575) \
-            & np.allclose(rmse2, 19.404919470812349) \
-            & np.allclose(rmse3, 297.48121295592665) \
-            & np.allclose(rmse4, 528.74597543402103) \
-            & np.allclose(rmse5, 5.4594298062878736e-13) \
-            & np.allclose(fit_obj.predict(X_test[0,:]), 447.88881097463855) \
-            & np.allclose(fit_obj2.predict(X_test[0,:]), 284.7193214062255) \
+            np.allclose(rmse, 63.243819280710575)
+            & np.allclose(rmse2, 19.404919470812349)
+            & np.allclose(rmse3, 297.48121295592665)
+            & np.allclose(rmse4, 528.74597543402103)
+            & np.allclose(rmse5, 5.4594298062878736e-13)
+            & np.allclose(
+                fit_obj.predict(X_test[0, :]),
+                447.88881097463855,
+            )
+            & np.allclose(
+                fit_obj2.predict(X_test[0, :]),
+                284.7193214062255,
+            )
             & (
                 fit_obj6.get_params()
-                == {'a': 0.01,
-                     'activation_name': 'elu',
-                     'bias': False,
-                     'direct_link': False,
-                     'dropout': 0,
-                     'n_clusters': 2,
-                     'n_hidden_features': 5,
-                     'nodes_sim': 'sobol',
-                     'seed': 123,
-                     'type_clust': 'gmm',
-                     'type_scaling': ('std', 'std', 'minmax')}
-            ) \
+                == {
+                    "a": 0.01,
+                    "activation_name": "elu",
+                    "bias": False,
+                    "direct_link": False,
+                    "dropout": 0,
+                    "n_clusters": 2,
+                    "n_hidden_features": 5,
+                    "nodes_sim": "sobol",
+                    "seed": 123,
+                    "type_clust": "gmm",
+                    "type_scaling": (
+                        "std",
+                        "std",
+                        "minmax",
+                    ),
+                }
+            )
             & (
                 fit_obj7.get_params()
-                == {'a': 0.01,
-                     'activation_name': 'prelu',
-                     'bias': False,
-                     'direct_link': False,
-                     'dropout': 0,
-                     'n_clusters': 2,
-                     'n_hidden_features': 5,
-                     'nodes_sim': 'sobol',
-                     'seed': 123,
-                     'type_clust': 'gmm',
-                     'type_scaling': ('std', 'std', 'minmax')}
+                == {
+                    "a": 0.01,
+                    "activation_name": "prelu",
+                    "bias": False,
+                    "direct_link": False,
+                    "dropout": 0,
+                    "n_clusters": 2,
+                    "n_hidden_features": 5,
+                    "nodes_sim": "sobol",
+                    "seed": 123,
+                    "type_clust": "gmm",
+                    "type_scaling": (
+                        "std",
+                        "std",
+                        "minmax",
+                    ),
+                }
             )
         )
 
@@ -202,12 +220,9 @@ class TestBase(ut.TestCase):
                     X, y, scoring="neg_mean_squared_error"
                 ),
                 8.8932331540758209,
-            ) \
+            )
             & np.allclose(
-                fit_obj.score(
-                    X, y
-                ),
-                8.8932331540758209,
+                fit_obj.score(X, y), 8.8932331540758209
             )
         )
 

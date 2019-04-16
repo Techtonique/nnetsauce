@@ -63,24 +63,48 @@ class TestRVFL(ut.TestCase):
         y_test = y[index_test]
 
         fit_obj.fit(X_train, y_train)
-        err = fit_obj.predict(X_test, return_std = True)[0] - y_test
+        err = (
+            fit_obj.predict(X_test, return_std=True)[0]
+            - y_test
+        )
         rmse = np.sqrt(np.mean(err ** 2))
 
         fit_obj2.fit(X_train, y_train)
-        err2 = fit_obj2.predict(X_test, return_std = True)[0] - y_test
+        err2 = (
+            fit_obj2.predict(X_test, return_std=True)[0]
+            - y_test
+        )
         rmse2 = np.sqrt(np.mean(err2 ** 2))
 
         fit_obj3.fit(X_train, y_train)
-        err3 = fit_obj3.predict(X_test, return_std = True)[0] - y_test
+        err3 = (
+            fit_obj3.predict(X_test, return_std=True)[0]
+            - y_test
+        )
         rmse3 = np.sqrt(np.mean(err3 ** 2))
 
         fit_obj4.fit(X_train, y_train)
-        err4 = fit_obj4.predict(X_test, return_std = True)[0] - y_test
+        err4 = (
+            fit_obj4.predict(X_test, return_std=True)[0]
+            - y_test
+        )
         rmse4 = np.sqrt(np.mean(err4 ** 2))
 
-        pred1 = fit_obj.predict(X_test[0, :], return_std = True)[0]
+        pred1 = fit_obj.predict(
+            X_test[0, :], return_std=True
+        )[0]
 
-        pred2 = fit_obj2.predict(X_test[0, :], return_std = True)[0]
+        pred2 = fit_obj2.predict(
+            X_test[0, :], return_std=True
+        )[0]
+
+        pred3 = fit_obj.predict(
+            X_test[0, :], return_std=False
+        )
+
+        pred4 = fit_obj4.predict(
+            X_test[0, :], return_std=False
+        )
 
         self.assertTrue(
             np.allclose(rmse, 0.81893186154747988)
@@ -89,6 +113,8 @@ class TestRVFL(ut.TestCase):
             & np.allclose(rmse4, 53.052553013478331)
             & np.allclose(pred1, 325.96545701774187)
             & np.allclose(pred2, 299.56243221494879)
+            & np.allclose(pred3, 325.96545701774187)
+            & np.allclose(pred4, 234.76784640807193)
         )
 
     def test_get_set(self):
@@ -135,7 +161,7 @@ class TestRVFL(ut.TestCase):
             a=0.01,
             nodes_sim="sobol",
             bias=True,
-            dropout = 0.5,
+            dropout=0.5,
             direct_link=True,
             n_clusters=None,  # optim
             type_clust="kmeans",
@@ -150,44 +176,56 @@ class TestRVFL(ut.TestCase):
         self.assertTrue(
             (
                 fit_obj.get_params()
-                == {'GCV': None,
-                     'Sigma': None,
-                     'a': 0.01,
-                     'activation_name': 'relu',
-                     'beta': None,
-                     'bias': True,
-                     'direct_link': True,
-                     'dropout': 0,
-                     'n_clusters': None,
-                     'n_hidden_features': 5,
-                     'nodes_sim': 'sobol',
-                     'return_std': True,
-                     's': 0.1,
-                     'seed': 123,
-                     'sigma': 0.05,
-                     'type_clust': 'kmeans',
-                     'type_scaling': ('std', 'minmax', 'std')}
+                == {
+                    "GCV": None,
+                    "Sigma": None,
+                    "a": 0.01,
+                    "activation_name": "relu",
+                    "beta": None,
+                    "bias": True,
+                    "direct_link": True,
+                    "dropout": 0,
+                    "n_clusters": None,
+                    "n_hidden_features": 5,
+                    "nodes_sim": "sobol",
+                    "return_std": True,
+                    "s": 0.1,
+                    "seed": 123,
+                    "sigma": 0.05,
+                    "type_clust": "kmeans",
+                    "type_scaling": (
+                        "std",
+                        "minmax",
+                        "std",
+                    ),
+                }
             )
             & (
                 fit_obj2.get_params()
-                == {'GCV': None,
-                     'Sigma': None,
-                     'a': 0.01,
-                     'activation_name': 'relu',
-                     'beta': None,
-                     'bias': True,
-                     'direct_link': True,
-                     'dropout': 0.5,
-                     'n_clusters': None,
-                     'n_hidden_features': 4,
-                     'nodes_sim': 'sobol',
-                     'return_std': True,
-                     's1': 0.1,
-                     's2': 0.1,
-                     'seed': 123,
-                     'sigma': 0.05,
-                     'type_clust': 'kmeans',
-                     'type_scaling': ('std', 'std', 'minmax')}
+                == {
+                    "GCV": None,
+                    "Sigma": None,
+                    "a": 0.01,
+                    "activation_name": "relu",
+                    "beta": None,
+                    "bias": True,
+                    "direct_link": True,
+                    "dropout": 0.5,
+                    "n_clusters": None,
+                    "n_hidden_features": 4,
+                    "nodes_sim": "sobol",
+                    "return_std": True,
+                    "s1": 0.1,
+                    "s2": 0.1,
+                    "seed": 123,
+                    "sigma": 0.05,
+                    "type_clust": "kmeans",
+                    "type_scaling": (
+                        "std",
+                        "std",
+                        "minmax",
+                    ),
+                }
             )
         )
 
@@ -217,7 +255,7 @@ class TestRVFL(ut.TestCase):
             activation_name="sigmoid",
             n_clusters=2,
         )
-        
+
         fit_obj3 = ns.BayesianRVFL2(
             n_hidden_features=9,
             direct_link=True,
@@ -228,7 +266,7 @@ class TestRVFL(ut.TestCase):
             activation_name="sigmoid",
             n_clusters=2,
         )
-        
+
         fit_obj4 = ns.BayesianRVFL2(
             n_hidden_features=9,
             direct_link=True,
@@ -244,6 +282,7 @@ class TestRVFL(ut.TestCase):
         fit_obj2.fit(X, y)
         fit_obj3.fit(X, y)
         fit_obj4.fit(X, y)
+        fit_obj4.set_params(return_std=True)
 
         self.assertTrue(
             np.allclose(

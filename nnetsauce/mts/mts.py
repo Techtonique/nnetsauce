@@ -30,6 +30,7 @@
 
 import numpy as np
 from ..base import Base
+from scipy.stats import norm
 from ..utils import matrixops as mo
 from ..utils import timeseries as ts
 import sklearn.metrics as skm2
@@ -128,7 +129,6 @@ class MTS(Base):
         self.return_std = return_std
         self.preds_std = []
 
-
     def fit(self, X, **kwargs):
         """Fit MTS model to training data (X, y).
         
@@ -167,9 +167,7 @@ class MTS(Base):
 
         # avoids scaling X p times in the loop
         scaled_Z = self.cook_training_set(
-            y=np.repeat(1, self.n_series),
-            X=self.X,
-            **kwargs
+            y=np.repeat(1, n), X=self.X, **kwargs
         )
 
         # loop on all the time series and adjust self.obj.fit
@@ -183,7 +181,6 @@ class MTS(Base):
         self.y_mean = None
 
         return self
-
 
     def predict(self, h=5, level=95, **kwargs):
         """Predict on horizon h.
@@ -212,10 +209,13 @@ class MTS(Base):
         n_features = self.n_series * self.lags
 
         self.preds_std = np.zeros(h)
-        
-        if 'return_std' in kwargs:
-            self.return_std = kwargs['return_std']
-            
+
+        if "return_std" in kwargs:
+
+            self.return_std = kwargs["return_std"]
+
+            qt = norm.ppf(1 - 0.5 * (1 - level / 100))
+
         for i in range(h):
 
             new_obs = ts.reformat_response(
@@ -235,8 +235,10 @@ class MTS(Base):
                 cooked_new_X, **kwargs
             )
 
-            if (self.return_std == False):  # std. dev. is not returned
-                
+            if (
+                self.return_std == False
+            ):  # std. dev. is not returned
+
                 preds = np.array(
                     [
                         (
@@ -271,8 +273,10 @@ class MTS(Base):
 
         self.preds = self.preds[0:h, :][::-1]
 
-        if self.return_std == False:  # the std. dev. is returned
-            
+        if (
+            self.return_std == False
+        ):  # the std. dev. is returned
+
             return self.preds
 
         else:
@@ -281,13 +285,17 @@ class MTS(Base):
                 h, 1
             )
 
+            # reshape
+            self.preds_std = np.repeat(
+                self.preds_std, self.n_series
+            ).reshape(-1, self.n_series)
+
             return (
                 self.preds,
                 self.preds_std,
-                self.preds - self.preds_std,
-                self.preds + self.preds_std,
+                self.preds - qt * self.preds_std,
+                self.preds + qt * self.preds_std,
             )
-
 
     def score(
         self,
@@ -323,7 +331,9 @@ class MTS(Base):
 
         # Fit and predict
         self.fit(X_train, **kwargs)
-        preds = self.predict(h=h, return_std = False, **kwargs)
+        preds = self.predict(
+            h=h, return_std=False, **kwargs
+        )
 
         if scoring is None:
             scoring = "neg_mean_squared_error"
