@@ -5,6 +5,7 @@
 # License: BSD 3
 
 import numpy as np
+from functools import partial
 from sklearn.base import BaseEstimator
 import sklearn.metrics as skm
 from sklearn.cluster import KMeans
@@ -13,6 +14,7 @@ from sklearn.preprocessing import (
     StandardScaler,
     MinMaxScaler,
 )
+from ..utils import activations as ac
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 from ..utils import lmfuncs as lmf
@@ -102,26 +104,12 @@ class Base(BaseEstimator):
 
         # activation function -----
 
-        def prelu(x, a):
-            y = x.copy()
-            index = x < 0
-            y[index] = a * x[index]
-
-            return y
-
-        def elu(x, a):
-            y = x.copy()
-            index = x < 0
-            y[index] = a * (np.exp(x[index]) - 1)
-
-            return y
-
         activation_options = {
-            "relu": lambda x: np.maximum(x, 0),
-            "tanh": lambda x: np.tanh(x),
-            "sigmoid": lambda x: 1 / (1 + np.exp(-x)),
-            "prelu": lambda x: prelu(x, a=a),
-            "elu": lambda x: elu(x, a=a),
+            "relu": ac.relu,
+            "tanh": np.tanh,
+            "sigmoid": ac.sigmoid,
+            "prelu": partial(ac.prelu, a=a),
+            "elu": partial(ac.elu, a=a),
         }
 
         self.n_hidden_features = n_hidden_features
