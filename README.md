@@ -263,60 +263,6 @@ __There are certainly many other creative ways of combining these objects__, tha
 
 ## Model validation
 
-Currently, a method `score` is available for all models in the `nnetsauce`. It allows to measure the model's 
-performance on a given testing set __(X, y)__. `scoring` options are the same 
-as `scikit-learn`'s. Using the previous code snippet, we have: 
-
-````python
-# RMSE of BayesianRidge on test set (X[350:360,:], y[350:360])
-print(np.sqrt(fit_obj.score(X[350:360,:], y[350:360], 
-        scoring="neg_mean_squared_error")))
-
-# RMSE of ElasticNet on test set (X[350:360,:], y[350:360])
-print(np.sqrt(fit_obj2.score(X[350:360,:], y[350:360], 
-        scoring="neg_mean_squared_error")))
-
-# Accuracy of Gaussian Process classifier on test set
-print(fit_obj3.score(Z[456:569,:], t[456:569], scoring="accuracy"))
-````
-
-For `BayesianRVFL` and `BayesianRVFL2` we also have the Generalized Cross-Validation (GCV) 
-error calculated right after the model is fitted:
-
-````python
-# Obtain GCV 
-fit_obj = ns.BayesianRVFL2(n_hidden_features=100, 
-                  direct_link=True,
-                  activation_name='tanh', 
-                  n_clusters=3, 
-                  s1=0.5, s2=0.1, sigma=0.1)
-
-fit_obj.fit(X[0:350,:], y[0:350])
-
-print(fit_obj.GCV)
-````
-
-For `Custom` objects, in addition to the method `score`, we have a cross-validation method `cross_val_score` similar to `scikit-learn` 's `cross_val_score`: 
-
-````python
-regr = linear_model.BayesianRidge()
-regr3 = gaussian_process.GaussianProcessClassifier()
-
-# create objects Custom
-fit_obj = ns.CustomRegressor(obj=regr, n_hidden_features=100, 
-                    direct_link=True, bias=True,
-                    activation_name='tanh', n_clusters=2)
-
-fit_obj3 = ns.CustomClassifier(obj=regr3, n_hidden_features=100, 
-                     direct_link=True, bias=True,
-                     activation_name='relu', n_clusters=0)
-
-# 5-fold cross-validation error (regression)
-print(fit_obj.cross_val_score(X, y, cv = 5))
-
-# 5-fold cross-validation error (classification)
-print(fit_obj3.cross_val_score(Z, t, cv = 5))
-````
 
 
 ## Contributing
