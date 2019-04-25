@@ -4,18 +4,6 @@
 #
 # License: BSD 3
 
-
-# for additional (deterministic) regressors,
-# modify the reformatting function
-# for additional (deterministic) regressors,
-# modify the reformatting function
-# for additional (deterministic) regressors,
-# modify the reformatting function
-# for additional (deterministic) regressors,
-# modify the reformatting function
-# for additional (deterministic) regressors,
-# modify the reformatting function
-
 # change: return_std = True must be in method predict
 # change: return_std = True must be in method predict
 # change: return_std = True must be in method predict
@@ -34,6 +22,7 @@ from scipy.stats import norm
 from ..utils import matrixops as mo
 from ..utils import timeseries as ts
 import sklearn.metrics as skm2
+from sklearn.preprocessing import StandardScaler
 
 
 class MTS(Base):
@@ -124,12 +113,14 @@ class MTS(Base):
             None
         )  # MTS responses (most recent observations first)
         self.X = None  # MTS lags
+        self.regressors_scaler = None
         self.y_means = []
         self.preds = None
         self.return_std = return_std
         self.preds_std = []
 
-    def fit(self, X, **kwargs):
+
+    def fit(self, X, xreg = None, **kwargs):
         """Fit MTS model to training data (X, y).
         
         Parameters
@@ -138,7 +129,8 @@ class MTS(Base):
             Training time series, where n_samples is the number 
             of samples and n_features is the number of features.
             X must be in increasing order (most recent observations last)
-        
+        xreg: {array-like}, shape = [n_samples, n_xreg]
+            Additional regressors to be passed to obj
         **kwargs: additional parameters to be passed to 
                   self.cook_training_set
                
@@ -160,29 +152,57 @@ class MTS(Base):
         mts_input = ts.create_train_inputs(
             X[::-1], self.lags
         )
-
+        
         self.y = mts_input[0]
 
         self.X = mts_input[1]
-
+        
         # avoids scaling X p times in the loop
         scaled_Z = self.cook_training_set(
             y=np.repeat(1, n), X=self.X, **kwargs
         )
+        
+        if xreg is not None: 
+            
+            xreg_input = ts.create_train_inputs(xreg[::-1], 
+                                                      self.lags)[1]
+            
+            self.xreg_scaler = StandardScaler(copy=True, with_mean=True, 
+                           with_std=True)
+            
+            scaled_xreg = self.xreg_scaler.transform(xreg_input)
+            
+            covariates = mo.cbind(scaled_Z, scaled_xreg)
+            
+            # loop on all the time series and adjust self.obj.fit
+            for i in range(p):
+                y_mean = np.mean(self.y[:, i])
+                self.y_means[i] = y_mean
+                self.fit_objs[i] = self.obj.fit(
+                    covariates, self.y[:, i] - y_mean, **kwargs
+                )
+    
+            self.y_mean = None
+    
+            return self
+            
+        
+        else: 
 
-        # loop on all the time series and adjust self.obj.fit
-        for i in range(p):
-            y_mean = np.mean(self.y[:, i])
-            self.y_means[i] = y_mean
-            self.fit_objs[i] = self.obj.fit(
-                scaled_Z, self.y[:, i] - y_mean, **kwargs
-            )
+            # loop on all the time series and adjust self.obj.fit
+            for i in range(p):
+                y_mean = np.mean(self.y[:, i])
+                self.y_means[i] = y_mean
+                self.fit_objs[i] = self.obj.fit(
+                    scaled_Z, self.y[:, i] - y_mean, **kwargs
+                )
+    
+            self.y_mean = None
+    
+            return self
 
-        self.y_mean = None
 
-        return self
-
-    def predict(self, h=5, level=95, **kwargs):
+    def predict(self, h=5, level=95, new_xreg = None, **kwargs):
         """Predict on horizon h.
         
         Parameters
@@ -193,6 +213,9 @@ class MTS(Base):
         level: {integer}
             Level of confidence (if obj has option 'return_std' and the 
             posterior is gaussian)
+            
+        new_xreg: {array-like}, shape = [n_samples, n_new_xreg]
+            New values of additional (deterministic) regressors on horizon = h
         
         **kwargs: additional parameters to be passed to 
                   self.cook_test_set
@@ -209,6 +232,17 @@ class MTS(Base):
         n_features = self.n_series * self.lags
 
         self.preds_std = np.zeros(h)
+        
+        if new_xreg is not None:
+            
+            assert new_xreg.shape[0] == h, "please provide values of regressors for the whole horizon 'h'"
+
+# To be checked - To be checked - To be checked - To be checked -             
+#            new_xreg_input = ts.create_train_inputs(new_xreg[::-1], 
+#                                                      self.lags)[1]
+# To be checked - To be checked - To be checked - To be checked - 
+            
+            scaled_new_xreg = self.xreg_scaler.transform(new_xreg_input)
 
         if "return_std" in kwargs:
 
@@ -296,6 +330,7 @@ class MTS(Base):
                 self.preds - qt * self.preds_std,
                 self.preds + qt * self.preds_std,
             )
+
 
     def score(
         self,
