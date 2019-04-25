@@ -17,8 +17,8 @@ class TestMTS(ut.TestCase):
 
         regr = linear_model.BayesianRidge()
         regr2 = gaussian_process.GaussianProcessRegressor()
-        regr3 = ns.BayesianRVFL(s=0.01)
-        regr4 = ns.BayesianRVFL2(
+        regr3 = ns.BayesianRVFLRegressor(s=0.01)
+        regr4 = ns.BayesianRVFL2Regressor(
             s1=0.01, s2=0.01, n_hidden_features=2
         )
 

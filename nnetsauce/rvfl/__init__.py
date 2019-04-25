@@ -1,4 +1,4 @@
-from .bayesianrvfl import BayesianRVFL
-from .bayesianrvfl2 import BayesianRVFL2
+from .bayesianrvflRegressor import BayesianRVFLRegressor
+from .bayesianrvfl2Regressor import BayesianRVFL2Regressor
 
-__all__ = ["BayesianRVFL", "BayesianRVFL2"]
+__all__ = ["BayesianRVFLRegressor", "BayesianRVFL2Regressor"]

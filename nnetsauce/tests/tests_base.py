@@ -15,7 +15,7 @@ class TestBase(ut.TestCase):
             n_samples=25, n_features=3
         )
 
-        fit_obj = ns.Base(
+        fit_obj = ns.BaseRegressor(
             n_hidden_features=10,
             direct_link=False,
             bias=False,
@@ -36,7 +36,7 @@ class TestBase(ut.TestCase):
             type_scaling=("std", "std", "minmax"),
         )
 
-        fit_obj2 = ns.Base(
+        fit_obj2 = ns.BaseRegressor(
             n_hidden_features=9,
             direct_link=False,
             bias=True,
@@ -45,7 +45,7 @@ class TestBase(ut.TestCase):
             n_clusters=2,
         )
 
-        fit_obj3 = ns.Base(
+        fit_obj3 = ns.BaseRegressor(
             n_hidden_features=8,
             direct_link=True,
             bias=False,
@@ -54,7 +54,7 @@ class TestBase(ut.TestCase):
             n_clusters=3,
         )
 
-        fit_obj4 = ns.Base(
+        fit_obj4 = ns.BaseRegressor(
             n_hidden_features=7,
             direct_link=True,
             bias=True,
@@ -63,7 +63,7 @@ class TestBase(ut.TestCase):
             n_clusters=4,
         )
 
-        fit_obj5 = ns.Base(
+        fit_obj5 = ns.BaseRegressor(
             n_hidden_features=2,
             direct_link=True,
             bias=True,
@@ -72,7 +72,7 @@ class TestBase(ut.TestCase):
             n_clusters=0,
         )
 
-        fit_obj6 = ns.Base(
+        fit_obj6 = ns.BaseRegressor(
             n_hidden_features=2,
             direct_link=True,
             bias=True,
@@ -93,7 +93,7 @@ class TestBase(ut.TestCase):
             type_scaling=("std", "std", "minmax"),
         )
 
-        fit_obj7 = ns.Base(
+        fit_obj7 = ns.BaseRegressor(
             n_hidden_features=2,
             direct_link=True,
             bias=True,
@@ -204,7 +204,7 @@ class TestBase(ut.TestCase):
             n_samples=100, n_features=3
         )
 
-        fit_obj = ns.Base(
+        fit_obj = ns.BaseRegressor(
             n_hidden_features=5,
             direct_link=True,
             bias=True,

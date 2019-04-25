@@ -15,7 +15,7 @@ class TestRVFL(ut.TestCase):
             n_samples=25, n_features=3
         )
 
-        fit_obj = ns.BayesianRVFL(
+        fit_obj = ns.BayesianRVFLRegressor(
             n_hidden_features=10,
             direct_link=False,
             bias=False,
@@ -25,7 +25,7 @@ class TestRVFL(ut.TestCase):
             n_clusters=0,
         )
 
-        fit_obj2 = ns.BayesianRVFL2(
+        fit_obj2 = ns.BayesianRVFL2Regressor(
             n_hidden_features=9,
             direct_link=False,
             bias=True,
@@ -35,7 +35,7 @@ class TestRVFL(ut.TestCase):
             n_clusters=2,
         )
 
-        fit_obj3 = ns.BayesianRVFL(
+        fit_obj3 = ns.BayesianRVFLRegressor(
             n_hidden_features=8,
             direct_link=True,
             bias=False,
@@ -45,7 +45,7 @@ class TestRVFL(ut.TestCase):
             n_clusters=3,
         )
 
-        fit_obj4 = ns.BayesianRVFL2(
+        fit_obj4 = ns.BayesianRVFL2Regressor(
             n_hidden_features=7,
             direct_link=True,
             bias=True,
@@ -119,7 +119,7 @@ class TestRVFL(ut.TestCase):
 
     def test_get_set(self):
 
-        fit_obj = ns.BayesianRVFL(
+        fit_obj = ns.BayesianRVFLRegressor(
             n_hidden_features=10,
             direct_link=False,
             bias=False,
@@ -129,7 +129,7 @@ class TestRVFL(ut.TestCase):
             n_clusters=0,
         )
 
-        fit_obj2 = ns.BayesianRVFL2(
+        fit_obj2 = ns.BayesianRVFL2Regressor(
             n_hidden_features=9,
             direct_link=False,
             bias=True,
@@ -236,7 +236,7 @@ class TestRVFL(ut.TestCase):
             n_samples=100, n_features=3
         )
 
-        fit_obj = ns.BayesianRVFL(
+        fit_obj = ns.BayesianRVFLRegressor(
             n_hidden_features=10,
             direct_link=False,
             bias=False,
@@ -246,7 +246,7 @@ class TestRVFL(ut.TestCase):
             n_clusters=0,
         )
 
-        fit_obj2 = ns.BayesianRVFL2(
+        fit_obj2 = ns.BayesianRVFL2Regressor(
             n_hidden_features=9,
             direct_link=False,
             bias=True,
@@ -256,7 +256,7 @@ class TestRVFL(ut.TestCase):
             n_clusters=2,
         )
 
-        fit_obj3 = ns.BayesianRVFL2(
+        fit_obj3 = ns.BayesianRVFL2Regressor(
             n_hidden_features=9,
             direct_link=True,
             bias=True,
@@ -267,7 +267,7 @@ class TestRVFL(ut.TestCase):
             n_clusters=2,
         )
 
-        fit_obj4 = ns.BayesianRVFL2(
+        fit_obj4 = ns.BayesianRVFL2Regressor(
             n_hidden_features=9,
             direct_link=True,
             bias=True,

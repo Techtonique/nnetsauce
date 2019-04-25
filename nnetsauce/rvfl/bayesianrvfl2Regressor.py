@@ -13,7 +13,7 @@ from ..utils import lmfuncs as lmf
 from sklearn.base import RegressorMixin
 
 
-class BayesianRVFL2(Base, RegressorMixin):
+class BayesianRVFL2Regressor(Base, RegressorMixin):
     """Bayesian RVFL model class derived from class Base, with parametrized covariance
     
        Parameters

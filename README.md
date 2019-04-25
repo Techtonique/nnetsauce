@@ -31,8 +31,8 @@ Every model in the `nnetsauce` is based on the component __g(XW + b)__, where:
 __Currently__, 5 models are implemented in the `nnetsauce`. If your response variable (the one that you want to explain) is __y__, then:
 
 - `Base` adjusts a linear regression to __y__, as a function of __X__ (optional) and __g(XW + b)__; without regularization of the regression coefficients. 
-- `BayesianRVFL` adds a ridge regularization parameter to the regression coefficients of `Base`, which prevents overfitting. Confidence intervals around the prediction can also be obtained.  
-- `BayesianRVFL2` adds 2 regularization parameters to `Base`. As with `BayesianRVFL`, confidence intervals around the prediction can be obtained.
+- `BayesianRVFL` (currently, `BayesianRVFLRegressor`) adds a ridge regularization parameter to the regression coefficients of `Base`, which prevents overfitting. Confidence intervals around the prediction can also be obtained.  
+- `BayesianRVFL2` (currently, `BayesianRVFL2Regressor`) adds 2 regularization parameters to `Base`. As with `BayesianRVFL`, confidence intervals around the prediction can be obtained.
 - `Custom` (`CustomRegressor` and `CustomClassifier`) works with any object `fit_obj` possessing methods `fit_obj.fit()` and `fit_obj.predict()`. Notably, the model can be applied to any [`scikit-learn`](https://scikit-learn.org)'s model, and to [`xgboost`](https://github.com/dmlc/xgboost), [`LightGBM`](https://github.com/Microsoft/LightGBM), [`CatBoost`](https://github.com/catboost/catboost) models. It adjusts `fit_obj` to __y__, as a function of __X__ (optional) and __g(XW + b)__. `Custom` objects can also be combined to form __deeper learning architectures__, as it will be shown in the next section. 
 - `MTS` does multivariate time series forecasting. Like `Custom`, it works with any object `fit_obj` possessing methods `fit_obj.fit()` and `fit_obj.predict()`.
 
@@ -67,7 +67,7 @@ t = breast_cancer.target
 # The activation function g is the hyperbolic tangent ('activation_name' parameter)
 # The data in X is clustered: 2 clusters are obtained with k-means before fitting the model ('type_clust', 'n_clusters' parameters)
 
-fit_obj = ns.Base(n_hidden_features=100, 
+fit_obj = ns.BaseRegressor(n_hidden_features=100, 
                   direct_link=False,
                   nodes_sim='sobol',
                   bias=False,
@@ -94,7 +94,7 @@ plt.show()
 # create object BayesianRVFL  
 # regularization is controlled by 's' and 'sigma'
 # here, nodes_sim='halton' is used in the hidden layer
-fit_obj = ns.BayesianRVFL(n_hidden_features=100,
+fit_obj = ns.BayesianRVFLRegressor(n_hidden_features=100,
                           nodes_sim='halton', 
                           direct_link=True,
                           bias=False,
@@ -119,7 +119,7 @@ plt.show()
 ````python
 # create object BayesianRVFL2 
 # regularization is controlled by 's1', 's2' and 'sigma'
-fit_obj = ns.BayesianRVFL2(n_hidden_features=100, 
+fit_obj = ns.BayesianRVFL2Regressor(n_hidden_features=100, 
                   direct_link=True,
                   activation_name='tanh', 
                   n_clusters=3, 
