@@ -334,7 +334,6 @@ A few things that we could explore are:
 - Creating a great documentation on [readthedocs.org](https://readthedocs.org/) 
 - Find other ways to combine `Custom` objects, using your fertile imagination (including [tests](#Tests))
 - Better management of dates for MTS objects (including [tests](#Tests))
-- Dealing with additional deterministic regressors in MTS objects (including [tests](#Tests))
 - Make package available on PyPI (for those who want)
 - Enrich the [tests](#Tests)
 - Make `nnetsauce` available to `R` users 

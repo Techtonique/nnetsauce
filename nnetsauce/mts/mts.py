@@ -104,6 +104,7 @@ class MTS(Base):
         self.fit_objs = {}
         self.y = None  # MTS responses (most recent observations first)
         self.X = None  # MTS lags
+        self.xreg = None
         self.regressors_scaler = None
         self.y_means = []
         self.preds = None
@@ -206,6 +207,9 @@ class MTS(Base):
         model predictions for horizon = h: {array-like}
         """
         
+        if self.xreg is not None:        
+            assert (new_xreg is not None), "'new_xreg' must be provided" 
+        
         self.preds = None
 
         self.preds = self.y
@@ -213,7 +217,6 @@ class MTS(Base):
         n_features = self.n_series * self.lags
         
         self.preds_std = np.zeros(h)    
-        
         
         if "return_std" in kwargs:
 
