@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 """Base class."""
 
+=======
+>>>>>>> new-vars
 # Authors: Thierry Moudiki
 #
 # License: BSD 3

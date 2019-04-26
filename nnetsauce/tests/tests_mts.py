@@ -118,10 +118,17 @@ class TestMTS(ut.TestCase):
         index_test = range(20, 25)
         X_train = X[index_train, :]
         X_test = X[index_test, :]
+        
+        Xreg_train = np.reshape(range(0, 60), (20, 3))
+        Xreg_test = np.reshape(range(60, 75), (5, 3))
 
-        fit_obj.fit(X_train)
+        fit_obj.fit(X = X_train)
         err = fit_obj.predict() - X_test
         rmse = np.sqrt(np.mean(err ** 2))
+        
+        fit_obj.fit(X_train, xreg = Xreg_train)
+        err_xreg = fit_obj.predict(new_xreg = Xreg_test) - X_test
+        rmse_xreg = np.sqrt(np.mean(err_xreg ** 2))
 
         fit_obj2.fit(X_train)
         err2 = fit_obj2.predict() - X_test
@@ -150,6 +157,7 @@ class TestMTS(ut.TestCase):
 
         self.assertTrue(
             np.allclose(rmse, 10.396062391967684)
+            & np.allclose(rmse_xreg, 10.396395408743871)
             & np.allclose(rmse2, 10.395489235411796)
             & np.allclose(rmse3, 10.395986434438191)
             & np.allclose(rmse4, 10.677585029352571)
