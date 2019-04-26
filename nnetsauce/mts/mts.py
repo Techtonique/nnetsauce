@@ -156,15 +156,7 @@ class MTS(Base):
             
             self.xreg = xreg
             
-            print("\n")
-            print(f"In MTS::fit : xreg : {xreg}")
-            print("\n")
-            
             xreg_input = ts.create_train_inputs(xreg[::-1], self.lags)
-            
-            print("\n")
-            print(f"In MTS::fit : lags of inversed xreg : {xreg_input[1]}")
-            print("\n")
             
             scaled_Z = self.cook_training_set(y = np.repeat(1, n), 
                                               X = mo.cbind(self.X, xreg_input[1]), 
@@ -246,11 +238,7 @@ class MTS(Base):
             
             inv_new_xreg = mo.rbind(self.xreg, new_xreg)[::-1]
             
-            print("\n")
-            print(f"inv_new_xreg in MTS::predict: {inv_new_xreg}")
-            print("\n")
-
-        
+            
         # Loop on horizon h
         
         for i in range(h):
