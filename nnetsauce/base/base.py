@@ -137,155 +137,6 @@ class Base(BaseEstimator):
         self.y_mean = None
         self.beta = None
 
-    def fit(self, X, y, **kwargs):
-        """Fit RVFL to training data (X, y).
-        
-        Parameters
-        ----------
-        X: {array-like}, shape = [n_samples, n_features]
-            Training vectors, where n_samples is the number 
-            of samples and n_features is the number of features.
-        
-        y: array-like, shape = [n_samples]
-               Target values.
-    
-        **kwargs: additional parameters to be passed to 
-                  self.cook_training_set
-               
-        Returns
-        -------
-        self: object
-        """
-        centered_y, scaled_Z = self.cook_training_set(
-            y=y, X=X, **kwargs
-        )
-        fit_obj = lmf.beta_Sigma_hat(
-            X=scaled_Z, y=centered_y
-        )
-
-        self.beta = fit_obj["beta_hat"]
-
-        self.GCV = fit_obj["GCV"]
-
-        return self
-
-    def predict(self, X, **kwargs):
-        """Predict test data X.
-        
-        Parameters
-        ----------
-        X: {array-like}, shape = [n_samples, n_features]
-            Training vectors, where n_samples is the number 
-            of samples and n_features is the number of features.
-        
-        **kwargs: additional parameters to be passed to 
-                  self.cook_test_set
-               
-        Returns
-        -------
-        model predictions: {array-like}
-        """
-
-        if len(X.shape) == 1:
-
-            n_features = X.shape[0]
-            new_X = mo.rbind(
-                X.reshape(1, n_features),
-                np.ones(n_features).reshape(1, n_features),
-            )
-
-            return (
-                self.y_mean
-                + np.dot(
-                    self.cook_test_set(new_X, **kwargs),
-                    self.beta,
-                )
-            )[0]
-
-        else:
-
-            return self.y_mean + np.dot(
-                self.cook_test_set(X, **kwargs), self.beta
-            )
-
-    def score(self, X, y, scoring=None, **kwargs):
-        """ Score the model on test set covariates X and response y. """
-
-        preds = self.predict(X)
-
-        if (
-            type(preds) == tuple
-        ):  # if there are std. devs in the predictions
-            preds = preds[0]
-
-        if mx.is_factor(y):  # classification
-
-            if scoring is None:
-                scoring = "accuracy"
-
-            # check inputs
-            assert scoring in (
-                "accuracy",
-                "average_precision",
-                "brier_score_loss",
-                "f1",
-                "f1_micro",
-                "f1_macro",
-                "f1_weighted",
-                "f1_samples",
-                "neg_log_loss",
-                "precision",
-                "recall",
-                "roc_auc",
-            ), "'scoring' should be in ('accuracy', 'average_precision', \
-                               'brier_score_loss', 'f1', 'f1_micro', \
-                               'f1_macro', 'f1_weighted',  'f1_samples', \
-                               'neg_log_loss', 'precision', 'recall', \
-                               'roc_auc')"
-
-            scoring_options = {
-                "accuracy": skm.accuracy_score,
-                "average_precision": skm.average_precision_score,
-                "brier_score_loss": skm.brier_score_loss,
-                "f1": skm.f1_score,
-                "f1_micro": skm.f1_score,
-                "f1_macro": skm.f1_score,
-                "f1_weighted": skm.f1_score,
-                "f1_samples": skm.f1_score,
-                "neg_log_loss": skm.log_loss,
-                "precision": skm.precision_score,
-                "recall": skm.recall_score,
-                "roc_auc": skm.roc_auc_score,
-            }
-
-        else:  # regression
-
-            if scoring is None:
-                scoring = "neg_mean_squared_error"
-
-            # check inputs
-            assert scoring in (
-                "explained_variance",
-                "neg_mean_absolute_error",
-                "neg_mean_squared_error",
-                "neg_mean_squared_log_error",
-                "neg_median_absolute_error",
-                "r2",
-            ), "'scoring' should be in ('explained_variance', 'neg_mean_absolute_error', \
-                               'neg_mean_squared_error', 'neg_mean_squared_log_error', \
-                               'neg_median_absolute_error', 'r2')"
-
-            scoring_options = {
-                "explained_variance": skm.explained_variance_score,
-                "neg_mean_absolute_error": skm.median_absolute_error,
-                "neg_mean_squared_error": skm.mean_squared_error,
-                "neg_mean_squared_log_error": skm.mean_squared_log_error,
-                "neg_median_absolute_error": skm.median_absolute_error,
-                "r2": skm.r2_score,
-            }
-
-        return scoring_options[scoring](y, preds, **kwargs)
-
     # "preprocessing" methods to be inherited -----
 
     def encode_clusters(
@@ -368,6 +219,7 @@ class Base(BaseEstimator):
             return mo.one_hot_encode(
                 X_clustered, self.n_clusters
             )
+
 
     def create_layer(self, scaled_X, W=None):
         """ Create hidden layer. """
@@ -485,6 +337,7 @@ class Base(BaseEstimator):
                     drop_prob=self.dropout,
                     seed=self.seed,
                 )
+                            
 
     def cook_training_set(
         self, y=None, X=None, W=None, **kwargs
@@ -604,6 +457,7 @@ class Base(BaseEstimator):
         else:  # classification
 
             return self.scaler.transform(Z)
+        
 
     def cook_test_set(self, X, **kwargs):
         """ Transform data from test set, with hidden layer. """
