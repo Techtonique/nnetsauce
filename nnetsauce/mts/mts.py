@@ -4,24 +4,6 @@
 #
 # License: BSD 3
 
-
-# for additional (deterministic) regressors,
-# modify the reformatting function
-# for additional (deterministic) regressors,
-# modify the reformatting function
-# for additional (deterministic) regressors,
-# modify the reformatting function
-# for additional (deterministic) regressors,
-# modify the reformatting function
-# for additional (deterministic) regressors,
-# modify the reformatting function
-
-# change: return_std = True must be in method predict
-# change: return_std = True must be in method predict
-# change: return_std = True must be in method predict
-# change: return_std = True must be in method predict
-# change: return_std = True must be in method predict
-
 # ts objects with rpy2
 # ts objects with rpy2
 # ts objects with rpy2
@@ -120,16 +102,16 @@ class MTS(Base):
         self.n_series = None
         self.lags = lags
         self.fit_objs = {}
-        self.y = (
-            None
-        )  # MTS responses (most recent observations first)
+        self.y = None  # MTS responses (most recent observations first)
         self.X = None  # MTS lags
+        self.regressors_scaler = None
         self.y_means = []
         self.preds = None
         self.return_std = return_std
         self.preds_std = []
 
-    def fit(self, X, **kwargs):
+
+    def fit(self, X, xreg = None, **kwargs):
         """Fit MTS model to training data (X, y).
         
         Parameters
@@ -138,7 +120,9 @@ class MTS(Base):
             Training time series, where n_samples is the number 
             of samples and n_features is the number of features.
             X must be in increasing order (most recent observations last)
-        
+        xreg: {array-like}, shape = [n_samples, n_features_xreg]
+              Additional regressors to be passed to obj
+              xreg must be in increasing order (most recent observations last)
         **kwargs: additional parameters to be passed to 
                   self.cook_training_set
                
@@ -160,15 +144,30 @@ class MTS(Base):
         mts_input = ts.create_train_inputs(
             X[::-1], self.lags
         )
-
+        
         self.y = mts_input[0]
 
         self.X = mts_input[1]
-
-        # avoids scaling X p times in the loop
-        scaled_Z = self.cook_training_set(
-            y=np.repeat(1, n), X=self.X, **kwargs
-        )
+       
+        
+        if xreg is not None: 
+            
+            assert xreg.shape[0] == n, "'xreg' and 'X' must have the same number or observations"
+            
+            self.xreg = xreg
+            
+            xreg_input = ts.create_train_inputs(xreg[::-1], self.lags)
+            
+            scaled_Z = self.cook_training_set(y = np.repeat(1, n), 
+                                              X = mo.cbind(self.X, xreg_input[1]), 
+                                              **kwargs)
+            
+        else: # xreg is None
+            
+             # avoids scaling X p times in the loop
+            scaled_Z = self.cook_training_set(
+                y=np.repeat(1, n), X=self.X, 
+                **kwargs)           
 
         # loop on all the time series and adjust self.obj.fit
         for i in range(p):
@@ -182,7 +181,8 @@ class MTS(Base):
 
         return self
 
-    def predict(self, h=5, level=95, **kwargs):
+
+    def predict(self, h=5, level=95, new_xreg=None, **kwargs):
         """Predict on horizon h.
         
         Parameters
@@ -193,6 +193,10 @@ class MTS(Base):
         level: {integer}
             Level of confidence (if obj has option 'return_std' and the 
             posterior is gaussian)
+            
+        new_xreg: {array-like}, shape = [n_samples = h, n_new_xreg]
+            New values of additional (deterministic) regressors on horizon = h
+            new_xreg must be in increasing order (most recent observations last)
         
         **kwargs: additional parameters to be passed to 
                   self.cook_test_set
@@ -201,31 +205,59 @@ class MTS(Base):
         -------
         model predictions for horizon = h: {array-like}
         """
-
+        
         self.preds = None
 
         self.preds = self.y
 
         n_features = self.n_series * self.lags
-
-        self.preds_std = np.zeros(h)
-
+        
+        self.preds_std = np.zeros(h)    
+        
+        
         if "return_std" in kwargs:
 
             self.return_std = kwargs["return_std"]
 
             qt = norm.ppf(1 - 0.5 * (1 - level / 100))
-
+        
+        
+        if new_xreg is not None: # Additional regressors provided
+            
+            try:
+                n_obs_xreg, n_features_xreg = new_xreg.shape
+                assert n_features_xreg == self.xreg.shape[1], "check number of series provided for 'new_xreg' (compare with self.xreg.shape[1])"
+            except:
+                n_obs_xreg = new_xreg.shape # one series           
+            
+            assert n_obs_xreg == h, "please provide values of regressors 'new_xreg' for the whole horizon 'h'"
+            
+            n_features_xreg = n_features_xreg * self.lags
+            
+            n_features_total = n_features + n_features_xreg
+            
+            inv_new_xreg = mo.rbind(self.xreg, new_xreg)[::-1]
+            
+            
+        # Loop on horizon h
+        
         for i in range(h):
 
-            new_obs = ts.reformat_response(
-                self.preds, self.lags
-            )
-
-            new_X = mo.rbind(
-                new_obs.reshape(1, n_features),
-                np.ones(n_features).reshape(1, n_features),
-            )
+            new_obs = ts.reformat_response(self.preds, self.lags)
+            
+            if new_xreg is not None: # Additional regressors provided 
+                
+                new_obs_xreg = ts.reformat_response(inv_new_xreg, self.lags)
+                
+                new_X = mo.rbind(np.union1d(new_obs.reshape(1, n_features), 
+                                 new_obs_xreg.reshape(1, n_features_xreg)),
+                                 np.ones(n_features_total).reshape(1, n_features_total)) 
+                
+            else: 
+                
+                new_X = mo.rbind(new_obs.reshape(1, n_features),
+                    np.ones(n_features).reshape(1, n_features))
+                
 
             cooked_new_X = self.cook_test_set(
                 new_X, **kwargs
@@ -296,6 +328,7 @@ class MTS(Base):
                 self.preds - qt * self.preds_std,
                 self.preds + qt * self.preds_std,
             )
+                  
 
     def score(
         self,
