@@ -43,6 +43,8 @@ class Custom(Base):
            scaling methods for inputs, hidden layer, and clustering respectively
            (and when relevant). 
            Currently available: standardization ('std') or MinMax scaling ('minmax')
+        col_sample: float
+           percentage of covariates randomly chosen for training    
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
     """
@@ -62,6 +64,7 @@ class Custom(Base):
         n_clusters=2,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
+        col_sample=1,
         seed=123,
     ):
 
@@ -76,6 +79,7 @@ class Custom(Base):
             n_clusters=n_clusters,
             type_clust=type_clust,
             type_scaling=type_scaling,
+            col_sample=col_sample,
             seed=seed,
         )
 
