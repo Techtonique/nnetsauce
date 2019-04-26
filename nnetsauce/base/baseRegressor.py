@@ -83,7 +83,6 @@ class BaseRegressor(Base):
             col_sample=col_sample,
             seed=seed,
         )
-        
 
     def fit(self, X, y, **kwargs):
         """Fit RVFL to training data (X, y).
@@ -116,7 +115,6 @@ class BaseRegressor(Base):
         self.GCV = fit_obj["GCV"]
 
         return self
-    
 
     def predict(self, X, **kwargs):
         """Predict test data X.
@@ -156,7 +154,6 @@ class BaseRegressor(Base):
             return self.y_mean + np.dot(
                 self.cook_test_set(X, **kwargs), self.beta
             )
-
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """

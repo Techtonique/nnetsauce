@@ -106,7 +106,9 @@ class MTS(Base):
         self.n_series = None
         self.lags = lags
         self.fit_objs = {}
-        self.y = None  # MTS responses (most recent observations first)
+        self.y = (
+            None
+        )  # MTS responses (most recent observations first)
         self.X = None  # MTS lags
         self.xreg = None
         self.regressors_scaler = None
@@ -115,8 +117,7 @@ class MTS(Base):
         self.return_std = return_std
         self.preds_std = []
 
-
-    def fit(self, X, xreg = None, **kwargs):
+    def fit(self, X, xreg=None, **kwargs):
         """Fit MTS model to training data (X, y).
         
         Parameters
@@ -149,30 +150,35 @@ class MTS(Base):
         mts_input = ts.create_train_inputs(
             X[::-1], self.lags
         )
-        
+
         self.y = mts_input[0]
 
         self.X = mts_input[1]
-       
-        
-        if xreg is not None: 
-            
-            assert xreg.shape[0] == n, "'xreg' and 'X' must have the same number or observations"
-            
+
+        if xreg is not None:
+
+            assert (
+                xreg.shape[0] == n
+            ), "'xreg' and 'X' must have the same number or observations"
+
             self.xreg = xreg
-            
-            xreg_input = ts.create_train_inputs(xreg[::-1], self.lags)
-            
-            scaled_Z = self.cook_training_set(y = np.repeat(1, n), 
-                                              X = mo.cbind(self.X, xreg_input[1]), 
-                                              **kwargs)
-            
-        else: # xreg is None
-            
-             # avoids scaling X p times in the loop
+
+            xreg_input = ts.create_train_inputs(
+                xreg[::-1], self.lags
+            )
+
             scaled_Z = self.cook_training_set(
-                y=np.repeat(1, n), X=self.X, 
-                **kwargs)           
+                y=np.repeat(1, n),
+                X=mo.cbind(self.X, xreg_input[1]),
+                **kwargs
+            )
+
+        else:  # xreg is None
+
+            # avoids scaling X p times in the loop
+            scaled_Z = self.cook_training_set(
+                y=np.repeat(1, n), X=self.X, **kwargs
+            )
 
         # loop on all the time series and adjust self.obj.fit
         for i in range(p):
@@ -186,8 +192,9 @@ class MTS(Base):
 
         return self
 
-
-    def predict(self, h=5, level=95, new_xreg=None, **kwargs):
+    def predict(
+        self, h=5, level=95, new_xreg=None, **kwargs
+    ):
         """Predict on horizon h.
         
         Parameters
@@ -210,61 +217,86 @@ class MTS(Base):
         -------
         model predictions for horizon = h: {array-like}
         """
-        
-        if self.xreg is not None:        
-            assert (new_xreg is not None), "'new_xreg' must be provided" 
-        
+
+        if self.xreg is not None:
+            assert (
+                new_xreg is not None
+            ), "'new_xreg' must be provided"
+
         self.preds = None
 
         self.preds = self.y
 
         n_features = self.n_series * self.lags
-        
-        self.preds_std = np.zeros(h)    
-        
+
+        self.preds_std = np.zeros(h)
+
         if "return_std" in kwargs:
 
             self.return_std = kwargs["return_std"]
 
             qt = norm.ppf(1 - 0.5 * (1 - level / 100))
-        
-        
-        if new_xreg is not None: # Additional regressors provided
-            
+
+        if (
+            new_xreg is not None
+        ):  # Additional regressors provided
+
             try:
                 n_obs_xreg, n_features_xreg = new_xreg.shape
-                assert n_features_xreg == self.xreg.shape[1], "check number of series provided for 'new_xreg' (compare with self.xreg.shape[1])"
+                assert (
+                    n_features_xreg == self.xreg.shape[1]
+                ), "check number of series provided for 'new_xreg' (compare with self.xreg.shape[1])"
             except:
-                n_obs_xreg = new_xreg.shape # one series           
-            
-            assert n_obs_xreg == h, "please provide values of regressors 'new_xreg' for the whole horizon 'h'"
-            
+                n_obs_xreg = new_xreg.shape  # one series
+
+            assert (
+                n_obs_xreg == h
+            ), "please provide values of regressors 'new_xreg' for the whole horizon 'h'"
+
             n_features_xreg = n_features_xreg * self.lags
-            
+
             n_features_total = n_features + n_features_xreg
-            
-            inv_new_xreg = mo.rbind(self.xreg, new_xreg)[::-1]
-            
-            
+
+            inv_new_xreg = mo.rbind(self.xreg, new_xreg)[
+                ::-1
+            ]
+
         # Loop on horizon h
-        
+
         for i in range(h):
 
-            new_obs = ts.reformat_response(self.preds, self.lags)
-            
-            if new_xreg is not None: # Additional regressors provided 
-                
-                new_obs_xreg = ts.reformat_response(inv_new_xreg, self.lags)
-                
-                new_X = mo.rbind(np.union1d(new_obs.reshape(1, n_features), 
-                                 new_obs_xreg.reshape(1, n_features_xreg)),
-                                 np.ones(n_features_total).reshape(1, n_features_total)) 
-                
-            else: 
-                
-                new_X = mo.rbind(new_obs.reshape(1, n_features),
-                    np.ones(n_features).reshape(1, n_features))
-                
+            new_obs = ts.reformat_response(
+                self.preds, self.lags
+            )
+
+            if (
+                new_xreg is not None
+            ):  # Additional regressors provided
+
+                new_obs_xreg = ts.reformat_response(
+                    inv_new_xreg, self.lags
+                )
+
+                new_X = mo.rbind(
+                    np.union1d(
+                        new_obs.reshape(1, n_features),
+                        new_obs_xreg.reshape(
+                            1, n_features_xreg
+                        ),
+                    ),
+                    np.ones(n_features_total).reshape(
+                        1, n_features_total
+                    ),
+                )
+
+            else:
+
+                new_X = mo.rbind(
+                    new_obs.reshape(1, n_features),
+                    np.ones(n_features).reshape(
+                        1, n_features
+                    ),
+                )
 
             cooked_new_X = self.cook_test_set(
                 new_X, **kwargs
@@ -335,7 +367,6 @@ class MTS(Base):
                 self.preds - qt * self.preds_std,
                 self.preds + qt * self.preds_std,
             )
-                  
 
     def score(
         self,

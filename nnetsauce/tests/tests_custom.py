@@ -183,5 +183,6 @@ class TestCustom(ut.TestCase):
             & np.allclose(fit_obj4.score(Z, t), 1.0)
         )
 
+
 if __name__ == "__main__":
     ut.main()

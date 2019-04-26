@@ -33,7 +33,7 @@ class TestBase(ut.TestCase):
             direct_link=False,
             n_clusters=2,
             type_clust="gmm",
-            type_scaling=("std", "std", "minmax")
+            type_scaling=("std", "std", "minmax"),
         )
 
         fit_obj2 = ns.BaseRegressor(
@@ -176,18 +176,25 @@ class TestBase(ut.TestCase):
                 }
             )
             & (
-                fit_obj7.get_params() == {'a': 0.01,
-                'activation_name': 'prelu',
-                'bias': False,
-                 'col_sample': 1,
-                 'direct_link': False,
-                 'dropout': 0,
-                 'n_clusters': 2,
-                 'n_hidden_features': 5,
-                 'nodes_sim': 'sobol',
-                 'seed': 123,
-                 'type_clust': 'gmm',
-                 'type_scaling': ('std', 'std', 'minmax')}
+                fit_obj7.get_params()
+                == {
+                    "a": 0.01,
+                    "activation_name": "prelu",
+                    "bias": False,
+                    "col_sample": 1,
+                    "direct_link": False,
+                    "dropout": 0,
+                    "n_clusters": 2,
+                    "n_hidden_features": 5,
+                    "nodes_sim": "sobol",
+                    "seed": 123,
+                    "type_clust": "gmm",
+                    "type_scaling": (
+                        "std",
+                        "std",
+                        "minmax",
+                    ),
+                }
             )
         )
 

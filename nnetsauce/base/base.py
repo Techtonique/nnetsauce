@@ -1,4 +1,3 @@
-
 """Base class."""
 
 # Authors: Thierry Moudiki
@@ -103,8 +102,10 @@ class Base(BaseEstimator):
             type_scaling[i] in ("minmax", "std")
             for i in range(len(type_scaling))
         ), "'type_scaling' must have length 3, and available scaling methods are 'minmax' scaling and standardization ('std')"
-        
-        assert (col_sample >= 0) & (col_sample <= 1), "'col_sample' must be comprised between 0 and 1 (both included)"
+
+        assert (col_sample >= 0) & (
+            col_sample <= 1
+        ), "'col_sample' must be comprised between 0 and 1 (both included)"
 
         # activation function -----
 
@@ -226,7 +227,6 @@ class Base(BaseEstimator):
                 X_clustered, self.n_clusters
             )
 
-
     def create_layer(self, scaled_X, W=None):
         """ Create hidden layer. """
 
@@ -262,8 +262,10 @@ class Base(BaseEstimator):
                         n_dims=n_features,
                         n_points=self.n_hidden_features,
                     )
-                    
-                assert (scaled_X.shape[1] == self.W.shape[0]), "check dimensions of covariates X and matrix W"
+
+                assert (
+                    scaled_X.shape[1] == self.W.shape[0]
+                ), "check dimensions of covariates X and matrix W"
 
                 return mo.dropout(
                     x=self.activation_func(
@@ -273,9 +275,11 @@ class Base(BaseEstimator):
                     seed=self.seed,
                 )
 
-            else: # W is not none
-                
-                assert (scaled_X.shape[1] == W.shape[0]), "check dimensions of covariates X and matrix W" 
+            else:  # W is not none
+
+                assert (
+                    scaled_X.shape[1] == W.shape[0]
+                ), "check dimensions of covariates X and matrix W"
 
                 # self.W = W
                 return mo.dropout(
@@ -348,7 +352,6 @@ class Base(BaseEstimator):
                     seed=self.seed,
                 )
 
-
     def cook_training_set(
         self, y=None, X=None, W=None, **kwargs
     ):
@@ -382,7 +385,7 @@ class Base(BaseEstimator):
 
         # center y
         if mx.is_factor(y) == False:  # regression
-            
+
             if y is None:
                 y_mean = self.y.mean()
                 centered_y = self.y - y_mean
@@ -390,43 +393,54 @@ class Base(BaseEstimator):
                 y_mean = y.mean()
                 self.y_mean = y_mean
                 centered_y = y - y_mean
-                
+
         if X is None:
-            
+
             if self.col_sample == 1:
-                
+
                 input_X = self.X
-                
+
             else:
-                
+
                 n_features = self.X.shape[1]
-                new_n_features = int(np.ceil(n_features*self.col_sample))
-                assert new_n_features >= 1, "check class attribute 'col_sample' and the number of covariates provided for X"
+                new_n_features = int(
+                    np.ceil(n_features * self.col_sample)
+                )
+                assert (
+                    new_n_features >= 1
+                ), "check class attribute 'col_sample' and the number of covariates provided for X"
                 np.random.seed(self.seed)
-                index_col = np.random.choice(range(n_features),
-                                             size = new_n_features,
-                                             replace = False)
+                index_col = np.random.choice(
+                    range(n_features),
+                    size=new_n_features,
+                    replace=False,
+                )
                 self.index_col = index_col
                 input_X = self.X[:, self.index_col]
-                
-        else: # X is not None
-            
+
+        else:  # X is not None
+
             if self.col_sample == 1:
-                
+
                 input_X = X
-                
+
             else:
-                
+
                 n_features = X.shape[1]
-                new_n_features = int(np.ceil(n_features*self.col_sample))
-                assert new_n_features >= 1, "check class attribute 'col_sample' and the number of covariates provided for X"
+                new_n_features = int(
+                    np.ceil(n_features * self.col_sample)
+                )
+                assert (
+                    new_n_features >= 1
+                ), "check class attribute 'col_sample' and the number of covariates provided for X"
                 np.random.seed(self.seed)
-                index_col = np.random.choice(range(n_features),
-                                             size = new_n_features,
-                                             replace = False)
+                index_col = np.random.choice(
+                    range(n_features),
+                    size=new_n_features,
+                    replace=False,
+                )
                 self.index_col = index_col
                 input_X = X[:, self.index_col]
-                
 
         if (
             self.n_clusters <= 0
@@ -500,7 +514,6 @@ class Base(BaseEstimator):
         else:  # classification
 
             return self.scaler.transform(Z)
-        
 
     def cook_test_set(self, X, **kwargs):
         """ Transform data from test set, with hidden layer. """
@@ -512,16 +525,17 @@ class Base(BaseEstimator):
             if (
                 self.n_hidden_features > 0
             ):  # if hidden layer
-                
-                if self.col_sample == 1: 
-                    
+
+                if self.col_sample == 1:
+
                     scaled_X = self.nn_scaler.transform(X)
-                    
+
                 else:
-                    
-                    scaled_X = self.nn_scaler.transform(X[:, self.index_col])
-                    
-                    
+
+                    scaled_X = self.nn_scaler.transform(
+                        X[:, self.index_col]
+                    )
+
                 Phi_X = self.create_layer(scaled_X, self.W)
 
                 if self.direct_link == True:
@@ -536,23 +550,27 @@ class Base(BaseEstimator):
                 return self.scaler.transform(X)
 
         else:  # data with clustering: self.n_clusters is None -----
-            
-            if self.col_sample == 1: 
-                
+
+            if self.col_sample == 1:
+
                 predicted_clusters = self.encode_clusters(
                     X=X, predict=True, **kwargs
                 )
-                augmented_X = mo.cbind(X, predicted_clusters)
-                
-            else:
-                
-                predicted_clusters = self.encode_clusters(
-                    X=X[:, self.index_col], predict=True, **kwargs
+                augmented_X = mo.cbind(
+                    X, predicted_clusters
                 )
-                augmented_X = mo.cbind(X[:, self.index_col], 
-                                       predicted_clusters)
-                
-                
+
+            else:
+
+                predicted_clusters = self.encode_clusters(
+                    X=X[:, self.index_col],
+                    predict=True,
+                    **kwargs
+                )
+                augmented_X = mo.cbind(
+                    X[:, self.index_col], predicted_clusters
+                )
+
             if (
                 self.n_hidden_features > 0
             ):  # if hidden layer
