@@ -116,6 +116,7 @@ class MTS(Base):
         self.preds = None
         self.return_std = return_std
         self.preds_std = []
+        self.row_sample = 1
 
     def fit(self, X, xreg=None, **kwargs):
         """Fit MTS model to training data (X, y).
@@ -167,7 +168,7 @@ class MTS(Base):
                 xreg[::-1], self.lags
             )
 
-            scaled_Z = self.cook_training_set(
+            dummy_y, scaled_Z = self.cook_training_set(
                 y=np.repeat(1, n),
                 X=mo.cbind(self.X, xreg_input[1]),
                 **kwargs
@@ -176,7 +177,7 @@ class MTS(Base):
         else:  # xreg is None
 
             # avoids scaling X p times in the loop
-            scaled_Z = self.cook_training_set(
+            dummy_y, scaled_Z = self.cook_training_set(
                 y=np.repeat(1, n), X=self.X, **kwargs
             )
 

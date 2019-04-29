@@ -5,7 +5,6 @@
 # License: BSD 3
 
 import numpy as np
-import sklearn.model_selection as skm
 import sklearn.metrics as skm2
 from .custom import Custom
 from ..utils import matrixops as mo
@@ -49,7 +48,9 @@ class CustomClassifier(Custom, ClassifierMixin):
            (and when relevant). 
            Currently available: standardization ('std') or MinMax scaling ('minmax')
        col_sample: float
-           percentage of covariates randomly chosen for training    
+           percentage of covariates randomly chosen for training   
+       row_sample: float
+           percentage of rows chosen for training, by stratified bootstrapping    
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
     """
@@ -70,6 +71,7 @@ class CustomClassifier(Custom, ClassifierMixin):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         col_sample=1,
+        row_sample=1,
         seed=123,
     ):
 
@@ -86,6 +88,7 @@ class CustomClassifier(Custom, ClassifierMixin):
             type_clust=type_clust,
             type_scaling=type_scaling,
             col_sample=col_sample,
+            row_sample=row_sample,
             seed=seed,
         )
 
@@ -111,11 +114,11 @@ class CustomClassifier(Custom, ClassifierMixin):
         self: object
         """
 
-        scaled_Z = self.cook_training_set(
+        output_y, scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs
         )
 
-        self.obj.fit(scaled_Z, y, **kwargs)
+        self.obj.fit(scaled_Z, output_y, **kwargs)
 
         return self
 

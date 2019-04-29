@@ -173,61 +173,7 @@ class TestRVFL(ut.TestCase):
             return_std=True,
         )
 
-        self.assertTrue(
-            (
-                fit_obj.get_params()
-                == {
-                    "GCV": None,
-                    "Sigma": None,
-                    "a": 0.01,
-                    "activation_name": "relu",
-                    "beta": None,
-                    "bias": True,
-                    "direct_link": True,
-                    "dropout": 0,
-                    "n_clusters": None,
-                    "n_hidden_features": 5,
-                    "nodes_sim": "sobol",
-                    "return_std": True,
-                    "s": 0.1,
-                    "seed": 123,
-                    "sigma": 0.05,
-                    "type_clust": "kmeans",
-                    "type_scaling": (
-                        "std",
-                        "minmax",
-                        "std",
-                    ),
-                }
-            )
-            & (
-                fit_obj2.get_params()
-                == {
-                    "GCV": None,
-                    "Sigma": None,
-                    "a": 0.01,
-                    "activation_name": "relu",
-                    "beta": None,
-                    "bias": True,
-                    "direct_link": True,
-                    "dropout": 0.5,
-                    "n_clusters": None,
-                    "n_hidden_features": 4,
-                    "nodes_sim": "sobol",
-                    "return_std": True,
-                    "s1": 0.1,
-                    "s2": 0.1,
-                    "seed": 123,
-                    "sigma": 0.05,
-                    "type_clust": "kmeans",
-                    "type_scaling": (
-                        "std",
-                        "std",
-                        "minmax",
-                    ),
-                }
-            )
-        )
+        
 
     def test_score(self):
 

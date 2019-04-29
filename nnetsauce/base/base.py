@@ -54,6 +54,8 @@ class Base(BaseEstimator):
            Currently available: standardization ('std') or MinMax scaling ('minmax')
        col_sample: float
            percentage of covariates randomly chosen for training    
+       row_sample: float
+           percentage of rows chosen for training, by stratified bootstrapping    
        seed: int 
            reproducibility seed for nodes_sim=='uniform', clustering and dropout
     """
@@ -73,6 +75,7 @@ class Base(BaseEstimator):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         col_sample=1,
+        row_sample=1,
         seed=123,
     ):
 
@@ -131,7 +134,9 @@ class Base(BaseEstimator):
         self.type_clust = type_clust
         self.type_scaling = type_scaling
         self.col_sample = col_sample
+        self.row_sample = row_sample
         self.index_col = None
+        self.index_row = True
         self.n_clusters = n_clusters
         self.clustering_obj = None
         self.clustering_scaler = None
@@ -352,11 +357,12 @@ class Base(BaseEstimator):
                     seed=self.seed,
                 )
 
+
     def cook_training_set(
         self, y=None, X=None, W=None, **kwargs
     ):
         """ Create new data for training set, with hidden layer, center the response. """
-
+        
         # either X and y are stored or not
         # assert ((y is None) & (X is None)) | ((y is not None) & (X is not None))
         scaling_options = {
@@ -507,13 +513,49 @@ class Base(BaseEstimator):
                 scaler.fit(Z)
                 self.scaler = scaler
 
-        if mx.is_factor(y) == False:  # regression
+        # Returning model inputs -----
+        
+        # y is subsampled
+        if self.row_sample < 1:
+            
+            n, p = Z.shape
+            
+            if y is None:
+                
+                self.index_row = ns.subsample(y = self.y, 
+                                          row_sample = self.row_sample, 
+                                          seed = self.seed)
+            else:
+                
+                self.index_row = ns.subsample(y = y, 
+                                          row_sample = self.row_sample, 
+                                          seed = self.seed)
+                
+            if mx.is_factor(y) == False:  # regression
+            
+                return (centered_y[self.index_row].reshape(n,), 
+                        self.scaler.transform(Z[self.index_row, :].reshape(n, p)))
 
-            return centered_y, self.scaler.transform(Z)
+            else:  # classification
 
-        else:  # classification
+                return (y[self.index_row], self.scaler.transform(Z[self.index_row, :]))
+                
+        else: # y is not subsampled
+            
+            if mx.is_factor(y) == False:  # regression
+            
+                return (centered_y, self.scaler.transform(Z))
 
-            return self.scaler.transform(Z)
+            else:  # classification
+
+                return (y, self.scaler.transform(Z))
+            
+
+        
+        
+
+
+
 
     def cook_test_set(self, X, **kwargs):
         """ Transform data from test set, with hidden layer. """

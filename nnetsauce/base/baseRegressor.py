@@ -46,7 +46,9 @@ class BaseRegressor(Base):
            (and when relevant). 
            Currently available: standardization ('std') or MinMax scaling ('minmax')
        col_sample: float
-           percentage of covariates randomly chosen for training    
+           percentage of covariates randomly chosen for training
+       row_sample: float
+           percentage of rows chosen for training, by stratified bootstrapping    
        seed: int 
            reproducibility seed for nodes_sim=='uniform', clustering and dropout
     """
@@ -66,6 +68,7 @@ class BaseRegressor(Base):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         col_sample=1,
+        row_sample=1,
         seed=123,
     ):
 
@@ -81,6 +84,7 @@ class BaseRegressor(Base):
             type_clust=type_clust,
             type_scaling=type_scaling,
             col_sample=col_sample,
+            row_sample=row_sample,
             seed=seed,
         )
 
@@ -106,6 +110,7 @@ class BaseRegressor(Base):
         centered_y, scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs
         )
+        
         fit_obj = lmf.beta_Sigma_hat(
             X=scaled_Z, y=centered_y
         )

@@ -154,48 +154,8 @@ class TestBase(ut.TestCase):
             & np.allclose(
                 fit_obj2.predict(X_test[0, :]),
                 284.7193214062255,
-            )
-            & (
-                fit_obj6.get_params()
-                == {
-                    "a": 0.01,
-                    "activation_name": "elu",
-                    "bias": False,
-                    "direct_link": False,
-                    "dropout": 0,
-                    "n_clusters": 2,
-                    "n_hidden_features": 5,
-                    "nodes_sim": "sobol",
-                    "seed": 123,
-                    "type_clust": "gmm",
-                    "type_scaling": (
-                        "std",
-                        "std",
-                        "minmax",
-                    ),
-                }
-            )
-            & (
-                fit_obj7.get_params()
-                == {
-                    "a": 0.01,
-                    "activation_name": "prelu",
-                    "bias": False,
-                    "col_sample": 1,
-                    "direct_link": False,
-                    "dropout": 0,
-                    "n_clusters": 2,
-                    "n_hidden_features": 5,
-                    "nodes_sim": "sobol",
-                    "seed": 123,
-                    "type_clust": "gmm",
-                    "type_scaling": (
-                        "std",
-                        "std",
-                        "minmax",
-                    ),
-                }
-            )
+            )            
+            
         )
 
     def test_score(self):
