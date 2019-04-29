@@ -5,7 +5,7 @@ from .nodesimulation import (
     generate_halton,
 )
 
-from .row_subsampling import subsample
+from .rowsubsampling import subsample
 
 
 __all__ = [

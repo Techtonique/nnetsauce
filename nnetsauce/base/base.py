@@ -17,6 +17,7 @@ from ..utils import activations as ac
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 from ..simulation import nodesimulation as ns
+from ..simulation import rowsubsampling as rs
 
 
 class Base(BaseEstimator):
@@ -522,23 +523,27 @@ class Base(BaseEstimator):
             
             if y is None:
                 
-                self.index_row = ns.subsample(y = self.y, 
+                self.index_row = rs.subsample(y = self.y, 
                                           row_sample = self.row_sample, 
                                           seed = self.seed)
+                
             else:
                 
-                self.index_row = ns.subsample(y = y, 
+                self.index_row = rs.subsample(y = y, 
                                           row_sample = self.row_sample, 
                                           seed = self.seed)
+                
+            n_row_sample = len(self.index_row)
                 
             if mx.is_factor(y) == False:  # regression
             
-                return (centered_y[self.index_row].reshape(n,), 
-                        self.scaler.transform(Z[self.index_row, :].reshape(n, p)))
+                return (centered_y[self.index_row].reshape(n_row_sample,), 
+                        self.scaler.transform(Z[self.index_row, :].reshape(n_row_sample, p)))
 
             else:  # classification
 
-                return (y[self.index_row], self.scaler.transform(Z[self.index_row, :]))
+                return (y[self.index_row].reshape(n_row_sample,), 
+                        self.scaler.transform(Z[self.index_row, :].reshape(n_row_sample, p)))
                 
         else: # y is not subsampled
             
