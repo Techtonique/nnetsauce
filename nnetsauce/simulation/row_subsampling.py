@@ -1,9 +1,9 @@
 import numpy as np
 from ..utils import misc as mx
 
-
 # stratified subsampling
 def subsample(y, row_sample = 0.8, seed = 123):
+    
     
     assert (row_sample < 1) & (row_sample >= 0), "'row_sample' must be < 1 and >= 0"
     
@@ -32,8 +32,8 @@ def subsample(y, row_sample = 0.8, seed = 123):
         
         for i in classes:
             y_as_classes[(y > breaks[i])*(y <= breaks[i+1])] = int(i)
+            
     
-        
     # main loop ----   
     index = np.array([], dtype = int)
     
@@ -55,17 +55,16 @@ def subsample(y, row_sample = 0.8, seed = 123):
         else: # only one element in class
             
             index = np.append(index, index_class_i[0])
+
         
-    # get kl div too
-    # get kl div too
-    # get kl div too
-    
     return index
+
 
 
 if __name__== "main":
     
     import matplotlib.pyplot as plt
+    from scipy.stats import entropy
 
     n_obs = 1000
     
@@ -78,13 +77,13 @@ if __name__== "main":
     # subsamples ----   
     
     ## continous
-    index_new = subsample(y, row_sample = 0.5)
+    index_new = subsample(y, row_sample = 0.4)
     y_new = y[index_new]
     print(len(y))
     print(len(y_new))
     
     ## factor
-    index_new_factor = subsample(y_factor, row_sample = 0.5)
+    index_new_factor = subsample(y_factor, row_sample = 0.4)
     y_new_factor = y_factor[index_new_factor]
     print(len(y_factor))
     print(len(y_new_factor))
@@ -97,4 +96,9 @@ if __name__== "main":
     plt.hist(y_factor, bins='auto', density=True) 
     plt.hist(y_new_factor, bins=h_factor[1], density=True) 
     
-        
+    # control
+    entropy(pk=h[0]/n_obs, 
+            qk=np.histogram(y_new, bins=h[1])[0]/n_obs)
+    
+    entropy(pk=h_factor[0]/n_obs, 
+            qk=np.histogram(y_new_factor, bins=h_factor[1])[0]/n_obs)
