@@ -53,52 +53,57 @@ def subsample(y, row_sample = 0.8, seed = 123):
                                      replace = True)) 
             
         else: # only one element in class
-            
-            index = np.append(index, index_class_i[0])
-
+         
+            try:
+                
+                index = np.append(index, index_class_i[0])
+                
+            except: 
+                
+                0
         
     return index
 
 
 
-if __name__== "main":
-    
-    import matplotlib.pyplot as plt
-    from scipy.stats import entropy
-
-    n_obs = 1000
-    
-    y = np.random.rand(n_obs)
-    h = np.histogram(y, bins='auto')
-    
-    y_factor = np.random.choice([0, 1], size = n_obs)
-    h_factor = np.histogram(y_factor, bins='auto')
-    
-    # subsamples ----   
-    
-    ## continous
-    index_new = subsample(y, row_sample = 0.4)
-    y_new = y[index_new]
-    print(len(y))
-    print(len(y_new))
-    
-    ## factor
-    index_new_factor = subsample(y_factor, row_sample = 0.4)
-    y_new_factor = y_factor[index_new_factor]
-    print(len(y_factor))
-    print(len(y_new_factor))
-    
-    # graph 1
-    plt.hist(y, bins='auto', density=True) 
-    plt.hist(y_new, bins=h[1], density=True) 
-    
-    # graph 2
-    plt.hist(y_factor, bins='auto', density=True) 
-    plt.hist(y_new_factor, bins=h_factor[1], density=True) 
-    
-    # control
-    entropy(pk=h[0]/n_obs, 
-            qk=np.histogram(y_new, bins=h[1])[0]/n_obs)
-    
-    entropy(pk=h_factor[0]/n_obs, 
-            qk=np.histogram(y_new_factor, bins=h_factor[1])[0]/n_obs)
+#if __name__== "main":
+#    
+#    import matplotlib.pyplot as plt
+#    from scipy.stats import entropy
+#
+#    n_obs = 1000
+#    
+#    y = np.random.rand(n_obs)
+#    h = np.histogram(y, bins='auto')
+#    
+#    y_factor = np.random.choice([0, 1], size = n_obs)
+#    h_factor = np.histogram(y_factor, bins='auto')
+#    
+#    # subsamples ----   
+#    
+#    ## continous
+#    index_new = subsample(y, row_sample = 0.4)
+#    y_new = y[index_new]
+#    print(len(y))
+#    print(len(y_new))
+#    
+#    ## factor
+#    index_new_factor = subsample(y_factor, row_sample = 0.4)
+#    y_new_factor = y_factor[index_new_factor]
+#    print(len(y_factor))
+#    print(len(y_new_factor))
+#    
+#    # graph 1
+#    plt.hist(y, bins='auto', density=True) 
+#    plt.hist(y_new, bins=h[1], density=True) 
+#    
+#    # graph 2
+#    plt.hist(y_factor, bins='auto', density=True) 
+#    plt.hist(y_new_factor, bins=h_factor[1], density=True) 
+#    
+#    # control
+#    entropy(pk=h[0]/n_obs, 
+#            qk=np.histogram(y_new, bins=h[1])[0]/n_obs)
+#    
+#    entropy(pk=h_factor[0]/n_obs, 
+#            qk=np.histogram(y_new_factor, bins=h_factor[1])[0]/n_obs)

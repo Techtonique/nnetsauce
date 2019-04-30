@@ -71,6 +71,41 @@ class TestCustom(ut.TestCase):
             activation_name="elu",
             n_clusters=4,
         )
+        
+        fit_obj6 = ns.CustomClassifier(
+            obj=regr2,
+            n_hidden_features=3,
+            direct_link=True,
+            bias=True,
+            nodes_sim="hammersley",
+            activation_name="elu",
+            n_clusters=4,
+            col_sample=0.8
+        )
+        
+        fit_obj7 = ns.CustomClassifier(
+            obj=regr2,
+            n_hidden_features=3,
+            direct_link=True,
+            bias=True,
+            nodes_sim="hammersley",
+            activation_name="elu",
+            n_clusters=4,
+            col_sample=0.8,
+            row_sample=0.9
+        )
+        
+        fit_obj8 = ns.CustomRegressor(
+            obj=regr,
+            n_hidden_features=10,
+            direct_link=False,
+            bias=False,
+            nodes_sim="sobol",
+            activation_name="relu",
+            n_clusters=0,
+            col_sample=0.8,
+            row_sample=0.9
+        )
 
         index_train = range(10)
         index_test = range(10, 15)
@@ -94,20 +129,27 @@ class TestCustom(ut.TestCase):
         fit_obj4.fit(X_train, y_train)
         err4 = fit_obj4.predict(X_test) - y_test
         rmse4 = np.sqrt(np.mean(err4 ** 2))
+        
+        fit_obj8.fit(X_train, y_train)
+        err8 = fit_obj8.predict(X_test) - y_test
+        rmse8 = np.sqrt(np.mean(err8 ** 2))
 
         fit_obj5.fit(Z[0:100, :], t[0:100])
+        fit_obj6.fit(Z[0:100, :], t[0:100])
+        fit_obj7.fit(Z[0:100, :], t[0:100])
 
         self.assertTrue(
-            np.allclose(rmse, 64.933610490495667)
-            & np.allclose(rmse2, 12.968755131423396)
-            & np.allclose(rmse3, 26.716371782298673)
-            & np.allclose(rmse4, 33.457280982445447)
-            & np.allclose(
-                fit_obj4.predict(X_test[0, :]),
-                127.70497052301884,
-            )
-            & np.allclose(fit_obj5.predict(Z[105, :]), 0)
-            & np.allclose(fit_obj5.predict(Z[106, :]), 1)
+            np.allclose(rmse, 64.933610490495667) \
+            & np.allclose(rmse2, 12.968755131423396) \
+            & np.allclose(rmse3, 26.716371782298673) \
+            & np.allclose(rmse4, 33.457280982445447) \
+            & np.allclose(rmse8, 135.15345592042246) \
+            & np.allclose(fit_obj4.predict(X_test[0, :]), 127.70497052301884) \
+            & np.allclose(fit_obj5.predict(Z[105, :]), 0) \
+            & np.allclose(fit_obj5.predict(Z[106, :]), 1) \
+            & np.allclose(fit_obj6.predict(Z[106, :]), 1) \
+            & np.allclose(fit_obj6.score(Z[100:120, :], t[100:120]), 0.94999999999999996) \
+            & np.allclose(fit_obj7.score(Z[100:120, :], t[100:120]), 0.90000000000000002)
         )
 
     def test_score(self):
