@@ -124,7 +124,6 @@ class CustomRegressor(Custom, RegressorMixin):
         self.obj.fit(scaled_Z, centered_y, **kwargs)
 
         return self
-    
 
     def predict(self, X, **kwargs):
         """Predict test data X.
@@ -150,7 +149,7 @@ class CustomRegressor(Custom, RegressorMixin):
                 X.reshape(1, n_features),
                 np.ones(n_features).reshape(1, n_features),
             )
-            
+
             return (
                 self.y_mean
                 + self.obj.predict(
@@ -164,7 +163,6 @@ class CustomRegressor(Custom, RegressorMixin):
             return self.y_mean + self.obj.predict(
                 self.cook_test_set(X, **kwargs), **kwargs
             )
-
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """

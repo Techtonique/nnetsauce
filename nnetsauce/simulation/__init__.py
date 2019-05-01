@@ -13,5 +13,5 @@ __all__ = [
     "generate_uniform",
     "generate_hammersley",
     "generate_halton",
-    "subsample"
+    "subsample",
 ]

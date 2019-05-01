@@ -71,7 +71,7 @@ class TestCustom(ut.TestCase):
             activation_name="elu",
             n_clusters=4,
         )
-        
+
         fit_obj6 = ns.CustomClassifier(
             obj=regr2,
             n_hidden_features=3,
@@ -80,9 +80,9 @@ class TestCustom(ut.TestCase):
             nodes_sim="hammersley",
             activation_name="elu",
             n_clusters=4,
-            col_sample=0.8
+            col_sample=0.8,
         )
-        
+
         fit_obj7 = ns.CustomClassifier(
             obj=regr2,
             n_hidden_features=3,
@@ -92,9 +92,9 @@ class TestCustom(ut.TestCase):
             activation_name="elu",
             n_clusters=2,
             col_sample=0.8,
-            row_sample=0.9
+            row_sample=0.9,
         )
-        
+
         fit_obj8 = ns.CustomRegressor(
             obj=regr,
             n_hidden_features=10,
@@ -104,7 +104,7 @@ class TestCustom(ut.TestCase):
             activation_name="relu",
             n_clusters=0,
             col_sample=0.8,
-            row_sample=0.9
+            row_sample=0.9,
         )
 
         index_train = range(10)
@@ -129,10 +129,10 @@ class TestCustom(ut.TestCase):
         fit_obj4.fit(X_train, y_train)
         err4 = fit_obj4.predict(X_test) - y_test
         rmse4 = np.sqrt(np.mean(err4 ** 2))
-        
-        err4_1 = fit_obj4.predict(X_test[0,:]) - y_test[0]
+
+        err4_1 = fit_obj4.predict(X_test[0, :]) - y_test[0]
         rmse4_1 = np.sqrt(np.mean(err4_1 ** 2))
-        
+
         fit_obj8.fit(X_train, y_train)
         err8 = fit_obj8.predict(X_test) - y_test
         rmse8 = np.sqrt(np.mean(err8 ** 2))
@@ -142,23 +142,23 @@ class TestCustom(ut.TestCase):
 
         fit_obj6.fit(Z[0:100, :], t[0:100])
         pred6 = fit_obj6.predict(Z[106, :])
-        score6 = fit_obj6.score(Z[100:120, :], t[100:120])                
-        
+        score6 = fit_obj6.score(Z[100:120, :], t[100:120])
+
         fit_obj7.fit(Z[0:100, :], t[0:100])
         score7 = fit_obj7.score(Z[100:120, :], t[100:120])
-        
 
         self.assertTrue(
-            np.allclose(rmse, 64.933610490495667) \
-            & np.allclose(rmse2, 12.968755131423396) \
-            & np.allclose(rmse3, 26.716371782298673) \
-            & np.allclose(rmse4, 3.3480684032382375) \
-            & np.allclose(rmse4_1, 3.4711185776359343e-05) \
-            & np.allclose(rmse8, 135.15345592042246) \
-            & np.allclose(pred5, 1) \
-            & np.allclose(pred6, 1) \
-            & np.allclose(score6, 0.94999999999999996) \
-            & np.allclose(score7, 0.84999999999999998))
+            np.allclose(rmse, 64.933610490495667)
+            & np.allclose(rmse2, 12.968755131423396)
+            & np.allclose(rmse3, 26.716371782298673)
+            & np.allclose(rmse4, 3.3480684032382375)
+            & np.allclose(rmse4_1, 3.4711185776359343e-05)
+            & np.allclose(rmse8, 135.15345592042246)
+            & np.allclose(pred5, 1)
+            & np.allclose(pred6, 1)
+            & np.allclose(score6, 0.94999999999999996)
+            & np.allclose(score7, 0.84999999999999998)
+        )
 
     def test_score(self):
 

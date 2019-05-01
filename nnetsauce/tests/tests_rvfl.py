@@ -173,8 +173,6 @@ class TestRVFL(ut.TestCase):
             return_std=True,
         )
 
-        
-
     def test_score(self):
 
         np.random.seed(123)

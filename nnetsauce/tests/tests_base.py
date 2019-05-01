@@ -140,15 +140,15 @@ class TestBase(ut.TestCase):
         fit_obj5.fit(X_train, y_train)
         err5 = fit_obj5.predict(X_test) - y_test
         rmse5 = np.sqrt(np.mean(err5 ** 2))
-        
+
         fit_obj6.fit(X_train, y_train)
         err6 = fit_obj6.predict(X_test) - y_test
         rmse6 = np.sqrt(np.mean(err6 ** 2))
-        
+
         fit_obj7.fit(X_train, y_train)
         err7 = fit_obj7.predict(X_test) - y_test
         rmse7 = np.sqrt(np.mean(err7 ** 2))
-         
+
         self.assertTrue(
             np.allclose(rmse, 63.243819280710575)
             & np.allclose(rmse2, 19.404919470812349)
@@ -157,7 +157,10 @@ class TestBase(ut.TestCase):
             & np.allclose(rmse5, 5.4594298062878736e-13)
             & np.allclose(rmse6, 62.613229649101946)
             & np.allclose(rmse7, 63.048908568696184)
-            & np.allclose(rmse7, np.sqrt(fit_obj7.score(X_test, y_test)))
+            & np.allclose(
+                rmse7,
+                np.sqrt(fit_obj7.score(X_test, y_test)),
+            )
             & np.allclose(
                 fit_obj.predict(X_test[0, :]),
                 447.88881097463855,
@@ -165,8 +168,7 @@ class TestBase(ut.TestCase):
             & np.allclose(
                 fit_obj2.predict(X_test[0, :]),
                 284.7193214062255,
-            )            
-            
+            )
         )
 
     def test_score(self):

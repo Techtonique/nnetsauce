@@ -358,12 +358,11 @@ class Base(BaseEstimator):
                     seed=self.seed,
                 )
 
-
     def cook_training_set(
         self, y=None, X=None, W=None, **kwargs
     ):
         """ Create new data for training set, with hidden layer, center the response. """
-        
+
         # either X and y are stored or not
         # assert ((y is None) & (X is None)) | ((y is not None) & (X is not None))
         scaling_options = {
@@ -515,52 +514,66 @@ class Base(BaseEstimator):
                 self.scaler = scaler
 
         # Returning model inputs -----
-        
+
         # y is subsampled
         if self.row_sample < 1:
-            
+
             n, p = Z.shape
-            
+
             if y is None:
-                
-                self.index_row = rs.subsample(y = self.y, 
-                                          row_sample = self.row_sample, 
-                                          seed = self.seed)
-                
+
+                self.index_row = rs.subsample(
+                    y=self.y,
+                    row_sample=self.row_sample,
+                    seed=self.seed,
+                )
+
             else:
-                
-                self.index_row = rs.subsample(y = y, 
-                                          row_sample = self.row_sample, 
-                                          seed = self.seed)
-                
+
+                self.index_row = rs.subsample(
+                    y=y,
+                    row_sample=self.row_sample,
+                    seed=self.seed,
+                )
+
             n_row_sample = len(self.index_row)
-                
+
             if mx.is_factor(y) == False:  # regression
-            
-                return (centered_y[self.index_row].reshape(n_row_sample,), 
-                        self.scaler.transform(Z[self.index_row, :].reshape(n_row_sample, p)))
+
+                return (
+                    centered_y[self.index_row].reshape(
+                        n_row_sample
+                    ),
+                    self.scaler.transform(
+                        Z[self.index_row, :].reshape(
+                            n_row_sample, p
+                        )
+                    ),
+                )
 
             else:  # classification
 
-                return (y[self.index_row].reshape(n_row_sample,), 
-                        self.scaler.transform(Z[self.index_row, :].reshape(n_row_sample, p)))
-                
-        else: # y is not subsampled
-            
+                return (
+                    y[self.index_row].reshape(n_row_sample),
+                    self.scaler.transform(
+                        Z[self.index_row, :].reshape(
+                            n_row_sample, p
+                        )
+                    ),
+                )
+
+        else:  # y is not subsampled
+
             if mx.is_factor(y) == False:  # regression
-            
-                return (centered_y, self.scaler.transform(Z))
+
+                return (
+                    centered_y,
+                    self.scaler.transform(Z),
+                )
 
             else:  # classification
 
                 return (y, self.scaler.transform(Z))
-            
-
-        
-        
-
-
-
 
     def cook_test_set(self, X, **kwargs):
         """ Transform data from test set, with hidden layer. """
