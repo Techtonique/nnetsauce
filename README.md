@@ -271,13 +271,14 @@ cancer data, and returns model accuracies:
 from sklearn.model_selection import cross_val_score
 
 cross_val_score(fit_obj3, X = Z, y = t, cv=3)
-``
+```
 
 ## Contributing
 
 Your contributions are welcome, and valuable. Please, make sure to __read__ the [Code of Conduct](CONTRIBUTING.md) first.
 
 In Pull Requests, let's strive to use [`black`](https://black.readthedocs.io/en/stable/) for formatting: 
+
 ```bash
 pip install black
 black --line-length=60 file_submitted_for_pr.py
