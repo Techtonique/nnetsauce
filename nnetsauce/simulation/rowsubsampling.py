@@ -1,3 +1,8 @@
+# Authors: Thierry Moudiki
+#
+# License: BSD 3
+
+
 import numpy as np
 from ..utils import misc as mx
 
