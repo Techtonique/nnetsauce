@@ -263,7 +263,15 @@ __There are certainly many other creative ways of combining these objects__, tha
 
 ## Model validation
 
+Every function from [sklearn.model_selection](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.model_selection) can be used 
+ for this purpose. For example, the following code snippet does 3-fold cross validation on breast 
+cancer data, and returns model accuracies: 
 
+```python
+from sklearn.model_selection import cross_val_score
+
+cross_val_score(fit_obj3, X = Z, y = t, cv=3)
+``
 
 ## Contributing
 

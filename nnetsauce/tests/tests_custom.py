@@ -59,7 +59,7 @@ class TestCustom(ut.TestCase):
             bias=True,
             nodes_sim="hammersley",
             activation_name="elu",
-            n_clusters=4,
+            n_clusters=2,
         )
 
         fit_obj5 = ns.CustomClassifier(
@@ -90,7 +90,7 @@ class TestCustom(ut.TestCase):
             bias=True,
             nodes_sim="hammersley",
             activation_name="elu",
-            n_clusters=4,
+            n_clusters=2,
             col_sample=0.8,
             row_sample=0.9
         )
@@ -130,27 +130,35 @@ class TestCustom(ut.TestCase):
         err4 = fit_obj4.predict(X_test) - y_test
         rmse4 = np.sqrt(np.mean(err4 ** 2))
         
+        err4_1 = fit_obj4.predict(X_test[0,:]) - y_test[0]
+        rmse4_1 = np.sqrt(np.mean(err4_1 ** 2))
+        
         fit_obj8.fit(X_train, y_train)
         err8 = fit_obj8.predict(X_test) - y_test
         rmse8 = np.sqrt(np.mean(err8 ** 2))
 
         fit_obj5.fit(Z[0:100, :], t[0:100])
+        pred5 = fit_obj5.predict(Z[106, :])
+
         fit_obj6.fit(Z[0:100, :], t[0:100])
+        pred6 = fit_obj6.predict(Z[106, :])
+        score6 = fit_obj6.score(Z[100:120, :], t[100:120])                
+        
         fit_obj7.fit(Z[0:100, :], t[0:100])
+        score7 = fit_obj7.score(Z[100:120, :], t[100:120])
+        
 
         self.assertTrue(
             np.allclose(rmse, 64.933610490495667) \
             & np.allclose(rmse2, 12.968755131423396) \
             & np.allclose(rmse3, 26.716371782298673) \
-            & np.allclose(rmse4, 33.457280982445447) \
+            & np.allclose(rmse4, 3.3480684032382375) \
+            & np.allclose(rmse4_1, 3.4711185776359343e-05) \
             & np.allclose(rmse8, 135.15345592042246) \
-            & np.allclose(fit_obj4.predict(X_test[0, :]), 127.70497052301884) \
-            & np.allclose(fit_obj5.predict(Z[105, :]), 0) \
-            & np.allclose(fit_obj5.predict(Z[106, :]), 1) \
-            & np.allclose(fit_obj6.predict(Z[106, :]), 1) \
-            & np.allclose(fit_obj6.score(Z[100:120, :], t[100:120]), 0.94999999999999996) \
-            & np.allclose(fit_obj7.score(Z[100:120, :], t[100:120]), 0.90000000000000002)
-        )
+            & np.allclose(pred5, 1) \
+            & np.allclose(pred6, 1) \
+            & np.allclose(score6, 0.94999999999999996) \
+            & np.allclose(score7, 0.84999999999999998))
 
     def test_score(self):
 
