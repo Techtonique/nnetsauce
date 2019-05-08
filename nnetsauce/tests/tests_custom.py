@@ -142,6 +142,9 @@ class TestCustom(ut.TestCase):
 
         fit_obj6.fit(Z[0:100, :], t[0:100])
         pred6 = fit_obj6.predict(Z[106, :])
+        pred6_proba1 = fit_obj6.predict_proba(Z[100, :])
+        pred6_proba2 = fit_obj6.predict_proba(Z[100:120, :])
+        
         score6 = fit_obj6.score(Z[100:120, :], t[100:120])
 
         fit_obj7.fit(Z[0:100, :], t[0:100])
@@ -156,6 +159,8 @@ class TestCustom(ut.TestCase):
             & np.allclose(rmse8, 135.15345592042246)
             & np.allclose(pred5, 1)
             & np.allclose(pred6, 1)
+            & np.allclose(pred6_proba1[0], 0.50507336437937767)
+            & np.allclose(pred6_proba2[3, 0], 0.4836233209751839)
             & np.allclose(score6, 0.94999999999999996)
             & np.allclose(score7, 0.84999999999999998)
         )
