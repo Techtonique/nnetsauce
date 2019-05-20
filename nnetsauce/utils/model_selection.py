@@ -44,6 +44,9 @@ class TimeSeriesSplit(TimeSeriesSplit):
         # assert horizon
         # assert fixed_window
         
+        # set n_splits after (?)
+        self.n_splits = 0
+        
         return self
 
 
