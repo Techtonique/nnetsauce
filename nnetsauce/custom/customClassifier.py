@@ -107,7 +107,7 @@ class CustomClassifier(Custom, ClassifierMixin):
                Target values.
     
         **kwargs: additional parameters to be passed to 
-                  self.cook_training_set
+                  self.cook_training_set or self.obj.fit
                
         Returns
         -------
@@ -201,7 +201,7 @@ class CustomClassifier(Custom, ClassifierMixin):
                 
         except:
             
-            raise ValueError("No method 'predict_proba' found object 'obj'")
+            raise ValueError("No method 'predict_proba' found in object 'obj'")
         
 
     def score(self, X, y, scoring=None, **kwargs):

@@ -110,7 +110,7 @@ class CustomRegressor(Custom, RegressorMixin):
                Target values.
     
         **kwargs: additional parameters to be passed to 
-                  self.cook_training_set
+                  self.cook_training_set or self.obj.fit
                
         Returns
         -------
