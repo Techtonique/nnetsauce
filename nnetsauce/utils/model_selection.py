@@ -18,7 +18,7 @@ class TimeSeriesSplit(TimeSeriesSplit):
              max_train_size=max_train_size)
         
     
-    def split(self, X,  
+    def split(self, X, 
               initial_window, horizon=3, fixed_window=False,
               y=None, groups=None):
         """Generate indices to split data into training and test set.
@@ -63,18 +63,18 @@ class TimeSeriesSplit(TimeSeriesSplit):
         
         # train index 
         min_index_train = 0
-        max_index_train = initial_window - 1
+        max_index_train = initial_window
         
         # test index 
         min_index_test = max_index_train
-        max_index_test = initial_window + horizon - 1
+        max_index_test = initial_window + horizon
         
         
         # Main loop -----
         
         if fixed_window == True: 
 
-            while (max_index_test <= (n-1)):  
+            while (max_index_test <= n):  
                     
                     yield (indices[min_index_train:max_index_train],
                            indices[min_index_test:max_index_test])
@@ -88,7 +88,7 @@ class TimeSeriesSplit(TimeSeriesSplit):
                     
         else: 
             
-            while (max_index_test <= (n-1)):  
+            while (max_index_test <= n):  
                     
                     yield (indices[min_index_train:max_index_train],
                            indices[min_index_test:max_index_test])
