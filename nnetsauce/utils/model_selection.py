@@ -18,7 +18,9 @@ class TimeSeriesSplit(TimeSeriesSplit):
              max_train_size=max_train_size)
         
     
-    def split(self, X, initial_window, horizon=3, fixed_window=False):
+    def split(self, X,  
+              initial_window, horizon=3, fixed_window=False,
+              y=None, groups=None):
         """Generate indices to split data into training and test set.
 
         Parameters
@@ -26,6 +28,12 @@ class TimeSeriesSplit(TimeSeriesSplit):
         X : array-like, shape (n_samples, n_features)
             Training data, where n_samples is the number of samples
             and n_features is the number of features.
+            
+        y : array-like, shape (n_samples,)
+            Always ignored, exists for compatibility.
+
+        groups : array-like, with shape (n_samples,)
+            Always ignored, exists for compatibility.
 
         initial_window : int, initial number of consecutive values in each 
                          training set sample
