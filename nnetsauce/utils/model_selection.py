@@ -6,18 +6,19 @@
 
 # MTS -----
 
+import numpy as np
 from sklearn.model_selection import TimeSeriesSplit
+
 
 class TimeSeriesSplit(TimeSeriesSplit):
     """Time Series cross-validator"""
     
-    def __init__(self):
-        # do something
-        # do something
-        # do something
-        return self
+    def __init__(self, n_splits=3, max_train_size=None):
+        super().__init__(n_splits=n_splits, 
+             max_train_size=max_train_size)
+        
     
-    def split(self, X, initial_window=5, horizon=5, fixed_window=False):
+    def split(self, X, initial_window, horizon=3, fixed_window=False):
         """Generate indices to split data into training and test set.
 
         Parameters
@@ -44,14 +45,52 @@ class TimeSeriesSplit(TimeSeriesSplit):
         # assert horizon
         # assert fixed_window
         
-        # set n_splits after (?)
-        self.n_splits = 0
+        n, p = X.shape
         
-        return self
+        # Initialization of indices -----
+        
+        indices = np.arange(n)
+        n_splits = 0   
+        
+        # train index 
+        min_index_train = 0
+        max_index_train = initial_window - 1
+        
+        # test index 
+        min_index_test = max_index_train
+        max_index_test = initial_window + horizon - 1
+        
+        
+        # Main loop -----
+        
+        if fixed_window == True: 
 
-
-
-
-
-
-
+            while (max_index_test <= (n-1)):  
+                    
+                    yield (indices[min_index_train:max_index_train],
+                           indices[min_index_test:max_index_test])
+                    
+                    min_index_train = min_index_train + 1 
+                    min_index_test = min_index_test + 1 
+                    max_index_train = max_index_train + 1 
+                    max_index_test = max_index_test + 1 
+                    
+                    n_splits = n_splits + 1 
+                    
+        else: 
+            
+            while (max_index_test <= (n-1)):  
+                    
+                    yield (indices[min_index_train:max_index_train],
+                           indices[min_index_test:max_index_test])
+                    
+                    max_index_train = max_index_train + 1 
+                    min_index_test = min_index_test + 1 
+                    max_index_test = max_index_test + 1                
+                    
+                    n_splits = n_splits + 1 
+        
+        
+        # set n_splits after (?)
+        self.n_splits = n_splits
+        self.max_train_size = max_index_train + 1
