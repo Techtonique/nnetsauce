@@ -29,18 +29,18 @@ class TimeSeriesSplit(TimeSeriesSplit):
             Training data, where n_samples is the number of samples
             and n_features is the number of features.
             
-        y : array-like, shape (n_samples,)
-            Always ignored, exists for compatibility.
-
-        groups : array-like, with shape (n_samples,)
-            Always ignored, exists for compatibility.
-
         initial_window : int, initial number of consecutive values in each 
                          training set sample
         
         horizon : int, number of consecutive values in test set sample
         
         fixed_window : boolean, if False, all training samples start at index 0
+        
+        y : array-like, shape (n_samples,)
+            Always ignored, exists for compatibility.
+
+        groups : array-like, with shape (n_samples,)
+            Always ignored, exists for compatibility.
 
         Yields
         ------
