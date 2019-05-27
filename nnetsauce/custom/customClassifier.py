@@ -159,7 +159,7 @@ class CustomClassifier(Custom, ClassifierMixin):
             return self.obj.predict(
                 self.cook_test_set(X, **kwargs), **kwargs
             )
-            
+
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
         
@@ -176,33 +176,37 @@ class CustomClassifier(Custom, ClassifierMixin):
         -------
         probability estimates for test data: {array-like}        
         """
-        try: 
-            
+        try:
+
             if len(X.shape) == 1:
-    
+
                 n_features = X.shape[0]
                 new_X = mo.rbind(
                     X.reshape(1, n_features),
-                    np.ones(n_features).reshape(1, n_features),
+                    np.ones(n_features).reshape(
+                        1, n_features
+                    ),
                 )
-    
+
                 return (
                     self.obj.predict_proba(
                         self.cook_test_set(new_X, **kwargs),
                         **kwargs
                     )
                 )[0]
-    
+
             else:
-    
+
                 return self.obj.predict_proba(
-                    self.cook_test_set(X, **kwargs), **kwargs
+                    self.cook_test_set(X, **kwargs),
+                    **kwargs
                 )
-                
+
         except:
-            
-            raise ValueError("No method 'predict_proba' found in object 'obj'")
-        
+
+            raise ValueError(
+                "No method 'predict_proba' found in object 'obj'"
+            )
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """

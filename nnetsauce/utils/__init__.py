@@ -29,5 +29,5 @@ __all__ = [
     "nearestPD",
     "create_train_inputs",
     "reformat_response",
-    "TimeSeriesSplit"
+    "TimeSeriesSplit",
 ]
