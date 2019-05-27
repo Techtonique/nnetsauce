@@ -10,9 +10,10 @@ import sklearn.metrics as skm
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 from ..utils import lmfuncs as lmf
+from sklearn.base import RegressorMixin
 
 
-class BaseRegressor(Base):
+class BaseRegressor(Base, RegressorMixin):
     """Base model with direct link and nonlinear activation.
         
        Parameters

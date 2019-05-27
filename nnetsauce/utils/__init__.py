@@ -7,6 +7,7 @@ from .matrixops import (
     to_np_array,
 )
 from .misc import merge_two_dicts, is_factor
+from .model_selection import TimeSeriesSplit
 from .psdcheck import isPD, nearestPD
 from .timeseries import (
     create_train_inputs,
@@ -28,4 +29,5 @@ __all__ = [
     "nearestPD",
     "create_train_inputs",
     "reformat_response",
+    "TimeSeriesSplit"
 ]
