@@ -10,7 +10,7 @@ setup(
     packages=find_packages(),
     author="Thierry Moudiki",
     author_email="thierry.moudiki@gmail.com",
-    description="Machine Learning using combinations of Single Layer Neural Networks",
+    description="Machine Learning using combinations of Neural Networks' layers",
     download_url="https://github.com/thierrymoudiki/nnetsauce",
     install_requires=["numpy >= 1.13.0", "scipy >= 0.19.0", "scikit-learn >= 0.18.0"],
     classifiers=[
