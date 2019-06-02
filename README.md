@@ -5,19 +5,17 @@ This package does Statistical/Machine Learning by using various -- advanced -- c
 
 ## Installation 
 
-- __1st method__: by using `pip`
+- __1st method__: by using `pip` for the stable version:
 
 ```bash
 pip install nnetsauce
 ```
 
 
-- __2nd method__: from Github
+- __2nd method__: from Github, for the development version:
 
 ```bash
-git clone https://github.com/thierrymoudiki/nnetsauce.git
-cd nnetsauce
-python setup.py install
+pip install git+https://github.com/thierrymoudiki/nnetsauce.git
 ```
 
 
