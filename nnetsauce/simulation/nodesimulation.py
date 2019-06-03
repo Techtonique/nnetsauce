@@ -1,6 +1,7 @@
 import numpy as np
 import sobol_seq
 from six import moves
+from . import sobol_lib # longer sobol sequence !
 
 # From: https://github.com/PhaethonPrime/hammersley/blob/master/hammersley/sequences.py
 
@@ -198,3 +199,10 @@ def generate_sobol(n_dims=2, n_points=10):
     return np.array(
         sobol_seq.i4_sobol_generate(n_dims, n_points)
     ).transpose()
+
+
+# sobol numbers' generation
+def generate_sobol2(n_dims=2, n_points=10):
+    return np.array(
+        sobol_lib.i4_sobol_generate (m = n_dims, n = n_points, skip = 2)
+    )
