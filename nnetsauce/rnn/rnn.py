@@ -96,11 +96,17 @@ class RNN(Base):
         )
 
         self.obj = obj
-        self.h = None # state # To be defined when fit is called
+        self.H = None # state # To be defined when fit is called
         self.n_steps = n_steps
         self.nodes_sim_x=nodes_sim_x
         self.nodes_sim_h=nodes_sim_h
 
+
+# in fit --> loop on n_steps
+# rnn = RNN()        
+# rnn.create_layer(X, self.H) # step 1 - self.H is identically 0 
+# rnn.create_layer(X, self.H) # step 2 with updated self.H
+# ... ...        
 
     def create_layer(self, scaled_X, W_x=None, W_h=None):
         """ Create hidden layer. """
@@ -170,7 +176,7 @@ class RNN(Base):
                 ), "check dimensions of covariates X and matrix W"
 
                 return mo.dropout(x=self.activation_func(
-                        np.dot(scaled_X, self.W_x) + np.dot(self.h, self.W_h)),
+                        np.dot(scaled_X, self.W_x) + np.dot(self.H, self.W_h)),
                         drop_prob=self.dropout,
                         seed=self.seed)
 
@@ -184,7 +190,7 @@ class RNN(Base):
 
                 # self.W = W
                 return mo.dropout(x=self.activation_func(
-                        np.dot(scaled_X, W_x) + np.dot(self.h, W_h)),
+                        np.dot(scaled_X, W_x) + np.dot(self.H, W_h)),
                         drop_prob=self.dropout,
                         seed=self.seed)
 
@@ -248,8 +254,8 @@ class RNN(Base):
                 return mo.dropout(
                     x=self.activation_func(
                         np.dot(mo.cbind(np.ones(scaled_X.shape[0]), scaled_X),
-                               self.W_x) + np.dot(mo.cbind(np.ones(self.h.shape[0]),
-                                self.h), self.W_h)),
+                               self.W_x) + np.dot(mo.cbind(np.ones(self.H.shape[0]),
+                                self.H), self.W_h)),
                     drop_prob=self.dropout,
                     seed=self.seed,
                 )
@@ -261,13 +267,11 @@ class RNN(Base):
                     x=self.activation_func(
                         np.dot(mo.cbind(
                                 np.ones(scaled_X.shape[0]),
-                                scaled_X),
-                            W_x,) + np.dot(
+                                scaled_X), W_x) + np.dot(
                             mo.cbind(
-                                np.ones(self.h.shape[0]),
-                                self.h,
-                            ),W_h)
-                    ),
+                                np.ones(self.H.shape[0]),
+                                self.H,
+                            ),W_h)),
                     drop_prob=self.dropout,
                     seed=self.seed,
                 )
