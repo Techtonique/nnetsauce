@@ -1,4 +1,4 @@
-from .customClassifier import CustomClassifier
-from .customRegressor import CustomRegressor
+from .rnnClassifier import RNNClassifier
+from .rnnRegressor import RNNRegressor
 
-__all__ = ["CustomClassifier", "CustomRegressor"]
+__all__ = ["RNNClassifier", "RNNRegressor"]

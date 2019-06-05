@@ -96,17 +96,23 @@ class RNN(Base):
         )
 
         self.obj = obj
-        self.H = None # state # To be defined when fit is called
+        self.H = None # current state # To be defined when fit is called
         self.n_steps = n_steps
         self.nodes_sim_x=nodes_sim_x
         self.nodes_sim_h=nodes_sim_h
 
 
 # in fit --> loop on n_steps
-# rnn = RNN()        
+# rnn = RNNRegressor()        
 # rnn.create_layer(X, self.H) # step 1 - self.H is identically 0 
 # rnn.create_layer(X, self.H) # step 2 with updated self.H
 # ... ...        
+
+# compute the output vector?
+# y = np.dot(self.W_hy, self.h)
+# the output can actually be anything (avoids choosing W_hy -_-). 
+# Like (self.obj.fit = Logistic reg):
+# self.obj.fit(X = self.H, y = y)        
 
     def create_layer(self, scaled_X, W_x=None, W_h=None):
         """ Create hidden layer. """
@@ -117,9 +123,7 @@ class RNN(Base):
             self.bias != True
         ):  # no bias term in the hidden layer
 
-            if W_x is None:
-                
-                assert self.W_h is not None, "self.W_h must be 'not None'"
+            if (W_x is None) | (W_h is None):
                 
                 if self.nodes_sim_x == "sobol":
                     self.W_x = ns.generate_sobol2(
@@ -172,15 +176,19 @@ class RNN(Base):
                     )
 
                 assert (
-                    scaled_X.shape[1] == self.W.shape[0]
-                ), "check dimensions of covariates X and matrix W"
+                    scaled_X.shape[1] == self.W_x.shape[0]
+                ), "check dimensions of covariates X and matrix W_x"
+                
+                assert (
+                    self.H.shape[1] == self.W_h.shape[0]
+                ), "check dimensions of state self.H and matrix W_h"
 
                 return mo.dropout(x=self.activation_func(
                         np.dot(scaled_X, self.W_x) + np.dot(self.H, self.W_h)),
                         drop_prob=self.dropout,
                         seed=self.seed)
 
-            else:  # W_x is not none
+            else:  # (W_x is not none) & (self.bias != True)
                 
                 assert W_h is not None, "W_h must be provided"
 
@@ -194,58 +202,58 @@ class RNN(Base):
                         drop_prob=self.dropout,
                         seed=self.seed)
 
-        else:  # with bias term in the hidden layer
+        else:  # self.bias == True
 
             if W_x is None:
 
-                n_features_1 = n_features + 1
+                n_features_1 = n_features + 1 # one more; constant feature
 
                 if self.nodes_sim_x == "sobol":
-                    self.W = ns.generate_sobol2(
+                    self.W_x = ns.generate_sobol2(
                         n_dims=n_features_1,
                         n_points=self.n_hidden_features,
                     )
 
                 if self.nodes_sim_x == "hammersley":
-                    self.W = ns.generate_hammersley(
+                    self.W_x = ns.generate_hammersley(
                         n_dims=n_features_1,
                         n_points=self.n_hidden_features,
                     )
 
                 if self.nodes_sim_x == "uniform":
-                    self.W = ns.generate_uniform(
+                    self.W_x = ns.generate_uniform(
                         n_dims=n_features_1,
                         n_points=self.n_hidden_features,
                         seed=self.seed,
                     )
 
                 if self.nodes_sim_x == "halton":
-                    self.W = ns.generate_halton(
+                    self.W_x = ns.generate_halton(
                         n_dims=n_features_1,
                         n_points=self.n_hidden_features,
                     )
                 
                 if self.nodes_sim_h == "sobol":
-                    self.W = ns.generate_sobol2(
+                    self.W_h = ns.generate_sobol2(
                         n_dims=n_features_1,
                         n_points=self.n_hidden_features,
                     )
 
                 if self.nodes_sim_h == "hammersley":
-                    self.W = ns.generate_hammersley(
+                    self.W_h = ns.generate_hammersley(
                         n_dims=n_features_1,
                         n_points=self.n_hidden_features,
                     )
 
                 if self.nodes_sim_h == "uniform":
-                    self.W = ns.generate_uniform(
+                    self.W_h = ns.generate_uniform(
                         n_dims=n_features_1,
                         n_points=self.n_hidden_features,
                         seed=self.seed,
                     )
 
                 if self.nodes_sim_h == "halton":
-                    self.W = ns.generate_halton(
+                    self.W_h = ns.generate_halton(
                         n_dims=n_features_1,
                         n_points=self.n_hidden_features,
                     )
@@ -257,10 +265,9 @@ class RNN(Base):
                                self.W_x) + np.dot(mo.cbind(np.ones(self.H.shape[0]),
                                 self.H), self.W_h)),
                     drop_prob=self.dropout,
-                    seed=self.seed,
-                )
+                    seed=self.seed)
 
-            else: # W_x is not None 
+            else: # W_x is not None & self.bias == True
 
                 # self.W = W
                 return mo.dropout(
@@ -271,7 +278,7 @@ class RNN(Base):
                             mo.cbind(
                                 np.ones(self.H.shape[0]),
                                 self.H,
-                            ),W_h)),
+                            ), W_h)),
                     drop_prob=self.dropout,
                     seed=self.seed,
                 )
