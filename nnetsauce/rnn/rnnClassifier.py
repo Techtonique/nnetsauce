@@ -6,7 +6,7 @@
 
 import numpy as np
 import sklearn.metrics as skm2
-from .RNN import RNN
+from .rnn import RNN
 from ..utils import matrixops as mo
 from sklearn.base import ClassifierMixin
 

@@ -3,6 +3,7 @@ from .base.baseRegressor import BaseRegressor
 from .custom.customClassifier import CustomClassifier
 from .custom.customRegressor import CustomRegressor
 from .mts import MTS
+from .rnn import RNN
 from .rvfl.bayesianrvflRegressor import (
     BayesianRVFLRegressor,
 )
@@ -18,5 +19,6 @@ __all__ = [
     "BayesianRVFL2Regressor",
     "CustomClassifier",
     "CustomRegressor",
+    "RNN",
     "MTS",
 ]

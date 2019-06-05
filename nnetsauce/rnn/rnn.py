@@ -68,7 +68,7 @@ class RNN(Base):
         activation_name="relu",
         a=0.01,
         nodes_sim_x="sobol",
-        nodes_sim_h="uniform",
+        nodes_sim_h="hammersley",
         bias=True,
         dropout=0,
         direct_link=True,
@@ -118,6 +118,10 @@ class RNN(Base):
         """ Create hidden layer. """
 
         n_features = scaled_X.shape[1]
+        
+        # gotta check this 
+        if self.H is None:
+            self.H = np.zeros_like(scaled_X)
 
         if (
             self.bias != True
@@ -183,7 +187,7 @@ class RNN(Base):
                     self.H.shape[1] == self.W_h.shape[0]
                 ), "check dimensions of state self.H and matrix W_h"
 
-                return mo.dropout(x=self.activation_func(
+                self.H = mo.dropout(x=self.activation_func(
                         np.dot(scaled_X, self.W_x) + np.dot(self.H, self.W_h)),
                         drop_prob=self.dropout,
                         seed=self.seed)
@@ -197,7 +201,7 @@ class RNN(Base):
                 ), "check dimensions of covariates X and matrix W"
 
                 # self.W = W
-                return mo.dropout(x=self.activation_func(
+                self.H = mo.dropout(x=self.activation_func(
                         np.dot(scaled_X, W_x) + np.dot(self.H, W_h)),
                         drop_prob=self.dropout,
                         seed=self.seed)
@@ -259,7 +263,7 @@ class RNN(Base):
                     )
 
 
-                return mo.dropout(
+                self.H = mo.dropout(
                     x=self.activation_func(
                         np.dot(mo.cbind(np.ones(scaled_X.shape[0]), scaled_X),
                                self.W_x) + np.dot(mo.cbind(np.ones(self.H.shape[0]),
@@ -270,7 +274,7 @@ class RNN(Base):
             else: # W_x is not None & self.bias == True
 
                 # self.W = W
-                return mo.dropout(
+                self.H = mo.dropout(
                     x=self.activation_func(
                         np.dot(mo.cbind(
                                 np.ones(scaled_X.shape[0]),
