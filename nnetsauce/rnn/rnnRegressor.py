@@ -5,7 +5,6 @@
 # License: BSD 3
 
 import numpy as np
-import sklearn.model_selection as skm
 import sklearn.metrics as skm2
 from .rnn import RNN
 from ..utils import matrixops as mo
@@ -73,8 +72,8 @@ class RNNRegressor(RNN, RegressorMixin):
         n_clusters=2,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
-        col_sample=1,
-        row_sample=1,
+        col_sample=1, # probably don't want to subsample here
+        row_sample=1, # probably don't want to subsample here
         seed=123,
     ):
 
@@ -96,8 +95,9 @@ class RNNRegressor(RNN, RegressorMixin):
         )
 
         self.type_fit = "regression"
-
-    def fit(self, X, y, **kwargs):
+     
+    # one step, on one input     
+    def fit_step(self, X, y, **kwargs):
         """Fit RNN model to training data (X, y).
         
         Parameters
@@ -116,7 +116,11 @@ class RNNRegressor(RNN, RegressorMixin):
         -------
         self: object
         """
-
+        if (len(X.shape) == 1):
+            X = X.reshape(-1, 1)
+        
+        # calls 'create_layer' from parent RNN: obtains centered_y, updates state H.
+        # 'scaled_Z' is not used, but H
         centered_y, scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs
         )
@@ -125,7 +129,8 @@ class RNNRegressor(RNN, RegressorMixin):
 
         return self
 
-    def predict(self, X, **kwargs):
+    # one step, on one input 
+    def predict_step(self, X, **kwargs):
         """Predict test data X.
         
         Parameters
@@ -142,27 +147,16 @@ class RNNRegressor(RNN, RegressorMixin):
         model predictions: {array-like}
         """
 
-        if len(X.shape) == 1:
+        if len(X.shape) == 1:            
+            X = X.reshape(-1, 1)            
 
-            n_features = X.shape[0]
-            new_X = mo.rbind(
-                X.reshape(1, n_features),
-                np.ones(n_features).reshape(1, n_features),
-            )
+        print("self.cook_test_set(X, **kwargs)")
+        print(self.cook_test_set(X, **kwargs))
 
-            return (
-                self.y_mean
-                + self.obj.predict(
-                    self.cook_test_set(new_X, **kwargs),
-                    **kwargs
-                )
-            )[0]
-
-        else:
-
-            return self.y_mean + self.obj.predict(
+        return self.y_mean + self.obj.predict(
                 self.cook_test_set(X, **kwargs), **kwargs
             )
+        
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
