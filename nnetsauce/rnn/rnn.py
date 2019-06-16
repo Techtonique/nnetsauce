@@ -204,7 +204,7 @@ class RNN(Base):
 
             else:  # (W_x is not none) & (self.bias != True)
                 
-                assert (W_x is None) & (W_h is None), "W_x and W_h must be provided"
+                assert (W_x is not None) & (W_h is not None), "W_x and W_h must be provided"
 
                 assert (
                     scaled_X.shape[1] == W_x.shape[0]
