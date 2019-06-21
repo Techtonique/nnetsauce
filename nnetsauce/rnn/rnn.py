@@ -176,17 +176,10 @@ class RNN(Base):
                     self.W_h = ns.generate_halton(
                         n_dims=self.n_hidden_features,
                         n_points=self.n_hidden_features,
-                    )
-                            
-                assert (
-                    scaled_X.shape[1] == self.W_x.shape[0]
-                ), "check dimensions of covariates X and matrix W_x"
-                
-                assert (
-                    self.H_train.shape[1] == self.W_h.shape[0]
-                ), "check dimensions of state self.H and matrix W_h"
+                    )                                            
                 
                 if training == True:
+                    
                     self.H_train = mo.dropout(x=self.activation_func(
                             np.dot(scaled_X, self.W_x) + np.dot(self.H_train, self.W_h)),
                             drop_prob=self.dropout,
@@ -195,6 +188,7 @@ class RNN(Base):
                     return self.H_train
                 
                 else: 
+                    
                     self.H_test = mo.dropout(x=self.activation_func(
                             np.dot(scaled_X, self.W_x) + np.dot(self.H_test, self.W_h)),
                             drop_prob=self.dropout,
@@ -204,21 +198,28 @@ class RNN(Base):
 
             else:  # (W_x is not none) & (self.bias != True)
                 
-                assert (W_x is not None) & (W_h is not None), "W_x and W_h must be provided"
+                assert (W_x is not None) & (W_h is not None), "both W_x and W_h must be provided"
 
                 assert (
                     scaled_X.shape[1] == W_x.shape[0]
-                ), "check dimensions of covariates X and matrix W"
+                ), "check dimensions of covariates X and matrix W_x"
+                
+                assert (
+                    self.H_train.shape[1] == W_h.shape[0]
+                ), "check dimensions of state self.H and matrix W_h"
 
                 # self.W = W
                 if training == True:
+                    
                     self.H_train = mo.dropout(x=self.activation_func(
                             np.dot(scaled_X, W_x) + np.dot(self.H_train, W_h)),
                             drop_prob=self.dropout,
                             seed=self.seed)
                     
                     return self.H_train
+                
                 else: 
+                    
                     self.H_test = mo.dropout(x=self.activation_func(
                             np.dot(scaled_X, W_x) + np.dot(self.H_test, W_h)),
                             drop_prob=self.dropout,
@@ -279,17 +280,8 @@ class RNN(Base):
                         n_points=self.n_hidden_features,
                     )
                 
-                print(" in RNN::create_layer: ")
-                print("scaled_X.shape")
-                print(scaled_X.shape)
-                print("self.W_x.shape")
-                print(self.W_x.shape)
-                print("self.H_train.shape")
-                print(self.H_train.shape)
-                print("self.W_h.shape")
-                print(self.W_h.shape)
-                
                 if training == True:
+                    
                     self.H_train = mo.dropout(
                         x=self.activation_func(
                             np.dot(mo.cbind(np.ones(scaled_X.shape[0]), scaled_X),
@@ -298,7 +290,9 @@ class RNN(Base):
                         seed=self.seed)
                         
                     return self.H_train
+                
                 else:
+                    
                     self.H_test = mo.dropout(
                         x=self.activation_func(
                             np.dot(mo.cbind(np.ones(scaled_X.shape[0]), scaled_X),
@@ -311,10 +305,11 @@ class RNN(Base):
 
             else: # W_x is not None & self.bias == True
                 
-                assert (W_x is not None) & (W_h is not None), "W_x and W_h must be provided"
+                assert (W_x is not None) & (W_h is not None), "both W_x and W_h must be provided"
                 
                 # self.W = W
                 if training == True:
+                    
                     self.H_train = mo.dropout(
                         x=self.activation_func(
                             np.dot(mo.cbind(
@@ -325,15 +320,8 @@ class RNN(Base):
                     )
                     
                     return self.H_train
-                else:
-                    print("scaled_X.shape")
-                    print(scaled_X.shape)
-                    print("W_x.shape")
-                    print(W_x.shape)
-                    print("self.H_test.shape")
-                    print(self.H_test.shape)
-                    print("W_h.shape")
-                    print(W_h.shape)
+                
+                else:                    
                     
                     self.H_test = mo.dropout(
                         x=self.activation_func(
@@ -494,10 +482,6 @@ class RNN(Base):
                                               training=True)
 
                 if self.direct_link == True:
-                    print("augmented_X.shape")
-                    print(augmented_X.shape)
-                    print("Phi_X")
-                    print(Phi_X)
                     Z = mo.cbind(augmented_X, Phi_X)
                 else:
                     Z = Phi_X

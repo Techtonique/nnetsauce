@@ -1,13 +1,11 @@
-"""RNN Regressor"""
+u"""RNN Regressor"""
 
 # Authors: Thierry Moudiki
 #
 # License: BSD 3
 
-import numpy as np
 import sklearn.metrics as skm2
 from .rnn import RNN
-from ..utils import matrixops as mo
 from sklearn.base import RegressorMixin
 
 
@@ -124,8 +122,8 @@ class RNNRegressor(RNN, RegressorMixin):
         centered_y, scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs
         )
-
-        self.obj.fit(scaled_Z, centered_y, **kwargs)
+        
+        self.obj.fit(X = scaled_Z, y = centered_y, **kwargs)
 
         return self
 
@@ -149,9 +147,6 @@ class RNNRegressor(RNN, RegressorMixin):
 
         if len(X.shape) == 1:            
             X = X.reshape(-1, 1)            
-
-        print("self.cook_test_set(X, **kwargs)")
-        print(self.cook_test_set(X, **kwargs))
 
         return self.y_mean + self.obj.predict(
                 self.cook_test_set(X, **kwargs), **kwargs
