@@ -4,7 +4,7 @@
 #
 # License: BSD 3
 
-#import numpy as np
+import numpy as np
 import sklearn.metrics as skm2
 from .rnn import RNN
 #from ..utils import matrixops as mo
@@ -180,10 +180,10 @@ class RNNClassifier(RNN, ClassifierMixin):
                 )                
 
 
-    def score(self, X, y, scoring=None, **kwargs):
+    def score_step(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
 
-        preds = self.predict(X)
+        preds = self.predict_step(X)
 
         if scoring is None:
             scoring = "accuracy"
@@ -224,3 +224,17 @@ class RNNClassifier(RNN, ClassifierMixin):
         }
 
         return scoring_options[scoring](y, preds, **kwargs)
+
+
+
+    def fit(self, inputs, targets): 
+        """ Fit RNN to inputs and targets. """
+
+        steps = inputs.shape[0]
+        loss = 0
+
+        for i in range(steps):
+            self.fit_step(inputs[i,:], targets[i,:])
+            loss += -np.log(self.predict_proba_step(inputs[i,:])[i, 1])
+        
+        return loss/steps

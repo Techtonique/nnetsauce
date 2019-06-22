@@ -153,10 +153,10 @@ class RNNRegressor(RNN, RegressorMixin):
             )
         
 
-    def score(self, X, y, scoring=None, **kwargs):
+    def score_step(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
 
-        preds = self.predict(X)
+        preds = self.predict_step(X)
 
         if (
             type(preds) == tuple
@@ -188,3 +188,22 @@ class RNNRegressor(RNN, RegressorMixin):
         }
 
         return scoring_options[scoring](y, preds, **kwargs)
+
+    
+    
+    def fit(self, inputs, targets, n_params = None): 
+
+        steps = inputs.shape[0]
+    
+        assert (steps > 0), "inputs.shape[0] must be > 0"
+                
+        assert (steps == targets.shape[0]), \
+        "'inputs' and 'targets' must contain the same number of steps"
+                
+        loss = 0
+        for i in range(steps):
+            self.fit_step(inputs[i,:], targets[i,:])
+            # compute AICc here instead
+            loss += self.score_step(inputs[i,:], targets[i,:])
+        
+        return loss
