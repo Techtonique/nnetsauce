@@ -227,14 +227,31 @@ class RNNClassifier(RNN, ClassifierMixin):
 
 
 
-    def fit(self, inputs, targets): 
+    def fit(self, inputs, targets, scoring=None): 
         """ Fit RNN to inputs and targets. """
 
         steps = inputs.shape[0]
-        loss = 0
-
-        for i in range(steps):
-            self.fit_step(inputs[i,:], targets[i,:])
-            loss += -np.log(self.predict_proba_step(inputs[i,:])[i, 1])
+    
+        assert (steps > 0), "inputs.shape[0] must be > 0"
+                
+        assert (steps == targets.shape[0]), \
+        "'inputs' and 'targets' must contain the same number of steps"
         
-        return loss/steps
+        loss = 0
+        
+        if scoring is None:
+            
+            for i in range(steps):
+                self.fit_step(inputs[i,:], targets[i,:])
+                loss += -np.log(self.predict_proba_step(inputs[i,:])[i, 1])
+            
+            return loss/steps
+        
+        else:
+            
+            for i in range(steps):
+                self.fit_step(inputs[i,:], targets[i,:])
+                loss += self.score_step(inputs[i,:], targets[i,:], 
+                                        scoring=scoring)
+            
+            return loss/steps

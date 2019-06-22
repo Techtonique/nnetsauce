@@ -191,7 +191,7 @@ class RNNRegressor(RNN, RegressorMixin):
 
     
     
-    def fit(self, inputs, targets, n_params = None): 
+    def fit(self, inputs, targets, scoring = None, n_params = None): 
 
         steps = inputs.shape[0]
     
@@ -199,11 +199,22 @@ class RNNRegressor(RNN, RegressorMixin):
                 
         assert (steps == targets.shape[0]), \
         "'inputs' and 'targets' must contain the same number of steps"
-                
-        loss = 0
-        for i in range(steps):
-            self.fit_step(inputs[i,:], targets[i,:])
-            # compute AICc here instead
-            loss += self.score_step(inputs[i,:], targets[i,:])
         
-        return loss
+        loss = 0
+        
+        if scoring is None:        
+            
+            for i in range(steps):
+                self.fit_step(inputs[i,:], targets[i,:])
+                # compute AICc here instead
+                loss += self.score_step(inputs[i,:], targets[i,:])
+            
+            return loss
+        
+        else: 
+            
+            for i in range(steps):
+                self.fit_step(inputs[i,:], targets[i,:])
+                loss += self.score_step(inputs[i,:], targets[i,:])
+            
+            return loss
