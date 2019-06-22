@@ -202,6 +202,9 @@ class RNNRegressor(RNN, RegressorMixin):
         
         loss = 0
         
+        # for long sequences, add progress bar
+        # for long sequences, add progress bar
+        # for long sequences, add progress bar
         if scoring is None:        
             
             for i in range(steps):
@@ -209,7 +212,7 @@ class RNNRegressor(RNN, RegressorMixin):
                 # compute AICc here instead
                 loss += self.score_step(inputs[i,:], targets[i,:])
             
-            return loss
+            return loss # return AICc
         
         else: 
             
@@ -217,4 +220,4 @@ class RNNRegressor(RNN, RegressorMixin):
                 self.fit_step(inputs[i,:], targets[i,:])
                 loss += self.score_step(inputs[i,:], targets[i,:])
             
-            return loss
+            return loss/steps

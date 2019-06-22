@@ -239,6 +239,9 @@ class RNNClassifier(RNN, ClassifierMixin):
         
         loss = 0
         
+        # for long sequences, add progress bar
+        # for long sequences, add progress bar
+        # for long sequences, add progress bar
         if scoring is None:
             
             for i in range(steps):
