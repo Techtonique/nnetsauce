@@ -4,6 +4,7 @@ u"""RNN Regressor"""
 #
 # License: BSD 3
 
+import numpy as np
 import sklearn.metrics as skm2
 from .rnn import RNN
 from sklearn.base import RegressorMixin
@@ -98,6 +99,7 @@ class RNNRegressor(RNN, RegressorMixin):
 
         self.type_fit = "regression"
      
+        
     # one step, on one input     
     def fit_step(self, X, y, **kwargs):
         """Fit RNN model to training data (X, y).
@@ -130,6 +132,7 @@ class RNNRegressor(RNN, RegressorMixin):
         self.obj.fit(X = scaled_Z, y = centered_y, **kwargs)
 
         return self
+    
 
     # one step, on one input 
     def predict_step(self, X, **kwargs):
@@ -156,6 +159,7 @@ class RNNRegressor(RNN, RegressorMixin):
                 self.cook_test_set(X, **kwargs), **kwargs
             )
         
+
 
     def score_step(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
@@ -196,6 +200,7 @@ class RNNRegressor(RNN, RegressorMixin):
     
     
     def fit(self, inputs, targets = None, scoring = None, n_params = None): 
+        """ Train the model on multiple steps. """
 
         steps = inputs.shape[0]
     
@@ -203,6 +208,10 @@ class RNNRegressor(RNN, RegressorMixin):
                 
         assert (steps == targets.shape[0]), \
         "'inputs' and 'targets' must contain the same number of steps"
+        
+        self.steps = steps
+        
+        self.last_target = targets[-1, :] 
         
         loss = 0
         
@@ -214,26 +223,60 @@ class RNNRegressor(RNN, RegressorMixin):
             if targets is not None: 
             
                 for i in range(steps):
-                    self.fit_step(inputs[i,:], targets[i,:])
+                    self.fit_step(X = inputs[i,:], y = targets[i,:])
                     # compute AICc here instead
-                    loss += self.score_step(inputs[i,:], targets[i,:])
+                    loss += self.score_step(X = inputs[i,:], y = targets[i,:])
                 
-                return loss # return AICc
+                return loss/steps # return AICc
             
             else:
             
-                return 0 
+                for i in range(steps - 1):
+                    self.fit_step(X = inputs[i,:], y = inputs[(i + 1), :])
+                    # compute AICc here instead
+                    loss += self.score_step(X = inputs[i,:], y = inputs[(i + 1), :])
+                
+                return loss/(steps - 1) # return AICc
         
-        else: 
+        else: # scoring is not none 
             
             if targets is not None: 
             
                 for i in range(steps):
-                    self.fit_step(inputs[i,:], targets[i,:])
-                    loss += self.score_step(inputs[i,:], targets[i,:])
+                    self.fit_step(X = inputs[i,:], y = targets[i,:])
+                    loss += self.score_step(X = inputs[i,:], y = targets[i,:], 
+                                            scoring = scoring)
                 
                 return loss/steps
             
             else:
                 
-                return 0 
+                for i in range(steps - 1):
+                    self.fit_step(X = inputs[i,:], y = inputs[(i + 1), :])
+                    # compute AICc here instead
+                    loss += self.score_step(X = inputs[i,:], y = inputs[(i + 1), :], 
+                                            scoring = scoring)
+                
+                return loss/(steps - 1) # return AICc 
+
+
+
+    def predict(
+        self, h=5, level=95, new_xreg=None, **kwargs
+        ):
+        
+        assert (self.steps > 0), "method 'fit' must be called first"
+        
+        n_series = len(self.last_target)
+        
+        res = np.zeros((h, n_series))
+        
+        preds = self.predict_step(X = self.last_target)
+        
+        res[0, :] = preds
+        
+        for i in range(1, h):            
+            preds = self.predict_step(X = preds)            
+            res[i, ] = preds
+        
+        return res

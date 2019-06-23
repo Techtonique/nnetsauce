@@ -27,8 +27,6 @@ class RNN(Base):
            (obj.predict())
        alpha: float
            smoothing parameter
-       n_steps: int
-           number of steps
        n_hidden_features: int
            number of nodes in the hidden layer
        activation_name: str
@@ -71,7 +69,6 @@ class RNN(Base):
         self,
         obj,
         alpha=0.5,
-        n_steps=3,
         n_hidden_features=5,
         activation_name="relu",
         a=0.01,
@@ -108,7 +105,6 @@ class RNN(Base):
         self.W_h = None
         self.H_train = None # current state on training # To be defined when fit is called
         self.H_test = None # current state on test set # To be defined when predict is called
-        self.n_steps = n_steps
         self.nodes_sim = nodes_sim
 
         
