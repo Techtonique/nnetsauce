@@ -17,6 +17,8 @@ class RNNRegressor(RNN, RegressorMixin):
        obj: object
            any object containing a method fit (obj.fit()) and a method predict 
            (obj.predict())
+       alpha: float
+           smoothing parameter
        n_hidden_features: int
            number of nodes in the hidden layer
        activation_name: str
@@ -60,6 +62,7 @@ class RNNRegressor(RNN, RegressorMixin):
     def __init__(
         self,
         obj,
+        alpha=0.5,
         n_hidden_features=5,
         activation_name="relu",
         a=0.01,
@@ -77,6 +80,7 @@ class RNNRegressor(RNN, RegressorMixin):
 
         super().__init__(
             obj=obj,
+            alpha=alpha,
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,
             a=a,
@@ -191,7 +195,7 @@ class RNNRegressor(RNN, RegressorMixin):
 
     
     
-    def fit(self, inputs, targets, scoring = None, n_params = None): 
+    def fit(self, inputs, targets = None, scoring = None, n_params = None): 
 
         steps = inputs.shape[0]
     
@@ -205,19 +209,31 @@ class RNNRegressor(RNN, RegressorMixin):
         # for long sequences, add progress bar
         # for long sequences, add progress bar
         # for long sequences, add progress bar
-        if scoring is None:        
+        if scoring is None:    
+        
+            if targets is not None: 
             
-            for i in range(steps):
-                self.fit_step(inputs[i,:], targets[i,:])
-                # compute AICc here instead
-                loss += self.score_step(inputs[i,:], targets[i,:])
+                for i in range(steps):
+                    self.fit_step(inputs[i,:], targets[i,:])
+                    # compute AICc here instead
+                    loss += self.score_step(inputs[i,:], targets[i,:])
+                
+                return loss # return AICc
             
-            return loss # return AICc
+            else:
+            
+                return 0 
         
         else: 
             
-            for i in range(steps):
-                self.fit_step(inputs[i,:], targets[i,:])
-                loss += self.score_step(inputs[i,:], targets[i,:])
+            if targets is not None: 
             
-            return loss/steps
+                for i in range(steps):
+                    self.fit_step(inputs[i,:], targets[i,:])
+                    loss += self.score_step(inputs[i,:], targets[i,:])
+                
+                return loss/steps
+            
+            else:
+                
+                return 0 

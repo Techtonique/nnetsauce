@@ -25,6 +25,8 @@ class RNN(Base):
        obj: object
            any object containing a method fit (obj.fit()) and a method predict 
            (obj.predict())
+       alpha: float
+           smoothing parameter
        n_steps: int
            number of steps
        n_hidden_features: int
@@ -68,6 +70,7 @@ class RNN(Base):
     def __init__(
         self,
         obj,
+        alpha=0.5,
         n_steps=3,
         n_hidden_features=5,
         activation_name="relu",
@@ -100,6 +103,7 @@ class RNN(Base):
         )
 
         self.obj = obj
+        self.alpha = alpha
         self.W_x = None
         self.W_h = None
         self.H_train = None # current state on training # To be defined when fit is called
@@ -181,7 +185,7 @@ class RNN(Base):
                 if training == True:
                     
                     self.H_train = mo.dropout(x=self.activation_func(
-                            np.dot(scaled_X, self.W_x) + np.dot(self.H_train, self.W_h)),
+                            self.alpha*np.dot(scaled_X, self.W_x) + (1 - self.alpha)*np.dot(self.H_train, self.W_h)),
                             drop_prob=self.dropout,
                             seed=self.seed)
 
@@ -190,7 +194,7 @@ class RNN(Base):
                 else: 
                     
                     self.H_test = mo.dropout(x=self.activation_func(
-                            np.dot(scaled_X, self.W_x) + np.dot(self.H_test, self.W_h)),
+                            self.alpha*np.dot(scaled_X, self.W_x) + (1 - self.alpha)*np.dot(self.H_test, self.W_h)),
                             drop_prob=self.dropout,
                             seed=self.seed)
                     
@@ -212,7 +216,7 @@ class RNN(Base):
                 if training == True:
                     
                     self.H_train = mo.dropout(x=self.activation_func(
-                            np.dot(scaled_X, W_x) + np.dot(self.H_train, W_h)),
+                            self.alpha*np.dot(scaled_X, W_x) + (1 - self.alpha)*np.dot(self.H_train, W_h)),
                             drop_prob=self.dropout,
                             seed=self.seed)
                     
@@ -221,7 +225,7 @@ class RNN(Base):
                 else: 
                     
                     self.H_test = mo.dropout(x=self.activation_func(
-                            np.dot(scaled_X, W_x) + np.dot(self.H_test, W_h)),
+                            self.alpha*np.dot(scaled_X, W_x) + (1 - self.alpha)*np.dot(self.H_test, W_h)),
                             drop_prob=self.dropout,
                             seed=self.seed)                    
                     
@@ -284,8 +288,8 @@ class RNN(Base):
                     
                     self.H_train = mo.dropout(
                         x=self.activation_func(
-                            np.dot(mo.cbind(np.ones(scaled_X.shape[0]), scaled_X),
-                                   self.W_x) + np.dot(self.H_train, self.W_h)),
+                            self.alpha*np.dot(mo.cbind(np.ones(scaled_X.shape[0]), scaled_X),
+                                   self.W_x) + (1 - self.alpha)*np.dot(self.H_train, self.W_h)),
                         drop_prob=self.dropout,
                         seed=self.seed)
                         
@@ -295,8 +299,8 @@ class RNN(Base):
                     
                     self.H_test = mo.dropout(
                         x=self.activation_func(
-                            np.dot(mo.cbind(np.ones(scaled_X.shape[0]), scaled_X),
-                                   self.W_x) + np.dot(self.H_test, self.W_h)),
+                            self.alpha*np.dot(mo.cbind(np.ones(scaled_X.shape[0]), scaled_X),
+                                   self.W_x) + (1 - self.alpha)*np.dot(self.H_test, self.W_h)),
                         drop_prob=self.dropout,
                         seed=self.seed)
                         
@@ -312,9 +316,9 @@ class RNN(Base):
                     
                     self.H_train = mo.dropout(
                         x=self.activation_func(
-                            np.dot(mo.cbind(
+                            self.alpha*np.dot(mo.cbind(
                                     np.ones(scaled_X.shape[0]),
-                                    scaled_X), W_x) + np.dot(self.H_train, W_h)),
+                                    scaled_X), W_x) + (1 - self.alpha)*np.dot(self.H_train, W_h)),
                         drop_prob=self.dropout,
                         seed=self.seed,
                     )
@@ -325,9 +329,9 @@ class RNN(Base):
                     
                     self.H_test = mo.dropout(
                         x=self.activation_func(
-                            np.dot(mo.cbind(
+                            self.alpha*np.dot(mo.cbind(
                                     np.ones(scaled_X.shape[0]),
-                                    scaled_X), W_x) + np.dot(self.H_test, W_h)),
+                                    scaled_X), W_x) + (1 - self.alpha)*np.dot(self.H_test, W_h)),
                         drop_prob=self.dropout,
                         seed=self.seed,
                     )

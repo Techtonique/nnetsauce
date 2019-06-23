@@ -19,6 +19,8 @@ class RNNClassifier(RNN, ClassifierMixin):
        obj: object
            any object containing a method fit (obj.fit()) and a method predict 
            (obj.predict())
+       alpha: float
+           smoothing parameter
        n_hidden_features: int
            number of nodes in the hidden layer
        activation_name: str
@@ -60,6 +62,7 @@ class RNNClassifier(RNN, ClassifierMixin):
     def __init__(
         self,
         obj,
+        alpha=0.5,
         n_hidden_features=5,
         activation_name="relu",
         a=0.01,
@@ -77,6 +80,7 @@ class RNNClassifier(RNN, ClassifierMixin):
 
         super().__init__(
             obj=obj,
+            alpha=alpha,
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,
             a=a,
