@@ -323,9 +323,6 @@ class RNN(Base):
                 
                 else:                    
                     
-                    print("scaled_X")
-                    print(scaled_X)
-                    
                     self.H_test = mo.dropout(
                         x=self.activation_func(
                             self.alpha*np.dot(mo.cbind(

@@ -1,4 +1,4 @@
-u"""RNN Regressor"""
+"""RNN Regressor"""
 
 # Authors: Thierry Moudiki
 #
