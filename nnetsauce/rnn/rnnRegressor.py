@@ -153,18 +153,35 @@ class RNNRegressor(RNN, RegressorMixin):
         """
 
         if len(X.shape) == 1:            
-            X = X.reshape(-1, 1)            
-
-        return self.y_mean + self.obj.predict(
-                self.cook_test_set(X, **kwargs), **kwargs
-            )
+            X = X.reshape(-1, 1)      
         
+        if 'return_std' not in kwargs:
+
+            return self.y_mean + self.obj.predict(
+                    self.cook_test_set(X, **kwargs), **kwargs
+                )
+            
+        else:
+            
+            preds = self.obj.predict(
+                    self.cook_test_set(X, **kwargs), **kwargs
+                )
+            
+            return (self.y_mean + preds[0], preds[1])
 
 
     def score_step(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
 
-        preds = self.predict_step(X)
+        
+        if 'return_std' not in kwargs:
+        
+            preds = self.predict_step(X)
+        
+        else:
+            
+            preds = self.predict_step(X)[0]
+        
 
         if (
             type(preds) == tuple
