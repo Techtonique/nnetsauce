@@ -112,10 +112,10 @@ class RNN(Base):
         """ Create hidden layer, updates state. """
         # training == True: to avoid updating the state twice        
         
-        # only one predictor
+        # only one predictor => W^Tx, not XW
         if len(scaled_X.shape) == 1:
             scaled_X = scaled_X.reshape(-1, 1)
-        
+            
         n_obs, n_features = scaled_X.shape        
         
         if training == True:
@@ -322,6 +322,9 @@ class RNN(Base):
                     return self.H_train
                 
                 else:                    
+                    
+                    print("scaled_X")
+                    print(scaled_X)
                     
                     self.H_test = mo.dropout(
                         x=self.activation_func(

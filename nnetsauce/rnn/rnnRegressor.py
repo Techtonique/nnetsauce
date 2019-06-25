@@ -271,12 +271,29 @@ class RNNRegressor(RNN, RegressorMixin):
         
         res = np.zeros((h, n_series))
         
-        preds = self.predict_step(X = self.last_target)
+        preds = self.predict_step(X = self.last_target, **kwargs)        
         
-        res[0, :] = preds
+        if 'return_std' not in kwargs:             
+            
+            res[0, :] = preds
+            
+            for i in range(1, h):            
+                preds = self.predict_step(X = preds, **kwargs)            
+                res[i, :] = preds
         
-        for i in range(1, h):            
-            preds = self.predict_step(X = preds)            
-            res[i, ] = preds
+            return res
         
-        return res
+        else:
+            
+            res_std = np.zeros((h, n_series))
+            
+            res[0, :] = preds[0]
+            res_std[0, :] = preds[1]
+            
+            for i in range(1, h):            
+                preds = self.predict_step(X = preds[0], **kwargs)            
+                res[i, :] = preds[0]
+                res_std[i, :] = preds[1]
+        
+            return (res, res_std)
+                                                
