@@ -122,6 +122,15 @@ class RNNRegressor(RNN, RegressorMixin):
         """
         if (len(X.shape) == 1):
             X = X.reshape(-1, 1)
+        else:
+            X = np.transpose(X)
+            
+        print("X: \n")    
+        print(X)
+        print("X.shape: \n")    
+        print(X.shape)
+        print("y: \n")    
+        print(y)
         
         # calls 'create_layer' from parent RNN: obtains centered_y, updates state H.
         # 'scaled_Z' is not used, but H
@@ -172,7 +181,12 @@ class RNNRegressor(RNN, RegressorMixin):
 
     def score_step(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
-
+        
+        if (len(X.shape) == 1):
+            X = X.reshape(-1, 1)
+        else:
+            X = np.transpose(X)
+        
         
         if 'return_std' not in kwargs:
         
@@ -276,7 +290,86 @@ class RNNRegressor(RNN, RegressorMixin):
                 
                 return loss/(steps - 1) # return AICc 
 
+    
+    def fit_batch(self, inputs, batch_size = 2, 
+                  targets = None, scoring = None, 
+                  n_params = None): 
+        """ Train the model on multiple steps. """
 
+        steps = inputs.shape[0]
+    
+        assert (steps > 0), "inputs.shape[0] must be > 0"
+                
+        assert (steps == targets.shape[0]), \
+        "'inputs' and 'targets' must contain the same number of steps"
+        
+        self.steps = steps
+        
+        self.last_target = targets[-1, :] 
+        
+        loss = 0
+        
+        # for long sequences, add progress bar
+        # for long sequences, add progress bar
+        # for long sequences, add progress bar
+        # for long sequences, add progress bar
+        # for long sequences, add progress bar
+        if scoring is None:    
+        
+            if targets is not None: 
+                
+                j = batch_size                
+                for i in range(steps-batch_size): 
+                    print("i= \n")                       
+                    print(i)                       
+                    batch_index = range(i, i + batch_size)
+                    self.fit_step(X = inputs[batch_index,:], y = targets[j,:])
+                    # compute AICc here instead
+                    loss += self.score_step(X = inputs[batch_index,:], y = targets[j,:])
+                    j += 1
+                    
+                return loss/steps # return AICc
+            
+            else:
+                
+                j = batch_size
+                for i in range(steps - 1):                    
+                    batch_index = range(i, i + batch_size)
+                    self.fit_step(X = inputs[batch_index,:], y = inputs[(i + 1), :])
+                    # compute AICc here instead
+                    loss += self.score_step(X = inputs[batch_index,:], y = inputs[(i + 1), :])
+                    j += 1                    
+                
+                return loss/(steps - 1) # return AICc
+        
+        else: # scoring is not none 
+            
+            if targets is not None: 
+            
+                j = batch_size
+                for i in range(steps-batch_size+1):
+                    batch_index = range(i, i + batch_size)
+                    self.fit_step(X = inputs[batch_index,:], y = targets[i,:])
+                    loss += self.score_step(X = inputs[batch_index,:], y = targets[i,:], 
+                                            scoring = scoring)
+                    j += 1
+                    
+                
+                return loss/steps
+            
+            else:
+                
+                j = batch_size
+                for i in range(steps - 1):                    
+                    batch_index = range(i, i + batch_size)
+                    self.fit_step(X = inputs[batch_index,:], y = inputs[(i + 1), :])
+                    # compute AICc here instead
+                    loss += self.score_step(X = inputs[batch_index,:], y = inputs[(i + 1), :], 
+                                            scoring = scoring)
+                    j += 1
+                    
+                return loss/(steps - 1) # return AICc 
+    
 
     def predict(
         self, h=5, level=95, new_xreg=None, **kwargs
