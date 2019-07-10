@@ -98,6 +98,7 @@ class RNNRegressor(RNN, RegressorMixin):
         )
 
         self.type_fit = "regression"
+        self.batch_size = None
      
         
     # one step, on one input     
@@ -162,7 +163,7 @@ class RNNRegressor(RNN, RegressorMixin):
         """
 
         if len(X.shape) == 1:            
-            X = X.reshape(-1, 1)      
+            X = X.reshape(-1, 1)          
         
         if 'return_std' not in kwargs:
 
@@ -297,6 +298,8 @@ class RNNRegressor(RNN, RegressorMixin):
         """ Train the model on multiple steps. """
 
         steps = inputs.shape[0]
+        
+        self.batch_size = batch_size
     
         assert (steps > 0), "inputs.shape[0] must be > 0"
                 
@@ -305,7 +308,7 @@ class RNNRegressor(RNN, RegressorMixin):
         
         self.steps = steps
         
-        self.last_target = targets[-1, :] 
+        self.last_target = np.transpose(targets[(steps-batch_size):steps, :])
         
         loss = 0
         
@@ -332,6 +335,11 @@ class RNNRegressor(RNN, RegressorMixin):
             
             else:
                 
+                # TBD
+                # TBD
+                # TBD
+                # TBD
+                # TBD                
                 j = batch_size
                 for i in range(steps - 1):                    
                     batch_index = range(i, i + batch_size)
@@ -347,7 +355,9 @@ class RNNRegressor(RNN, RegressorMixin):
             if targets is not None: 
             
                 j = batch_size
-                for i in range(steps-batch_size+1):
+                for i in range(steps-batch_size): 
+                    print("i= \n")                       
+                    print(i)
                     batch_index = range(i, i + batch_size)
                     self.fit_step(X = inputs[batch_index,:], y = targets[i,:])
                     loss += self.score_step(X = inputs[batch_index,:], y = targets[i,:], 
@@ -357,8 +367,13 @@ class RNNRegressor(RNN, RegressorMixin):
                 
                 return loss/steps
             
-            else:
+            else:                
                 
+                # TBD
+                # TBD
+                # TBD
+                # TBD
+                # TBD                
                 j = batch_size
                 for i in range(steps - 1):                    
                     batch_index = range(i, i + batch_size)
@@ -375,35 +390,71 @@ class RNNRegressor(RNN, RegressorMixin):
         self, h=5, level=95, new_xreg=None, **kwargs
         ):
         
-        assert (self.steps > 0), "method 'fit' must be called first"
+        if (self.batch_size is None): 
         
-        n_series = len(self.last_target)
-        
-        res = np.zeros((h, n_series))
-        
-        preds = self.predict_step(X = self.last_target, **kwargs)        
-        
-        if 'return_std' not in kwargs:             
+            assert (self.steps > 0), "method 'fit' must be called first"
             
-            res[0, :] = preds
+            n_series = len(self.last_target)
             
-            for i in range(1, h):            
-                preds = self.predict_step(X = preds, **kwargs)            
-                res[i, :] = preds
+            res = np.zeros((h, n_series))
+                        
+            preds = self.predict_step(X = self.last_target, 
+                                      **kwargs) 
+            
+            if 'return_std' not in kwargs:             
+                
+                res[0, :] = preds
+                
+                for i in range(1, h):            
+                    
+                    preds = self.predict_step(X = preds, **kwargs) 
+                    
+                    print("preds: \n")
+                    print(preds)
+                    
+                    res[i, :] = preds
+            
+                return res
+            
+            else:
+                
+                res_std = np.zeros((h, n_series))
+                
+                res[0, :] = preds[0]
+                res_std[0, :] = preds[1]
+                
+                for i in range(1, h):            
+                    preds = self.predict_step(X = preds[0], **kwargs)            
+                    res[i, :] = preds[0]
+                    res_std[i, :] = preds[1]
+            
+                return (res, res_std)
         
-            return res
-        
-        else:
+        else: # if (self.batch_size is not None): 
+           
+            assert (self.steps > 0), "method 'fit' must be called first"
             
-            res_std = np.zeros((h, n_series))
+            n_series = self.last_target.shape[0]
             
-            res[0, :] = preds[0]
-            res_std[0, :] = preds[1]
+            n_res = h + self.batch_size
             
-            for i in range(1, h):            
-                preds = self.predict_step(X = preds[0], **kwargs)            
-                res[i, :] = preds[0]
-                res_std[i, :] = preds[1]
-        
-            return (res, res_std)
-                                                
+            res = np.zeros((n_series, n_res))
+            
+            print("self.last_target")
+            print(self.last_target)            
+            
+            print("self.last_target.shape")
+            print(self.last_target.shape)            
+            
+            res[:, 0:self.batch_size] = self.last_target
+                        
+            if 'return_std' not in kwargs:             
+                
+                for i in range(self.batch_size, self.batch_size+h):            
+                
+                    res[:,i] = self.predict_step(X = res[:,(i-self.batch_size):i], 
+                                        **kwargs)
+                    
+                return np.transpose(res)[(n_res-h):n_res,:]
+            
+                                                                        
