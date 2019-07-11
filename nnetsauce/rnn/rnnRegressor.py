@@ -125,13 +125,17 @@ class RNNRegressor(RNN, RegressorMixin):
             X = X.reshape(-1, 1)
         else:
             X = np.transpose(X)
-            
+        
+        print("========== \n")
         print("X: \n")    
         print(X)
+        print("\n")
         print("X.shape: \n")    
         print(X.shape)
+        print("\n")
         print("y: \n")    
         print(y)
+        print("\n")
         
         # calls 'create_layer' from parent RNN: obtains centered_y, updates state H.
         # 'scaled_Z' is not used, but H
@@ -321,8 +325,8 @@ class RNNRegressor(RNN, RegressorMixin):
         
             if targets is not None: 
                 
-                j = batch_size                
-                for i in range(steps-batch_size): 
+                j = batch_size - 1                
+                for i in range(steps - batch_size + 1): 
                     print("i= \n")                       
                     print(i)                       
                     batch_index = range(i, i + batch_size)
@@ -340,32 +344,13 @@ class RNNRegressor(RNN, RegressorMixin):
                 # TBD
                 # TBD
                 # TBD                
-                j = batch_size
-                for i in range(steps - 1):                    
-                    batch_index = range(i, i + batch_size)
-                    self.fit_step(X = inputs[batch_index,:], y = inputs[(i + 1), :])
-                    # compute AICc here instead
-                    loss += self.score_step(X = inputs[batch_index,:], y = inputs[(i + 1), :])
-                    j += 1                    
-                
-                return loss/(steps - 1) # return AICc
+                0
         
         else: # scoring is not none 
             
             if targets is not None: 
             
-                j = batch_size
-                for i in range(steps-batch_size): 
-                    print("i= \n")                       
-                    print(i)
-                    batch_index = range(i, i + batch_size)
-                    self.fit_step(X = inputs[batch_index,:], y = targets[i,:])
-                    loss += self.score_step(X = inputs[batch_index,:], y = targets[i,:], 
-                                            scoring = scoring)
-                    j += 1
-                    
-                
-                return loss/steps
+                0
             
             else:                
                 
@@ -374,16 +359,7 @@ class RNNRegressor(RNN, RegressorMixin):
                 # TBD
                 # TBD
                 # TBD                
-                j = batch_size
-                for i in range(steps - 1):                    
-                    batch_index = range(i, i + batch_size)
-                    self.fit_step(X = inputs[batch_index,:], y = inputs[(i + 1), :])
-                    # compute AICc here instead
-                    loss += self.score_step(X = inputs[batch_index,:], y = inputs[(i + 1), :], 
-                                            scoring = scoring)
-                    j += 1
-                    
-                return loss/(steps - 1) # return AICc 
+                0
     
 
     def predict(
