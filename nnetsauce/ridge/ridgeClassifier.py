@@ -177,7 +177,7 @@ class RidgeClassifier(Ridge, ClassifierMixin):
                                Y = Y, # one-hot encoded response
                                beta = x))
             
-        self.beta = minimize(fun = loglik_objective, x0 = x0, method="BFGS").x                                
+        self.beta = minimize(fun = loglik_objective, x0 = x0, method="L-BFGS-B").x                                
                 
         return self
 
