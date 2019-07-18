@@ -129,7 +129,8 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         B = beta.reshape(Y.shape[1], p).T     
         
         # (n, K)
-        XB = np.dot(X, B)
+        #XB = np.dot(X, B)
+        XB = mo.safe_sparse_dot(X, B)
         
         ans = -(np.sum(Y*XB, axis=1) - logsumexp(XB, axis=1)).mean()
         ans += self.lambda1*mo.squared_norm(B[0:init_p,:])
