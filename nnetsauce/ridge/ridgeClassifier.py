@@ -167,7 +167,7 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         
         self.n_classes = len(np.unique(y))
         
-        Y = mo.one_hot_encode2(y)
+        Y = mo.one_hot_encode2(output_y)
         
         # optimize for beta, minimize self.loglik (maximize loglik) -----        
         def loglik_objective(x):
