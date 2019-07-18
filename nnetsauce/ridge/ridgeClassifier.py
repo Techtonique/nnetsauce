@@ -139,7 +139,7 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         return ans
     
     
-    def fit(self, X, y, **kwargs):
+    def fit(self, X, y, solver = "L-BFGS-B", **kwargs):
         """Fit Ridge model to training data (X, y).
         
         Parameters
@@ -169,15 +169,15 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         
         Y = mo.one_hot_encode2(y)
         
-        x0 = np.zeros(scaled_Z.shape[1]*len(np.unique(y)))
-                
         # optimize for beta, minimize self.loglik (maximize loglik) -----        
         def loglik_objective(x):
             return(self.loglik(X = scaled_Z, 
                                Y = Y, # one-hot encoded response
                                beta = x))
-            
-        self.beta = minimize(fun = loglik_objective, x0 = x0, method="L-BFGS-B").x                                
+        
+        self.beta = minimize(fun = loglik_objective, 
+                             x0 = np.zeros(scaled_Z.shape[1]*self.n_classes), 
+                             method=solver).x  
                 
         return self
 
@@ -235,7 +235,7 @@ class RidgeClassifier(Ridge, ClassifierMixin):
 
             Z = self.cook_test_set(X, **kwargs)
         
-        ZB = np.dot(Z, self.beta.reshape(self.n_classes, 
+        ZB = mo.safe_sparse_dot(Z, self.beta.reshape(self.n_classes, 
                                          X.shape[1] + self.n_hidden_features).T)
         
         exp_ZB = np.exp(ZB)
