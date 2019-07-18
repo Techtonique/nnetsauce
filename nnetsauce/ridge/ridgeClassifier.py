@@ -5,13 +5,12 @@
 # License: BSD 3
 
 import numpy as np
-from numpy.linalg import norm
 from scipy.optimize import minimize
 import sklearn.metrics as skm2
 from .ridge import Ridge
 from ..utils import matrixops as mo
-from ..utils import optim as opt
 from ..utils import misc as mx
+from scipy.special import logsumexp
 from sklearn.base import ClassifierMixin
 
 
@@ -119,10 +118,7 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         Returns
         -------
         """                
-               
-        # number of classes 
-        K = Y.shape[1]
-        
+                       
         # total number of covariates
         p = X.shape[1]
         
@@ -130,15 +126,16 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         init_p = p - self.n_hidden_features
         
         # (p, K)
-        B = beta.reshape(K, p).T     
+        B = beta.reshape(Y.shape[1], p).T     
         
         # (n, K)
         XB = np.dot(X, B)
         
-        # -> n
-        T = np.log(np.exp(np.sum(Y*XB, axis=1))/np.sum(np.exp(XB), axis=1))
+        ans = -(np.sum(Y*XB, axis=1) - logsumexp(XB, axis=1)).mean()
+        ans += self.lambda1*mo.squared_norm(B[0:init_p,:])
+        ans += self.lambda2*mo.squared_norm(B[init_p:p,:])
                 
-        return -np.mean(T) + self.lambda1*norm(B[0:init_p,:]) + self.lambda2*norm(B[init_p:p,:])
+        return ans
     
     
     def fit(self, X, y, **kwargs):
@@ -171,18 +168,16 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         
         Y = mo.one_hot_encode2(y)
         
+        x0 = np.zeros(scaled_Z.shape[1]*len(np.unique(y)))
+                
         # optimize for beta, minimize self.loglik (maximize loglik) -----        
         def loglik_objective(x):
             return(self.loglik(X = scaled_Z, 
                                Y = Y, # one-hot encoded response
                                beta = x))
+            
+        self.beta = minimize(fun = loglik_objective, x0 = x0, method="BFGS").x                                
                 
-        res = minimize(fun = loglik_objective, 
-                   x0 = np.zeros(scaled_Z.shape[1]*len(np.unique(y))))
-        
-        # slow as expected
-        self.beta = res.x                            
-        
         return self
 
 
