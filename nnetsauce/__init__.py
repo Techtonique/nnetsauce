@@ -3,6 +3,8 @@ from .base.baseRegressor import BaseRegressor
 from .custom.customClassifier import CustomClassifier
 from .custom.customRegressor import CustomRegressor
 from .mts import MTS
+from .ridge.ridgeClassifier import RidgeClassifier
+from .ridge.ridgeRegressor import RidgeRegressor
 from .rnn.rnnRegressor import RNNRegressor
 from .rnn.rnnClassifier import RNNClassifier
 from .rvfl.bayesianrvflRegressor import (
@@ -20,6 +22,8 @@ __all__ = [
     "BayesianRVFL2Regressor",
     "CustomClassifier",
     "CustomRegressor",
+    "RidgeRegressor",
+    "RidgeClassifier",
     "RNNRegressor",
     "RNNClassifier",
     "MTS",

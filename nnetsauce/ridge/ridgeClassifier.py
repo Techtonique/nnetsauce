@@ -4,14 +4,16 @@
 #
 # License: BSD 3
 
-import numpy as np
+import autograd.numpy as np
+from autograd import grad
 from scipy.optimize import minimize
 import sklearn.metrics as skm2
 from .ridge import Ridge
 from ..utils import matrixops as mo
 from ..utils import misc as mx
-from scipy.special import logsumexp
+#from scipy.special import logsumexp
 from sklearn.base import ClassifierMixin
+from time import time
 
 
 class RidgeClassifier(Ridge, ClassifierMixin):
@@ -97,7 +99,7 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         self.type_fit = "classification"
 
     
-    def loglik(self, X, Y, beta, **kwargs):
+    def loglik(self, X, Y, beta, grad_hess=True, **kwargs):
         """Log-likelihood for training data (X, y).
         
         Parameters
@@ -129,16 +131,71 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         B = beta.reshape(Y.shape[1], p).T     
         
         # (n, K)
-        #XB = np.dot(X, B)
-        XB = mo.safe_sparse_dot(X, B)
+        XB = np.dot(X, B)
         
-        ans = -(np.sum(Y*XB, axis=1) - logsumexp(XB, axis=1)).mean()
-        ans += self.lambda1*mo.squared_norm(B[0:init_p,:])
-        ans += self.lambda2*mo.squared_norm(B[init_p:p,:])
+        def logsumexp(x):
+            """Numerically stable log(sum(exp(x))), also defined in scipy.special"""
+            max_x = np.max(x)
+            return max_x + np.log(np.sum(np.exp(x - max_x), axis = 1))
+            
+        
+        return -np.mean((np.sum(Y*XB, axis=1) - logsumexp(XB))) +\
+        0.5*self.lambda1*mo.squared_norm(B[0:init_p,:]) +\
+        0.5*self.lambda2*mo.squared_norm(B[init_p:p,:])
+ 
+    
+    # to be merged with loglik
+    # to be merged with loglik
+    # to be merged with loglik
+    def probas(self, X, Y, beta, **kwargs):
+        # total number of covariates
+        p = X.shape[1]
+        
+        # (p, K)
+        B = beta.reshape(Y.shape[1], p).T 
+        
+        # (n, K)
+        XB = np.dot(X, B)
+        
+        # (n, K)
+        exp_XB = np.exp(XB)                
+        
+        # (n, K)
+        return exp_XB/exp_XB.sum(axis=1)[:, None]
+    
+    # to be merged with loglik
+    # to be merged with loglik
+    # to be merged with loglik
+    def grad_hess(self, X, Y, beta, **kwargs):
+        
+        # nobs
+        n, K = Y.shape
+        
+        # total number of covariates
+        p = X.shape[1]
+        
+        # initial number of covariates
+        init_p = p - self.n_hidden_features
+        
+        # (N, K)
+        probs = self.probas(X, Y, beta, **kwargs)
+        
+        # (p, K)
+        B = beta.reshape(K, p).T
                 
-        return ans
-    
-    
+        # (Y - p) -> (n, K)
+        # X -> (n, p)        
+        # (K, n) %*% (n, p) -> (K, p)
+        # make flat?
+        res = - np.dot((Y - probs).T, X)/n +\
+    self.lambda1*B[0:init_p,:].sum(axis=0)[:, None] +\
+    self.lambda2*B[init_p:p,:].sum(axis=0)[:, None]
+                
+        return res.flatten() 
+        
+    # trust-ncg
+    # newton-cg
+    # L-BFGS-B
     def fit(self, X, y, solver = "L-BFGS-B", **kwargs):
         """Fit Ridge model to training data (X, y).
         
@@ -174,9 +231,39 @@ class RidgeClassifier(Ridge, ClassifierMixin):
             return(self.loglik(X = scaled_Z, 
                                Y = Y, # one-hot encoded response
                                beta = x))
+        def grad_objective(x):
+            return(self.grad_hess(X= scaled_Z, 
+                                  Y = Y, 
+                                  beta = x))
+            
+        x0 = np.zeros(scaled_Z.shape[1]*self.n_classes)
+        
+        grad_loglik = grad(loglik_objective)
+        
+        hess_loglik = grad(grad_objective)
+        
+        print("\n")
+        print("loglik_objective(x0)")        
+        print(loglik_objective(x0))
+        print("\n")
+        print("grad_objective(x0)")            
+        start = time()
+        print(grad_objective(x0))            
+        end = time()
+        print(f"Elapsed {end - start}")
+        print("\n")        
+        print("grad_loglik(x0)")            
+        start = time()
+        print(grad_loglik(x0))  
+        end = time()          
+        print(f"Elapsed {end - start}")
+        print("\n")
+        
         
         self.beta = minimize(fun = loglik_objective, 
                              x0 = np.zeros(scaled_Z.shape[1]*self.n_classes), 
+                             jac = grad_objective,    
+                             #hess = hess_loglik,
                              method=solver).x  
                 
         return self
@@ -240,8 +327,8 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         
         exp_ZB = np.exp(ZB)
         
-        return exp_ZB/np.repeat(np.sum(exp_ZB, axis = 1), 
-                      self.n_classes).reshape(ZB.shape[0], self.n_classes)
+        return exp_ZB/exp_ZB.sum(axis=1)[:, None]
+                      
         
 
     def score(self, X, y, scoring=None, **kwargs):
@@ -288,3 +375,4 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         }
 
         return scoring_options[scoring](y, preds, **kwargs)
+

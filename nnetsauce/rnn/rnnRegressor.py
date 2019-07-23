@@ -327,6 +327,7 @@ class RNNRegressor(RNN, RegressorMixin):
                 
                 j = batch_size - 1                
                 for i in range(steps - batch_size + 1): 
+                    # can't do this in parallel. Think about the state H, updated by 'fit_step'. 
                     print("i= \n")                       
                     print(i)                       
                     batch_index = range(i, i + batch_size)
