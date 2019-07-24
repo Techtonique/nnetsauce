@@ -99,7 +99,7 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         self.type_fit = "classification"
 
     
-    def loglik(self, X, Y, beta, grad_hess=True, **kwargs):
+    def loglik(self, X, Y, **kwargs):
         """Log-likelihood for training data (X, y).
         
         Parameters
@@ -111,9 +111,6 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         y: array-like, shape = [n_samples]
                Target values.
     
-        beta: regression coeffs (beta11, ..., beta1p, ..., betaK1, ..., betaKp)
-              for K classes and p covariates.
-    
         **kwargs: additional parameters to be passed to 
                   self.cook_training_set or self.obj.fit
                
@@ -121,88 +118,77 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         -------
         """                
         
-        # need to take into account the case: self.n_clusters > 0       
-                       
-        # total number of covariates
-        p = X.shape[1]
-        
-        # initial number of covariates
-        init_p = p - self.n_hidden_features
-        
-        # (p, K)
-        B = beta.reshape(Y.shape[1], p).T     
-        
-        # (n, K)
-        XB = np.dot(X, B)
-        
         def logsumexp(x):
             """Numerically stable log(sum(exp(x))), also defined in scipy.special"""
             max_x = np.max(x)
             return max_x + np.log(np.sum(np.exp(x - max_x), axis = 1))
+        
+        
+        def loglik_grad(Y, X, B, XB, **kwargs):            
+            # nobs, n_classes
+            n, K = Y.shape
             
-        
-        return -np.mean((np.sum(Y*XB, axis=1) - logsumexp(XB))) +\
-        0.5*self.lambda1*mo.squared_norm(B[0:init_p,:]) +\
-        0.5*self.lambda2*mo.squared_norm(B[init_p:p,:])
- 
-    
-    # to be merged with loglik
-    # to be merged with loglik
-    # to be merged with loglik
-    def probas(self, X, Y, beta, **kwargs):
-        # total number of covariates
-        p = X.shape[1]
-        
-        # (p, K)
-        B = beta.reshape(Y.shape[1], p).T 
-        
-        # (n, K)
-        XB = np.dot(X, B)
-        
-        # (n, K)
-        exp_XB = np.exp(XB)                
-        
-        # (n, K)
-        return exp_XB/exp_XB.sum(axis=1)[:, None]
-    
-    
-    # to be merged with loglik
-    # to be merged with loglik
-    # to be merged with loglik
-    def grad_hess(self, X, Y, beta, **kwargs):
-        
-        # nobs
-        n, K = Y.shape
-        
-        # need to take into account the case: self.n_clusters > 0
+            # total number of covariates
+            p = X.shape[1]
+            
+            # initial number of covariates
+            init_p = p - self.n_hidden_features
+            
+            # (N, K)
+            exp_XB = np.exp(XB)                            
+            probs = exp_XB/exp_XB.sum(axis=1)[:, None]
+                                
+            # (Y - p) -> (n, K)
+            # X -> (n, p)        
+            # (K, n) %*% (n, p) -> (K, p)
+            res = - np.dot((Y - probs).T, X)/n 
+            res += self.lambda1*B[0:init_p,:].sum(axis=0)[:, None]
+            res += self.lambda2*B[init_p:p,:].sum(axis=0)[:, None]
+                    
+            return res.flatten()                        
         
         # total number of covariates
         p = X.shape[1]
         
         # initial number of covariates
-        init_p = p - self.n_hidden_features
+        init_p = p - self.n_hidden_features        
         
-        # (N, K)
-        probs = self.probas(X, Y, beta, **kwargs)
         
-        # (p, K)
-        B = beta.reshape(K, p).T
-                
-        # (Y - p) -> (n, K)
-        # X -> (n, p)        
-        # (K, n) %*% (n, p) -> (K, p)
-        # make flat?
-        res = - np.dot((Y - probs).T, X)/n +\
-    self.lambda1*B[0:init_p,:].sum(axis=0)[:, None] +\
-    self.lambda2*B[init_p:p,:].sum(axis=0)[:, None]
-                
-        return res.flatten() 
+        # log-likelihood (1st return)
+        def loglik_func(x):             
+            # (p, K)
+            B = x.reshape(Y.shape[1], p).T
+            # (n, K)
+            # XB = np.dot(X, B)                
+            XB = mo.safe_sparse_dot(X, B)        
+            
+            res = -(np.sum(Y*XB, axis=1) - logsumexp(XB)).mean()
+            res += 0.5*self.lambda1*mo.squared_norm(B[0:init_p,:])
+            res += 0.5*self.lambda2*mo.squared_norm(B[init_p:p,:])                           
+        
+            return  res
+        
+        
+        # gradient of log-likelihood (2nd return)
+        def grad_func(x):            
+            # (p, K)
+            B = x.reshape(Y.shape[1], p).T
+            
+            return loglik_grad(Y = Y, X = X, B = B, 
+                               XB = mo.safe_sparse_dot(X, B), 
+                               **kwargs)
+        
+        
+        return loglik_func, grad_func
 
         
     # newton-cg
     # L-BFGS-B
     def fit(self, X, y, solver = "L-BFGS-B", **kwargs):
         """Fit Ridge model to training data (X, y).
+           for beta: regression coeffs (beta11, ..., beta1p, ..., betaK1, ..., betaKp)
+           for K classes and p covariates.
+
         
         Parameters
         ----------
@@ -231,46 +217,12 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         
         Y = mo.one_hot_encode2(output_y)
         
-        # optimize for beta, minimize self.loglik (maximize loglik) -----        
-        def loglik_objective(x):
-            return(self.loglik(X = scaled_Z, 
-                               Y = Y, # one-hot encoded response
-                               beta = x))
-        def grad_objective(x):
-            return(self.grad_hess(X= scaled_Z, 
-                                  Y = Y, 
-                                  beta = x))
-            
-        x0 = np.zeros(scaled_Z.shape[1]*self.n_classes)
-        
-        grad_loglik = grad(loglik_objective)
-        
-        hess_loglik = hessian(loglik_objective)
-        
-        print("\n")
-        print("loglik_objective(x0)")        
-        print(loglik_objective(x0))
-        print("\n")
-        print("grad_objective(x0)")            
-        start = time()
-        print(grad_objective(x0))            
-        end = time()
-        print(f"Elapsed {end - start}")
-        print("\n")        
-        print("grad_loglik(x0)")            
-        start = time()
-        print(grad_loglik(x0))  
-        end = time()          
-        print(f"Elapsed {end - start}")
-        print("\n")
-        #print("hessian_loglik(x0)")            
-        #print(hess_loglik(x0))
-        #print("\n")
-        
-        self.beta = minimize(fun = loglik_objective, 
+        # optimize for beta, minimize self.loglik (maximize loglik) -----         
+        loglik_func, grad_func = self.loglik(X = scaled_Z, Y = Y)
+                    
+        self.beta = minimize(fun = loglik_func, 
                              x0 = np.zeros(scaled_Z.shape[1]*self.n_classes), 
-                             jac = grad_objective,    
-                             hess = hess_loglik,
+                             jac = grad_func,                                 
                              method=solver).x  
                 
         return self
