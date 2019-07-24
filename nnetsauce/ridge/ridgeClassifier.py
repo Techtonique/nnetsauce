@@ -5,7 +5,7 @@
 # License: BSD 3
 
 import autograd.numpy as np
-from autograd import grad
+from autograd import grad, hessian
 from scipy.optimize import minimize
 import sklearn.metrics as skm2
 from .ridge import Ridge
@@ -120,6 +120,8 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         Returns
         -------
         """                
+        
+        # need to take into account the case: self.n_clusters > 0       
                        
         # total number of covariates
         p = X.shape[1]
@@ -163,6 +165,7 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         # (n, K)
         return exp_XB/exp_XB.sum(axis=1)[:, None]
     
+    
     # to be merged with loglik
     # to be merged with loglik
     # to be merged with loglik
@@ -170,6 +173,8 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         
         # nobs
         n, K = Y.shape
+        
+        # need to take into account the case: self.n_clusters > 0
         
         # total number of covariates
         p = X.shape[1]
@@ -192,8 +197,8 @@ class RidgeClassifier(Ridge, ClassifierMixin):
     self.lambda2*B[init_p:p,:].sum(axis=0)[:, None]
                 
         return res.flatten() 
+
         
-    # trust-ncg
     # newton-cg
     # L-BFGS-B
     def fit(self, X, y, solver = "L-BFGS-B", **kwargs):
@@ -240,7 +245,7 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         
         grad_loglik = grad(loglik_objective)
         
-        hess_loglik = grad(grad_objective)
+        hess_loglik = hessian(loglik_objective)
         
         print("\n")
         print("loglik_objective(x0)")        
@@ -258,12 +263,14 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         end = time()          
         print(f"Elapsed {end - start}")
         print("\n")
-        
+        #print("hessian_loglik(x0)")            
+        #print(hess_loglik(x0))
+        #print("\n")
         
         self.beta = minimize(fun = loglik_objective, 
                              x0 = np.zeros(scaled_Z.shape[1]*self.n_classes), 
                              jac = grad_objective,    
-                             #hess = hess_loglik,
+                             hess = hess_loglik,
                              method=solver).x  
                 
         return self
@@ -323,7 +330,7 @@ class RidgeClassifier(Ridge, ClassifierMixin):
             Z = self.cook_test_set(X, **kwargs)
         
         ZB = mo.safe_sparse_dot(Z, self.beta.reshape(self.n_classes, 
-                                         X.shape[1] + self.n_hidden_features).T)
+                                         X.shape[1] + self.n_hidden_features + self.n_clusters).T)
         
         exp_ZB = np.exp(ZB)
         
