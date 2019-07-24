@@ -1,5 +1,5 @@
 import numpy as np
-
+from scipy import linalg, sparse
 
 # column bind
 def cbind(x, y):
@@ -39,13 +39,27 @@ def dropout(x, drop_prob=0, seed=123):
 # one-hot encoding
 def one_hot_encode(x_clusters, n_clusters):
 
-    assert max(x_clusters) <= n_clusters
+    assert max(x_clusters) <= n_clusters, "you must have max(x_clusters) <= n_clusters"
 
     n_obs = len(x_clusters)
     res = np.zeros((n_obs, n_clusters))
 
     for i in range(n_obs):
         res[i, x_clusters[i]] = 1
+
+    return res
+
+
+# one-hot encoding for regression
+def one_hot_encode2(y):
+    
+    classes = np.unique(y)
+    n_classes = len(classes)
+    n_obs = len(y)
+    res = np.zeros((n_obs, n_classes))
+
+    for i in range(n_obs):
+            res[i, y[i]] = 1
 
     return res
 
@@ -57,9 +71,54 @@ def rbind(x, y):
     return np.row_stack((x, y))
 
 
-# else:
-#    return np.concatenate((x, y),
-#                      axis = 0)
+# from sklearn.utils.exmath
+def safe_sparse_dot(a, b, dense_output=False):
+    """Dot product that handle the sparse matrix case correctly
+
+    Uses BLAS GEMM as replacement for numpy.dot where possible
+    to avoid unnecessary copies.
+
+    Parameters
+    ----------
+    a : array or sparse matrix
+    b : array or sparse matrix
+    dense_output : boolean, default False
+        When False, either ``a`` or ``b`` being sparse will yield sparse
+        output. When True, output will always be an array.
+
+    Returns
+    -------
+    dot_product : array or sparse matrix
+        sparse if ``a`` or ``b`` is sparse and ``dense_output=False``.
+    """
+    if sparse.issparse(a) or sparse.issparse(b):
+        ret = a * b
+        if dense_output and hasattr(ret, "toarray"):
+            ret = ret.toarray()
+        return ret
+    else:
+        return np.dot(a, b)    
+
+
+# from sklearn.utils.exmath
+def squared_norm(x):
+    """Squared Euclidean or Frobenius norm of x.
+
+    Faster than norm(x) ** 2.
+
+    Parameters
+    ----------
+    x : array_like
+
+    Returns
+    -------
+    float
+        The Euclidean norm when x is a vector, the Frobenius norm when x
+        is a matrix (2-d array).
+    """
+    x = np.ravel(x, order='K')    
+    return np.dot(x, x)
+
 
 # computes x%*%t(y)
 def tcrossprod(x, y=None):
