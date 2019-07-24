@@ -5,15 +5,12 @@
 # License: BSD 3
 
 import autograd.numpy as np
-from autograd import grad, hessian
 from scipy.optimize import minimize
 import sklearn.metrics as skm2
 from .ridge import Ridge
 from ..utils import matrixops as mo
 from ..utils import misc as mx
-#from scipy.special import logsumexp
 from sklearn.base import ClassifierMixin
-from time import time
 
 
 class RidgeClassifier(Ridge, ClassifierMixin):
@@ -100,7 +97,7 @@ class RidgeClassifier(Ridge, ClassifierMixin):
 
     
     def loglik(self, X, Y, **kwargs):
-        """Log-likelihood for training data (X, y).
+        """Log-likelihood for training data (X, Y).
         
         Parameters
         ----------
@@ -108,8 +105,8 @@ class RidgeClassifier(Ridge, ClassifierMixin):
             Training vectors, where n_samples is the number 
             of samples and n_features is the number of features.
         
-        y: array-like, shape = [n_samples]
-               Target values.
+        Y: array-like, shape = [n_samples]
+               One-hot encode target values.
     
         **kwargs: additional parameters to be passed to 
                   self.cook_training_set or self.obj.fit
@@ -166,7 +163,7 @@ class RidgeClassifier(Ridge, ClassifierMixin):
             res += 0.5*self.lambda1*mo.squared_norm(B[0:init_p,:])
             res += 0.5*self.lambda2*mo.squared_norm(B[init_p:p,:])                           
         
-            return  res
+            return res
         
         
         # gradient of log-likelihood (2nd return)
