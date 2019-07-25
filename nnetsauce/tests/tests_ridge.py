@@ -47,13 +47,13 @@ class TestRidge(ut.TestCase):
         preds4 = fit_obj4.predict_proba(Z_test)        
 
         self.assertTrue(
-            np.allclose(preds1[0,0], 0.072245528639349257)
-            & np.allclose(preds1[0,1], 0.9277544713606507)
-            & np.allclose(preds2[0,0], 0.072245528639349257) 
-            & np.allclose(preds2[0,1], 0.9277544713606507) 
-            & np.allclose(preds3[0,0], 0.0073238249098072404) 
-            & np.allclose(preds4[0,0], 0.010384894850966228)
-            & np.allclose(preds4[0,1], 0.030072217421317559))
+            np.allclose(preds1[0,0], 0.21129105778141863)
+            & np.allclose(preds1[0,1], 0.78870894221858123)
+            & np.allclose(preds2[0,0], 0.21129105778141863) 
+            & np.allclose(preds2[0,1], 0.78870894221858123) 
+            & np.allclose(preds3[0,0], 0.016826287913295948) 
+            & np.allclose(preds4[0,0], 0.023063162147422128)
+            & np.allclose(preds4[0,1], 0.099130106748579583))
         
         self.assertTrue(
                 np.allclose(fit_obj.predict(X_test)[0], 1)
@@ -100,8 +100,8 @@ class TestRidge(ut.TestCase):
         fit_obj4.fit(Z_train, t_train)
         score4 = fit_obj4.score(Z_test, t_test)
 
-        self.assertTrue(np.allclose(score1, 0.94736842105263153)        
-        & np.allclose(score2, 0.97368421052631582)        
+        self.assertTrue(np.allclose(score1, 0.97368421052631582)        
+        & np.allclose(score2, 0.94736842105263153)        
         & np.allclose(score3, 1.0)        
         & np.allclose(score4, 0.97222222222222221))    
 
