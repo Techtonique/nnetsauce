@@ -8,6 +8,7 @@ import numpy as np
 import sklearn.metrics as skm2
 from .rnn import RNN
 from sklearn.base import RegressorMixin
+from ..utils import Progbar
 
 
 class RNNRegressor(RNN, RegressorMixin):
@@ -20,6 +21,8 @@ class RNNRegressor(RNN, RegressorMixin):
            (obj.predict())
        alpha: float
            smoothing parameter
+       window: int
+           size of training window
        n_hidden_features: int
            number of nodes in the hidden layer
        activation_name: str
@@ -64,6 +67,7 @@ class RNNRegressor(RNN, RegressorMixin):
         self,
         obj,
         alpha=0.5,
+        window=2,
         n_hidden_features=5,
         activation_name="relu",
         a=0.01,
@@ -98,9 +102,119 @@ class RNNRegressor(RNN, RegressorMixin):
         )
 
         self.type_fit = "regression"
-        self.batch_size = None
-     
+        self.window = window        
+
+    
+    def fit(self, inputs, targets=None, 
+            scoring=None, n_params=None, verbose=0): 
+        """ Train the model on multiple steps. """
+
+        steps = inputs.shape[0]
         
+        assert (steps > 0), "inputs.shape[0] must be > 0"                 
+        
+        self.steps = steps
+        
+        
+        if targets is not None:
+            assert (steps == targets.shape[0]), \
+            "'inputs' and 'targets' must contain the same number of steps"        
+            self.last_target = np.transpose(targets[(steps-self.window):steps, :])
+        else:
+            self.last_target = np.transpose(inputs[(steps-self.window):steps, :])
+        
+        
+        # loss obtained by fitting on training set
+        loss = 0                        
+        
+        # for long sequences, add progress bar
+        if targets is not None: 
+            
+            j = self.window - 1   
+            n_steps = steps - self.window + 1 
+            
+            if verbose == 1:
+                pbar = Progbar(target=n_steps)                               
+            
+            for i in range(n_steps):   
+                
+                print("i= \n")                       
+                print(i)  
+                batch_index = range(i, i + self.window)
+                self.fit_step(X = inputs[batch_index,:], y = targets[j,:])
+                loss += self.score_step(X = inputs[batch_index,:], 
+                                        y = targets[j,:], 
+                                        scoring = scoring)
+                
+                if verbose == 1:
+                    pbar.update(i)
+                    
+                j += 1                            
+
+            if verbose == 1:
+                pbar.update(n_steps)
+            
+        else: # targets is None
+            
+            j = self.window
+            n_steps = steps - self.window
+            
+            if verbose == 1:
+                pbar = Progbar(target=n_steps)        
+                
+            for i in range(n_steps):
+                print("i= \n")                       
+                print(i)  
+                batch_index = range(i, i + self.window)
+                self.fit_step(X = inputs[batch_index,:], y = inputs[j,:])                    
+                loss += self.score_step(X = inputs[batch_index,:], 
+                                        y = inputs[j,:], 
+                                        scoring = scoring)
+                
+                if verbose == 1:
+                    pbar.update(i)
+                
+                j += 1   
+            
+            if verbose == 1:
+                pbar.update(n_steps)
+                
+        return loss
+
+
+    def predict(
+        self, h=5, level=95, new_xreg=None, **kwargs
+        ):
+                   
+        assert (self.steps > 0), "method 'fit' must be called first"
+        
+        n_series = self.last_target.shape[0]
+        
+        n_res = h + self.window
+        
+        res = np.zeros((n_series, n_res))
+        
+        print("self.last_target")
+        print(self.last_target)            
+        
+        print("self.last_target.shape")
+        print(self.last_target.shape)    
+        
+        try:                        
+            res[:, 0:self.window] = self.last_target.reshape(self.last_target.shape[0], self.last_target.shape[1])
+        except:
+            res[:, 0:self.window] = self.last_target.reshape(-1, 1)
+                    
+        if 'return_std' not in kwargs:             
+            
+            for i in range(self.window, self.window+h):            
+            
+                res[:,i] = self.predict_step(X = res[:,(i-self.window):i], 
+                                    **kwargs)
+                
+            return np.transpose(res)[(n_res-h):n_res,:]
+            
+            
     # one step, on one input     
     def fit_step(self, X, y, **kwargs):
         """Fit RNN model to training data (X, y).
@@ -232,206 +346,4 @@ class RNNRegressor(RNN, RegressorMixin):
         }
 
         return scoring_options[scoring](y, preds, **kwargs)
-
-    
-    
-    def fit(self, inputs, targets = None, scoring = None, n_params = None): 
-        """ Train the model on multiple steps. """
-
-        steps = inputs.shape[0]
-    
-        assert (steps > 0), "inputs.shape[0] must be > 0"
-                
-        assert (steps == targets.shape[0]), \
-        "'inputs' and 'targets' must contain the same number of steps"
-        
-        self.steps = steps
-        
-        self.last_target = targets[-1, :] 
-        
-        loss = 0
-        
-        # for long sequences, add progress bar
-        # for long sequences, add progress bar
-        # for long sequences, add progress bar
-        if scoring is None:    
-        
-            if targets is not None: 
-            
-                for i in range(steps):
-                    self.fit_step(X = inputs[i,:], y = targets[i,:])
-                    # compute AICc here instead
-                    loss += self.score_step(X = inputs[i,:], y = targets[i,:])
-                
-                return loss/steps # return AICc
-            
-            else:
-            
-                for i in range(steps - 1):
-                    self.fit_step(X = inputs[i,:], y = inputs[(i + 1), :])
-                    # compute AICc here instead
-                    loss += self.score_step(X = inputs[i,:], y = inputs[(i + 1), :])
-                
-                return loss/(steps - 1) # return AICc
-        
-        else: # scoring is not none 
-            
-            if targets is not None: 
-            
-                for i in range(steps):
-                    self.fit_step(X = inputs[i,:], y = targets[i,:])
-                    loss += self.score_step(X = inputs[i,:], y = targets[i,:], 
-                                            scoring = scoring)
-                
-                return loss/steps
-            
-            else:
-                
-                for i in range(steps - 1):
-                    self.fit_step(X = inputs[i,:], y = inputs[(i + 1), :])
-                    # compute AICc here instead
-                    loss += self.score_step(X = inputs[i,:], y = inputs[(i + 1), :], 
-                                            scoring = scoring)
-                
-                return loss/(steps - 1) # return AICc 
-
-    
-    def fit_batch(self, inputs, batch_size = 2, 
-                  targets = None, scoring = None, 
-                  n_params = None): 
-        """ Train the model on multiple steps. """
-
-        steps = inputs.shape[0]
-        
-        self.batch_size = batch_size
-    
-        assert (steps > 0), "inputs.shape[0] must be > 0"
-                
-        assert (steps == targets.shape[0]), \
-        "'inputs' and 'targets' must contain the same number of steps"
-        
-        self.steps = steps
-        
-        self.last_target = np.transpose(targets[(steps-batch_size):steps, :])
-        
-        loss = 0
-        
-        # for long sequences, add progress bar
-        # for long sequences, add progress bar
-        # for long sequences, add progress bar
-        # for long sequences, add progress bar
-        # for long sequences, add progress bar
-        if scoring is None:    
-        
-            if targets is not None: 
-                
-                j = batch_size - 1                
-                for i in range(steps - batch_size + 1): 
-                    # can't do this in parallel. Think about the state H, updated by 'fit_step'. 
-                    print("i= \n")                       
-                    print(i)                       
-                    batch_index = range(i, i + batch_size)
-                    self.fit_step(X = inputs[batch_index,:], y = targets[j,:])
-                    # compute AICc here instead
-                    loss += self.score_step(X = inputs[batch_index,:], y = targets[j,:])
-                    j += 1
-                    
-                return loss/steps # return AICc
-            
-            else:
-                
-                # TBD
-                # TBD
-                # TBD
-                # TBD
-                # TBD                
-                0
-        
-        else: # scoring is not none 
-            
-            if targets is not None: 
-            
-                0
-            
-            else:                
-                
-                # TBD
-                # TBD
-                # TBD
-                # TBD
-                # TBD                
-                0
-    
-
-    def predict(
-        self, h=5, level=95, new_xreg=None, **kwargs
-        ):
-        
-        if (self.batch_size is None): 
-        
-            assert (self.steps > 0), "method 'fit' must be called first"
-            
-            n_series = len(self.last_target)
-            
-            res = np.zeros((h, n_series))
-                        
-            preds = self.predict_step(X = self.last_target, 
-                                      **kwargs) 
-            
-            if 'return_std' not in kwargs:             
-                
-                res[0, :] = preds
-                
-                for i in range(1, h):            
-                    
-                    preds = self.predict_step(X = preds, **kwargs) 
-                    
-                    print("preds: \n")
-                    print(preds)
-                    
-                    res[i, :] = preds
-            
-                return res
-            
-            else:
-                
-                res_std = np.zeros((h, n_series))
-                
-                res[0, :] = preds[0]
-                res_std[0, :] = preds[1]
-                
-                for i in range(1, h):            
-                    preds = self.predict_step(X = preds[0], **kwargs)            
-                    res[i, :] = preds[0]
-                    res_std[i, :] = preds[1]
-            
-                return (res, res_std)
-        
-        else: # if (self.batch_size is not None): 
-           
-            assert (self.steps > 0), "method 'fit' must be called first"
-            
-            n_series = self.last_target.shape[0]
-            
-            n_res = h + self.batch_size
-            
-            res = np.zeros((n_series, n_res))
-            
-            print("self.last_target")
-            print(self.last_target)            
-            
-            print("self.last_target.shape")
-            print(self.last_target.shape)            
-            
-            res[:, 0:self.batch_size] = self.last_target
-                        
-            if 'return_std' not in kwargs:             
-                
-                for i in range(self.batch_size, self.batch_size+h):            
-                
-                    res[:,i] = self.predict_step(X = res[:,(i-self.batch_size):i], 
-                                        **kwargs)
-                    
-                return np.transpose(res)[(n_res-h):n_res,:]
-            
-                                                                        
+                                                                  
