@@ -127,7 +127,6 @@ class RNNRegressor(RNN, RegressorMixin):
         # loss obtained by fitting on training set
         loss = 0                        
         
-        # for long sequences, add progress bar
         if targets is not None: 
             
             j = self.window - 1   
@@ -179,7 +178,7 @@ class RNNRegressor(RNN, RegressorMixin):
             if verbose == 1:
                 pbar.update(n_steps)
                 
-        return loss
+        return loss/n_steps
 
 
     def predict(

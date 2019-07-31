@@ -50,6 +50,10 @@ class RidgeClassifier(Ridge, ClassifierMixin):
            percentage of covariates randomly chosen for training   
        row_sample: float
            percentage of rows chosen for training, by stratified bootstrapping    
+       lambda1: float
+           regularization parameter on direct link
+       lambda2: float
+           regularization parameter on hidden layer
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
     """

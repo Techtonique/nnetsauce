@@ -192,17 +192,16 @@ def rebalance(y, down=True, seed=123):
 #            qk=np.histogram(y_new_factor, bins=h_factor[1])[0]/n_obs)
 
 
-
-#from sklearn.datasets import load_digits
-
-#digits = load_digits()
-#Z = digits.data
-#t = digits.target
-#
-#Counter(t)
-#
-#index = rebalance(t)
-#Counter(t[index])
-#
-#index2 = rebalance(t, down=False)
-#Counter(t[index2])
+    #from sklearn.datasets import load_digits
+    
+    #digits = load_digits()
+    #Z = digits.data
+    #t = digits.target
+    #
+    #Counter(t)
+    #
+    #index = rebalance(t)
+    #Counter(t[index])
+    #
+    #index2 = rebalance(t, down=False)
+    #Counter(t[index2])

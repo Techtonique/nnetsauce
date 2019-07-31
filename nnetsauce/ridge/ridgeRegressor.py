@@ -48,7 +48,11 @@ class RidgeRegressor(Ridge, RegressorMixin):
        col_sample: float
            percentage of covariates randomly chosen for training  
        row_sample: float
-           percentage of rows chosen for training, by stratified bootstrapping    
+           percentage of rows chosen for training, by stratified bootstrapping   
+       lambda1: float
+           regularization parameter on direct link
+       lambda2: float
+           regularization parameter on hidden layer
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
        type_fit: str
@@ -71,6 +75,8 @@ class RidgeRegressor(Ridge, RegressorMixin):
         type_scaling=("std", "std", "std"),
         col_sample=1,
         row_sample=1,
+        lambda1=0.1,
+        lambda2=0.1,
         seed=123,
     ):
 
@@ -87,10 +93,13 @@ class RidgeRegressor(Ridge, RegressorMixin):
             type_scaling=type_scaling,
             col_sample=col_sample,
             row_sample=row_sample,
+            lambda1=lambda1,
+            lambda2=lambda2,
             seed=seed,
         )
 
         self.type_fit = "regression"
+
 
     def fit(self, X, y, **kwargs):
         """Fit Ridge model to training data (X, y).
@@ -115,10 +124,12 @@ class RidgeRegressor(Ridge, RegressorMixin):
         centered_y, scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs
         )
-
+        
+        # change this
         self.obj.fit(scaled_Z, centered_y, **kwargs)
 
         return self
+
 
     def predict(self, X, **kwargs):
         """Predict test data X.
@@ -144,7 +155,8 @@ class RidgeRegressor(Ridge, RegressorMixin):
                 X.reshape(1, n_features),
                 np.ones(n_features).reshape(1, n_features),
             )
-
+            
+            # change this
             return (
                 self.y_mean
                 + self.obj.predict(
@@ -155,9 +167,11 @@ class RidgeRegressor(Ridge, RegressorMixin):
 
         else:
 
+            # change this
             return self.y_mean + self.obj.predict(
                 self.cook_test_set(X, **kwargs), **kwargs
             )
+
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
