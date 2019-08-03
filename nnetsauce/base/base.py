@@ -223,24 +223,22 @@ class Base(BaseEstimator):
                     X_gmm, self.n_clusters
                 )
 
-        else:  # if predict == True, encode test set
+        # if predict == True, encode test set
+        X_clustered = self.clustering_obj.predict(
+            self.clustering_scaler.transform(X)
+        )
 
-            X_clustered = self.clustering_obj.predict(
-                self.clustering_scaler.transform(X)
-            )
+        return mo.one_hot_encode(
+            X_clustered, self.n_clusters
+        )
 
-            return mo.one_hot_encode(
-                X_clustered, self.n_clusters
-            )
 
     def create_layer(self, scaled_X, W=None):
         """ Create hidden layer. """
 
         n_features = scaled_X.shape[1]
 
-        if (
-            self.bias != True
-        ):  # no bias term in the hidden layer
+        if self.bias is False:  # no bias term in the hidden layer
 
             if W is None:
 
@@ -281,82 +279,80 @@ class Base(BaseEstimator):
                     seed=self.seed,
                 )
 
-            else:  # W is not none
 
-                assert (
-                    scaled_X.shape[1] == W.shape[0]
-                ), "check dimensions of covariates X and matrix W"
+            # W is not none
+            assert (
+                scaled_X.shape[1] == W.shape[0]
+            ), "check dimensions of covariates X and matrix W"
 
-                # self.W = W
-                return mo.dropout(
-                    x=self.activation_func(
-                        np.dot(scaled_X, W)
-                    ),
-                    drop_prob=self.dropout,
+            # self.W = W
+            return mo.dropout(
+                x=self.activation_func(
+                    np.dot(scaled_X, W)
+                ),
+                drop_prob=self.dropout,
+                seed=self.seed,
+            )
+
+        # with bias term in the hidden layer
+        if W is None:
+
+            n_features_1 = n_features + 1
+
+            if self.nodes_sim == "sobol":
+                self.W = ns.generate_sobol2(
+                    n_dims=n_features_1,
+                    n_points=self.n_hidden_features,
+                )
+
+            if self.nodes_sim == "hammersley":
+                self.W = ns.generate_hammersley(
+                    n_dims=n_features_1,
+                    n_points=self.n_hidden_features,
+                )
+
+            if self.nodes_sim == "uniform":
+                self.W = ns.generate_uniform(
+                    n_dims=n_features_1,
+                    n_points=self.n_hidden_features,
                     seed=self.seed,
                 )
 
-        else:  # with bias term in the hidden layer
-
-            if W is None:
-
-                n_features_1 = n_features + 1
-
-                if self.nodes_sim == "sobol":
-                    self.W = ns.generate_sobol2(
-                        n_dims=n_features_1,
-                        n_points=self.n_hidden_features,
-                    )
-
-                if self.nodes_sim == "hammersley":
-                    self.W = ns.generate_hammersley(
-                        n_dims=n_features_1,
-                        n_points=self.n_hidden_features,
-                    )
-
-                if self.nodes_sim == "uniform":
-                    self.W = ns.generate_uniform(
-                        n_dims=n_features_1,
-                        n_points=self.n_hidden_features,
-                        seed=self.seed,
-                    )
-
-                if self.nodes_sim == "halton":
-                    self.W = ns.generate_halton(
-                        n_dims=n_features_1,
-                        n_points=self.n_hidden_features,
-                    )
-
-                return mo.dropout(
-                    x=self.activation_func(
-                        np.dot(
-                            mo.cbind(
-                                np.ones(scaled_X.shape[0]),
-                                scaled_X,
-                            ),
-                            self.W,
-                        )
-                    ),
-                    drop_prob=self.dropout,
-                    seed=self.seed,
+            if self.nodes_sim == "halton":
+                self.W = ns.generate_halton(
+                    n_dims=n_features_1,
+                    n_points=self.n_hidden_features,
                 )
 
-            else:
+            return mo.dropout(
+                x=self.activation_func(
+                    np.dot(
+                        mo.cbind(
+                            np.ones(scaled_X.shape[0]),
+                            scaled_X,
+                        ),
+                        self.W,
+                    )
+                ),
+                drop_prob=self.dropout,
+                seed=self.seed,
+            )
 
-                # self.W = W
-                return mo.dropout(
-                    x=self.activation_func(
-                        np.dot(
-                            mo.cbind(
-                                np.ones(scaled_X.shape[0]),
-                                scaled_X,
-                            ),
-                            W,
-                        )
+        # W is not None
+        # self.W = W
+        return mo.dropout(
+            x=self.activation_func(
+                np.dot(
+                    mo.cbind(
+                        np.ones(scaled_X.shape[0]),
+                        scaled_X,
                     ),
-                    drop_prob=self.dropout,
-                    seed=self.seed,
+                    W,
                 )
+            ),
+            drop_prob=self.dropout,
+            seed=self.seed,
+        )
 
     def cook_training_set(
         self, y=None, X=None, W=None, **kwargs
@@ -395,7 +391,7 @@ class Base(BaseEstimator):
             if y is None:
                 y_mean = self.y.mean()
                 centered_y = self.y - y_mean
-            else:
+            else: # keep
                 y_mean = y.mean()
                 self.y_mean = y_mean
                 centered_y = y - y_mean
@@ -551,40 +547,34 @@ class Base(BaseEstimator):
                     ),
                 )
 
-            else:  # classification
+            # classification
+            return (
+                y[self.index_row].reshape(n_row_sample),
+                self.scaler.transform(
+                    Z[self.index_row, :].reshape(
+                        n_row_sample, p
+                    )
+                ),
+            )
 
-                return (
-                    y[self.index_row].reshape(n_row_sample),
-                    self.scaler.transform(
-                        Z[self.index_row, :].reshape(
-                            n_row_sample, p
-                        )
-                    ),
-                )
+        # y is not subsampled
+        if mx.is_factor(y) == False:  # regression
 
-        else:  # y is not subsampled
+            return (
+                centered_y,
+                self.scaler.transform(Z),
+            )
 
-            if mx.is_factor(y) == False:  # regression
-
-                return (
-                    centered_y,
-                    self.scaler.transform(Z),
-                )
-
-            else:  # classification
-
-                return (y, self.scaler.transform(Z))
+        # classification
+        return (y, self.scaler.transform(Z))
+        
 
     def cook_test_set(self, X, **kwargs):
         """ Transform data from test set, with hidden layer. """
 
-        if (
-            self.n_clusters <= 0
-        ):  # data without clustering: self.n_clusters is None -----
+        if self.n_clusters == 0:  # data without clustering: self.n_clusters is None -----
 
-            if (
-                self.n_hidden_features > 0
-            ):  # if hidden layer
+            if self.n_hidden_features > 0:  # if hidden layer
 
                 if self.col_sample == 1:
 
@@ -602,51 +592,49 @@ class Base(BaseEstimator):
                     return self.scaler.transform(
                         mo.cbind(X, Phi_X)
                     )
-                else:
-                    return self.scaler.transform(Phi_X)
+                
+                # when self.direct_link == False
+                return self.scaler.transform(Phi_X)
 
-            else:  # if no hidden layer
+            # if no hidden layer # self.n_hidden_features == 0
+            return self.scaler.transform(X)
 
-                return self.scaler.transform(X)
+        # data with clustering: self.n_clusters > 0 -----
+        if self.col_sample == 1:
 
-        else:  # data with clustering: self.n_clusters is None -----
+            predicted_clusters = self.encode_clusters(
+                X=X, predict=True, **kwargs
+            )
+            augmented_X = mo.cbind(
+                X, predicted_clusters
+            )
 
-            if self.col_sample == 1:
+        else:
 
-                predicted_clusters = self.encode_clusters(
-                    X=X, predict=True, **kwargs
+            predicted_clusters = self.encode_clusters(
+                X=X[:, self.index_col],
+                predict=True,
+                **kwargs
+            )
+            augmented_X = mo.cbind(
+                X[:, self.index_col], predicted_clusters
+            )
+
+        if (
+            self.n_hidden_features > 0
+        ):  # if hidden layer
+
+            scaled_X = self.nn_scaler.transform(
+                augmented_X
+            )
+            Phi_X = self.create_layer(scaled_X, self.W)
+
+            if self.direct_link == True:
+                return self.scaler.transform(
+                    mo.cbind(augmented_X, Phi_X)
                 )
-                augmented_X = mo.cbind(
-                    X, predicted_clusters
-                )
+            
+            return self.scaler.transform(Phi_X)
 
-            else:
-
-                predicted_clusters = self.encode_clusters(
-                    X=X[:, self.index_col],
-                    predict=True,
-                    **kwargs
-                )
-                augmented_X = mo.cbind(
-                    X[:, self.index_col], predicted_clusters
-                )
-
-            if (
-                self.n_hidden_features > 0
-            ):  # if hidden layer
-
-                scaled_X = self.nn_scaler.transform(
-                    augmented_X
-                )
-                Phi_X = self.create_layer(scaled_X, self.W)
-
-                if self.direct_link == True:
-                    return self.scaler.transform(
-                        mo.cbind(augmented_X, Phi_X)
-                    )
-                else:
-                    return self.scaler.transform(Phi_X)
-
-            else:  # if no hidden layer
-
-                return self.scaler.transform(augmented_X)
+        # if no hidden layer
+        return self.scaler.transform(augmented_X)
