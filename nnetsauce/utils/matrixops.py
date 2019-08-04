@@ -39,7 +39,9 @@ def dropout(x, drop_prob=0, seed=123):
 # one-hot encoding
 def one_hot_encode(x_clusters, n_clusters):
 
-    assert max(x_clusters) <= n_clusters, "you must have max(x_clusters) <= n_clusters"
+    assert (
+        max(x_clusters) <= n_clusters
+    ), "you must have max(x_clusters) <= n_clusters"
 
     n_obs = len(x_clusters)
     res = np.zeros((n_obs, n_clusters))
@@ -52,14 +54,14 @@ def one_hot_encode(x_clusters, n_clusters):
 
 # one-hot encoding for regression
 def one_hot_encode2(y):
-    
+
     classes = np.unique(y)
     n_classes = len(classes)
     n_obs = len(y)
     res = np.zeros((n_obs, n_classes))
 
     for i in range(n_obs):
-            res[i, y[i]] = 1
+        res[i, y[i]] = 1
 
     return res
 
@@ -97,7 +99,7 @@ def safe_sparse_dot(a, b, dense_output=False):
             ret = ret.toarray()
         return ret
     else:
-        return np.dot(a, b)    
+        return np.dot(a, b)
 
 
 # from sklearn.utils.exmath
@@ -116,7 +118,7 @@ def squared_norm(x):
         The Euclidean norm when x is a vector, the Frobenius norm when x
         is a matrix (2-d array).
     """
-    x = np.ravel(x, order='K')    
+    x = np.ravel(x, order="K")
     return np.dot(x, x)
 
 

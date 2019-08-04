@@ -12,8 +12,7 @@ class TestBase(ut.TestCase):
 
         np.random.seed(123)
         X, y = datasets.make_regression(
-            n_samples=25, n_features=3, 
-            random_state=123
+            n_samples=25, n_features=3, random_state=123
         )
 
         fit_obj = ns.BaseRegressor(
@@ -114,7 +113,7 @@ class TestBase(ut.TestCase):
             type_clust="gmm",
             type_scaling=("std", "std", "minmax"),
         )
-        
+
         fit_obj8 = ns.BaseRegressor(
             n_hidden_features=2,
             direct_link=True,
@@ -123,7 +122,7 @@ class TestBase(ut.TestCase):
             activation_name="elu",
             n_clusters=0,
         )
-        
+
         fit_obj9 = ns.BaseRegressor(
             n_hidden_features=2,
             direct_link=True,
@@ -149,7 +148,7 @@ class TestBase(ut.TestCase):
             nodes_sim="uniform",
             activation_name="tanh",
             n_clusters=0,
-            col_sample=1
+            col_sample=1,
         )
 
         fit_obj12 = ns.BaseRegressor(
@@ -159,9 +158,9 @@ class TestBase(ut.TestCase):
             nodes_sim="uniform",
             activation_name="tanh",
             n_clusters=0,
-            col_sample=0.8
-        )        
-        
+            col_sample=0.8,
+        )
+
         index_train = range(20)
         index_test = range(20, 25)
         X_train = X[index_train, :]
@@ -196,23 +195,23 @@ class TestBase(ut.TestCase):
         fit_obj7.fit(X_train, y_train)
         err7 = fit_obj7.predict(X_test) - y_test
         rmse7 = np.sqrt(np.mean(err7 ** 2))
-        
+
         fit_obj8.fit(X_train, y_train)
         err8 = fit_obj8.predict(X_test) - y_test
         rmse8 = np.sqrt(np.mean(err8 ** 2))
-        
+
         fit_obj9.fit(X_train, y_train)
         err9 = fit_obj9.predict(X_test) - y_test
         rmse9 = np.sqrt(np.mean(err9 ** 2))
-        
+
         fit_obj10.fit(X_train, y_train)
         err10 = fit_obj10.predict(X_test) - y_test
         rmse10 = np.sqrt(np.mean(err10 ** 2))
-        
+
         fit_obj11.fit(X_train, y_train)
         err11 = fit_obj11.predict(X_test) - y_test
         rmse11 = np.sqrt(np.mean(err11 ** 2))
-        
+
         fit_obj12.fit(X_train, y_train)
         err12 = fit_obj12.predict(X_test) - y_test
         rmse12 = np.sqrt(np.mean(err12 ** 2))
@@ -236,14 +235,20 @@ class TestBase(ut.TestCase):
             & np.allclose(
                 fit_obj2.predict(X_test[0, :]),
                 284.7193214062255,
-            )            
+            )
         )
-        
+
         self.assertTrue(np.allclose(rmse8, 1.63e-13))
         self.assertTrue(np.allclose(rmse9, 1.76e-13))
-        self.assertTrue(np.allclose(rmse10, 521.20488275410139))
-        self.assertTrue(np.allclose(rmse11, 9.5129871217393398e-13))
-        self.assertTrue(np.allclose(rmse12, 1.1293081556555561e-12))
+        self.assertTrue(
+            np.allclose(rmse10, 521.20488275410139)
+        )
+        self.assertTrue(
+            np.allclose(rmse11, 9.5129871217393398e-13)
+        )
+        self.assertTrue(
+            np.allclose(rmse12, 1.1293081556555561e-12)
+        )
 
     def test_score(self):
 

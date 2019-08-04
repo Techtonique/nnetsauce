@@ -33,5 +33,5 @@ __all__ = [
     "reformat_response",
     "TimeSeriesSplit",
     "quasirandom_search",
-    "Progbar"
+    "Progbar",
 ]

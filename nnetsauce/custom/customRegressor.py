@@ -5,7 +5,6 @@
 # License: BSD 3
 
 import numpy as np
-import sklearn.model_selection as skm
 import sklearn.metrics as skm2
 from .custom import Custom
 from ..utils import matrixops as mo
@@ -158,11 +157,9 @@ class CustomRegressor(Custom, RegressorMixin):
                 )
             )[0]
 
-        else:
-
-            return self.y_mean + self.obj.predict(
-                self.cook_test_set(X, **kwargs), **kwargs
-            )
+        return self.y_mean + self.obj.predict(
+            self.cook_test_set(X, **kwargs), **kwargs
+        )
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """

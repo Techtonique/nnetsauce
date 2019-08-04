@@ -16,7 +16,6 @@ from sklearn.preprocessing import (
 )
 
 
-
 class RNN(Base):
     """RNN model class derived from class Base
     
@@ -64,7 +63,7 @@ class RNN(Base):
     """
 
     # construct the object -----
-    
+
     def __init__(
         self,
         obj,
@@ -75,12 +74,12 @@ class RNN(Base):
         nodes_sim="sobol",
         bias=True,
         dropout=0,
-        direct_link=True, # 
+        direct_link=True,  #
         n_clusters=2,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
-        col_sample=1, # probably don't want to subsample here
-        row_sample=1, # probably don't want to subsample here
+        col_sample=1,  # probably don't want to subsample here
+        row_sample=1,  # probably don't want to subsample here
         seed=123,
     ):
 
@@ -103,37 +102,45 @@ class RNN(Base):
         self.alpha = alpha
         self.W_x = None
         self.W_h = None
-        self.H_train = None # current state on training # To be defined when fit is called
-        self.H_test = None # current state on test set # To be defined when predict is called
+        self.H_train = (
+            None
+        )  # current state on training # To be defined when fit is called
+        self.H_test = (
+            None
+        )  # current state on test set # To be defined when predict is called
         self.nodes_sim = nodes_sim
 
-        
-    def create_layer(self, scaled_X, W_x=None, W_h=None, training=True):
+    def create_layer(
+        self, scaled_X, W_x=None, W_h=None, training=True
+    ):
         """ Create hidden layer, updates state. """
-        # training == True: to avoid updating the state twice        
-        
+        # training == True: to avoid updating the state twice
+
         # only one predictor => W^Tx, not XW
         if len(scaled_X.shape) == 1:
             scaled_X = scaled_X.reshape(-1, 1)
-            
-        n_obs, n_features = scaled_X.shape        
-        
+
+        n_obs, n_features = scaled_X.shape
+
         if training == True:
-            if self.H_train is None:               
-                self.H_train = np.zeros((n_obs, self.n_hidden_features))
+            if self.H_train is None:
+                self.H_train = np.zeros(
+                    (n_obs, self.n_hidden_features)
+                )
         else:
             if self.H_test is None:
-                self.H_test = np.zeros((n_obs, self.n_hidden_features))
-            
+                self.H_test = np.zeros(
+                    (n_obs, self.n_hidden_features)
+                )
 
         if (
             self.bias != True
         ):  # no bias term in the hidden layer
 
             if (W_x is None) | (W_h is None):
-                
+
                 if self.nodes_sim == "sobol":
-                     
+
                     self.W_x = ns.generate_sobol2(
                         n_dims=n_features,
                         n_points=self.n_hidden_features,
@@ -176,62 +183,85 @@ class RNN(Base):
                     self.W_h = ns.generate_halton(
                         n_dims=self.n_hidden_features,
                         n_points=self.n_hidden_features,
-                    )                                            
-                
+                    )
+
                 if training == True:
-                    
-                    self.H_train = mo.dropout(x=self.activation_func(
-                            self.alpha*np.dot(scaled_X, self.W_x) + (1 - self.alpha)*np.dot(self.H_train, self.W_h)),
-                            drop_prob=self.dropout,
-                            seed=self.seed)
+
+                    self.H_train = mo.dropout(
+                        x=self.activation_func(
+                            self.alpha
+                            * np.dot(scaled_X, self.W_x)
+                            + (1 - self.alpha)
+                            * np.dot(self.H_train, self.W_h)
+                        ),
+                        drop_prob=self.dropout,
+                        seed=self.seed,
+                    )
 
                     return self.H_train
-                
-                else: 
-                    
-                    self.H_test = mo.dropout(x=self.activation_func(
-                            self.alpha*np.dot(scaled_X, self.W_x) + (1 - self.alpha)*np.dot(self.H_test, self.W_h)),
-                            drop_prob=self.dropout,
-                            seed=self.seed)
-                    
-                    return self.H_test
+
+                self.H_test = mo.dropout(
+                    x=self.activation_func(
+                        self.alpha
+                        * np.dot(scaled_X, self.W_x)
+                        + (1 - self.alpha)
+                        * np.dot(self.H_test, self.W_h)
+                    ),
+                    drop_prob=self.dropout,
+                    seed=self.seed,
+                )
+
+                return self.H_test
 
             else:  # (W_x is not none) & (self.bias != True)
-                
-                assert (W_x is not None) & (W_h is not None), "both W_x and W_h must be provided"
+
+                assert (W_x is not None) & (
+                    W_h is not None
+                ), "both W_x and W_h must be provided"
 
                 assert (
                     scaled_X.shape[1] == W_x.shape[0]
                 ), "check dimensions of covariates X and matrix W_x"
-                
+
                 assert (
                     self.H_train.shape[1] == W_h.shape[0]
                 ), "check dimensions of state self.H and matrix W_h"
 
                 # self.W = W
                 if training == True:
-                    
-                    self.H_train = mo.dropout(x=self.activation_func(
-                            self.alpha*np.dot(scaled_X, W_x) + (1 - self.alpha)*np.dot(self.H_train, W_h)),
-                            drop_prob=self.dropout,
-                            seed=self.seed)
-                    
+
+                    self.H_train = mo.dropout(
+                        x=self.activation_func(
+                            self.alpha
+                            * np.dot(scaled_X, W_x)
+                            + (1 - self.alpha)
+                            * np.dot(self.H_train, W_h)
+                        ),
+                        drop_prob=self.dropout,
+                        seed=self.seed,
+                    )
+
                     return self.H_train
-                
-                else: 
-                    
-                    self.H_test = mo.dropout(x=self.activation_func(
-                            self.alpha*np.dot(scaled_X, W_x) + (1 - self.alpha)*np.dot(self.H_test, W_h)),
-                            drop_prob=self.dropout,
-                            seed=self.seed)                    
-                    
-                    return self.H_test
+
+                self.H_test = mo.dropout(
+                    x=self.activation_func(
+                        self.alpha * np.dot(scaled_X, W_x)
+                        + (1 - self.alpha)
+                        * np.dot(self.H_test, W_h)
+                    ),
+                    drop_prob=self.dropout,
+                    seed=self.seed,
+                )
+
+                return self.H_test
 
         else:  # self.bias == True
 
             if (W_x is None) | (W_h is None):
 
-                n_features_1 = n_features + 1 # one more; constant feature
+                n_features_1 = (
+                    n_features + 1
+                )  # one more; constant feature
 
                 if self.nodes_sim == "sobol":
 
@@ -267,7 +297,6 @@ class RNN(Base):
                         n_points=self.n_hidden_features,
                         seed=self.seed,
                     )
-                    
 
                 if self.nodes_sim == "halton":
 
@@ -279,68 +308,103 @@ class RNN(Base):
                         n_dims=self.n_hidden_features,
                         n_points=self.n_hidden_features,
                     )
-                
+
                 if training == True:
-                    
+
                     self.H_train = mo.dropout(
                         x=self.activation_func(
-                            self.alpha*np.dot(mo.cbind(np.ones(scaled_X.shape[0]), scaled_X),
-                                   self.W_x) + (1 - self.alpha)*np.dot(self.H_train, self.W_h)),
+                            self.alpha
+                            * np.dot(
+                                mo.cbind(
+                                    np.ones(
+                                        scaled_X.shape[0]
+                                    ),
+                                    scaled_X,
+                                ),
+                                self.W_x,
+                            )
+                            + (1 - self.alpha)
+                            * np.dot(self.H_train, self.W_h)
+                        ),
                         drop_prob=self.dropout,
-                        seed=self.seed)
-                        
-                    return self.H_train
-                
-                else:
-                    
-                    self.H_test = mo.dropout(
-                        x=self.activation_func(
-                            self.alpha*np.dot(mo.cbind(np.ones(scaled_X.shape[0]), scaled_X),
-                                   self.W_x) + (1 - self.alpha)*np.dot(self.H_test, self.W_h)),
-                        drop_prob=self.dropout,
-                        seed=self.seed)
-                        
-                    return self.H_test
-                    
+                        seed=self.seed,
+                    )
 
-            else: # W_x is not None & self.bias == True
-                
-                assert (W_x is not None) & (W_h is not None), "both W_x and W_h must be provided"
-                
+                    return self.H_train
+
+                self.H_test = mo.dropout(
+                    x=self.activation_func(
+                        self.alpha
+                        * np.dot(
+                            mo.cbind(
+                                np.ones(scaled_X.shape[0]),
+                                scaled_X,
+                            ),
+                            self.W_x,
+                        )
+                        + (1 - self.alpha)
+                        * np.dot(self.H_test, self.W_h)
+                    ),
+                    drop_prob=self.dropout,
+                    seed=self.seed,
+                )
+
+                return self.H_test
+
+            else:  # W_x is not None & self.bias == True
+
+                assert (W_x is not None) & (
+                    W_h is not None
+                ), "both W_x and W_h must be provided"
+
                 # self.W = W
                 if training == True:
-                    
+
                     self.H_train = mo.dropout(
                         x=self.activation_func(
-                            self.alpha*np.dot(mo.cbind(
-                                    np.ones(scaled_X.shape[0]),
-                                    scaled_X), W_x) + (1 - self.alpha)*np.dot(self.H_train, W_h)),
+                            self.alpha
+                            * np.dot(
+                                mo.cbind(
+                                    np.ones(
+                                        scaled_X.shape[0]
+                                    ),
+                                    scaled_X,
+                                ),
+                                W_x,
+                            )
+                            + (1 - self.alpha)
+                            * np.dot(self.H_train, W_h)
+                        ),
                         drop_prob=self.dropout,
                         seed=self.seed,
                     )
-                    
+
                     return self.H_train
-                
-                else:                    
-                    
-                    self.H_test = mo.dropout(
-                        x=self.activation_func(
-                            self.alpha*np.dot(mo.cbind(
-                                    np.ones(scaled_X.shape[0]),
-                                    scaled_X), W_x) + (1 - self.alpha)*np.dot(self.H_test, W_h)),
-                        drop_prob=self.dropout,
-                        seed=self.seed,
-                    )
-                    
-                    return self.H_test
-                    
-        
-        
-     # redefined from Base, with 2 Ws: Wx and Wh
+
+                self.H_test = mo.dropout(
+                    x=self.activation_func(
+                        self.alpha
+                        * np.dot(
+                            mo.cbind(
+                                np.ones(scaled_X.shape[0]),
+                                scaled_X,
+                            ),
+                            W_x,
+                        )
+                        + (1 - self.alpha)
+                        * np.dot(self.H_test, W_h)
+                    ),
+                    drop_prob=self.dropout,
+                    seed=self.seed,
+                )
+
+                return self.H_test
+
+    # redefined from Base, with 2 Ws: Wx and Wh
     def cook_training_set(
         self, y=None, X=None, W_x=None, W_h=None, **kwargs
     ):
-        """ Create new data for training set, with hidden layer, center the response. """                        
+        """ Create new data for training set, with hidden layer, center the response. """
 
         # either X and y are stored or not
         # assert ((y is None) & (X is None)) | ((y is not None) & (X is not None))
@@ -441,10 +505,16 @@ class RNN(Base):
 
                 # def create_layer(self, scaled_X, W_x=None, W_h=None):
                 if (W_x is None) | (W_h is None):
-                    Phi_X = self.create_layer(scaled_X, training=True)
+                    Phi_X = self.create_layer(
+                        scaled_X, training=True
+                    )
                 else:
-                    Phi_X = self.create_layer(scaled_X, W_x=W_x, W_h=W_h, 
-                                              training=True)
+                    Phi_X = self.create_layer(
+                        scaled_X,
+                        W_x=W_x,
+                        W_h=W_h,
+                        training=True,
+                    )
 
                 if self.direct_link == True:
                     Z = mo.cbind(input_X, Phi_X)
@@ -476,10 +546,16 @@ class RNN(Base):
                 self.nn_scaler = nn_scaler
 
                 if (W_x is None) | (W_h is None):
-                    Phi_X = self.create_layer(scaled_X, training=True)
+                    Phi_X = self.create_layer(
+                        scaled_X, training=True
+                    )
                 else:
-                    Phi_X = self.create_layer(scaled_X, W_x=W_x, W_h=W_h, 
-                                              training=True)
+                    Phi_X = self.create_layer(
+                        scaled_X,
+                        W_x=W_x,
+                        W_h=W_h,
+                        training=True,
+                    )
 
                 if self.direct_link == True:
                     Z = mo.cbind(augmented_X, Phi_X)
@@ -533,16 +609,14 @@ class RNN(Base):
                     ),
                 )
 
-            else:  # classification
-
-                return (
-                    y[self.index_row].reshape(n_row_sample),
-                    self.scaler.transform(
-                        Z[self.index_row, :].reshape(
-                            n_row_sample, p
-                        )
-                    ),
-                )
+            return (
+                y[self.index_row].reshape(n_row_sample),
+                self.scaler.transform(
+                    Z[self.index_row, :].reshape(
+                        n_row_sample, p
+                    )
+                ),
+            )
 
         else:  # y is not subsampled
 
@@ -553,14 +627,12 @@ class RNN(Base):
                     self.scaler.transform(Z),
                 )
 
-            else:  # classification
-
-                return (y, self.scaler.transform(Z))
-
+            # classification
+            return (y, self.scaler.transform(Z))
 
     # redefined from Base, with 2 Ws: Wx and Wh
     def cook_test_set(self, X, **kwargs):
-        """ Transform data from test set, with hidden layer. """                
+        """ Transform data from test set, with hidden layer. """
 
         if (
             self.n_clusters <= 0
@@ -581,59 +653,58 @@ class RNN(Base):
                     )
 
                 # def create_layer(self, scaled_X, W_x=None, W_h=None):
-                Phi_X = self.create_layer(scaled_X, W_x = self.W_x, 
-                                          W_h = self.W_h, training = False)
+                Phi_X = self.create_layer(
+                    scaled_X,
+                    W_x=self.W_x,
+                    W_h=self.W_h,
+                    training=False,
+                )
 
                 if self.direct_link == True:
                     return self.scaler.transform(
                         mo.cbind(X, Phi_X)
                     )
-                else:
-                    return self.scaler.transform(Phi_X)
 
-            else:  # if no hidden layer
+                return self.scaler.transform(Phi_X)
 
-                return self.scaler.transform(X)
+            # if no hidden layer
+            return self.scaler.transform(X)
 
-        else:  # data with clustering: self.n_clusters is None -----
+        # data with clustering: self.n_clusters is None -----
+        if self.col_sample == 1:
 
-            if self.col_sample == 1:
+            predicted_clusters = self.encode_clusters(
+                X=X, predict=True, **kwargs
+            )
+            augmented_X = mo.cbind(X, predicted_clusters)
 
-                predicted_clusters = self.encode_clusters(
-                    X=X, predict=True, **kwargs
+        else:
+
+            predicted_clusters = self.encode_clusters(
+                X=X[:, self.index_col],
+                predict=True,
+                **kwargs
+            )
+            augmented_X = mo.cbind(
+                X[:, self.index_col], predicted_clusters
+            )
+
+        if self.n_hidden_features > 0:  # if hidden layer
+
+            scaled_X = self.nn_scaler.transform(augmented_X)
+            Phi_X = self.create_layer(
+                scaled_X,
+                W_x=self.W_x,
+                W_h=self.W_h,
+                training=False,
+            )
+
+            if self.direct_link == True:
+                return self.scaler.transform(
+                    mo.cbind(augmented_X, Phi_X)
                 )
-                augmented_X = mo.cbind(
-                    X, predicted_clusters
-                )
 
-            else:
+            return self.scaler.transform(Phi_X)
 
-                predicted_clusters = self.encode_clusters(
-                    X=X[:, self.index_col],
-                    predict=True,
-                    **kwargs
-                )
-                augmented_X = mo.cbind(
-                    X[:, self.index_col], predicted_clusters
-                )
-
-            if (
-                self.n_hidden_features > 0
-            ):  # if hidden layer
-
-                scaled_X = self.nn_scaler.transform(
-                    augmented_X
-                )
-                Phi_X = self.create_layer(scaled_X, W_x = self.W_x, 
-                                          W_h = self.W_h, training = False)
-
-                if self.direct_link == True:
-                    return self.scaler.transform(
-                        mo.cbind(augmented_X, Phi_X)
-                    )
-                else:
-                    return self.scaler.transform(Phi_X)
-
-            else:  # if no hidden layer
-
-                return self.scaler.transform(augmented_X)
+        # if no hidden layer
+        return self.scaler.transform(augmented_X)

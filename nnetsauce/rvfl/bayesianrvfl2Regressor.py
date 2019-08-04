@@ -214,12 +214,9 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
                     )
                 )[0]
 
-            else:
-
-                return self.y_mean + np.dot(
-                    self.cook_test_set(X, **kwargs),
-                    self.beta,
-                )
+            return self.y_mean + np.dot(
+                self.cook_test_set(X, **kwargs), self.beta
+            )
 
         else:  # confidence interval required for preds?
 
@@ -239,21 +236,19 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
                     pred_obj["preds_std"][0],
                 )
 
-            else:
+            Z = self.cook_test_set(X, **kwargs)
 
-                Z = self.cook_test_set(X, **kwargs)
+            pred_obj = lmf.beta_Sigma_hat_rvfl2(
+                X_star=Z,
+                return_cov=self.return_std,
+                beta_hat_=self.beta,
+                Sigma_hat_=self.Sigma,
+            )
 
-                pred_obj = lmf.beta_Sigma_hat_rvfl2(
-                    X_star=Z,
-                    return_cov=self.return_std,
-                    beta_hat_=self.beta,
-                    Sigma_hat_=self.Sigma,
-                )
-
-                return (
-                    self.y_mean + pred_obj["preds"],
-                    pred_obj["preds_std"],
-                )
+            return (
+                self.y_mean + pred_obj["preds"],
+                pred_obj["preds_std"],
+            )
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """

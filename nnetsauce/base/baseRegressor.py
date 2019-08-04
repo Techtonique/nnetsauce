@@ -8,7 +8,6 @@ import numpy as np
 from .base import Base
 import sklearn.metrics as skm
 from ..utils import matrixops as mo
-from ..utils import misc as mx
 from ..utils import lmfuncs as lmf
 from sklearn.base import RegressorMixin
 
@@ -155,11 +154,9 @@ class BaseRegressor(Base, RegressorMixin):
                 )
             )[0]
 
-        else:
-
-            return self.y_mean + np.dot(
-                self.cook_test_set(X, **kwargs), self.beta
-            )
+        return self.y_mean + np.dot(
+            self.cook_test_set(X, **kwargs), self.beta
+        )
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """

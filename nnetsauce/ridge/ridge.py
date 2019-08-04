@@ -68,8 +68,8 @@ class Ridge(Base):
         type_scaling=("std", "std", "std"),
         col_sample=1,
         row_sample=1,
-        lambda1 = 0.1,
-        lambda2 = 0.1,
+        lambda1=0.1,
+        lambda2=0.1,
         seed=123,
     ):
 
@@ -88,6 +88,6 @@ class Ridge(Base):
             row_sample=row_sample,
             seed=seed,
         )
-        
+
         self.lambda1 = lambda1
         self.lambda2 = lambda2

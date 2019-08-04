@@ -16,5 +16,5 @@ __all__ = [
     "generate_hammersley",
     "generate_halton",
     "subsample",
-    "rebalance"
+    "rebalance",
 ]

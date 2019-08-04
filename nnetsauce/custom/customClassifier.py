@@ -154,11 +154,9 @@ class CustomClassifier(Custom, ClassifierMixin):
                 )
             )[0]
 
-        else:
-
-            return self.obj.predict(
-                self.cook_test_set(X, **kwargs), **kwargs
-            )
+        return self.obj.predict(
+            self.cook_test_set(X, **kwargs), **kwargs
+        )
 
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
@@ -195,12 +193,9 @@ class CustomClassifier(Custom, ClassifierMixin):
                     )
                 )[0]
 
-            else:
-
-                return self.obj.predict_proba(
-                    self.cook_test_set(X, **kwargs),
-                    **kwargs
-                )
+            return self.obj.predict_proba(
+                self.cook_test_set(X, **kwargs), **kwargs
+            )
 
         except:
 

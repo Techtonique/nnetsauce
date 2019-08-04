@@ -5,7 +5,6 @@
 # License: BSD 3
 
 import numpy as np
-import sklearn.model_selection as skm
 import sklearn.metrics as skm2
 from .ridge import Ridge
 from ..utils import matrixops as mo
@@ -100,7 +99,6 @@ class RidgeRegressor(Ridge, RegressorMixin):
 
         self.type_fit = "regression"
 
-
     def fit(self, X, y, **kwargs):
         """Fit Ridge model to training data (X, y).
         
@@ -124,12 +122,11 @@ class RidgeRegressor(Ridge, RegressorMixin):
         centered_y, scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs
         )
-        
+
         # change this
         self.obj.fit(scaled_Z, centered_y, **kwargs)
 
         return self
-
 
     def predict(self, X, **kwargs):
         """Predict test data X.
@@ -155,7 +152,7 @@ class RidgeRegressor(Ridge, RegressorMixin):
                 X.reshape(1, n_features),
                 np.ones(n_features).reshape(1, n_features),
             )
-            
+
             # change this
             return (
                 self.y_mean
@@ -165,13 +162,9 @@ class RidgeRegressor(Ridge, RegressorMixin):
                 )
             )[0]
 
-        else:
-
-            # change this
-            return self.y_mean + self.obj.predict(
-                self.cook_test_set(X, **kwargs), **kwargs
-            )
-
+        return self.y_mean + self.obj.predict(
+            self.cook_test_set(X, **kwargs), **kwargs
+        )
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
