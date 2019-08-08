@@ -119,7 +119,7 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         -------
         """
 
-        def loglik_grad(Y, X, B, XB, **kwargs):
+        def loglik_grad_hess(Y, X, B, XB, hessian=True, **kwargs):
             # nobs, n_classes
             n, K = Y.shape
 
@@ -133,21 +133,36 @@ class RidgeClassifier(Ridge, ClassifierMixin):
             XB[XB > max_double] = max_double
             exp_XB = np.exp(XB)
             probs = exp_XB / exp_XB.sum(axis=1)[:, None]
-
+            
+            # gradient -----
             # (Y - p) -> (n, K)
             # X -> (n, p)
-            # (K, n) %*% (n, p) -> (K, p)
-            res = -np.dot((Y - probs).T, X) / n
-            res += (
-                self.lambda1
-                * B[0:init_p, :].sum(axis=0)[:, None]
-            )
-            res += (
-                self.lambda2
-                * B[init_p:p, :].sum(axis=0)[:, None]
-            )
-
-            return res.flatten()
+            # (K, n) %*% (n, p) -> (K, p)            
+            if hessian is False:             
+                grad = -np.dot((Y - probs).T, X) / n
+                grad += (
+                    self.lambda1
+                    * B[0:init_p, :].sum(axis=0)[:, None]
+                )
+                grad += (
+                    self.lambda2
+                    * B[init_p:p, :].sum(axis=0)[:, None]
+                )
+                
+                return grad.flatten()
+            
+            # hessian -----            
+            if hessian is True:            
+                Kp = K*p
+                hess = np.zeros((Kp, Kp), float)
+                for k1 in range(K):            
+                    x_index = range(k1*p, (k1+1)*p)
+                    for k2 in range(k1, K):                      
+                        y_index = range(k2*p, (k2+1)*p)        
+                        H_sub = -np.dot(X.T, (probs[:, k1]*probs[:, k2])[:, None]*X)/n # do not store     
+                        hess[np.ix_(x_index, y_index)] = hess[np.ix_(y_index, x_index)] = H_sub
+    
+                return hess + (self.lambda1 + self.lambda2)*np.identity(Kp)
 
         # total number of covariates
         p = X.shape[1]
@@ -166,6 +181,7 @@ class RidgeClassifier(Ridge, ClassifierMixin):
             res = -(
                 np.sum(Y * XB, axis=1) - logsumexp(XB)
             ).mean()
+            
             res += (
                 0.5
                 * self.lambda1
@@ -179,20 +195,33 @@ class RidgeClassifier(Ridge, ClassifierMixin):
 
             return res
 
-        # gradient of log-likelihood (2nd return)
+        # gradient of log-likelihood
         def grad_func(x):
             # (p, K)
             B = x.reshape(Y.shape[1], p).T
 
-            return loglik_grad(
+            return loglik_grad_hess(
                 Y=Y,
                 X=X,
                 B=B,
                 XB=mo.safe_sparse_dot(X, B),
-                **kwargs
-            )
+                hessian=False,
+                **kwargs)
+        
+        # hessian of log-likelihood
+        def hessian_func(x):
+            # (p, K)
+            B = x.reshape(Y.shape[1], p).T
 
-        return loglik_func, grad_func
+            return loglik_grad_hess(
+                Y=Y,
+                X=X,
+                B=B,
+                XB=mo.safe_sparse_dot(X, B),
+                hessian=True,
+                **kwargs)
+
+        return loglik_func, grad_func, hessian_func
 
     # newton-cg
     # L-BFGS-B
@@ -232,16 +261,26 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         Y = mo.one_hot_encode2(output_y)
 
         # optimize for beta, minimize self.loglik (maximize loglik) -----
-        loglik_func, grad_func = self.loglik(
+        loglik_func, grad_func, hessian_func = self.loglik(
             X=scaled_Z, Y=Y
         )
-
-        self.beta = minimize(
-            fun=loglik_func,
-            x0=np.zeros(scaled_Z.shape[1] * self.n_classes),
-            jac=grad_func,
-            method=solver,
-        ).x
+        
+        if solver == "L-BFGS-B":
+            self.beta = minimize(
+                fun=loglik_func,
+                x0=np.zeros(scaled_Z.shape[1] * self.n_classes),
+                jac=grad_func,               
+                method=solver,
+            ).x
+        
+        if solver in ("Newton-CG", "trust-ncg"):
+            self.beta = minimize(
+                fun=loglik_func,
+                x0=np.zeros(scaled_Z.shape[1] * self.n_classes),
+                jac=grad_func,
+                hess=hessian_func,
+                method=solver,
+            ).x
 
         return self
 

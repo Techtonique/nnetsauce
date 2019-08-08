@@ -54,7 +54,7 @@ def one_hot_encode(x_clusters, n_clusters):
 
 # one-hot encoding for regression
 def one_hot_encode2(y):
-
+    assert 0 in y, "variable must contain 0 for one-hot encoding"
     classes = np.unique(y)
     n_classes = len(classes)
     n_obs = len(y)

@@ -1,5 +1,6 @@
 from .base.base import Base
 from .base.baseRegressor import BaseRegressor
+from .boosting.bstClassifier import BoostingClassifier
 from .custom.customClassifier import CustomClassifier
 from .custom.customRegressor import CustomRegressor
 from .mts import MTS
@@ -20,6 +21,7 @@ __all__ = [
     "BaseRegressor",
     "BayesianRVFLRegressor",
     "BayesianRVFL2Regressor",
+    "BoostingClassifier",
     "CustomClassifier",
     "CustomRegressor",
     "RidgeRegressor",
