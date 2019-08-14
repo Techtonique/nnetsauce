@@ -462,7 +462,7 @@ class Base(BaseEstimator):
                     Z = mo.cbind(input_X, Phi_X)
                 else:
                     Z = Phi_X
-
+                    
                 scaler.fit(Z)
                 self.scaler = scaler
 
@@ -584,10 +584,11 @@ class Base(BaseEstimator):
                     )
 
                 Phi_X = self.create_layer(scaled_X, self.W)
-
+                
                 if self.direct_link == True:
+                    
                     return self.scaler.transform(
-                        mo.cbind(X, Phi_X)
+                        mo.cbind(scaled_X, Phi_X)
                     )
 
                 # when self.direct_link == False
