@@ -132,12 +132,14 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         -------
         self: object
         """
+        
         assert mx.is_factor(
             y
         ), "y must contain only integers"     
 
         assert method in ("SAMME", "SAMME.R"),\
-        "method must be either SAMME or SAMME.R"                                                                                   
+        "method must be either SAMME or SAMME.R"                                                                                           
+        
         
         base_learner = CustomClassifier(self.obj,
         n_hidden_features=self.n_hidden_features,
@@ -154,24 +156,27 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         row_sample=self.row_sample,
         seed=self.seed)
         
+        
         # training 
         n, p = X.shape   
         K = len(np.unique(y))
         self.n_classes = K
         #ws = []
         w_m = np.repeat(1/n, n) # (N, 1)
-        #self.alpha.append(self.learning_rate*1.0)
-        self.alpha.append(1.0)
         #ws.append(cp.deepcopy(w_m.tolist()))
-        weighted_X = w_m[:, None]*X # (N, K)
-        err_m = 1e6
+        weighted_X = w_m[:, None]*X # (N, K)    
         self.method = method
         
-        if self.verbose == 1:
-            pbar = Progbar(self.n_estimators)   
-               
         
-        if method == "SAMME":        
+        if self.verbose == 1:
+            pbar = Progbar(self.n_estimators)                  
+        
+        
+        if self.method == "SAMME":        
+            
+            err_m = 1e6            
+            #self.alpha.append(self.learning_rate*1.0)
+            self.alpha.append(1.0)        
             
             for m in range(self.n_estimators): 
                                                         
@@ -199,7 +204,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             return self
 
 
-        if method == "SAMME.R": 
+        if self.method == "SAMME.R": 
             
             Y = mo.one_hot_encode2(y, self.n_classes)
             
@@ -319,7 +324,12 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         if self.verbose == 1:        
             pbar.update(self.n_estimators)
         
-        return ensemble_learner/ensemble_learner.sum(axis=1)[:, None]
+        sum_ensemble = ensemble_learner.sum(axis=1)
+            
+        np.clip(a = sum_ensemble, a_min = np.finfo(sum_ensemble.dtype).eps, 
+                    a_max = None, out = sum_ensemble)    
+            
+        return ensemble_learner/sum_ensemble[:, None]
 
 
     def score(self, X, y, scoring=None, **kwargs):
