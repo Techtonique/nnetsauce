@@ -12,6 +12,9 @@ from ..utils import misc as mx
 from ..utils import Progbar
 from sklearn.base import ClassifierMixin
 import pickle
+from joblib import Parallel, delayed
+import copy as cp
+from tqdm import tqdm
 
 
 class RandomBagClassifier(RandomBag, ClassifierMixin):
@@ -152,8 +155,9 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         
         if self.verbose == 1:
             pbar = Progbar(self.n_estimators)  
-                
-        # Sequential training:
+        
+        
+        # 1 - Sequential training -----       
         
         if self.n_jobs is None:
         
@@ -184,9 +188,35 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             
             return self
         
+        
+        # 2 - Parallel training -----       
+        
         # if self.n_jobs is not None:
-        # Parallel(n_jobs=self.n_jobs, prefer="threads")(
-        #     delayed(sqrt)(i ** 2) for i in tqdm(range(self.n_estimators)))
+        def fit_estimators(m):    
+            base_learner = CustomClassifier(self.obj,
+                            n_hidden_features=self.n_hidden_features,
+                            activation_name=self.activation_name,
+                            a=self.a,
+                            nodes_sim=self.nodes_sim,
+                            bias=self.bias,
+                            dropout=self.dropout,
+                            direct_link=self.direct_link,
+                            n_clusters=self.n_clusters,
+                            type_clust=self.type_clust,
+                            type_scaling=self.type_scaling,
+                            col_sample=self.col_sample,
+                            row_sample=self.row_sample,
+                            seed=self.seed + (m+1)*1000)                                                                                             
+            base_learner.fit(X, y, **kwargs)                                    
+            self.voter.append(base_learner)                                                                 
+        
+        Parallel(n_jobs=self.n_jobs, prefer="threads")(
+             delayed(fit_estimators)(m)\
+             for m in tqdm(range(self.n_estimators)))
+         
+        self.n_estimators = len(self.voter)               
+            
+        return self
 
 
     def predict(self, X, weights=None, **kwargs):
@@ -224,12 +254,14 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         -------
         probability estimates for test data: {array-like}        
         """ 
-        
-        def calculate_probas(voter, weights=None):
-            
+                
+        def calculate_probas(voter, weights=None, verbose=None):
+                        
             ensemble_proba = 0
             
             n_iter = len(voter)
+            
+            assert n_iter > 0, "no estimator found in `RandomBag` ensemble"
             
             if weights is None: 
                 
@@ -237,10 +269,10 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
                         
                     ensemble_proba += pickle.loads(elt).predict_proba(X)
                     
-                    if self.verbose == 1:              
+                    if verbose == 1:              
                         pbar.update(idx)
                     
-                if self.verbose == 1:
+                if verbose == 1:
                     pbar.update(n_iter) 
                     
                 return ensemble_proba/n_iter
@@ -250,55 +282,30 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
                         
                 ensemble_proba += weights[idx]*pickle.loads(elt).predict_proba(X)
                     
-                if self.verbose == 1:              
+                if verbose == 1:              
                     pbar.update(idx)
                     
-            if self.verbose == 1:
+            if verbose == 1:
                     pbar.update(n_iter) 
                     
             return ensemble_proba/n_iter
+        # end calculate_probas ----
             
         
         if self.n_jobs is None:
         
             if self.verbose == 1:
                 pbar = Progbar(self.n_estimators)  
-            
-            ensemble_proba = 0 
-            
-            n_iter = len(self.voter)
-            
-            assert n_iter > 0, "no estimator found in `RandomBag` ensemble"
-            
-            if weights is None: 
-            
-                for idx, elt in enumerate(self.voter):            
-                    
-                    ensemble_proba += pickle.loads(elt).predict_proba(X)
-                    
-                    if self.verbose == 1:              
-                        pbar.update(idx)
+                        
+            if weights is None:                             
                 
-                if self.verbose == 1:
-                    pbar.update(n_iter) 
-                
-                return ensemble_proba/n_iter
+                return calculate_probas(self.voter, verbose = self.verbose)
             
             # if weights is not None: 
-            assert len(weights) == n_iter,\
-            "number of weights not equal to number of estimators, check len(self.voter)"
-            
-            for idx, elt in enumerate(range(n_iter)):         
-                    
-                ensemble_proba += weights[idx]*pickle.loads(elt).predict_proba(X)
-                
-                if self.verbose == 1:              
-                    pbar.update(idx)
-                
-            if self.verbose == 1:
-                pbar.update(n_iter) 
-            
-            return ensemble_proba            
+            self.weights = weights
+                        
+            return calculate_probas(self.voter, weights,\
+                                    verbose = self.verbose)
         
         # if self.n_jobs is not None:
         # Parallel(n_jobs=self.n_jobs, prefer="threads")(
