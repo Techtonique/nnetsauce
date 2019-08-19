@@ -94,7 +94,7 @@ class CustomClassifier(Custom, ClassifierMixin):
 
         self.type_fit = "classification"
 
-    def fit(self, X, y, **kwargs):
+    def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit custom model to training data (X, y).
         
         Parameters
@@ -117,10 +117,22 @@ class CustomClassifier(Custom, ClassifierMixin):
         output_y, scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs
         )
-
+        
+        # if sample_weights, else: (must use self.row_index)
+        
+        if sample_weight is not None:
+            
+            self.obj.fit(scaled_Z, output_y, 
+                         sample_weight=sample_weight[self.index_row],
+                         **kwargs)
+            
+            return self
+        
+        # if sample_weight is None:
         self.obj.fit(scaled_Z, output_y, **kwargs)
 
         return self
+
 
     def predict(self, X, **kwargs):
         """Predict test data X.

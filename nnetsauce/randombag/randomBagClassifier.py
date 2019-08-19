@@ -6,7 +6,6 @@
 
 import numpy as np
 import sklearn.metrics as skm2
-from sklearn.ensemble import VotingClassifier
 from .bag import RandomBag
 from ..custom import CustomClassifier
 from ..utils import misc as mx
@@ -65,8 +64,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
     def __init__(
         self,
-        obj,
-        weights=None,
+        obj,        
         n_estimators=10,
         n_hidden_features=1,
         activation_name="relu",
@@ -106,14 +104,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         self.type_fit = "classification"
         self.verbose = verbose
         self.n_jobs = n_jobs        
-        self.voter = []
-        
-        if weights is None:
-            self.weights = np.repeat(1/n_estimators, n_estimators)
-        else:
-            assert len(self.weights) == n_estimators,\
-            "you must have len(self.weights) == n_estimators"
-            self.weights = weights
+        self.voter = []                
 
 
     def fit(self, X, y, **kwargs):
@@ -135,6 +126,12 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         -------
         self: object
         """
+        
+        # cache results for subsequent calls        
+        # cache results for subsequent calls        
+        # cache results for subsequent calls        
+        # cache results for subsequent calls        
+        # cache results for subsequent calls        
         
         assert mx.is_factor(
             y
@@ -163,6 +160,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             pbar = Progbar(self.n_estimators)  
                 
         # Sequential training:
+        
         if self.n_jobs is None:
         
             for idx, m in enumerate(range(self.n_estimators)): 
@@ -183,22 +181,21 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
                     if self.verbose == 1:              
                         pbar.update(m)
                     
-                    del self.weights[idx]
-                        
                     continue
             
             if self.verbose == 1:
                 pbar.update(self.n_estimators) 
-    
+                
             self.n_estimators = len(self.voter)               
             
             return self
         
         # if self.n_jobs is not None:
-        # tqdm(range(5))
+        # Parallel(n_jobs=self.n_jobs, prefer="threads")(
+        #     delayed(sqrt)(i ** 2) for i in tqdm(range(self.n_estimators)))
 
 
-    def predict(self, X, **kwargs):
+    def predict(self, X, weights=None, **kwargs):
         """Predict test data X.
         
         Parameters
@@ -214,10 +211,10 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         -------
         model predictions: {array-like}        
         """                        
-        return self.predict_proba(X, **kwargs).argmax(axis=1)
+        return self.predict_proba(X, weights, **kwargs).argmax(axis=1)
 
 
-    def predict_proba(self, X, **kwargs):
+    def predict_proba(self, X, weights=None, **kwargs):
         """Predict probabilities for test data X.
         
         Parameters
@@ -235,6 +232,11 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         """ 
         
         # cache results for subsequent calls        
+        # cache results for subsequent calls        
+        # cache results for subsequent calls        
+        # cache results for subsequent calls        
+        # cache results for subsequent calls        
+        
         if self.n_jobs is None:
         
             if self.verbose == 1:
@@ -242,26 +244,49 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             
             ensemble_proba = 0 
             
-            for idx, elt in enumerate(self.voter):            
+            n_iter = len(self.voter)
+            
+            assert n_iter > 0, "no estimator found in `RandomBag` ensemble"
+            
+            if weights is None: 
+            
+                for idx, elt in enumerate(self.voter):            
+                    
+                    ensemble_proba += pickle.loads(elt).predict_proba(X)
+                    
+                    if self.verbose == 1:              
+                        pbar.update(idx)
                 
-                ensemble_proba += self.weights[idx]*pickle.loads(elt).predict_proba(X)
+                if self.verbose == 1:
+                    pbar.update(n_iter) 
+                
+                return ensemble_proba/n_iter
+            
+            # if weights is not None: 
+            assert len(weights) == n_iter,\
+            "number of weights not equal to number of estimators, check len(self.voter)"
+            
+            for idx, elt in enumerate(range(n_iter)):         
+                    
+                ensemble_proba += weights[idx]*pickle.loads(elt).predict_proba(X)
                 
                 if self.verbose == 1:              
                     pbar.update(idx)
-            
+                
             if self.verbose == 1:
-                pbar.update(self.n_estimators) 
+                pbar.update(n_iter) 
             
-            return ensemble_proba
+            return ensemble_proba            
         
         # if self.n_jobs is not None:
-        # tqdm(range(5))
+        # Parallel(n_jobs=self.n_jobs, prefer="threads")(
+        #     delayed(sqrt)(i ** 2) for i in tqdm(range(self.n_estimators)))
 
 
-    def score(self, X, y, scoring=None, **kwargs):
+    def score(self, X, y, weights=None, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
 
-        preds = self.predict(X)
+        preds = self.predict(X, weights)
 
         if scoring is None:
             scoring = "accuracy"
