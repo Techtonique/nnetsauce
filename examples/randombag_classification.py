@@ -26,9 +26,12 @@ fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=2,
 
 fit_obj.fit(X_train, y_train)
 
-print(fit_obj.score(X_test, y_test))
+preds = fit_obj.predict(X_test)
 
+print(fit_obj.score(X_test, y_test))
 print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
+print(metrics.classification_report(preds, y_test))
+
 
 # dataset no. 2 ----------
 
@@ -51,7 +54,6 @@ fit_obj.fit(Z_train, y_train)
 preds = fit_obj.predict(Z_test)
 
 print(fit_obj.score(Z_test, y_test))
-
 print(metrics.classification_report(preds, y_test))
 
 

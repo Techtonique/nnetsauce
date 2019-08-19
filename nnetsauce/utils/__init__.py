@@ -6,6 +6,7 @@ from .matrixops import (
     tcrossprod,
     to_np_array,
 )
+from .memoize import memoize
 from .misc import merge_two_dicts, is_factor
 from .model_selection import TimeSeriesSplit
 from .optim import quasirandom_search
@@ -28,6 +29,7 @@ __all__ = [
     "merge_two_dicts",
     "is_factor",
     "isPD",
+    "memoize",
     "nearestPD",
     "create_train_inputs",
     "reformat_response",

@@ -127,12 +127,6 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         self: object
         """
         
-        # cache results for subsequent calls        
-        # cache results for subsequent calls        
-        # cache results for subsequent calls        
-        # cache results for subsequent calls        
-        # cache results for subsequent calls        
-        
         assert mx.is_factor(
             y
         ), "y must contain only integers"     
@@ -212,7 +206,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         model predictions: {array-like}        
         """                        
         return self.predict_proba(X, weights, **kwargs).argmax(axis=1)
-
+    
 
     def predict_proba(self, X, weights=None, **kwargs):
         """Predict probabilities for test data X.
@@ -231,11 +225,39 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         probability estimates for test data: {array-like}        
         """ 
         
-        # cache results for subsequent calls        
-        # cache results for subsequent calls        
-        # cache results for subsequent calls        
-        # cache results for subsequent calls        
-        # cache results for subsequent calls        
+        def calculate_probas(voter, weights=None):
+            
+            ensemble_proba = 0
+            
+            n_iter = len(voter)
+            
+            if weights is None: 
+                
+                for idx, elt in enumerate(voter):            
+                        
+                    ensemble_proba += pickle.loads(elt).predict_proba(X)
+                    
+                    if self.verbose == 1:              
+                        pbar.update(idx)
+                    
+                if self.verbose == 1:
+                    pbar.update(n_iter) 
+                    
+                return ensemble_proba/n_iter
+            
+            # if weights is not None: 
+            for idx, elt in enumerate(voter):            
+                        
+                ensemble_proba += weights[idx]*pickle.loads(elt).predict_proba(X)
+                    
+                if self.verbose == 1:              
+                    pbar.update(idx)
+                    
+            if self.verbose == 1:
+                    pbar.update(n_iter) 
+                    
+            return ensemble_proba/n_iter
+            
         
         if self.n_jobs is None:
         
