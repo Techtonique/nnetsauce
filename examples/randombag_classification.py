@@ -31,19 +31,10 @@ start = time()
 preds = fit_obj.predict(X_test)
 print(time() - start)
 
+print(fit_obj.score(X_test, y_test))
 print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
 print(metrics.classification_report(preds, y_test))
 
-
-clf = DecisionTreeClassifier(max_depth=2)
-fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=2,
-                                direct_link=True,
-                                n_estimators=100, 
-                                col_sample=0.9, row_sample=0.9,
-                                dropout=0.3, n_clusters=0, verbose=1, 
-                                n_jobs = -1)
-fit_obj.fit(X_train, y_train)
-print(fit_obj.score(X_test, y_test))
 
 # dataset no. 2 ----------
 
@@ -82,9 +73,8 @@ fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=5,
                                 direct_link=False,
                                 n_estimators=1000, 
                                 col_sample=0.5, row_sample=0.5,
-                                dropout=0.1, n_clusters=0, verbose=1)
+                                dropout=0.1, n_clusters=0, verbose=1, 
+                                n_jobs=None)
 
 fit_obj.fit(Z_train, y_train)
 print(fit_obj.score(Z_test, y_test))
-
-

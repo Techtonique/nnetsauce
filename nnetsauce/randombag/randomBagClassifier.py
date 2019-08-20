@@ -206,13 +206,20 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
                             type_scaling=self.type_scaling,
                             col_sample=self.col_sample,
                             row_sample=self.row_sample,
-                            seed=self.seed + (m+1)*1000)                                                                                             
+                            seed=self.seed + m*1000)                                                                                             
             base_learner.fit(X, y, **kwargs)                                    
             self.voter.append(base_learner)                                                                 
         
-        Parallel(n_jobs=self.n_jobs, prefer="threads")(
-             delayed(fit_estimators)(m)\
-             for m in tqdm(range(self.n_estimators)))
+        if self.verbose == 1:
+            
+            Parallel(n_jobs=self.n_jobs, prefer="threads")(
+                 delayed(fit_estimators)(m)\
+                 for m in tqdm(range(self.n_estimators)))
+        else:
+            
+            Parallel(n_jobs=self.n_jobs, prefer="threads")(
+                 delayed(fit_estimators)(m)\
+                 for m in range(self.n_estimators))
          
         self.n_estimators = len(self.voter)               
             
@@ -288,7 +295,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             if verbose == 1:
                     pbar.update(n_iter) 
                     
-            return ensemble_proba/n_iter
+            return ensemble_proba
         # end calculate_probas ----
             
         
@@ -307,15 +314,42 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             return calculate_probas(self.voter, weights,\
                                     verbose = self.verbose)
         
-        # if self.n_jobs is not None:
-        # Parallel(n_jobs=self.n_jobs, prefer="threads")(
-        #     delayed(sqrt)(i ** 2) for i in tqdm(range(self.n_estimators)))
-
+        # if self.n_jobs is not None:        
+        def predict_estimator(m): return self.voter[m].predict_proba(X)
+        
+        if self.verbose == 1:                        
+            
+            preds = Parallel(n_jobs=self.n_jobs, prefer="threads")(
+                 delayed(predict_estimator)(m)\
+                 for m in tqdm(range(self.n_estimators)))                        
+            
+        else:
+            
+            preds = Parallel(n_jobs=self.n_jobs, prefer="threads")(
+                 delayed(predict_estimator)(m)\
+                 for m in range(self.n_estimators))
+        
+        ensemble_proba = 0                                
+        
+        if weights is None:
+            
+            for i in range(self.n_estimators):
+                
+                ensemble_proba += preds[i]
+            
+            return ensemble_proba/self.n_estimators
+        
+        for i in range(self.n_estimators):
+                
+            ensemble_proba += weights[i]*preds[i]
+            
+        return ensemble_proba
+    
 
     def score(self, X, y, weights=None, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
 
-        preds = self.predict(X, weights)
+        preds = self.predict(X, weights, **kwargs)
 
         if scoring is None:
             scoring = "accuracy"
