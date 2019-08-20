@@ -5,7 +5,6 @@
 # License: BSD 3
 
 import numpy as np
-import copy as cp
 import sklearn.metrics as skm2
 from .bst import Boosting
 from ..custom import CustomClassifier
@@ -13,8 +12,9 @@ from ..utils import matrixops as mo
 from ..utils import misc as mx
 from ..utils import Progbar
 from sklearn.base import ClassifierMixin
-from scipy.linalg import norm
 from scipy.special import xlogy
+import pickle
+
 
 class AdaBoostClassifier(Boosting, ClassifierMixin):
     """AdaBoost Classification (SAMME) model class derived from class Boosting
@@ -27,7 +27,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
        n_estimators: int
            number of boosting iterations
        learning_rate: float
-           
+           learning rate of the boosting procedure
        n_hidden_features: int
            number of nodes in the hidden layer
        activation_name: str
@@ -62,6 +62,8 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
            percentage of rows chosen for training, by stratified bootstrapping    
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
+       method: str
+           type of Adaboost method, 'SAMME' (discrete) or 'SAMME.R' (real)
     """
 
     # construct the object -----
@@ -84,7 +86,8 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         col_sample=1,
         row_sample=1,
         seed=123,
-        verbose=1
+        verbose=1,
+        method="SAMME",
     ):
 
         super().__init__(
@@ -111,9 +114,10 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         self.w = []
         self.base_learners = []
         self.verbose = verbose
+        self.method = method
 
 
-    def fit(self, X, y, method="SAMME", **kwargs):
+    def fit(self, X, y, **kwargs):
         """Fit Boosting model to training data (X, y).
         
         Parameters
@@ -137,36 +141,28 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             y
         ), "y must contain only integers"     
 
-        assert method in ("SAMME", "SAMME.R"),\
-        "method must be either SAMME or SAMME.R"                                                                                           
-        
-        
-        base_learner = CustomClassifier(self.obj,
-        n_hidden_features=self.n_hidden_features,
-        activation_name=self.activation_name,
-        a=self.a,
-        nodes_sim=self.nodes_sim,
-        bias=self.bias,
-        dropout=self.dropout,
-        direct_link=self.direct_link,
-        n_clusters=self.n_clusters,
-        type_clust=self.type_clust,
-        type_scaling=self.type_scaling,
-        col_sample=self.col_sample,
-        row_sample=self.row_sample,
-        seed=self.seed)
-        
+        assert self.method in ("SAMME", "SAMME.R"),\
+        "`method` must be either 'SAMME' or 'SAMME.R'"                                                                                           
         
         # training 
         n, p = X.shape   
-        K = len(np.unique(y))
-        self.n_classes = K
-        #ws = []
-        w_m = np.repeat(1/n, n) # (N, 1)
-        #ws.append(cp.deepcopy(w_m.tolist()))
-        weighted_X = w_m[:, None]*X # (N, K)    
-        self.method = method
+        self.n_classes = len(np.unique(y))
+        w_m = np.repeat(1.0/n, n) # (N, 1)
         
+        base_learner = CustomClassifier(self.obj,
+                            n_hidden_features=self.n_hidden_features,
+                            activation_name=self.activation_name,
+                            a=self.a,
+                            nodes_sim=self.nodes_sim,
+                            bias=self.bias,
+                            dropout=self.dropout,
+                            direct_link=self.direct_link,
+                            n_clusters=self.n_clusters,
+                            type_clust=self.type_clust,
+                            type_scaling=self.type_scaling,
+                            col_sample=self.col_sample,
+                            row_sample=self.row_sample,
+                            seed=self.seed)
         
         if self.verbose == 1:
             pbar = Progbar(self.n_estimators)                  
@@ -175,31 +171,45 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         if self.method == "SAMME":        
             
             err_m = 1e6            
-            #self.alpha.append(self.learning_rate*1.0)
             self.alpha.append(1.0)        
             
             for m in range(self.n_estimators): 
+                
+                try:                                        
                                                         
-                preds = base_learner.fit(weighted_X, y, **kwargs).predict(weighted_X)
-                self.base_learners.append(cp.deepcopy(base_learner))
-                cond = (y != preds)
-                            
-                err_m = np.mean(w_m*cond)
-                alpha_m = self.learning_rate*(np.log((1 - err_m)/err_m) + np.log(K - 1))            
-                self.alpha.append(alpha_m)
+                    preds = base_learner.fit(X, y, sample_weight = w_m,\
+                                             **kwargs).predict(X)
+                    
+                    self.base_learners.append(pickle.dumps(base_learner))
+                    
+                    cond = (y != preds)
+                                
+                    err_m = np.maximum(np.mean(w_m*cond), 2.220446049250313e-16)
+                    
+                    alpha_m = xlogy(self.learning_rate, (self.n_classes - 1)*(1 - err_m)/err_m)
+                    
+                    self.alpha.append(alpha_m)
+                    
+                    if (np.isfinite(alpha_m*cond).all() & np.isnan(alpha_m*cond).any() == False):
+                        w_m *= np.exp(alpha_m*cond) 
+                        w_m /= np.sum(w_m)
+        
+                    base_learner.set_params(seed = self.seed + (m + 1)*1000)      
+                    
+                    if self.verbose == 1:              
+                        pbar.update(m)
                 
-                w_m *= np.exp(alpha_m*cond) 
-                w_m /= np.sum(w_m)
-                #ws.append(cp.deepcopy(w_m.tolist()))            
-    
-                weighted_X = w_m[:, None]*X
-                base_learner.set_params(seed = self.seed + (m + 1)*1000)      
-                
-                if self.verbose == 1:              
-                    pbar.update(m)
+                except:
+                    
+                    if self.verbose == 1:              
+                        pbar.update(m)
+                        
+                    continue
             
             if self.verbose == 1:
-                pbar.update(self.n_estimators)                    
+                pbar.update(self.n_estimators) 
+
+            self.n_estimators = len(self.base_learners)                   
     
             return self
 
@@ -210,30 +220,39 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             
             for m in range(self.n_estimators):
                 
-                probs = base_learner.fit(weighted_X, y, **kwargs).predict_proba(weighted_X) 
+                try:
                 
-                np.clip(a = probs, a_min = np.finfo(probs.dtype).eps, 
-                        a_max = 1.0, out=probs)                                                  
+                    probs = base_learner.fit(X, y, sample_weight = w_m,\
+                                             **kwargs).predict_proba(X) 
+                    
+                    np.clip(a = probs, a_min = 2.220446049250313e-16, 
+                            a_max = 1.0, out = probs)                                                  
+                    
+                    self.base_learners.append(pickle.dumps(base_learner))
+                    
+                    w_m *= np.exp(-1.0*self.learning_rate*(1.0 - 1.0/self.n_classes)\
+                    *xlogy(Y, probs).sum(axis=1))
+                    
+                    w_m /= np.sum(w_m)
+        
+                    base_learner.set_params(seed = self.seed + (m + 1)*1000) 
+                    
+                    if self.verbose == 1:              
+                        pbar.update(m)
                 
-                self.base_learners.append(cp.deepcopy(base_learner))
-                
-                w_m *= np.exp(-1.0*self.learning_rate*(1.0 - 1.0/self.n_classes)\
-                *xlogy(Y, probs).sum(axis=1))
-                
-                w_m /= np.sum(w_m)
-    
-                weighted_X = w_m[:, None]*X
-                
-                base_learner.set_params(seed = self.seed + (m + 1)*1000)      
-                
-                if self.verbose == 1:              
-                    pbar.update(m)
-                
+                except:
+                        
+                    if self.verbose == 1:              
+                        pbar.update(m)
+                        
+                    continue                        
+            
             if self.verbose == 1:
                 pbar.update(self.n_estimators) 
-                
-        
-        return self
+            
+            self.n_estimators = len(self.base_learners)
+                        
+            return self
 
 
     def predict(self, X, **kwargs):
@@ -273,63 +292,91 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         probability estimates for test data: {array-like}        
         """
         
-        if self.method == "SAMME.R":
-            
-            ensemble_learner = 0    
+        n_iter = len(self.base_learners)
         
-            if self.verbose == 1:
-                pbar = Progbar(self.n_estimators)            
+        if self.method == "SAMME":
             
-            for idx, base_learner in enumerate(self.base_learners):             
-                                                                 
-                probs = base_learner.predict_proba(X, **kwargs)
+            # self.method == "SAMME"
+            ensemble_learner = 0    
+            
+            if self.verbose == 1:
+                pbar = Progbar(n_iter)            
+            
+            for idx, base_learner in enumerate(self.base_learners): 
                 
-                np.clip(a = probs, a_min = np.finfo(probs.dtype).eps, 
+                try: 
+                    
+                    preds = pickle.loads(base_learner).predict(X, **kwargs)    
+                    
+                    ensemble_learner += self.alpha[idx]*mo.one_hot_encode2(preds,\
+                                                  self.n_classes)
+                    
+                    if self.verbose == 1:            
+                        pbar.update(idx)
+                        
+                except:
+                    
+                    if self.verbose == 1:            
+                        pbar.update(idx)
+                    
+                    # fix this
+                    # fix this
+                    del self.alpha[idx]
+                        
+                    continue
+    
+            if self.verbose == 1:        
+                pbar.update(n_iter)
+            
+            sum_ensemble = ensemble_learner.sum(axis=1)
+                
+            np.clip(a = sum_ensemble, a_min = np.finfo(sum_ensemble.dtype).eps, 
+                        a_max = None, out = sum_ensemble)    
+                
+            return ensemble_learner/sum_ensemble[:, None]
+         
+            
+        # if self.method == "SAMME.R":    
+        ensemble_learner = 0        
+    
+        if self.verbose == 1:
+            pbar = Progbar(n_iter)                    
+        
+        for idx, base_learner in enumerate(self.base_learners):             
+            
+            try:
+                                                 
+                probs = pickle.loads(base_learner).predict_proba(X, **kwargs)
+                
+                np.clip(a = probs, a_min = 2.220446049250313e-16, 
                     a_max = 1.0, out = probs)    
-
+    
                 log_preds_proba = np.log(probs)        
                 
-                ensemble_learner += (self.n_classes - 1)*(log_preds_proba -\
-                                    log_preds_proba.mean(axis=1)[:, None])
+                ensemble_learner += (log_preds_proba -\
+                                    log_preds_proba.mean(axis=1)[:, None])                
                 
                 if self.verbose == 1:            
                     pbar.update(idx)
-    
-            if self.verbose == 1:        
-                pbar.update(self.n_estimators)
             
-            sum_ensemble = ensemble_learner.sum(axis=1)
+            except: 
+                
+                if self.verbose == 1:            
+                    pbar.update(idx)
+                    
+                continue
             
-            np.clip(a = sum_ensemble, a_min = np.finfo(sum_ensemble.dtype).eps, 
-                    a_max = None, out = sum_ensemble)    
-            
-            return ensemble_learner/sum_ensemble[:, None]
-            
-        # self.method == "SAMME"
-        ensemble_learner = 0    
-        
-        if self.verbose == 1:
-            pbar = Progbar(self.n_estimators)            
-        
-        for idx, base_learner in enumerate(self.base_learners): 
-        
-            preds = base_learner.predict(X, **kwargs)    
-            
-            ensemble_learner += self.alpha[idx]*mo.one_hot_encode2(preds,\
-                                          self.n_classes)
-            
-            if self.verbose == 1:            
-                pbar.update(idx)
+        ensemble_learner *= (self.n_classes - 1)        
 
         if self.verbose == 1:        
-            pbar.update(self.n_estimators)
+            pbar.update(n_iter)
         
         sum_ensemble = ensemble_learner.sum(axis=1)
-            
-        np.clip(a = sum_ensemble, a_min = np.finfo(sum_ensemble.dtype).eps, 
-                    a_max = None, out = sum_ensemble)    
-            
-        return ensemble_learner/sum_ensemble[:, None]
+        
+        np.clip(a = sum_ensemble, a_min = 2.220446049250313e-16, 
+                a_max = None, out = sum_ensemble)    
+        
+        return ensemble_learner/sum_ensemble[:, None]                    
 
 
     def score(self, X, y, scoring=None, **kwargs):
