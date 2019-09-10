@@ -1,12 +1,10 @@
 import nnetsauce as ns
 import numpy as np
 from sklearn.datasets import load_breast_cancer, load_wine, load_iris
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
-from time import time
-from sklearn import metrics
+
 
 # dataset no. 1 ----------
 
@@ -18,7 +16,8 @@ np.random.seed(123)
 X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
 # SAMME
-clf = LogisticRegression(solver='liblinear', multi_class = 'ovr')
+clf = LogisticRegression(solver='liblinear', multi_class = 'ovr', 
+                         random_state=123)
 fit_obj = ns.AdaBoostClassifier(clf, 
                                 n_hidden_features=np.int(56.13806152), 
                                 direct_link=True,
@@ -36,7 +35,8 @@ print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
 print(metrics.classification_report(preds, y_test))
 
 # SAMME.R
-clf = LogisticRegression(solver='liblinear', multi_class = 'ovr')
+clf = LogisticRegression(solver='liblinear', multi_class = 'ovr', 
+                         random_state=123)
 fit_obj = ns.AdaBoostClassifier(clf, 
                                 n_hidden_features=np.int(11.22338867), 
                                 direct_link=True,
@@ -62,7 +62,10 @@ t = wine.target
 np.random.seed(123)
 Z_train, Z_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
-clf = LogisticRegression(solver='liblinear', multi_class = 'ovr')
+
+# SAMME
+clf = LogisticRegression(solver='liblinear', multi_class = 'ovr', 
+                         random_state=123)
 fit_obj = ns.AdaBoostClassifier(clf, 
                                 n_hidden_features=np.int(8.21154785e+01), 
                                 direct_link=True,
@@ -72,21 +75,6 @@ fit_obj = ns.AdaBoostClassifier(clf,
                                 type_clust="gmm",
                                 verbose=1, seed = 123, 
                                 method="SAMME")  
-fit_obj.fit(Z_train, y_train)  
-print(fit_obj.score(Z_test, y_test))
-preds = fit_obj.predict(Z_test)     
-print(metrics.classification_report(preds, y_test))     
-
-clf = LogisticRegression(solver='liblinear', multi_class = 'ovr')
-fit_obj = ns.AdaBoostClassifier(clf, 
-                                n_hidden_features=np.int(87.02026367), 
-                                direct_link=True,
-                                n_estimators=250, learning_rate=0.1136853,
-                                col_sample=0.44168701, row_sample=0.59476318,
-                                dropout=0.14797363, n_clusters=3,
-                                type_clust="gmm",
-                                verbose=1, seed = 123, 
-                                method="SAMME.R")  
 fit_obj.fit(Z_train, y_train)  
 print(fit_obj.score(Z_test, y_test))
 preds = fit_obj.predict(Z_test)     
@@ -102,24 +90,9 @@ np.random.seed(123)
 Z_train, Z_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
 
-# SAMME
-clf = LogisticRegression(solver='liblinear', multi_class = 'ovr')
-fit_obj = ns.AdaBoostClassifier(clf, 
-                                n_hidden_features=np.int(31.44665527), 
-                                direct_link=True,
-                                n_estimators=1000, learning_rate=0.09797668,
-                                col_sample=0.47516479, row_sample=0.89246216,
-                                dropout=0.15020752, n_clusters=0,
-                                verbose=1, seed = 123, 
-                                method="SAMME")  
-fit_obj.fit(Z_train, y_train)  
-print(fit_obj.score(Z_test, y_test))
-preds = fit_obj.predict(Z_test)     
-print(metrics.classification_report(preds, y_test))     
-         
-
 # SAMME.R
-clf = LogisticRegression(solver='liblinear', multi_class = 'ovr')
+clf = LogisticRegression(solver='liblinear', multi_class = 'ovr', 
+                         random_state=123)
 fit_obj = ns.AdaBoostClassifier(clf, 
                                 n_hidden_features=np.int(19.66918945), 
                                 direct_link=True,
