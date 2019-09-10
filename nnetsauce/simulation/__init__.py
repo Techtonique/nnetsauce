@@ -1,5 +1,4 @@
 from .nodesimulation import (
-    generate_sobol,
     generate_sobol2,
     generate_uniform,
     generate_hammersley,
@@ -10,7 +9,6 @@ from .rowsubsampling import subsample, rebalance
 
 
 __all__ = [
-    "generate_sobol",
     "generate_sobol2",
     "generate_uniform",
     "generate_hammersley",

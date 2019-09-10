@@ -45,47 +45,43 @@ def subsample(y, row_sample=0.8, seed=123):
             ] = int(i)
 
     # main loop ----
-    index = np.array([], dtype=int)
+    index = []
 
     np.random.seed(seed)
 
     for i in range(n_classes):
 
-        bool_class_i = y_as_classes == classes[i]
+        bool_class_i = (y_as_classes == classes[i])
 
-        index_class_i = [
-            int(i)
-            for i, e in enumerate(bool_class_i)
-            if e == True
-        ]
+        #index_class_i = [i for i, e in enumerate(bool_class_i) if e == True]
+        index_class_i = np.where(bool_class_i==True)[0].tolist()
 
         if (
             np.sum(bool_class_i) > 1
         ):  # at least 2 elements in class  #i
 
-            index = np.append(
-                index,
-                np.random.choice(
+            index.append(np.random.choice(
                     index_class_i,
                     size=int(
                         n_obs_out * freqs_hist[i]
                     ),  # output size
                     replace=True,
-                ),
-            )
+                ).tolist())
 
         else:  # only one element in class
 
             try:
 
-                index = np.append(index, index_class_i[0])
+                index.append(index_class_i[0])
 
             except:
 
                 0
-
-    return index
-
+    try:
+        return np.asarray(mx.flatten(index))
+    except:
+        return np.asarray(index)
+    
 
 # rebalancing classes (downsampling or upsampling)
 def rebalance(y, down=True, seed=123):
@@ -141,7 +137,7 @@ def rebalance(y, down=True, seed=123):
 
                 res.append(up_index.tolist())
 
-        return np.array(mx.flatten(res))
+        return np.asarray(mx.flatten(res))
 
     else:  # mx.is_factor(y) == False
 

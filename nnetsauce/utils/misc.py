@@ -28,7 +28,7 @@ def is_factor(y):
         sum(
             list(
                 map(
-                    lambda x: isinstance(y[x], np.int),
+                    lambda x: isinstance(y[x], np.integer),
                     range(n),
                 )
             )
@@ -39,18 +39,7 @@ def is_factor(y):
         sum(
             list(
                 map(
-                    lambda x: isinstance(y[x], np.int32),
-                    range(n),
-                )
-            )
-        )
-        == n
-    )
-    cond3 = (
-        sum(
-            list(
-                map(
-                    lambda x: isinstance(y[x], np.int64),
+                    lambda x: isinstance(y[x], str),
                     range(n),
                 )
             )
@@ -58,7 +47,7 @@ def is_factor(y):
         == n
     )
 
-    return cond0 or cond1 or cond2 or cond3
+    return cond0 or cond1 or cond2
 
 
 # flatten list of lists
