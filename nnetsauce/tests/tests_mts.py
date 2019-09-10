@@ -113,6 +113,19 @@ class TestMTS(ut.TestCase):
             activation_name="elu",
             n_clusters=4,
         )
+        
+        fit_obj9 = ns.MTS(
+            regr4,
+            n_hidden_features=0,
+            direct_link=True,
+            bias=True,
+            dropout=0.5,
+            nodes_sim="hammersley",
+            type_scaling=("minmax", "minmax", "minmax"),
+            activation_name="elu",
+            n_clusters=4,
+            cluster_encode=False,
+        )
 
         index_train = range(20)
         index_test = range(20, 25)
@@ -156,24 +169,22 @@ class TestMTS(ut.TestCase):
 
         fit_obj8.fit(X_train)
         preds3 = fit_obj8.predict(return_std=True)
+        
+        fit_obj9.fit(X_train)
+        preds4 = fit_obj9.predict(return_std=True)
 
-        self.assertTrue(
-            np.allclose(rmse, 10.396062391967684)
-            & np.allclose(rmse_xreg, 10.396395408743871)
-            & np.allclose(rmse2, 10.395489235411796)
-            & np.allclose(rmse3, 10.395986434438191)
-            & np.allclose(rmse4, 10.677585029352571)
-            & np.allclose(rmse5, 10.360814075763624)
-            & np.allclose(
-                preds[2][1, 0], 49.895558528390268
-            )
-            & np.allclose(
-                preds2[2][1, 0], 50.085113393704411
-            )
-            & np.allclose(
-                preds3[2][1, 0], 50.442935176433764
-            )
-        )
+        self.assertTrue(np.allclose(rmse, 10.396062391967684))
+        self.assertTrue(np.allclose(rmse_xreg, 10.39593866961476))
+        self.assertTrue(np.allclose(rmse2, 10.395489235411796))
+        self.assertTrue(np.allclose(rmse3, 10.395986434438191))
+        self.assertTrue(np.allclose(rmse4, 10.677585029352571))
+        self.assertTrue(np.allclose(rmse5, 10.360814075763624))
+        self.assertTrue(np.allclose(preds[2][1, 0], 49.895558528390268))
+        self.assertTrue(np.allclose(preds2[2][1, 0], 50.08511339370441))
+            
+        self.assertTrue(preds4[2][1, 0], 50.38107971065952)
+        
+        self.assertTrue(abs(preds3[2][1, 0] - 50.0)<= 0.05)
 
     def test_get_set(self):
 

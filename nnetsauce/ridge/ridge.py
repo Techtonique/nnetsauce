@@ -33,6 +33,9 @@ class Ridge(Base):
        n_clusters: int
            number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
                no clustering)
+       cluster_encode: bool
+           defines how the variable containing clusters is treated (default is one-hot)
+           if `False`, then labels are used, without one-hot encoding
        type_clust: str
            type of clustering method: currently k-means ('kmeans') or Gaussian 
            Mixture Model ('gmm')
@@ -64,6 +67,7 @@ class Ridge(Base):
         dropout=0,
         direct_link=True,
         n_clusters=2,
+        cluster_encode=True,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         col_sample=1,
@@ -82,6 +86,7 @@ class Ridge(Base):
             dropout=dropout,
             direct_link=direct_link,
             n_clusters=n_clusters,
+            cluster_encode=cluster_encode,
             type_clust=type_clust,
             type_scaling=type_scaling,
             col_sample=col_sample,

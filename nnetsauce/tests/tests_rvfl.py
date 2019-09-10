@@ -54,6 +54,17 @@ class TestRVFL(ut.TestCase):
             activation_name="elu",
             n_clusters=4,
         )
+        
+        fit_obj5 = ns.BayesianRVFL2Regressor(
+            n_hidden_features=7,
+            direct_link=True,
+            bias=True,
+            nodes_sim="hammersley",
+            type_scaling=("minmax", "minmax", "minmax"),
+            activation_name="elu",
+            n_clusters=4,
+            cluster_encode=True
+        )
 
         index_train = range(20)
         index_test = range(20, 25)
@@ -89,6 +100,13 @@ class TestRVFL(ut.TestCase):
             - y_test
         )
         rmse4 = np.sqrt(np.mean(err4 ** 2))
+        
+        fit_obj5.fit(X_train, y_train)
+        err5 = (
+            fit_obj5.predict(X_test, return_std=True)[0]
+            - y_test
+        )
+        rmse5 = np.sqrt(np.mean(err5 ** 2))
 
         pred1 = fit_obj.predict(
             X_test[0, :], return_std=True
@@ -111,6 +129,7 @@ class TestRVFL(ut.TestCase):
             & np.allclose(rmse2, 17.278090150613096)
             & np.allclose(rmse3, 32.582378601766486)
             & np.allclose(rmse4, 53.052553013478331)
+            & np.allclose(rmse5, 53.052553013478295)
             & np.allclose(pred1, 325.96545701774187)
             & np.allclose(pred2, 299.56243221494879)
             & np.allclose(pred3, 325.96545701774187)

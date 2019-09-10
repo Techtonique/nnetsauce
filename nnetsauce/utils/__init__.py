@@ -9,7 +9,6 @@ from .matrixops import (
 from .memoize import memoize
 from .misc import merge_two_dicts, is_factor
 from .model_selection import TimeSeriesSplit
-from .optim import quasirandom_search
 from .progress_bar import Progbar
 from .psdcheck import isPD, nearestPD
 from .timeseries import (
@@ -34,6 +33,5 @@ __all__ = [
     "create_train_inputs",
     "reformat_response",
     "TimeSeriesSplit",
-    "quasirandom_search",
     "Progbar",
 ]

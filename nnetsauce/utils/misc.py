@@ -1,6 +1,3 @@
-import numpy as np
-
-
 # merge two dictionaries
 def merge_two_dicts(x, y):
     z = x.copy()
@@ -8,46 +5,17 @@ def merge_two_dicts(x, y):
     return z
 
 
+# check if x is int
+def is_int(x):
+    try:
+        return int(x)==x
+    except:
+        return False
+
+
 # check if the response contains only integers
 def is_factor(y):
-
-    n = len(y)
-
-    cond0 = (
-        sum(
-            list(
-                map(
-                    lambda x: isinstance(y[x], int),
-                    range(n),
-                )
-            )
-        )
-        == n
-    )
-    cond1 = (
-        sum(
-            list(
-                map(
-                    lambda x: isinstance(y[x], np.integer),
-                    range(n),
-                )
-            )
-        )
-        == n
-    )
-    cond2 = (
-        sum(
-            list(
-                map(
-                    lambda x: isinstance(y[x], str),
-                    range(n),
-                )
-            )
-        )
-        == n
-    )
-
-    return cond0 or cond1 or cond2
+    return all(is_int(item) for item in y)
 
 
 # flatten list of lists

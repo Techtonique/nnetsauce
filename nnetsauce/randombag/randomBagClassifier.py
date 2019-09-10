@@ -13,7 +13,6 @@ from ..utils import Progbar
 from sklearn.base import ClassifierMixin
 import pickle
 from joblib import Parallel, delayed
-import copy as cp
 from tqdm import tqdm
 
 
@@ -48,6 +47,9 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
        n_clusters: int
            number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
                no clustering)
+       cluster_encode: bool
+           defines how the variable containing clusters is treated (default is one-hot)
+           if `False`, then labels are used, without one-hot encoding
        type_clust: str
            type of clustering method: currently k-means ('kmeans') or Gaussian 
            Mixture Model ('gmm')
@@ -77,6 +79,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         dropout=0,
         direct_link=False,
         n_clusters=2,
+        cluster_encode=True,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         col_sample=1,
@@ -97,6 +100,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             dropout=dropout,
             direct_link=direct_link,
             n_clusters=n_clusters,
+            cluster_encode=cluster_encode,
             type_clust=type_clust,
             type_scaling=type_scaling,
             col_sample=col_sample,
@@ -167,7 +171,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
                                                         
                     base_learner.fit(X, y, **kwargs)                    
                     
-                    self.voter.append(pickle.dumps(base_learner))                                          
+                    self.voter.append(pickle.loads(pickle.dumps(base_learner, -1)))                                          
                             
                     base_learner.set_params(seed = self.seed + (m+1)*1000)      
                     
@@ -208,7 +212,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
                             row_sample=self.row_sample,
                             seed=self.seed + m*1000)                                                                                             
             base_learner.fit(X, y, **kwargs)                                    
-            self.voter.append(base_learner)                                                                 
+            self.voter.append(pickle.loads(pickle.dumps(base_learner, -1)))                                                                 
         
         if self.verbose == 1:
             
@@ -274,7 +278,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
                 
                 for idx, elt in enumerate(voter):            
                         
-                    ensemble_proba += pickle.loads(elt).predict_proba(X)
+                    ensemble_proba += elt.predict_proba(X)
                     
                     if verbose == 1:              
                         pbar.update(idx)
@@ -287,7 +291,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             # if weights is not None: 
             for idx, elt in enumerate(voter):            
                         
-                ensemble_proba += weights[idx]*pickle.loads(elt).predict_proba(X)
+                ensemble_proba += weights[idx]*elt.predict_proba(X)
                     
                 if verbose == 1:              
                     pbar.update(idx)

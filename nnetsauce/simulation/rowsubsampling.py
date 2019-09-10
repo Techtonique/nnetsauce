@@ -81,69 +81,6 @@ def subsample(y, row_sample=0.8, seed=123):
         return np.asarray(mx.flatten(index))
     except:
         return np.asarray(index)
-    
-
-# rebalancing classes (downsampling or upsampling)
-def rebalance(y, down=True, seed=123):
-
-    classes = np.unique(y)
-    n_classes = len(classes)
-    counts = np.array(list(Counter(y).values()))
-    res = []
-
-    if mx.is_factor(y):  # works only for classification
-
-        if down is True:  # downsampling
-
-            # detect which class has the lowest number of elements
-            min_index = counts.argmin()
-
-            # get that number of elements (min_count)
-            min_count = counts[min_index]
-
-            # loop on each other class
-            for i in range(n_classes):
-
-                # downsample them to min_count
-                class_index = np.where(y == classes[i])[0]
-                np.random.seed(seed)
-                down_index = np.random.choice(
-                    class_index,
-                    size=min_count,  # output size
-                    replace=True,
-                )
-
-                res.append(down_index.tolist())
-
-        else:  # upsampling
-
-            # detect which class has the highest number of elements
-            max_index = counts.argmax()
-
-            # get that number of elements (max_count)
-            max_count = counts[max_index]
-
-            # loop on each other class
-            for i in range(n_classes):
-
-                # upsample them to max_count
-                class_index = np.where(y == classes[i])[0]
-                np.random.seed(seed)
-                up_index = np.random.choice(
-                    class_index,
-                    size=max_count,  # output size
-                    replace=True,
-                )
-
-                res.append(up_index.tolist())
-
-        return np.asarray(mx.flatten(res))
-
-    else:  # mx.is_factor(y) == False
-
-        raise ValueError(
-            "This function works for classification data only"
-        )
 
 
 # if __name__== "main":

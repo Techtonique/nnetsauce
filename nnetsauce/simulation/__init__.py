@@ -5,7 +5,7 @@ from .nodesimulation import (
     generate_halton,
 )
 
-from .rowsubsampling import subsample, rebalance
+from .rowsubsampling import subsample
 
 
 __all__ = [
@@ -14,5 +14,4 @@ __all__ = [
     "generate_hammersley",
     "generate_halton",
     "subsample",
-    "rebalance",
 ]

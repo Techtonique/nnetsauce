@@ -11,7 +11,7 @@ from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import (
     StandardScaler,
-    MinMaxScaler,
+    MinMaxScaler
 )
 from ..utils import activations as ac
 from ..utils import matrixops as mo
@@ -46,6 +46,9 @@ class Base(BaseEstimator):
        n_clusters: int
            number of clusters for type_clust='kmeans' or type_clust='gmm' 
            clustering (could be 0: no clustering)
+       cluster_encode: bool
+           defines how the variable containing clusters is treated (default is one-hot)
+           if `False`, then labels are used, without one-hot encoding
        type_clust: str
            type of clustering method: currently k-means ('kmeans') or Gaussian 
            Mixture Model ('gmm')
@@ -73,6 +76,7 @@ class Base(BaseEstimator):
         dropout=0,
         direct_link=True,
         n_clusters=2,
+        cluster_encode=True,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         col_sample=1,
@@ -132,6 +136,7 @@ class Base(BaseEstimator):
         self.seed = seed
         self.dropout = dropout
         self.direct_link = direct_link
+        self.cluster_encode = cluster_encode
         self.type_clust = type_clust
         self.type_scaling = type_scaling
         self.col_sample = col_sample
@@ -189,48 +194,61 @@ class Base(BaseEstimator):
 
             # scale input data before clustering
             scaler = scaling_options[self.type_scaling[2]]
-
-            scaler.fit(X)
-            scaled_X = scaler.transform(X)
+            
+            scaled_X = scaler.fit_transform(X)
             self.clustering_scaler = scaler
 
             if self.type_clust == "kmeans":
 
                 # do kmeans + one-hot encoding
-                np.random.seed(self.seed)
                 kmeans = KMeans(
-                    n_clusters=self.n_clusters, **kwargs
+                    n_clusters=self.n_clusters, 
+                    random_state=self.seed,
+                    **kwargs
                 )
                 kmeans.fit(scaled_X)
                 X_kmeans = kmeans.predict(scaled_X)
                 self.clustering_obj = kmeans
 
-                return mo.one_hot_encode(
-                    X_kmeans, self.n_clusters
-                )
+                if self.cluster_encode == True:
+                    
+                    return mo.one_hot_encode(
+                    X_kmeans, self.n_clusters)
+                
+                return X_kmeans
+                
 
             if self.type_clust == "gmm":
 
-                np.random.seed(self.seed)
                 gmm = GaussianMixture(
-                    n_components=self.n_clusters, **kwargs
+                    n_components=self.n_clusters, 
+                    random_state=self.seed,
+                    **kwargs
                 )
                 gmm.fit(scaled_X)
                 X_gmm = gmm.predict(scaled_X)
                 self.clustering_obj = gmm
-
-                return mo.one_hot_encode(
-                    X_gmm, self.n_clusters
-                )
+                
+                if self.cluster_encode == True:
+                    
+                    return mo.one_hot_encode(
+                    X_gmm, self.n_clusters)
+                
+                return X_gmm                
 
         # if predict == True, encode test set
         X_clustered = self.clustering_obj.predict(
             self.clustering_scaler.transform(X)
         )
+        
+        if self.cluster_encode == True:
+            
+            return mo.one_hot_encode(
+            X_clustered, self.n_clusters)
+        
+        return X_clustered
+        
 
-        return mo.one_hot_encode(
-            X_clustered, self.n_clusters
-        )
 
     def create_layer(self, scaled_X, W=None):
         """ Create hidden layer. """
@@ -449,8 +467,7 @@ class Base(BaseEstimator):
                 self.n_hidden_features > 0
             ):  # with hidden layer
 
-                nn_scaler.fit(input_X)
-                scaled_X = nn_scaler.transform(input_X)
+                scaled_X = nn_scaler.fit_transform(input_X)
                 self.nn_scaler = nn_scaler
 
                 if W is None:
@@ -483,8 +500,7 @@ class Base(BaseEstimator):
                 self.n_hidden_features > 0
             ):  # with hidden layer
 
-                nn_scaler.fit(augmented_X)
-                scaled_X = nn_scaler.transform(augmented_X)
+                scaled_X = nn_scaler.fit_transform(augmented_X)
                 self.nn_scaler = nn_scaler
 
                 if W is None:
