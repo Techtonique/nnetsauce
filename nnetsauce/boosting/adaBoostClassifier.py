@@ -222,7 +222,8 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                 self.alpha.append(alpha_m)
                 
                 w_m_temp = [exp(alpha_m*cond[i]) for i in x_range_n]
-                w_m = [w_m_temp[i]/sum(w_m_temp) for i in x_range_n]
+                sum_w_m = sum(w_m_temp)
+                w_m = [w_m_temp[i]/sum_w_m for i in x_range_n]
     
                 base_learner.set_params(seed = self.seed + (m + 1)*1000)      
                 
