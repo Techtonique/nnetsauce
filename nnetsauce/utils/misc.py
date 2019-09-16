@@ -8,7 +8,7 @@ def merge_two_dicts(x, y):
 # check if x is int
 def is_int(x):
     try:
-        return int(x)==x
+        return int(x) == x
     except:
         return False
 

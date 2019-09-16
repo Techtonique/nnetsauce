@@ -11,8 +11,8 @@ class TestBase(ut.TestCase):
     def test_base(self):
 
         X, y = datasets.make_regression(
-            n_samples=25, n_features=3,
-            random_state=123)
+            n_samples=25, n_features=3, random_state=123
+        )
 
         fit_obj = ns.BaseRegressor(
             n_hidden_features=10,
@@ -137,7 +137,8 @@ class TestBase(ut.TestCase):
             bias=True,
             nodes_sim="uniform",
             activation_name="tanh",
-            n_clusters=3, seed = 5610
+            n_clusters=3,
+            seed=5610,
         )
 
         fit_obj11 = ns.BaseRegressor(
@@ -147,7 +148,8 @@ class TestBase(ut.TestCase):
             nodes_sim="uniform",
             activation_name="tanh",
             n_clusters=0,
-            col_sample=1, seed = 5260
+            col_sample=1,
+            seed=5260,
         )
 
         fit_obj12 = ns.BaseRegressor(
@@ -157,9 +159,10 @@ class TestBase(ut.TestCase):
             nodes_sim="uniform",
             activation_name="tanh",
             n_clusters=0,
-            col_sample=0.8,seed = 2763
+            col_sample=0.8,
+            seed=2763,
         )
-        
+
         fit_obj13 = ns.BaseRegressor(
             n_hidden_features=3,
             direct_link=True,
@@ -168,7 +171,8 @@ class TestBase(ut.TestCase):
             activation_name="tanh",
             n_clusters=2,
             cluster_encode=False,
-            col_sample=0.8,seed = 2763
+            col_sample=0.8,
+            seed=2763,
         )
 
         index_train = range(20)
@@ -225,44 +229,60 @@ class TestBase(ut.TestCase):
         fit_obj12.fit(X_train, y_train)
         err12 = fit_obj12.predict(X_test) - y_test
         rmse12 = np.sqrt(np.mean(err12 ** 2))
-        
+
         fit_obj13.fit(X_train, y_train)
         err13 = fit_obj13.predict(X_test) - y_test
         rmse13 = np.sqrt(np.mean(err13 ** 2))
 
-        self.assertTrue(np.allclose(rmse, 63.243819280710575))
-        self.assertTrue(np.allclose(rmse2, 19.404919470812349))
+        self.assertTrue(
+            np.allclose(rmse, 63.243819280710575)
+        )
+        self.assertTrue(
+            np.allclose(rmse2, 19.404919470812349)
+        )
         self.assertFalse(np.allclose(rmse3, 0))
         self.assertTrue(np.allclose(rmse4, 208.284))
         self.assertFalse(np.allclose(rmse5, 0))
-        self.assertTrue(np.allclose(rmse6, 62.613229649101946))
-        self.assertTrue(np.allclose(rmse7, 63.048908568696184))
-        self.assertTrue(np.allclose(
+        self.assertTrue(
+            np.allclose(rmse6, 62.613229649101946)
+        )
+        self.assertTrue(
+            np.allclose(rmse7, 63.048908568696184)
+        )
+        self.assertTrue(
+            np.allclose(
                 rmse7,
                 np.sqrt(fit_obj7.score(X_test, y_test)),
-            ))
-        self.assertTrue(np.allclose(
+            )
+        )
+        self.assertTrue(
+            np.allclose(
                 fit_obj.predict(X_test[0, :]),
                 447.88881097463855,
-            ))
-        self.assertFalse(np.allclose(
-                fit_obj2.predict(X_test[0, :]),
-                0,
             )
+        )
+        self.assertFalse(
+            np.allclose(fit_obj2.predict(X_test[0, :]), 0)
         )
 
         self.assertFalse(np.allclose(rmse8, 1.63e-13))
         self.assertFalse(np.allclose(rmse9, 1.76e-13))
-        self.assertTrue(np.allclose(rmse10, 12.827880281249008))
-        self.assertTrue(np.allclose(rmse11, 22.54340221323043))
-        self.assertTrue(np.allclose(rmse12, 22.54340221322761))
+        self.assertTrue(
+            np.allclose(rmse10, 12.827880281249008)
+        )
+        self.assertTrue(
+            np.allclose(rmse11, 22.54340221323043)
+        )
+        self.assertTrue(
+            np.allclose(rmse12, 22.54340221322761)
+        )
         self.assertFalse(np.allclose(rmse13, 1e6))
 
     def test_score(self):
 
         X, y = datasets.make_regression(
-            n_samples=100, n_features=3, 
-            random_state=123)
+            n_samples=100, n_features=3, random_state=123
+        )
 
         fit_obj = ns.BaseRegressor(
             n_hidden_features=5,

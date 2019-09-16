@@ -10,7 +10,6 @@ from time import time
 
 # dataset no. 1 ----------
 
-# logistic reg
 breast_cancer = load_breast_cancer()
 Z = breast_cancer.data
 t = breast_cancer.target

@@ -4,11 +4,14 @@ from .boosting.adaBoostClassifier import AdaBoostClassifier
 from .custom.customClassifier import CustomClassifier
 from .custom.customRegressor import CustomRegressor
 from .mts import MTS
-from .randombag.randomBagClassifier import RandomBagClassifier
+from .randombag.randomBagClassifier import (
+    RandomBagClassifier,
+)
 from .ridge.ridgeClassifier import RidgeClassifier
-#from .ridge.ridgeRegressor import RidgeRegressor
-#from .rnn.rnnRegressor import RNNRegressor
-#from .rnn.rnnClassifier import RNNClassifier
+
+# from .ridge.ridgeRegressor import RidgeRegressor
+# from .rnn.rnnRegressor import RNNRegressor
+# from .rnn.rnnClassifier import RNNClassifier
 from .rvfl.bayesianrvflRegressor import (
     BayesianRVFLRegressor,
 )
@@ -26,9 +29,9 @@ __all__ = [
     "CustomClassifier",
     "CustomRegressor",
     "RandomBagClassifier",
-#    "RidgeRegressor",
+    #    "RidgeRegressor",
     "RidgeClassifier",
-#    "RNNRegressor",
-#    "RNNClassifier",
+    #    "RNNRegressor",
+    #    "RNNClassifier",
     "MTS",
 ]

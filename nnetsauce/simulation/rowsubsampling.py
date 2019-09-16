@@ -51,22 +51,26 @@ def subsample(y, row_sample=0.8, seed=123):
 
     for i in range(n_classes):
 
-        bool_class_i = (y_as_classes == classes[i])
+        bool_class_i = y_as_classes == classes[i]
 
-        #index_class_i = [i for i, e in enumerate(bool_class_i) if e == True]
-        index_class_i = np.where(bool_class_i==True)[0].tolist()
+        # index_class_i = [i for i, e in enumerate(bool_class_i) if e == True]
+        index_class_i = np.where(bool_class_i == True)[
+            0
+        ].tolist()
 
         if (
             np.sum(bool_class_i) > 1
         ):  # at least 2 elements in class  #i
 
-            index.append(np.random.choice(
+            index.append(
+                np.random.choice(
                     index_class_i,
                     size=int(
                         n_obs_out * freqs_hist[i]
                     ),  # output size
                     replace=True,
-                ).tolist())
+                ).tolist()
+            )
 
         else:  # only one element in class
 

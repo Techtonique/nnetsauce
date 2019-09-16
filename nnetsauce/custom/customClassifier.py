@@ -98,7 +98,6 @@ class CustomClassifier(Custom, ClassifierMixin):
         )
 
         self.type_fit = "classification"
-        
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit custom model to training data (X, y).
@@ -123,22 +122,24 @@ class CustomClassifier(Custom, ClassifierMixin):
         output_y, scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs
         )
-        
+
         # if sample_weights, else: (must use self.row_index)
-        
+
         if sample_weight is not None:
-            
-            self.obj.fit(scaled_Z, output_y, 
-                         sample_weight=sample_weight[self.index_row],
-                         **kwargs)
-            
+
+            self.obj.fit(
+                scaled_Z,
+                output_y,
+                sample_weight=sample_weight[self.index_row],
+                **kwargs
+            )
+
             return self
-        
+
         # if sample_weight is None:
         self.obj.fit(scaled_Z, output_y, **kwargs)
 
         return self
-
 
     def predict(self, X, **kwargs):
         """Predict test data X.
@@ -192,15 +193,13 @@ class CustomClassifier(Custom, ClassifierMixin):
         -------
         probability estimates for test data: {array-like}        
         """
-        
+
         if len(X.shape) == 1:
 
             n_features = X.shape[0]
             new_X = mo.rbind(
                 X.reshape(1, n_features),
-                np.ones(n_features).reshape(
-                    1, n_features
-                ),
+                np.ones(n_features).reshape(1, n_features),
             )
 
             return (
@@ -213,7 +212,6 @@ class CustomClassifier(Custom, ClassifierMixin):
         return self.obj.predict_proba(
             self.cook_test_set(X, **kwargs), **kwargs
         )
-
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """

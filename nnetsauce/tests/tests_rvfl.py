@@ -54,7 +54,7 @@ class TestRVFL(ut.TestCase):
             activation_name="elu",
             n_clusters=4,
         )
-        
+
         fit_obj5 = ns.BayesianRVFL2Regressor(
             n_hidden_features=7,
             direct_link=True,
@@ -63,7 +63,7 @@ class TestRVFL(ut.TestCase):
             type_scaling=("minmax", "minmax", "minmax"),
             activation_name="elu",
             n_clusters=4,
-            cluster_encode=True
+            cluster_encode=True,
         )
 
         index_train = range(20)
@@ -100,7 +100,7 @@ class TestRVFL(ut.TestCase):
             - y_test
         )
         rmse4 = np.sqrt(np.mean(err4 ** 2))
-        
+
         fit_obj5.fit(X_train, y_train)
         err5 = (
             fit_obj5.predict(X_test, return_std=True)[0]

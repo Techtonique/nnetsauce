@@ -106,7 +106,7 @@ class TestCustom(ut.TestCase):
             col_sample=0.9,
             row_sample=1.0,
         )
-        
+
         fit_obj9 = ns.CustomRegressor(
             obj=regr,
             n_hidden_features=10,
@@ -162,25 +162,48 @@ class TestCustom(ut.TestCase):
 
         fit_obj7.fit(Z[0:100, :], t[0:100])
         score7 = fit_obj7.score(Z[100:120, :], t[100:120])
-        
+
         fit_obj9.fit(X_train, y_train)
         err9 = fit_obj9.predict(X_test) - y_test
         rmse9 = np.sqrt(np.mean(err9 ** 2))
 
-        self.assertTrue(np.allclose(rmse, 64.933610490495667))                    
-        self.assertTrue(np.allclose(rmse2, 12.968755131423396))
-        self.assertTrue(np.allclose(rmse3, 26.716371782298673))
-        self.assertTrue(np.allclose(rmse4, 3.3480684032382375))
-        self.assertTrue(np.allclose(rmse4_1,  3.4339085800638713e-05))
-        self.assertTrue(np.allclose(rmse8, 64.93379560651447))
+        self.assertTrue(
+            np.allclose(rmse, 64.933610490495667)
+        )
+        self.assertTrue(
+            np.allclose(rmse2, 12.968755131423396)
+        )
+        self.assertTrue(
+            np.allclose(rmse3, 26.716371782298673)
+        )
+        self.assertTrue(
+            np.allclose(rmse4, 3.3480684032382375)
+        )
+        self.assertTrue(
+            np.allclose(rmse4_1, 3.4339085800638713e-05)
+        )
+        self.assertTrue(
+            np.allclose(rmse8, 64.93379560651447)
+        )
         self.assertTrue(np.allclose(pred5, 1))
         self.assertTrue(np.allclose(pred6, 1))
-        self.assertTrue(np.allclose(pred6_proba1[0], 0.50507336437937767)) 
-        self.assertTrue(np.allclose(pred6_proba2[3, 0], 0.4836233209751839))         
-        self.assertTrue(np.allclose(score6, 0.94999999999999996))        
+        self.assertTrue(
+            np.allclose(
+                pred6_proba1[0], 0.50507336437937767
+            )
+        )
+        self.assertTrue(
+            np.allclose(
+                pred6_proba2[3, 0], 0.4836233209751839
+            )
+        )
+        self.assertTrue(
+            np.allclose(score6, 0.94999999999999996)
+        )
         self.assertTrue(np.allclose(score7, 0.85))
-        self.assertTrue(np.allclose(rmse9, 76.12747461579583))
-        
+        self.assertTrue(
+            np.allclose(rmse9, 76.12747461579583)
+        )
 
     def test_score(self):
 

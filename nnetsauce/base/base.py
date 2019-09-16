@@ -11,7 +11,7 @@ from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import (
     StandardScaler,
-    MinMaxScaler
+    MinMaxScaler,
 )
 from ..utils import activations as ac
 from ..utils import matrixops as mo
@@ -194,7 +194,7 @@ class Base(BaseEstimator):
 
             # scale input data before clustering
             scaler = scaling_options[self.type_scaling[2]]
-            
+
             scaled_X = scaler.fit_transform(X)
             self.clustering_scaler = scaler
 
@@ -202,7 +202,7 @@ class Base(BaseEstimator):
 
                 # do kmeans + one-hot encoding
                 kmeans = KMeans(
-                    n_clusters=self.n_clusters, 
+                    n_clusters=self.n_clusters,
                     random_state=self.seed,
                     **kwargs
                 )
@@ -211,44 +211,44 @@ class Base(BaseEstimator):
                 self.clustering_obj = kmeans
 
                 if self.cluster_encode == True:
-                    
+
                     return mo.one_hot_encode(
-                    X_kmeans, self.n_clusters)
-                
+                        X_kmeans, self.n_clusters
+                    )
+
                 return X_kmeans
-                
 
             if self.type_clust == "gmm":
 
                 gmm = GaussianMixture(
-                    n_components=self.n_clusters, 
+                    n_components=self.n_clusters,
                     random_state=self.seed,
                     **kwargs
                 )
                 gmm.fit(scaled_X)
                 X_gmm = gmm.predict(scaled_X)
                 self.clustering_obj = gmm
-                
+
                 if self.cluster_encode == True:
-                    
+
                     return mo.one_hot_encode(
-                    X_gmm, self.n_clusters)
-                
-                return X_gmm                
+                        X_gmm, self.n_clusters
+                    )
+
+                return X_gmm
 
         # if predict == True, encode test set
         X_clustered = self.clustering_obj.predict(
             self.clustering_scaler.transform(X)
         )
-        
-        if self.cluster_encode == True:
-            
-            return mo.one_hot_encode(
-            X_clustered, self.n_clusters)
-        
-        return X_clustered
-        
 
+        if self.cluster_encode == True:
+
+            return mo.one_hot_encode(
+                X_clustered, self.n_clusters
+            )
+
+        return X_clustered
 
     def create_layer(self, scaled_X, W=None):
         """ Create hidden layer. """
@@ -479,7 +479,7 @@ class Base(BaseEstimator):
                     Z = mo.cbind(input_X, Phi_X)
                 else:
                     Z = Phi_X
-                    
+
                 scaler.fit(Z)
                 self.scaler = scaler
 
@@ -500,7 +500,9 @@ class Base(BaseEstimator):
                 self.n_hidden_features > 0
             ):  # with hidden layer
 
-                scaled_X = nn_scaler.fit_transform(augmented_X)
+                scaled_X = nn_scaler.fit_transform(
+                    augmented_X
+                )
                 self.nn_scaler = nn_scaler
 
                 if W is None:
@@ -600,9 +602,9 @@ class Base(BaseEstimator):
                     )
 
                 Phi_X = self.create_layer(scaled_X, self.W)
-                
+
                 if self.direct_link == True:
-                    
+
                     return self.scaler.transform(
                         mo.cbind(scaled_X, Phi_X)
                     )

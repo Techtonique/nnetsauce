@@ -13,13 +13,15 @@ class TestRidge(ut.TestCase):
         X = breast_cancer.data
         y = breast_cancer.target
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=71023)
+            X, y, test_size=0.2, random_state=71023
+        )
 
         wine = load_wine()
         Z = wine.data
         t = wine.target
         Z_train, Z_test, t_train, t_test = train_test_split(
-            Z, t, test_size=0.2, random_state=61283)
+            Z, t, test_size=0.2, random_state=61283
+        )
 
         fit_obj = ns.RidgeClassifier(
             lambda1=0.025,
@@ -61,11 +63,23 @@ class TestRidge(ut.TestCase):
         fit_obj4.fit(Z_train, t_train)
         preds4 = fit_obj4.predict_proba(Z_test)
 
-        self.assertTrue(np.allclose(preds1[0, 0], 5.1412488698250085e-06))
-        self.assertTrue(np.allclose(preds2[0, 0], 5.1412488698250085e-06))
-        self.assertTrue(np.allclose(preds3[0, 0], 0.0488412175))
-        self.assertTrue(np.allclose(preds4[0, 0], 0.8545733738))
-        
+        self.assertTrue(
+            np.allclose(
+                preds1[0, 0], 5.1412488698250085e-06
+            )
+        )
+        self.assertTrue(
+            np.allclose(
+                preds2[0, 0], 5.1412488698250085e-06
+            )
+        )
+        self.assertTrue(
+            np.allclose(preds3[0, 0], 0.0488412175)
+        )
+        self.assertTrue(
+            np.allclose(preds4[0, 0], 0.8545733738)
+        )
+
         self.assertTrue(
             np.allclose(fit_obj.predict(X_test)[0], 1)
             & np.allclose(fit_obj2.predict(X_test)[0], 1)
@@ -130,14 +144,19 @@ class TestRidge(ut.TestCase):
         fit_obj4.fit(Z_train, t_train)
         score4 = fit_obj4.score(Z_test, t_test)
 
-        self.assertTrue(np.allclose(score1, 0.9649122807017544))
-        
-        self.assertTrue(np.allclose(score2, 0.94736842105263153))
-        
+        self.assertTrue(
+            np.allclose(score1, 0.9649122807017544)
+        )
+
+        self.assertTrue(
+            np.allclose(score2, 0.94736842105263153)
+        )
+
         self.assertTrue(np.allclose(score3, 1.0))
-        
-        self.assertTrue(np.allclose(score4, 0.9722222222222222))
-        
+
+        self.assertTrue(
+            np.allclose(score4, 0.9722222222222222)
+        )
 
 
 if __name__ == "__main__":

@@ -82,8 +82,8 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         n_estimators=10,
         learning_rate=0.1,
         n_hidden_features=1,
-        reg_lambda = 0,
-        reg_alpha = 0.5,
+        reg_lambda=0,
+        reg_alpha=0.5,
         activation_name="relu",
         a=0.01,
         nodes_sim="sobol",
@@ -130,7 +130,6 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         self.reg_lambda = reg_lambda
         self.reg_alpha = reg_alpha
 
-
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit Boosting model to training data (X, y).
         
@@ -150,128 +149,182 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         -------
         self: object
         """
-        
+
         assert mx.is_factor(
             y
-        ), "y must contain only integers"     
+        ), "y must contain only integers"
 
-        assert self.method in ("SAMME", "SAMME.R"),\
-        "`method` must be either 'SAMME' or 'SAMME.R'"  
-        
-        assert (self.reg_lambda <= 1) &  (self.reg_lambda >= 0),\
-        "must have self.reg_lambda <= 1 &  self.reg_lambda >= 0"                                                                                       
-        
-        assert (self.reg_alpha <= 1) &  (self.reg_alpha >= 0),\
-        "must have self.reg_alpha <= 1 &  self.reg_alpha >= 0"                                                                                       
-        
-        # training 
-        n, p = X.shape   
-        self.n_classes = len(np.unique(y))  
-        
+        assert self.method in (
+            "SAMME",
+            "SAMME.R",
+        ), "`method` must be either 'SAMME' or 'SAMME.R'"
+
+        assert (self.reg_lambda <= 1) & (
+            self.reg_lambda >= 0
+        ), "must have self.reg_lambda <= 1 &  self.reg_lambda >= 0"
+
+        assert (self.reg_alpha <= 1) & (
+            self.reg_alpha >= 0
+        ), "must have self.reg_alpha <= 1 &  self.reg_alpha >= 0"
+
+        # training
+        n, p = X.shape
+        self.n_classes = len(np.unique(y))
+
         if sample_weight is None:
-            
-            w_m = [1.0/n]*n
-            
+
+            w_m = [1.0 / n] * n
+
         else:
-            
+
             w_m = sample_weight
-        
-        base_learner = CustomClassifier(self.obj,
-                            n_hidden_features=self.n_hidden_features,
-                            activation_name=self.activation_name,
-                            a=self.a,
-                            nodes_sim=self.nodes_sim,
-                            bias=self.bias,
-                            dropout=self.dropout,
-                            direct_link=self.direct_link,
-                            n_clusters=self.n_clusters,
-                            type_clust=self.type_clust,
-                            type_scaling=self.type_scaling,
-                            col_sample=self.col_sample,
-                            row_sample=self.row_sample,
-                            seed=self.seed)
-        
+
+        base_learner = CustomClassifier(
+            self.obj,
+            n_hidden_features=self.n_hidden_features,
+            activation_name=self.activation_name,
+            a=self.a,
+            nodes_sim=self.nodes_sim,
+            bias=self.bias,
+            dropout=self.dropout,
+            direct_link=self.direct_link,
+            n_clusters=self.n_clusters,
+            type_clust=self.type_clust,
+            type_scaling=self.type_scaling,
+            col_sample=self.col_sample,
+            row_sample=self.row_sample,
+            seed=self.seed,
+        )
+
         if self.verbose == 1:
-            pbar = Progbar(self.n_estimators)                  
-        
-        
-        if self.method == "SAMME":        
-            
-            err_m = 1e6            
-            self.alpha.append(1.0)       
+            pbar = Progbar(self.n_estimators)
+
+        if self.method == "SAMME":
+
+            err_m = 1e6
+            self.alpha.append(1.0)
             x_range_n = range(n)
-            
-            for m in range(self.n_estimators): 
-                                                                        
-                preds = base_learner.fit(X, y, sample_weight = np.asarray(w_m),\
-                                         **kwargs).predict(X)
-                
-                self.base_learners.append(pickle.loads(pickle.dumps(base_learner, -1)))                                        
-                
-                cond = [y[i] != preds[i] for i in x_range_n]
-                
-                err_m = max(sum([elt[0]*elt[1] for elt in zip(cond, w_m)]), 
-                            2.220446049250313e-16) #sum(w_m) == 1
-                
-                if self.reg_lambda > 0:
-                    err_m += self.reg_lambda*((1-self.reg_alpha)*0.5*sum([x**2 for x in w_m]) \
-                                          + self.reg_alpha*sum([abs(x) for x in w_m]))
-                
-                alpha_m = self.learning_rate*log((self.n_classes - 1)*(1 - err_m)/err_m)
-                
-                self.alpha.append(alpha_m)
-                
-                w_m_temp = [exp(alpha_m*cond[i]) for i in x_range_n]
-                sum_w_m = sum(w_m_temp)
-                w_m = [w_m_temp[i]/sum_w_m for i in x_range_n]
-    
-                base_learner.set_params(seed = self.seed + (m + 1)*1000)      
-                
-                if self.verbose == 1:              
-                    pbar.update(m)
-                                
-            
-            if self.verbose == 1:
-                pbar.update(self.n_estimators) 
 
-            self.n_estimators = len(self.base_learners)                   
-    
-            return self
-
-
-        if self.method == "SAMME.R": 
-            
-            Y = mo.one_hot_encode2(y, self.n_classes)
-            
-            w_m = np.repeat(1.0/n, n) # (N, 1)
-            
             for m in range(self.n_estimators):
-                
-                probs = base_learner.fit(X, y, sample_weight = w_m,\
-                                         **kwargs).predict_proba(X) 
-                
-                np.clip(a = probs, a_min = 2.220446049250313e-16, 
-                        a_max = 1.0, out = probs)                                                  
-                
-                self.base_learners.append(pickle.loads(pickle.dumps(base_learner, -1)))
-                
-                w_m *= np.exp(-1.0*self.learning_rate*(1.0 - 1.0/self.n_classes)\
-                *xlogy(Y, probs).sum(axis=1))
-                
-                w_m /= np.sum(w_m)
-    
-                base_learner.set_params(seed = self.seed + (m + 1)*1000) 
-                
-                if self.verbose == 1:              
-                    pbar.update(m)                                
-            
+
+                preds = base_learner.fit(
+                    X,
+                    y,
+                    sample_weight=np.asarray(w_m),
+                    **kwargs
+                ).predict(X)
+
+                self.base_learners.append(
+                    pickle.loads(
+                        pickle.dumps(base_learner, -1)
+                    )
+                )
+
+                cond = [y[i] != preds[i] for i in x_range_n]
+
+                err_m = max(
+                    sum(
+                        [
+                            elt[0] * elt[1]
+                            for elt in zip(cond, w_m)
+                        ]
+                    ),
+                    2.220446049250313e-16,
+                )  # sum(w_m) == 1
+
+                if self.reg_lambda > 0:
+                    err_m += self.reg_lambda * (
+                        (1 - self.reg_alpha)
+                        * 0.5
+                        * sum([x ** 2 for x in w_m])
+                        + self.reg_alpha
+                        * sum([abs(x) for x in w_m])
+                    )
+
+                alpha_m = self.learning_rate * log(
+                    (self.n_classes - 1)
+                    * (1 - err_m)
+                    / err_m
+                )
+
+                self.alpha.append(alpha_m)
+
+                w_m_temp = [
+                    exp(alpha_m * cond[i])
+                    for i in x_range_n
+                ]
+                sum_w_m = sum(w_m_temp)
+                w_m = [
+                    w_m_temp[i] / sum_w_m for i in x_range_n
+                ]
+
+                base_learner.set_params(
+                    seed=self.seed + (m + 1) * 1000
+                )
+
+                if self.verbose == 1:
+                    pbar.update(m)
+
             if self.verbose == 1:
-                pbar.update(self.n_estimators) 
-            
+                pbar.update(self.n_estimators)
+
             self.n_estimators = len(self.base_learners)
-                        
+
             return self
 
+        if self.method == "SAMME.R":
+
+            Y = mo.one_hot_encode2(y, self.n_classes)
+
+            if sample_weight is None:
+
+                w_m = np.repeat(1.0 / n, n)  # (N, 1)
+
+            else:
+
+                w_m = np.asarray(sample_weight)
+
+            for m in range(self.n_estimators):
+
+                probs = base_learner.fit(
+                    X, y, sample_weight=w_m, **kwargs
+                ).predict_proba(X)
+
+                np.clip(
+                    a=probs,
+                    a_min=2.220446049250313e-16,
+                    a_max=1.0,
+                    out=probs,
+                )
+
+                self.base_learners.append(
+                    pickle.loads(
+                        pickle.dumps(base_learner, -1)
+                    )
+                )
+
+                w_m *= np.exp(
+                    -1.0
+                    * self.learning_rate
+                    * (1.0 - 1.0 / self.n_classes)
+                    * xlogy(Y, probs).sum(axis=1)
+                )
+
+                w_m /= np.sum(w_m)
+
+                base_learner.set_params(
+                    seed=self.seed + (m + 1) * 1000
+                )
+
+                if self.verbose == 1:
+                    pbar.update(m)
+
+            if self.verbose == 1:
+                pbar.update(self.n_estimators)
+
+            self.n_estimators = len(self.base_learners)
+
+            return self
 
     def predict(self, X, **kwargs):
         """Predict test data X.
@@ -288,10 +341,11 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         Returns
         -------
         model predictions: {array-like}        
-        """                
-        
-        return self.predict_proba(X, **kwargs).argmax(axis=1)
+        """
 
+        return self.predict_proba(X, **kwargs).argmax(
+            axis=1
+        )
 
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
@@ -309,70 +363,88 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         -------
         probability estimates for test data: {array-like}        
         """
-        
+
         n_iter = len(self.base_learners)
-        
+
         if self.method == "SAMME":
-            
-            ensemble_learner = np.zeros((X.shape[0], self.n_classes))               
-            
+
+            ensemble_learner = np.zeros(
+                (X.shape[0], self.n_classes)
+            )
+
             if self.verbose == 1:
-                pbar = Progbar(n_iter)            
-            
-            
-            for idx, base_learner in enumerate(self.base_learners): 
-                                    
-                preds = base_learner.predict(X, **kwargs)    
-                
-                ensemble_learner += self.alpha[idx]*mo.one_hot_encode2(preds,\
-                                              self.n_classes)
-                
-                if self.verbose == 1:            
+                pbar = Progbar(n_iter)
+
+            for idx, base_learner in enumerate(
+                self.base_learners
+            ):
+
+                preds = base_learner.predict(X, **kwargs)
+
+                ensemble_learner += self.alpha[
+                    idx
+                ] * mo.one_hot_encode2(
+                    preds, self.n_classes
+                )
+
+                if self.verbose == 1:
                     pbar.update(idx)
-                                        
-    
-            if self.verbose == 1:        
+
+            if self.verbose == 1:
                 pbar.update(n_iter)
-            
+
             expit_ensemble_learner = expit(ensemble_learner)
-                        
-            sum_ensemble = expit_ensemble_learner.sum(axis=1)
-            
-            return expit_ensemble_learner/sum_ensemble[:, None]
-         
-            
-        # if self.method == "SAMME.R":    
-        ensemble_learner = 0        
-    
+
+            sum_ensemble = expit_ensemble_learner.sum(
+                axis=1
+            )
+
+            return (
+                expit_ensemble_learner
+                / sum_ensemble[:, None]
+            )
+
+        # if self.method == "SAMME.R":
+        ensemble_learner = 0
+
         if self.verbose == 1:
-            pbar = Progbar(n_iter)                    
-        
-        for idx, base_learner in enumerate(self.base_learners):             
-            
+            pbar = Progbar(n_iter)
+
+        for idx, base_learner in enumerate(
+            self.base_learners
+        ):
+
             probs = base_learner.predict_proba(X, **kwargs)
-            
-            np.clip(a = probs, a_min = 2.220446049250313e-16, 
-                    a_max = 1.0, out = probs)    
 
-            log_preds_proba = np.log(probs)        
-            
-            ensemble_learner += (log_preds_proba -\
-                                log_preds_proba.mean(axis=1)[:, None])                
-            
-            if self.verbose == 1:            
+            np.clip(
+                a=probs,
+                a_min=2.220446049250313e-16,
+                a_max=1.0,
+                out=probs,
+            )
+
+            log_preds_proba = np.log(probs)
+
+            ensemble_learner += (
+                log_preds_proba
+                - log_preds_proba.mean(axis=1)[:, None]
+            )
+
+            if self.verbose == 1:
                 pbar.update(idx)
-                        
-        ensemble_learner *= (self.n_classes - 1)                  
 
-        if self.verbose == 1:        
+        ensemble_learner *= self.n_classes - 1
+
+        if self.verbose == 1:
             pbar.update(n_iter)
-            
-        expit_ensemble_learner = expit(ensemble_learner)
-        
-        sum_ensemble = expit_ensemble_learner.sum(axis=1)                
-        
-        return expit_ensemble_learner/sum_ensemble[:, None]
 
+        expit_ensemble_learner = expit(ensemble_learner)
+
+        sum_ensemble = expit_ensemble_learner.sum(axis=1)
+
+        return (
+            expit_ensemble_learner / sum_ensemble[:, None]
+        )
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
