@@ -2,6 +2,7 @@
 
 - Add AdaBoost classifier 
 - Add RandomBag classifier (bagging)
+- Add multinomial logit Ridge classifier 
 - Remove dependency to package `sobol_seq`(not used)
 
 
