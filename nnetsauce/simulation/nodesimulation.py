@@ -1,7 +1,8 @@
 import numpy as np
 from six import moves
 from . import sobol_lib2  # longer sobol sequence !
-
+from . import sobol
+import ctypes
 
 # From: https://github.com/PhaethonPrime/hammersley/blob/master/hammersley/sequences.py
 
@@ -192,6 +193,14 @@ def generate_halton(n_dims=2, n_points=10, primes=None):
     return np.array(list(func_halton()))[
         1 : (n_points + 1), :
     ].transpose()
+
+
+# sobol numbers' generation (cpp)
+def generate_sobol(n_dims=2, n_points=10):
+    n_p = n_points*n_dims
+    x = sobol.i8_sobol_generate(n_dims, n_points, 1)
+    xx = (ctypes.c_double * n_p).from_address(int(x))
+    return np.transpose(np.array(list(xx)).reshape(n_points, n_dims))
 
 
 # sobol numbers' generation

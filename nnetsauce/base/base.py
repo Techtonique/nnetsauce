@@ -262,10 +262,16 @@ class Base(BaseEstimator):
             if W is None:
 
                 if self.nodes_sim == "sobol":
-                    self.W = ns.generate_sobol2(
-                        n_dims=n_features,
-                        n_points=self.n_hidden_features,
-                    )
+                    try: # try cpp version
+                        self.W = ns.generate_sobol(
+                            n_dims=n_features,
+                            n_points=self.n_hidden_features,
+                        )
+                    except: # python version
+                        self.W = ns.generate_sobol2(
+                            n_dims=n_features,
+                            n_points=self.n_hidden_features,
+                        )
 
                 if self.nodes_sim == "hammersley":
                     self.W = ns.generate_hammersley(
@@ -316,10 +322,16 @@ class Base(BaseEstimator):
             n_features_1 = n_features + 1
 
             if self.nodes_sim == "sobol":
-                self.W = ns.generate_sobol2(
-                    n_dims=n_features_1,
-                    n_points=self.n_hidden_features,
-                )
+                try: # try cpp version
+                    self.W = ns.generate_sobol(
+                        n_dims=n_features_1,
+                        n_points=self.n_hidden_features,
+                    )
+                except: # python version
+                    self.W = ns.generate_sobol2(
+                        n_dims=n_features_1,
+                        n_points=self.n_hidden_features,
+                    )
 
             if self.nodes_sim == "hammersley":
                 self.W = ns.generate_hammersley(
