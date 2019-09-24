@@ -3,13 +3,21 @@ from sys import version_info as _swig_python_version_info
 if _swig_python_version_info < (2, 7, 0):
     raise RuntimeError("Python 2.7 or later required")
 
+
 # Import the low-level C/C++ module
 if __package__ or "." in __name__:
+    
     try:
-        from . import _sobol
+        
+        for attr in _sobol.__all__:
+            globals()[attr] = getattr(_sobol, attr)
+            
     except:
-        import _sobol
+        
+        from ._sobol import *
+        
     else:
+        
         try:
             import builtins as __builtin__
         except ImportError:
