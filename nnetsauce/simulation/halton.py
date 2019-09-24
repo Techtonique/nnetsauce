@@ -5,16 +5,15 @@ if _swig_python_version_info < (2, 7, 0):
 
 
 # Import the low-level C/C++ module
-if __package__ or "." in __name__:
+#if __package__ or "." in __name__:
     
     try:
         
-        for attr in _halton.__all__:
-            globals()[attr] = getattr(_halton, attr)
-            
+        from ._halton import *
+    
     except:
         
-        from ._halton import *
+        import _halton
         
     else:
         

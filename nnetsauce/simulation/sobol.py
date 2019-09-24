@@ -5,16 +5,15 @@ if _swig_python_version_info < (2, 7, 0):
 
 
 # Import the low-level C/C++ module
-if __package__ or "." in __name__:
+#if __package__ or "." in __name__:
     
     try:
         
-        for attr in _sobol.__all__:
-            globals()[attr] = getattr(_sobol, attr)
-            
-    except:
-        
         from ._sobol import *
+            
+    except:        
+            
+        import _sobol
         
     else:
         
