@@ -4,6 +4,7 @@ from .nodesimulation import (
     generate_uniform,
     generate_hammersley,
     generate_halton,
+    generate_halton_cpp
 )
 
 from .rowsubsampling import subsample
@@ -15,5 +16,6 @@ __all__ = [
     "generate_uniform",
     "generate_hammersley",
     "generate_halton",
+    "generate_halton_cpp",
     "subsample",
 ]

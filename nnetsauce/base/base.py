@@ -287,10 +287,16 @@ class Base(BaseEstimator):
                     )
 
                 if self.nodes_sim == "halton":
-                    self.W = ns.generate_halton(
-                        n_dims=n_features,
-                        n_points=self.n_hidden_features,
-                    )
+                    try:
+                        self.W = ns.generate_halton_cpp(
+                            n_dims=n_features,
+                            n_points=self.n_hidden_features,
+                        )
+                    except:
+                        self.W = ns.generate_halton(
+                            n_dims=n_features,
+                            n_points=self.n_hidden_features,
+                        )
 
                 assert (
                     scaled_X.shape[1] == self.W.shape[0]
@@ -347,10 +353,16 @@ class Base(BaseEstimator):
                 )
 
             if self.nodes_sim == "halton":
-                self.W = ns.generate_halton(
-                    n_dims=n_features_1,
-                    n_points=self.n_hidden_features,
-                )
+                try: 
+                    self.W = ns.generate_halton_cpp(
+                        n_dims=n_features_1,
+                        n_points=self.n_hidden_features,
+                    )
+                except:
+                    self.W = ns.generate_halton(
+                        n_dims=n_features_1,
+                        n_points=self.n_hidden_features,
+                    )
 
             return mo.dropout(
                 x=self.activation_func(
