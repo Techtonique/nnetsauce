@@ -14,7 +14,7 @@ def memoize(func, maxsize=1000):
         
         # else: key not in cache       
         # you don't want it to grow indefinitely
-        if len(cache) >= maxsize:
+        if len(cache) > maxsize:
             cache.clear()
         
         cache[key] = func(*args, **kwargs)
