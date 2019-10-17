@@ -11,11 +11,11 @@ from .rowsubsampling import subsample
 
 try:
     
-    from .nodesimulation import generate_sobol
+    from .nodesimulation import generate_sobol_cpp
     from .nodesimulation import generate_halton_cpp
     
     __all__ = [
-    "generate_sobol",
+    "generate_sobol_cpp",
     "generate_sobol2",
     "generate_uniform",
     "generate_hammersley",

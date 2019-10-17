@@ -263,7 +263,7 @@ class Base(BaseEstimator):
 
                 if self.nodes_sim == "sobol":
                     try: # try cpp version
-                        self.W = ns.generate_sobol(
+                        self.W = ns.generate_sobol_cpp(
                             n_dims=n_features,
                             n_points=self.n_hidden_features,
                         )
@@ -287,12 +287,12 @@ class Base(BaseEstimator):
                     )
 
                 if self.nodes_sim == "halton":
-                    try:
+                    try: # try cpp version
                         self.W = ns.generate_halton_cpp(
                             n_dims=n_features,
                             n_points=self.n_hidden_features,
                         )
-                    except:
+                    except: # python version
                         self.W = ns.generate_halton(
                             n_dims=n_features,
                             n_points=self.n_hidden_features,
@@ -329,7 +329,7 @@ class Base(BaseEstimator):
 
             if self.nodes_sim == "sobol":
                 try: # try cpp version
-                    self.W = ns.generate_sobol(
+                    self.W = ns.generate_sobol_cpp(
                         n_dims=n_features_1,
                         n_points=self.n_hidden_features,
                     )
@@ -353,12 +353,12 @@ class Base(BaseEstimator):
                 )
 
             if self.nodes_sim == "halton":
-                try: 
+                try: # try cpp version
                     self.W = ns.generate_halton_cpp(
                         n_dims=n_features_1,
                         n_points=self.n_hidden_features,
                     )
-                except:
+                except: # python version
                     self.W = ns.generate_halton(
                         n_dims=n_features_1,
                         n_points=self.n_hidden_features,

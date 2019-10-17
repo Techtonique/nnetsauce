@@ -62,7 +62,7 @@ def generate_hammersley(
     ].transpose()
 
 
-# halton numbers' generation
+# halton numbers' generation (python)
 def generate_halton(n_dims=2, n_points=10, primes=None):
     def func_halton(
         n_dims=n_dims,
@@ -82,20 +82,19 @@ def generate_halton(n_dims=2, n_points=10, primes=None):
     return np.array(list(func_halton()))[
         1 : (n_points + 1), :
     ].transpose()
-
-
-def generate_halton_cpp(n_dims=2, n_points=10):
-    try:
-        n_p = n_dims*n_points
-        x = halton_sequence(1, n_points, n_dims)
-        xx = (ctypes.c_double * n_p).from_address(int(x))
-        return np.transpose(np.array(list(xx)).reshape(n_points, n_dims))
-    except:
-        raise ValueError('_halton.so is not imported.')
-
     
+
+# sobol numbers' generation (python)
+def generate_sobol2(n_dims=2, n_points=10):
+    return np.array(
+        i4_sobol_generate(
+            m=n_dims, n=n_points, skip=2
+        )
+    )
+
+
 # sobol numbers' generation (cpp)
-def generate_sobol(n_dims=2, n_points=10):
+def generate_sobol_cpp(n_dims=2, n_points=10):
     try:
         n_p = n_points*n_dims
         x = i8_sobol_generate(n_dims, n_points, 1)
@@ -105,19 +104,12 @@ def generate_sobol(n_dims=2, n_points=10):
         raise ValueError('_sobol.so is not imported.')
 
 
-# sobol numbers' generation
-def generate_sobol2(n_dims=2, n_points=10):
-    return np.array(
-        i4_sobol_generate(
-            m=n_dims, n=n_points, skip=2
-        )
-    )
-
-
-# sobol numbers' generation
-# def generate_sobol2(n_dims=2, n_points=10):
-#    return np.array(
-#        sobol_lib.i4_sobol_generate(
-#            m=n_dims, n=n_points, skip=2
-#        )
-#    )
+# halton numbers' generation (cpp)
+def generate_halton_cpp(n_dims=2, n_points=10):
+    try:
+        n_p = n_dims*n_points
+        x = halton_sequence(1, n_points, n_dims)
+        xx = (ctypes.c_double * n_p).from_address(int(x))
+        return np.transpose(np.array(list(xx)).reshape(n_points, n_dims))
+    except:
+        raise ValueError('_halton.so is not imported.')
