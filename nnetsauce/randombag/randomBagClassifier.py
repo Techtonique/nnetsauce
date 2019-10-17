@@ -134,7 +134,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         """
 
         assert mx.is_factor(
-            y
+            y.tolist()
         ), "y must contain only integers"
 
         # training

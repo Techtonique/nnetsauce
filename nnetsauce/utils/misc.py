@@ -1,4 +1,4 @@
-import functools
+from .memoize import memoize
 
 
 # merge two dictionaries
@@ -9,7 +9,8 @@ def merge_two_dicts(x, y):
 
 
 # check if x is int
-def is_int(x):
+@memoize        
+def is_int(x):    
     try:
         return int(x) == x
     except:
@@ -17,14 +18,27 @@ def is_int(x):
 
 
 # check if x is float
-def is_float(x):
+@memoize            
+def is_float(x):    
     return isinstance(x, float)
 
 
 # check if the response contains only integers
-@functools.lru_cache(maxsize=1000)
+@memoize    
 def is_factor(y):
-    return all((is_int(item)) & (is_float(item)==False) for item in y)
+    
+    n = len(y)
+    ans = True
+    idx = 0
+    
+    while (idx < n):
+        if (is_int(y[idx]) & (is_float(y[idx])==False)):
+            idx += 1
+        else:
+            ans = False
+            break            
+    
+    return ans
     
 
 # flatten list of lists

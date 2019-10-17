@@ -53,7 +53,9 @@ fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=5,
                                 dropout=0.1, n_clusters=3, 
                                 type_clust="gmm", verbose=1)
 
+start = time()
 fit_obj.fit(Z_train, y_train)
+print(time() - start)
 print(fit_obj.score(Z_test, y_test))
 
 preds = fit_obj.predict(Z_test)
@@ -77,7 +79,9 @@ fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=5,
                                 dropout=0.1, n_clusters=0, verbose=0,
                                 n_jobs=1)
 
+start = time()
 fit_obj.fit(Z_train, y_train)
+print(time() - start)
 print(fit_obj.score(Z_test, y_test))
 
 
@@ -96,8 +100,9 @@ fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=5,
                                 dropout=0.1, n_clusters=3, 
                                 type_clust="gmm", verbose=1)
 
-
+start = time()
 fit_obj.fit(X_train, y_train)
+print(time() - start)
 print(fit_obj.score(X_test, y_test))
 
 preds = fit_obj.predict(X_test)

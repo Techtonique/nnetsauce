@@ -14,6 +14,7 @@ from sklearn.preprocessing import (
     MinMaxScaler,
 )
 from ..utils import activations as ac
+from ..utils import memoize
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 from ..simulation import nodesimulation as ns

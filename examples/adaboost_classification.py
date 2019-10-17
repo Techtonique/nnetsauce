@@ -4,6 +4,7 @@ from sklearn.datasets import load_breast_cancer, load_wine, load_iris
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
+from time import time
 
 
 # dataset no. 1 ----------
@@ -26,8 +27,12 @@ fit_obj = ns.AdaBoostClassifier(clf,
                                 dropout=0.10216064, n_clusters=2,
                                 type_clust="gmm",
                                 verbose=1, seed = 123, 
-                                method="SAMME")  
-fit_obj.fit(X_train, y_train)  
+                                method="SAMME") 
+
+start = time() 
+fit_obj.fit(X_train, y_train) 
+print(time() - start)
+ 
 print(fit_obj.score(X_test, y_test))
 preds = fit_obj.predict(X_test)                        
 
