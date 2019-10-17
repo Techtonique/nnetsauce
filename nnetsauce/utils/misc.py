@@ -1,3 +1,6 @@
+import functools
+
+
 # merge two dictionaries
 def merge_two_dicts(x, y):
     z = x.copy()
@@ -19,6 +22,7 @@ def is_float(x):
 
 
 # check if the response contains only integers
+@functools.lru_cache(maxsize=1000)
 def is_factor(y):
     return all((is_int(item)) & (is_float(item)==False) for item in y)
     

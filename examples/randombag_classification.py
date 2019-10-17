@@ -96,6 +96,7 @@ fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=5,
                                 dropout=0.1, n_clusters=3, 
                                 type_clust="gmm", verbose=1)
 
+
 fit_obj.fit(X_train, y_train)
 print(fit_obj.score(X_test, y_test))
 
