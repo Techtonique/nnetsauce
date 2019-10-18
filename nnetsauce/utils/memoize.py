@@ -1,6 +1,6 @@
 import functools
 
-def memoize(func, maxsize=1000):
+def memoize(func, maxsize=128):
     
     cache = func.cache = {}
     

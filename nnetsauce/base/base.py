@@ -191,15 +191,9 @@ class Base(BaseEstimator):
 
             if self.type_clust == "kmeans":
 
-                # do kmeans + one-hot encoding
-                kmeans = KMeans(
-                    n_clusters=self.n_clusters,
-                    random_state=self.seed,
-                    **kwargs
-                )
-                kmeans.fit(scaled_X)
-                X_kmeans = kmeans.predict(scaled_X)
-                self.clustering_obj = kmeans
+                self.clustering_obj, X_kmeans = mo.cluster_covariates(scaled_X, self.n_clusters, 
+                                                                self.seed, type_clust = "kmeans", 
+                                                                **kwargs)
 
                 if self.cluster_encode == True:
 
@@ -211,15 +205,10 @@ class Base(BaseEstimator):
 
             if self.type_clust == "gmm":
 
-                gmm = GaussianMixture(
-                    n_components=self.n_clusters,
-                    random_state=self.seed,
-                    **kwargs
-                )
-                gmm.fit(scaled_X)
-                X_gmm = gmm.predict(scaled_X)
-                self.clustering_obj = gmm
-
+                self.clustering_obj, X_gmm = mo.cluster_covariates(scaled_X, self.n_clusters, 
+                                                                self.seed, type_clust = "gmm", 
+                                                                **kwargs)
+                
                 if self.cluster_encode == True:
 
                     return mo.one_hot_encode(

@@ -8,7 +8,7 @@ from sklearn import metrics
 from time import time
 
 
-# dataset no. 1 ----------
+# dataset no. 1 ---------- 
 
 breast_cancer = load_breast_cancer()
 Z = breast_cancer.data
@@ -27,6 +27,7 @@ fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=2,
 start = time()
 fit_obj.fit(X_train, y_train)
 print(time() - start)
+#0.8955960273742676
 print(fit_obj.score(X_test, y_test))
 print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
 
@@ -56,6 +57,7 @@ fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=5,
 start = time()
 fit_obj.fit(Z_train, y_train)
 print(time() - start)
+# 1.8651049137115479
 print(fit_obj.score(Z_test, y_test))
 
 preds = fit_obj.predict(Z_test)
@@ -82,6 +84,7 @@ fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=5,
 start = time()
 fit_obj.fit(Z_train, y_train)
 print(time() - start)
+# 0.4114112854003906
 print(fit_obj.score(Z_test, y_test))
 
 
@@ -103,6 +106,7 @@ fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=5,
 start = time()
 fit_obj.fit(X_train, y_train)
 print(time() - start)
+# 5.983736038208008
 print(fit_obj.score(X_test, y_test))
 
 preds = fit_obj.predict(X_test)

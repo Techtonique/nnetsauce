@@ -1,10 +1,13 @@
 import numpy as np
+
 from .memoize import memoize
 from scipy import sparse
 from sklearn.preprocessing import (
     StandardScaler,
     MinMaxScaler,
 )
+from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
 
 
 # column bind
@@ -21,6 +24,34 @@ def center_response(y):
     return y_mean, (y - y_mean)
 
 
+# cluster the covariates 
+def cluster_covariates(X, n_clusters, seed, 
+                       type_clust = "kmeans", 
+                       **kwargs):
+    
+    if (type_clust == "kmeans"):
+        
+        kmeans = KMeans(
+            n_clusters=n_clusters,
+            random_state=seed,
+            **kwargs
+        )
+        kmeans.fit(X)
+        
+        return kmeans, kmeans.predict(X)
+    
+    if (type_clust == "gmm"):
+        
+        gmm = GaussianMixture(
+                    n_components=n_clusters,
+                    random_state=seed,
+                    **kwargs
+                )
+        gmm.fit(X)
+        
+        return gmm, gmm.predict(X)
+
+
 # computes t(x)%*%y
 def crossprod(x, y=None):
     # assert on dimensions
@@ -31,7 +62,6 @@ def crossprod(x, y=None):
 
 
 # dropout
-@memoize
 def dropout(x, drop_prob=0, seed=123):
 
     assert 0 <= drop_prob <= 1
@@ -86,7 +116,7 @@ def rbind(x, y):
     return np.row_stack((x, y))
 
 
-# from sklearn.utils.exmath
+# from sklearn.utils.exmath  
 def safe_sparse_dot(a, b, dense_output=False):
     """Dot product that handle the sparse matrix case correctly
 
@@ -116,7 +146,6 @@ def safe_sparse_dot(a, b, dense_output=False):
 
 
 # scale... covariates
-@memoize
 def scale_covariates(X, choice="std", 
                      training=True, scaler=None):
     
@@ -158,7 +187,7 @@ def squared_norm(x):
     return np.dot(x, x)
 
 
-# computes x%*%t(y)
+# computes x%*%t(y)    
 def tcrossprod(x, y=None):
     # assert on dimensions
     if y is None:

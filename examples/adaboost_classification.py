@@ -32,7 +32,7 @@ fit_obj = ns.AdaBoostClassifier(clf,
 start = time() 
 fit_obj.fit(X_train, y_train) 
 print(time() - start)
- 
+# 37.240473985672 
 print(fit_obj.score(X_test, y_test))
 preds = fit_obj.predict(X_test)                        
 
@@ -51,7 +51,10 @@ fit_obj = ns.AdaBoostClassifier(clf,
                                 type_clust="gmm",
                                 verbose=1, seed = 123, 
                                 method="SAMME.R")  
-fit_obj.fit(X_train, y_train)  
+start = time() 
+fit_obj.fit(X_train, y_train) 
+print(time() - start) 
+# 6.906151294708252
 print(fit_obj.score(X_test, y_test))
 preds = fit_obj.predict(X_test)                        
 
@@ -80,7 +83,10 @@ fit_obj = ns.AdaBoostClassifier(clf,
                                 type_clust="gmm",
                                 verbose=1, seed = 123, 
                                 method="SAMME")  
-fit_obj.fit(Z_train, y_train)  
+start = time() 
+fit_obj.fit(Z_train, y_train) 
+print(time() - start)  
+# 22.685115098953247
 print(fit_obj.score(Z_test, y_test))
 preds = fit_obj.predict(Z_test)     
 print(metrics.classification_report(preds, y_test))     
@@ -106,7 +112,10 @@ fit_obj = ns.AdaBoostClassifier(clf,
                                 dropout=0.15603027, n_clusters=0,
                                 verbose=1, seed = 123, 
                                 method="SAMME.R")  
-fit_obj.fit(Z_train, y_train)  
+start = time() 
+fit_obj.fit(Z_train, y_train)
+print(time() - start)    
+# 1.413327932357788
 print(fit_obj.score(Z_test, y_test))
 preds = fit_obj.predict(Z_test)     
 print(metrics.classification_report(preds, y_test))     
