@@ -184,20 +184,10 @@ class Base(BaseEstimator):
         if X is None:
             X = self.X
 
-        if predict == False:  # encode training set
-
-            scaling_options = {
-                "std": StandardScaler(
-                    copy=True, with_mean=True, with_std=True
-                ),
-                "minmax": MinMaxScaler(),
-            }
-
+        if predict == False:  # encode training set            
+            
             # scale input data before clustering
-            scaler = scaling_options[self.type_scaling[2]]
-
-            scaled_X = scaler.fit_transform(X)
-            self.clustering_scaler = scaler
+            self.clustering_scaler, scaled_X = mo.scale_covariates(X, choice=self.type_scaling[2])            
 
             if self.type_clust == "kmeans":
 
@@ -400,26 +390,6 @@ class Base(BaseEstimator):
     ):
         """ Create new data for training set, with hidden layer, center the response. """
 
-#def scale_covariates(X, choice="std", 
-#                     training=True, scaler=None):
-#    
-#    scaling_options = {
-#            "std": StandardScaler(
-#                copy=True, with_mean=True, with_std=True
-#            ),
-#            "minmax": MinMaxScaler(),
-#        }
-#    
-#    if training == True: 
-#        # scaler must be not None
-#        scaler = scaling_options[choice]
-#        scaled_X = scaler.fit_transform(X)
-#        return scaler, scaled_X
-#    
-#    # training == False:
-#    # scaler must be not None
-#    return scaler.transform(X)
-    
         # either X and y are stored or not
         # assert ((y is None) & (X is None)) | ((y is not None) & (X is not None))
         if self.n_hidden_features > 0:  # has a hidden layer
