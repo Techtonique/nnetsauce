@@ -157,7 +157,7 @@ class Base(BaseEstimator):
         self.beta = None
 
     # "preprocessing" methods to be inherited -----
-
+        
     def encode_clusters(
         self, X=None, predict=False, **kwargs
     ):  #
@@ -400,42 +400,40 @@ class Base(BaseEstimator):
     ):
         """ Create new data for training set, with hidden layer, center the response. """
 
+#def scale_covariates(X, choice="std", 
+#                     training=True, scaler=None):
+#    
+#    scaling_options = {
+#            "std": StandardScaler(
+#                copy=True, with_mean=True, with_std=True
+#            ),
+#            "minmax": MinMaxScaler(),
+#        }
+#    
+#    if training == True: 
+#        # scaler must be not None
+#        scaler = scaling_options[choice]
+#        scaled_X = scaler.fit_transform(X)
+#        return scaler, scaled_X
+#    
+#    # training == False:
+#    # scaler must be not None
+#    return scaler.transform(X)
+    
         # either X and y are stored or not
         # assert ((y is None) & (X is None)) | ((y is not None) & (X is not None))
-        scaling_options = {
-            "std": StandardScaler(
-                copy=True, with_mean=True, with_std=True
-            ),
-            "minmax": MinMaxScaler(),
-        }
-
         if self.n_hidden_features > 0:  # has a hidden layer
 
             assert len(self.type_scaling) >= 2, ""
-
-            nn_scaling_options = {
-                "std": StandardScaler(
-                    copy=True, with_mean=True, with_std=True
-                ),
-                "minmax": MinMaxScaler(),
-            }
-
-            nn_scaler = nn_scaling_options[
-                self.type_scaling[1]
-            ]
-
-        scaler = scaling_options[self.type_scaling[0]]
-
+                        
+            
         # center y
         if mx.is_factor(y) == False:  # regression
-
+            
             if y is None:
-                y_mean = self.y.mean()
-                centered_y = self.y - y_mean
+                self.y_mean, centered_y = mo.center_response(self.y)
             else:  # keep
-                y_mean = y.mean()
-                self.y_mean = y_mean
-                centered_y = y - y_mean
+                self.y_mean, centered_y = mo.center_response(y)
 
         if X is None:
 
@@ -492,9 +490,9 @@ class Base(BaseEstimator):
             if (
                 self.n_hidden_features > 0
             ):  # with hidden layer
-
-                scaled_X = nn_scaler.fit_transform(input_X)
-                self.nn_scaler = nn_scaler
+                
+                self.nn_scaler, scaled_X = mo.scale_covariates(input_X, 
+                                                            choice=self.type_scaling[1])                
 
                 if W is None:
                     Phi_X = self.create_layer(scaled_X)
@@ -506,14 +504,13 @@ class Base(BaseEstimator):
                 else:
                     Z = Phi_X
 
-                scaler.fit(Z)
-                self.scaler = scaler
+                self.scaler, scaled_Z = mo.scale_covariates(Z, choice=self.type_scaling[0])
 
             else:  # no hidden layer
 
                 Z = input_X
-                scaler.fit(Z)
-                self.scaler = scaler
+                
+                self.scaler, scaled_Z = mo.scale_covariates(Z, choice=self.type_scaling[0])
 
         else:  # data with clustering: self.n_clusters is not None -----
 
@@ -525,11 +522,9 @@ class Base(BaseEstimator):
             if (
                 self.n_hidden_features > 0
             ):  # with hidden layer
-
-                scaled_X = nn_scaler.fit_transform(
-                    augmented_X
-                )
-                self.nn_scaler = nn_scaler
+                
+                self.nn_scaler, scaled_X = mo.scale_covariates(augmented_X, 
+                                                               choice=self.type_scaling[1])                
 
                 if W is None:
                     Phi_X = self.create_layer(scaled_X)
@@ -541,14 +536,13 @@ class Base(BaseEstimator):
                 else:
                     Z = Phi_X
 
-                scaler.fit(Z)
-                self.scaler = scaler
+                self.scaler, scaled_Z = mo.scale_covariates(Z, choice=self.type_scaling[0])
 
             else:  # no hidden layer
 
                 Z = augmented_X
-                scaler.fit(Z)
-                self.scaler = scaler
+                
+                self.scaler, scaled_Z = mo.scale_covariates(Z, choice=self.type_scaling[0])
 
         # Returning model inputs -----
 

@@ -1,11 +1,24 @@
 import numpy as np
-from scipy import linalg, sparse
+from .memoize import memoize
+from scipy import sparse
+from sklearn.preprocessing import (
+    StandardScaler,
+    MinMaxScaler,
+)
+
 
 # column bind
 def cbind(x, y):
 
     # if len(x.shape) == 1 or len(y.shape) == 1:
     return np.column_stack((x, y))
+
+
+# center... response
+@memoize
+def center_response(y):
+    y_mean = np.mean(y)
+    return y_mean, (y - y_mean)
 
 
 # computes t(x)%*%y
@@ -18,6 +31,7 @@ def crossprod(x, y=None):
 
 
 # dropout
+@memoize
 def dropout(x, drop_prob=0, seed=123):
 
     assert 0 <= drop_prob <= 1
@@ -37,6 +51,7 @@ def dropout(x, drop_prob=0, seed=123):
 
 
 # one-hot encoding
+@memoize
 def one_hot_encode(x_clusters, n_clusters):
 
     assert (
@@ -53,6 +68,7 @@ def one_hot_encode(x_clusters, n_clusters):
 
 
 # one-hot encoding
+@memoize    
 def one_hot_encode2(y, n_classes):
     n_obs = len(y)
     res = np.zeros((n_obs, n_classes))
@@ -98,6 +114,29 @@ def safe_sparse_dot(a, b, dense_output=False):
     else:
         return np.dot(a, b)
 
+
+# scale... covariates
+@memoize
+def scale_covariates(X, choice="std", 
+                     training=True, scaler=None):
+    
+    scaling_options = {
+            "std": StandardScaler(
+                copy=True, with_mean=True, with_std=True
+            ),
+            "minmax": MinMaxScaler(),
+        }
+    
+    if training == True: 
+        # scaler must be not None
+        scaler = scaling_options[choice]
+        scaled_X = scaler.fit_transform(X)
+        return scaler, scaled_X
+    
+    # training == False:
+    # scaler must be not None
+    return scaler.transform(X)
+    
 
 # from sklearn.utils.exmath
 def squared_norm(x):

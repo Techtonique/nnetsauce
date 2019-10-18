@@ -3,7 +3,9 @@ import ctypes
 from six import moves
 from .sobol_lib2 import *  # longer sobol sequence !
 from .sobol import *      
-from .halton import *    
+from .halton import *   
+from ..utils import memoize
+ 
 
 # From: https://github.com/PhaethonPrime/hammersley/blob/master/hammersley/sequences.py
 
@@ -19,7 +21,7 @@ saved_primes = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,
                 563,569,571,577,587,593,599,601,607,613,617,619,
                 631,641,643,647,653,659]
 
-
+@memoize
 def get_phi(p, k):
     p_ = p
     k_ = k
@@ -33,12 +35,14 @@ def get_phi(p, k):
 
 
 # uniform numbers' generation
+@memoize
 def generate_uniform(n_dims=2, n_points=10, seed=123):
     np.random.seed(seed=seed)
     return np.random.random((n_dims, n_points))
 
 
 # hammersley numbers' generation
+@memoize
 def generate_hammersley(
     n_dims=2, n_points=100, primes=None
 ):
@@ -63,6 +67,7 @@ def generate_hammersley(
 
 
 # halton numbers' generation (python)
+@memoize        
 def generate_halton(n_dims=2, n_points=10, primes=None):
     def func_halton(
         n_dims=n_dims,
@@ -85,6 +90,7 @@ def generate_halton(n_dims=2, n_points=10, primes=None):
     
 
 # sobol numbers' generation (python)
+@memoize        
 def generate_sobol2(n_dims=2, n_points=10):
     return np.array(
         i4_sobol_generate(
@@ -94,6 +100,7 @@ def generate_sobol2(n_dims=2, n_points=10):
 
 
 # sobol numbers' generation (cpp)
+@memoize        
 def generate_sobol_cpp(n_dims=2, n_points=10):
     try:
         n_p = n_points*n_dims
@@ -105,6 +112,7 @@ def generate_sobol_cpp(n_dims=2, n_points=10):
 
 
 # halton numbers' generation (cpp)
+@memoize        
 def generate_halton_cpp(n_dims=2, n_points=10):
     try:
         n_p = n_dims*n_points
