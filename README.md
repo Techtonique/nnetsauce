@@ -1,5 +1,7 @@
 ![nnetsauce logo](the-nnetsauce.png)
 
+<hr>
+
 This package does Statistical/Machine Learning by using various -- advanced -- combinations of single layer 'neural' networks. 
 
 
