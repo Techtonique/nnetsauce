@@ -1,6 +1,4 @@
-<div align="center">
-![](the-nnetsauce.png)
-</div>
+![nnetsauce logo](the-nnetsauce.png)
 
 
 # nnetsauce 
