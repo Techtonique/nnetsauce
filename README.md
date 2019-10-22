@@ -1,4 +1,7 @@
-![logo](https://github.com/thierrymoudiki/thierrymoudiki.github.io/tree/master/images/the-nnetsauce.png){:class="img-responsive"}
+<div align="center">
+![](the-nnetsauce.png)
+</div>
+
 
 # nnetsauce 
 
