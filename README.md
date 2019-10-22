@@ -1,3 +1,5 @@
+![logo](https://github.com/thierrymoudiki/thierrymoudiki.github.io/tree/master/images/the-nnetsauce.png){:class="img-responsive"}
+
 # nnetsauce 
 
 This package does Statistical/Machine Learning by using various -- advanced -- combinations of single layer 'neural' networks. 
