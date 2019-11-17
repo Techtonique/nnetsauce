@@ -129,6 +129,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         self.method = method
         self.reg_lambda = reg_lambda
         self.reg_alpha = reg_alpha
+        
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit Boosting model to training data (X, y).
@@ -326,6 +327,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
             return self
 
+
     def predict(self, X, **kwargs):
         """Predict test data X.
         
@@ -346,6 +348,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         return self.predict_proba(X, **kwargs).argmax(
             axis=1
         )
+        
 
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
@@ -445,6 +448,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         return (
             expit_ensemble_learner / sum_ensemble[:, None]
         )
+        
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
