@@ -111,7 +111,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         self.type_fit = "classification"
         self.verbose = verbose
         self.n_jobs = n_jobs
-        self.voter = []
+        self.voter = dict.fromkeys(range(n_estimators))
         
 
     def fit(self, X, y, **kwargs):
@@ -174,11 +174,9 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
                     base_learner.fit(X, y, **kwargs)
 
-                    self.voter.append(
-                        pickle.loads(
+                    self.voter.update({m: pickle.loads(
                             pickle.dumps(base_learner, -1)
-                        )
-                    )
+                        )})
 
                     base_learner.set_params(
                         seed=self.seed + (m + 1) * 1000
@@ -222,9 +220,9 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
                 seed=self.seed + m * 1000,
             )
             base_learner.fit(X, y, **kwargs)
-            self.voter.append(
-                pickle.loads(pickle.dumps(base_learner, -1))
-            )
+            self.voter.update({m: pickle.loads(
+                            pickle.dumps(base_learner, -1)
+                        )})
 
         if self.verbose == 1:
 
@@ -296,7 +294,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
             if weights is None:
 
-                for idx, elt in enumerate(voter):
+                for idx, elt in voter.items():
 
                     ensemble_proba += elt.predict_proba(X)
 
@@ -309,7 +307,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
                 return ensemble_proba / n_iter
 
             # if weights is not None:
-            for idx, elt in enumerate(voter):
+            for idx, elt in voter.items():
 
                 ensemble_proba += weights[
                     idx
