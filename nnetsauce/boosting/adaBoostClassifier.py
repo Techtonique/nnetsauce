@@ -124,7 +124,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         self.type_fit = "classification"
         self.alpha = []
         self.w = []
-        self.base_learners = []
+        self.base_learners = dict.fromkeys(range(n_estimators))
         self.verbose = verbose
         self.method = method
         self.reg_lambda = reg_lambda
@@ -215,11 +215,9 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                     **kwargs
                 ).predict(X)
 
-                self.base_learners.append(
-                    pickle.loads(
-                        pickle.dumps(base_learner, -1)
-                    )
-                )
+                self.base_learners.update({m: pickle.loads(
+                            pickle.dumps(base_learner, -1)
+                        )})
 
                 cond = [y[i] != preds[i] for i in x_range_n]
 
@@ -298,11 +296,9 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                     out=probs,
                 )
 
-                self.base_learners.append(
-                    pickle.loads(
-                        pickle.dumps(base_learner, -1)
-                    )
-                )
+                self.base_learners.update({m: pickle.loads(
+                            pickle.dumps(base_learner, -1)
+                        )})
 
                 w_m *= np.exp(
                     -1.0
@@ -378,9 +374,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             if self.verbose == 1:
                 pbar = Progbar(n_iter)
 
-            for idx, base_learner in enumerate(
-                self.base_learners
-            ):
+            for idx, base_learner in self.base_learners.items():
 
                 preds = base_learner.predict(X, **kwargs)
 
@@ -413,9 +407,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         if self.verbose == 1:
             pbar = Progbar(n_iter)
 
-        for idx, base_learner in enumerate(
-            self.base_learners
-        ):
+        for idx, base_learner in self.base_learners.items():
 
             probs = base_learner.predict_proba(X, **kwargs)
 
