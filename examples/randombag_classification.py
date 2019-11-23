@@ -22,15 +22,19 @@ fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=2,
                                 direct_link=True,
                                 n_estimators=100, 
                                 col_sample=0.9, row_sample=0.9,
-                                dropout=0.3, n_clusters=0, verbose=1)
+                                dropout=0.3, n_clusters=0, verbose=0)
 
 start = time()
 fit_obj.fit(X_train, y_train)
 print(time() - start)
 #0.8955960273742676
+
 print(fit_obj.score(X_test, y_test))
 print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
 
+start = time()
+[fit_obj.fit(X_train, y_train) for _ in range(10)]
+print(time() - start)
 
 start = time()
 preds = fit_obj.predict(X_test)

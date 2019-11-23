@@ -32,7 +32,7 @@ fit_obj = ns.AdaBoostClassifier(clf,
 start = time() 
 fit_obj.fit(X_train, y_train) 
 print(time() - start)
-# 37.240473985672 
+# 29.34
 print(fit_obj.score(X_test, y_test))
 preds = fit_obj.predict(X_test)                        
 
