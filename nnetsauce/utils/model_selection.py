@@ -60,7 +60,7 @@ class TimeSeriesSplit(TimeSeriesSplit):
         # assert horizon
         # assert fixed_window
         
-        n, p = X.shape
+        n = X.shape[0]
 
         # Initialization of indices -----
 
@@ -88,12 +88,12 @@ class TimeSeriesSplit(TimeSeriesSplit):
                     indices[min_index_test:max_index_test],
                 )
 
-                min_index_train = min_index_train + 1
-                min_index_test = min_index_test + 1
-                max_index_train = max_index_train + 1
-                max_index_test = max_index_test + 1
+                min_index_train += 1
+                min_index_test += 1
+                max_index_train += 1
+                max_index_test += 1
 
-                n_splits = n_splits + 1
+                n_splits += 1
 
         else:
 
@@ -106,11 +106,11 @@ class TimeSeriesSplit(TimeSeriesSplit):
                     indices[min_index_test:max_index_test],
                 )
 
-                max_index_train = max_index_train + 1
-                min_index_test = min_index_test + 1
-                max_index_test = max_index_test + 1
+                max_index_train += 1
+                min_index_test += 1
+                max_index_test += 1
 
-                n_splits = n_splits + 1
+                n_splits += 1
 
         # set n_splits after (?)
         self.n_splits = n_splits
