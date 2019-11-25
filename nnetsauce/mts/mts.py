@@ -16,6 +16,7 @@ from scipy.stats import norm
 from ..utils import matrixops as mo
 from ..utils import timeseries as ts
 import sklearn.metrics as skm2
+import pickle
 
 
 class MTS(Base):
@@ -117,7 +118,7 @@ class MTS(Base):
         self.X = None  # MTS lags
         self.xreg = None
         self.regressors_scaler = None
-        self.y_means = []
+        self.y_means = {}
         self.preds = None
         self.return_std = return_std
         self.preds_std = []
@@ -150,8 +151,10 @@ class MTS(Base):
         n, p = X.shape
 
         self.n_series = p
-
-        self.y_means = np.zeros(p)
+        
+        self.fit_objs.clear()
+        
+        self.y_means.clear()
 
         mts_input = ts.create_train_inputs(
             X[::-1], self.lags
@@ -190,9 +193,10 @@ class MTS(Base):
         for i in range(p):
             y_mean = np.mean(self.y[:, i])
             self.y_means[i] = y_mean
-            self.fit_objs[i] = self.obj.fit(
+            self.fit_objs[i] = pickle.loads(
+                            pickle.dumps(self.obj.fit(
                 scaled_Z, self.y[:, i] - y_mean, **kwargs
-            )
+            ), -1))                        
 
         self.y_mean = None
 
@@ -224,18 +228,20 @@ class MTS(Base):
         model predictions for horizon = h: {array-like}
         """
 
+
         if self.xreg is not None:
             assert (
                 new_xreg is not None
             ), "'new_xreg' must be provided"
 
         self.preds = None
-
-        self.preds = self.y
+        
+        self.preds = pickle.loads(pickle.dumps(self.y, -1))
 
         n_features = self.n_series * self.lags
 
         self.preds_std = np.zeros(h)
+        
 
         if "return_std" in kwargs:
 
@@ -243,9 +249,8 @@ class MTS(Base):
 
             qt = norm.ppf(1 - 0.5 * (1 - level / 100))
 
-        if (
-            new_xreg is not None
-        ):  # Additional regressors provided
+
+        if (new_xreg is not None):  # Additional regressors provided
 
             try:
                 n_obs_xreg, n_features_xreg = new_xreg.shape
@@ -263,21 +268,17 @@ class MTS(Base):
 
             n_features_total = n_features + n_features_xreg
 
-            inv_new_xreg = mo.rbind(self.xreg, new_xreg)[
-                ::-1
-            ]
+            inv_new_xreg = mo.rbind(self.xreg, new_xreg)[::-1]
+
 
         # Loop on horizon h
-
         for i in range(h):
 
             new_obs = ts.reformat_response(
                 self.preds, self.lags
             )
 
-            if (
-                new_xreg is not None
-            ):  # Additional regressors provided
+            if (new_xreg is not None):  # Additional regressors provided
 
                 new_obs_xreg = ts.reformat_response(
                     inv_new_xreg, self.lags
@@ -312,9 +313,7 @@ class MTS(Base):
                 cooked_new_X, **kwargs
             )
 
-            if (
-                self.return_std == False
-            ):  # std. dev. is not returned
+            if (self.return_std == False):  # std. dev. is not returned
 
                 preds = np.array(
                     [
@@ -350,9 +349,7 @@ class MTS(Base):
 
         self.preds = self.preds[0:h, :][::-1]
 
-        if (
-            self.return_std == False
-        ):  # the std. dev. is returned
+        if (self.return_std == False):  # the std. dev. is returned
 
             return self.preds
 
