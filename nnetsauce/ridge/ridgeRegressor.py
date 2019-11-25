@@ -16,7 +16,7 @@ from scipy.linalg import pinv
 
 
 class RidgeRegressor(Ridge, RegressorMixin):
-    """Ridge regression model class derived from class Ridge
+    """Ridge regression model class with 2 regularization parameters derived from class Ridge
     
        Parameters
        ----------
@@ -103,9 +103,7 @@ class RidgeRegressor(Ridge, RegressorMixin):
 
    
     def fit(self, X, y, **kwargs):
-        """Fit Ridge model to training data (X, y).
-           for beta: regression coeffs (beta11, ..., beta1p, ..., betaK1, ..., betaKp)
-           for K classes and p covariates.
+        """Fit Ridge model to training data (X, y).           
 
         
         Parameters

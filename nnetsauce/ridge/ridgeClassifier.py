@@ -15,7 +15,7 @@ from scipy.special import logsumexp
 
 
 class RidgeClassifier(Ridge, ClassifierMixin):
-    """Ridge Classification model class derived from class Ridge
+    """Ridge Classification model class with 2 regularization parameters derived from class Ridge
     
        Parameters
        ----------
