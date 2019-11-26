@@ -2,24 +2,137 @@ import numpy as np
 import ctypes
 from six import moves
 from .sobol_lib2 import *  # longer sobol sequence !
-from .sobol import *      
-from .halton import *   
+from .sobol import *
+from .halton import *
 from ..utils import memoize
- 
+
 
 # From: https://github.com/PhaethonPrime/hammersley/blob/master/hammersley/sequences.py
 
 # this list of primes allows up to a size 120 vector
-saved_primes = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,
-                59,61,67,71,73,79,83,89,97,101,103,107,109,113,
-                127,131,137,139,149,151,157,163,167,173,179,181,
-                191,193,197,199,211,223,227,229,233,239,241,251,
-                257,263,269,271,277,281,283,293,307,311,313,317,
-                331,337,347,349,353,359,367,373,379,383,389,397,
-                401,409,419,421,431,433,439,443,449,457,461,463,
-                467,479,487,491,499,503,509,521,523,541,547,557,
-                563,569,571,577,587,593,599,601,607,613,617,619,
-                631,641,643,647,653,659]
+saved_primes = [
+    2,
+    3,
+    5,
+    7,
+    11,
+    13,
+    17,
+    19,
+    23,
+    29,
+    31,
+    37,
+    41,
+    43,
+    47,
+    53,
+    59,
+    61,
+    67,
+    71,
+    73,
+    79,
+    83,
+    89,
+    97,
+    101,
+    103,
+    107,
+    109,
+    113,
+    127,
+    131,
+    137,
+    139,
+    149,
+    151,
+    157,
+    163,
+    167,
+    173,
+    179,
+    181,
+    191,
+    193,
+    197,
+    199,
+    211,
+    223,
+    227,
+    229,
+    233,
+    239,
+    241,
+    251,
+    257,
+    263,
+    269,
+    271,
+    277,
+    281,
+    283,
+    293,
+    307,
+    311,
+    313,
+    317,
+    331,
+    337,
+    347,
+    349,
+    353,
+    359,
+    367,
+    373,
+    379,
+    383,
+    389,
+    397,
+    401,
+    409,
+    419,
+    421,
+    431,
+    433,
+    439,
+    443,
+    449,
+    457,
+    461,
+    463,
+    467,
+    479,
+    487,
+    491,
+    499,
+    503,
+    509,
+    521,
+    523,
+    541,
+    547,
+    557,
+    563,
+    569,
+    571,
+    577,
+    587,
+    593,
+    599,
+    601,
+    607,
+    613,
+    617,
+    619,
+    631,
+    641,
+    643,
+    647,
+    653,
+    659,
+]
+
 
 @memoize
 def get_phi(p, k):
@@ -67,7 +180,7 @@ def generate_hammersley(
 
 
 # halton numbers' generation (python)
-@memoize        
+@memoize
 def generate_halton(n_dims=2, n_points=10, primes=None):
     def func_halton(
         n_dims=n_dims,
@@ -87,37 +200,39 @@ def generate_halton(n_dims=2, n_points=10, primes=None):
     return np.array(list(func_halton()))[
         1 : (n_points + 1), :
     ].transpose()
-    
+
 
 # sobol numbers' generation (python)
-@memoize        
+@memoize
 def generate_sobol2(n_dims=2, n_points=10):
     return np.array(
-        i4_sobol_generate(
-            m=n_dims, n=n_points, skip=2
-        )
+        i4_sobol_generate(m=n_dims, n=n_points, skip=2)
     )
 
 
 # sobol numbers' generation (cpp)
-@memoize        
+@memoize
 def generate_sobol_cpp(n_dims=2, n_points=10):
     try:
-        n_p = n_points*n_dims
+        n_p = n_points * n_dims
         x = i8_sobol_generate(n_dims, n_points, 1)
         xx = (ctypes.c_double * n_p).from_address(int(x))
-        return np.transpose(np.array(list(xx)).reshape(n_points, n_dims))
+        return np.transpose(
+            np.array(list(xx)).reshape(n_points, n_dims)
+        )
     except:
-        raise ValueError('_sobol.so is not imported.')
+        raise ValueError("_sobol.so is not imported.")
 
 
 # halton numbers' generation (cpp)
-@memoize        
+@memoize
 def generate_halton_cpp(n_dims=2, n_points=10):
     try:
-        n_p = n_dims*n_points
+        n_p = n_dims * n_points
         x = halton_sequence(1, n_points, n_dims)
         xx = (ctypes.c_double * n_p).from_address(int(x))
-        return np.transpose(np.array(list(xx)).reshape(n_points, n_dims))
+        return np.transpose(
+            np.array(list(xx)).reshape(n_points, n_dims)
+        )
     except:
-        raise ValueError('_halton.so is not imported.')
+        raise ValueError("_halton.so is not imported.")

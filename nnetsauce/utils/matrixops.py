@@ -24,31 +24,31 @@ def center_response(y):
     return y_mean, (y - y_mean)
 
 
-# cluster the covariates 
-def cluster_covariates(X, n_clusters, seed, 
-                       type_clust = "kmeans", 
-                       **kwargs):
-    
-    if (type_clust == "kmeans"):
-        
+# cluster the covariates
+def cluster_covariates(
+    X, n_clusters, seed, type_clust="kmeans", **kwargs
+):
+
+    if type_clust == "kmeans":
+
         kmeans = KMeans(
             n_clusters=n_clusters,
             random_state=seed,
             **kwargs
         )
         kmeans.fit(X)
-        
+
         return kmeans, kmeans.predict(X)
-    
-    if (type_clust == "gmm"):
-        
+
+    if type_clust == "gmm":
+
         gmm = GaussianMixture(
-                    n_components=n_clusters,
-                    random_state=seed,
-                    **kwargs
-                )
+            n_components=n_clusters,
+            random_state=seed,
+            **kwargs
+        )
         gmm.fit(X)
-        
+
         return gmm, gmm.predict(X)
 
 
@@ -98,7 +98,7 @@ def one_hot_encode(x_clusters, n_clusters):
 
 
 # one-hot encoding
-@memoize    
+@memoize
 def one_hot_encode2(y, n_classes):
     n_obs = len(y)
     res = np.zeros((n_obs, n_classes))
@@ -116,7 +116,7 @@ def rbind(x, y):
     return np.row_stack((x, y))
 
 
-# from sklearn.utils.exmath  
+# from sklearn.utils.exmath
 def safe_sparse_dot(a, b, dense_output=False):
     """Dot product that handle the sparse matrix case correctly
 
@@ -146,26 +146,27 @@ def safe_sparse_dot(a, b, dense_output=False):
 
 
 # scale... covariates
-def scale_covariates(X, choice="std", 
-                     training=True, scaler=None):
-    
+def scale_covariates(
+    X, choice="std", training=True, scaler=None
+):
+
     scaling_options = {
-            "std": StandardScaler(
-                copy=True, with_mean=True, with_std=True
-            ),
-            "minmax": MinMaxScaler(),
-        }
-    
-    if training == True: 
+        "std": StandardScaler(
+            copy=True, with_mean=True, with_std=True
+        ),
+        "minmax": MinMaxScaler(),
+    }
+
+    if training == True:
         # scaler must be not None
         scaler = scaling_options[choice]
         scaled_X = scaler.fit_transform(X)
         return scaler, scaled_X
-    
+
     # training == False:
     # scaler must be not None
     return scaler.transform(X)
-    
+
 
 # from sklearn.utils.exmath
 def squared_norm(x):
@@ -187,7 +188,7 @@ def squared_norm(x):
     return np.dot(x, x)
 
 
-# computes x%*%t(y)    
+# computes x%*%t(y)
 def tcrossprod(x, y=None):
     # assert on dimensions
     if y is None:

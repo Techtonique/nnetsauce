@@ -13,14 +13,16 @@ from sklearn.model_selection import TimeSeriesSplit
 class TimeSeriesSplit(TimeSeriesSplit):
     """Time Series cross-validator"""
 
-    def __init__(self, n_splits='warn', max_train_size=None):
+    def __init__(
+        self, n_splits="warn", max_train_size=None
+    ):
         super().__init__(
             n_splits=n_splits, max_train_size=max_train_size
         )
 
     def split(
         self,
-        X,        
+        X,
         y=None,
         groups=None,
         initial_window=5,
@@ -59,7 +61,7 @@ class TimeSeriesSplit(TimeSeriesSplit):
         # assert initial_window
         # assert horizon
         # assert fixed_window
-        
+
         n = X.shape[0]
 
         # Initialization of indices -----

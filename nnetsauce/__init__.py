@@ -9,6 +9,7 @@ from .randombag.randomBagClassifier import (
 )
 from .ridge.ridgeClassifier import RidgeClassifier
 from .ridge.ridgeRegressor import RidgeRegressor
+
 # from .rnn.rnnRegressor import RNNRegressor
 # from .rnn.rnnClassifier import RNNClassifier
 from .rvfl.bayesianrvflRegressor import (

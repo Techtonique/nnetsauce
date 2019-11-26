@@ -108,7 +108,6 @@ class TestRidgeRegressor(ut.TestCase):
             lambda2=0.01,
         )
 
-
         fit_obj7.set_params(
             n_hidden_features=5,
             activation_name="prelu",
@@ -254,8 +253,12 @@ class TestRidgeRegressor(ut.TestCase):
             np.allclose(rmse2, 19.95472988159529)
         )
         self.assertFalse(np.allclose(rmse3, 1.949793))
-        self.assertTrue(np.allclose(rmse4, 13.024632782703636))
-        self.assertFalse(np.allclose(rmse5, 22.200957971900483))
+        self.assertTrue(
+            np.allclose(rmse4, 13.024632782703636)
+        )
+        self.assertFalse(
+            np.allclose(rmse5, 22.200957971900483)
+        )
         self.assertTrue(
             np.allclose(rmse6, 0.614492143979095)
         )
@@ -275,11 +278,18 @@ class TestRidgeRegressor(ut.TestCase):
             )
         )
         self.assertFalse(
-            np.allclose(fit_obj2.predict(X_test[0, :]), 283.416245307822)
+            np.allclose(
+                fit_obj2.predict(X_test[0, :]),
+                283.416245307822,
+            )
         )
 
-        self.assertFalse(np.allclose(rmse8, 22.454022827189625))
-        self.assertFalse(np.allclose(rmse9, 21.46698682773668))
+        self.assertFalse(
+            np.allclose(rmse8, 22.454022827189625)
+        )
+        self.assertFalse(
+            np.allclose(rmse9, 21.46698682773668)
+        )
         self.assertTrue(
             np.allclose(rmse10, 0.8443989968382506)
         )

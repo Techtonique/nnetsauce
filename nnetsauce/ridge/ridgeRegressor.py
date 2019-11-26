@@ -101,7 +101,6 @@ class RidgeRegressor(Ridge, RegressorMixin):
 
         self.type_fit = "regression"
 
-   
     def fit(self, X, y, **kwargs):
         """Fit Ridge model to training data (X, y).           
 
@@ -126,31 +125,38 @@ class RidgeRegressor(Ridge, RegressorMixin):
         centered_y, scaled_Z = self.cook_training_set(
             y=y, X=X, **kwargs
         )
-        
+
         n_X, p_X = X.shape
-        n_Z, p_Z = scaled_Z.shape          
-        n_features = (p_X + self.n_clusters)
-        
-        X_ = scaled_Z[:, 0:n_features]        
+        n_Z, p_Z = scaled_Z.shape
+        n_features = p_X + self.n_clusters
+
+        X_ = scaled_Z[:, 0:n_features]
         Phi_X_ = scaled_Z[:, n_features:p_Z]
-        
-        B = mo.crossprod(X_) + self.lambda1*np.diag(np.repeat(1, n_features))
+
+        B = mo.crossprod(X_) + self.lambda1 * np.diag(
+            np.repeat(1, n_features)
+        )
         C = mo.crossprod(Phi_X_, X_)
-        D = mo.crossprod(Phi_X_) + self.lambda2*np.diag(np.repeat(1, 
-                        Phi_X_.shape[1]))
+        D = mo.crossprod(Phi_X_) + self.lambda2 * np.diag(
+            np.repeat(1, Phi_X_.shape[1])
+        )
         B_inv = pinv(B)
         W = np.dot(C, B_inv)
         S_mat = D - mo.tcrossprod(W, C)
         S_inv = pinv(S_mat)
         Y = np.dot(S_inv, W)
-        inv = mo.rbind(mo.cbind(B_inv + mo.crossprod(W, Y), 
-                                -np.transpose(Y)),
-                       mo.cbind(-Y, S_inv))    
-        
-        self.beta = np.dot(inv, mo.crossprod(scaled_Z, centered_y))
-        
-        return self
+        inv = mo.rbind(
+            mo.cbind(
+                B_inv + mo.crossprod(W, Y), -np.transpose(Y)
+            ),
+            mo.cbind(-Y, S_inv),
+        )
 
+        self.beta = np.dot(
+            inv, mo.crossprod(scaled_Z, centered_y)
+        )
+
+        return self
 
     def predict(self, X, **kwargs):
         """Predict test data X.
@@ -188,7 +194,6 @@ class RidgeRegressor(Ridge, RegressorMixin):
         return self.y_mean + np.dot(
             self.cook_test_set(X, **kwargs), self.beta
         )
-
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """

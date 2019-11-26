@@ -112,7 +112,6 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         self.verbose = verbose
         self.n_jobs = n_jobs
         self.voter = dict.fromkeys(range(n_estimators))
-        
 
     def fit(self, X, y, **kwargs):
         """Fit Random 'Forest' model to training data (X, y).
@@ -174,9 +173,15 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
                     base_learner.fit(X, y, **kwargs)
 
-                    self.voter.update({m: pickle.loads(
-                            pickle.dumps(base_learner, -1)
-                        )})
+                    self.voter.update(
+                        {
+                            m: pickle.loads(
+                                pickle.dumps(
+                                    base_learner, -1
+                                )
+                            )
+                        }
+                    )
 
                     base_learner.set_params(
                         seed=self.seed + (m + 1) * 1000
@@ -220,9 +225,13 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
                 seed=self.seed + m * 1000,
             )
             base_learner.fit(X, y, **kwargs)
-            self.voter.update({m: pickle.loads(
-                            pickle.dumps(base_learner, -1)
-                        )})
+            self.voter.update(
+                {
+                    m: pickle.loads(
+                        pickle.dumps(base_learner, -1)
+                    )
+                }
+            )
 
         if self.verbose == 1:
 
@@ -240,7 +249,6 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         self.n_estimators = len(self.voter)
 
         return self
-    
 
     def predict(self, X, weights=None, **kwargs):
         """Predict test data X.
@@ -261,7 +269,6 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         return self.predict_proba(
             X, weights, **kwargs
         ).argmax(axis=1)
-        
 
     def predict_proba(self, X, weights=None, **kwargs):
         """Predict probabilities for test data X.
@@ -378,7 +385,6 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             ensemble_proba += weights[i] * preds[i]
 
         return ensemble_proba
-
 
     def score(
         self, X, y, weights=None, scoring=None, **kwargs

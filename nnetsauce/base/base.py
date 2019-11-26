@@ -157,7 +157,7 @@ class Base(BaseEstimator):
         self.beta = None
 
     # "preprocessing" methods to be inherited -----
-        
+
     def encode_clusters(
         self, X=None, predict=False, **kwargs
     ):  #
@@ -184,16 +184,22 @@ class Base(BaseEstimator):
         if X is None:
             X = self.X
 
-        if predict == False:  # encode training set            
-            
+        if predict == False:  # encode training set
+
             # scale input data before clustering
-            self.clustering_scaler, scaled_X = mo.scale_covariates(X, choice=self.type_scaling[2])            
+            self.clustering_scaler, scaled_X = mo.scale_covariates(
+                X, choice=self.type_scaling[2]
+            )
 
             if self.type_clust == "kmeans":
 
-                self.clustering_obj, X_kmeans = mo.cluster_covariates(scaled_X, self.n_clusters, 
-                                                                self.seed, type_clust = "kmeans", 
-                                                                **kwargs)
+                self.clustering_obj, X_kmeans = mo.cluster_covariates(
+                    scaled_X,
+                    self.n_clusters,
+                    self.seed,
+                    type_clust="kmeans",
+                    **kwargs
+                )
 
                 if self.cluster_encode == True:
 
@@ -205,10 +211,14 @@ class Base(BaseEstimator):
 
             if self.type_clust == "gmm":
 
-                self.clustering_obj, X_gmm = mo.cluster_covariates(scaled_X, self.n_clusters, 
-                                                                self.seed, type_clust = "gmm", 
-                                                                **kwargs)
-                
+                self.clustering_obj, X_gmm = mo.cluster_covariates(
+                    scaled_X,
+                    self.n_clusters,
+                    self.seed,
+                    type_clust="gmm",
+                    **kwargs
+                )
+
                 if self.cluster_encode == True:
 
                     return mo.one_hot_encode(
@@ -242,12 +252,12 @@ class Base(BaseEstimator):
             if W is None:
 
                 if self.nodes_sim == "sobol":
-                    try: # try cpp version
+                    try:  # try cpp version
                         self.W = ns.generate_sobol_cpp(
                             n_dims=n_features,
                             n_points=self.n_hidden_features,
                         )
-                    except: # python version
+                    except:  # python version
                         self.W = ns.generate_sobol2(
                             n_dims=n_features,
                             n_points=self.n_hidden_features,
@@ -267,12 +277,12 @@ class Base(BaseEstimator):
                     )
 
                 if self.nodes_sim == "halton":
-                    try: # try cpp version
+                    try:  # try cpp version
                         self.W = ns.generate_halton_cpp(
                             n_dims=n_features,
                             n_points=self.n_hidden_features,
                         )
-                    except: # python version
+                    except:  # python version
                         self.W = ns.generate_halton(
                             n_dims=n_features,
                             n_points=self.n_hidden_features,
@@ -308,12 +318,12 @@ class Base(BaseEstimator):
             n_features_1 = n_features + 1
 
             if self.nodes_sim == "sobol":
-                try: # try cpp version
+                try:  # try cpp version
                     self.W = ns.generate_sobol_cpp(
                         n_dims=n_features_1,
                         n_points=self.n_hidden_features,
                     )
-                except: # python version
+                except:  # python version
                     self.W = ns.generate_sobol2(
                         n_dims=n_features_1,
                         n_points=self.n_hidden_features,
@@ -333,12 +343,12 @@ class Base(BaseEstimator):
                 )
 
             if self.nodes_sim == "halton":
-                try: # try cpp version
+                try:  # try cpp version
                     self.W = ns.generate_halton_cpp(
                         n_dims=n_features_1,
                         n_points=self.n_hidden_features,
                     )
-                except: # python version
+                except:  # python version
                     self.W = ns.generate_halton(
                         n_dims=n_features_1,
                         n_points=self.n_hidden_features,
@@ -372,8 +382,7 @@ class Base(BaseEstimator):
             drop_prob=self.dropout,
             seed=self.seed,
         )
-    
-    
+
     def cook_training_set(
         self, y=None, X=None, W=None, **kwargs
     ):
@@ -384,15 +393,18 @@ class Base(BaseEstimator):
         if self.n_hidden_features > 0:  # has a hidden layer
 
             assert len(self.type_scaling) >= 2, ""
-                        
-            
+
         # center y
         if mx.is_factor(y) == False:  # regression
-            
+
             if y is None:
-                self.y_mean, centered_y = mo.center_response(self.y)
+                self.y_mean, centered_y = mo.center_response(
+                    self.y
+                )
             else:  # keep
-                self.y_mean, centered_y = mo.center_response(y)
+                self.y_mean, centered_y = mo.center_response(
+                    y
+                )
 
         if X is None:
 
@@ -449,9 +461,10 @@ class Base(BaseEstimator):
             if (
                 self.n_hidden_features > 0
             ):  # with hidden layer
-                
-                self.nn_scaler, scaled_X = mo.scale_covariates(input_X, 
-                                                            choice=self.type_scaling[1])                
+
+                self.nn_scaler, scaled_X = mo.scale_covariates(
+                    input_X, choice=self.type_scaling[1]
+                )
 
                 if W is None:
                     Phi_X = self.create_layer(scaled_X)
@@ -463,13 +476,17 @@ class Base(BaseEstimator):
                 else:
                     Z = Phi_X
 
-                self.scaler, scaled_Z = mo.scale_covariates(Z, choice=self.type_scaling[0])
+                self.scaler, scaled_Z = mo.scale_covariates(
+                    Z, choice=self.type_scaling[0]
+                )
 
             else:  # no hidden layer
 
                 Z = input_X
-                
-                self.scaler, scaled_Z = mo.scale_covariates(Z, choice=self.type_scaling[0])
+
+                self.scaler, scaled_Z = mo.scale_covariates(
+                    Z, choice=self.type_scaling[0]
+                )
 
         else:  # data with clustering: self.n_clusters is not None -----
 
@@ -481,9 +498,10 @@ class Base(BaseEstimator):
             if (
                 self.n_hidden_features > 0
             ):  # with hidden layer
-                
-                self.nn_scaler, scaled_X = mo.scale_covariates(augmented_X, 
-                                                               choice=self.type_scaling[1])                
+
+                self.nn_scaler, scaled_X = mo.scale_covariates(
+                    augmented_X, choice=self.type_scaling[1]
+                )
 
                 if W is None:
                     Phi_X = self.create_layer(scaled_X)
@@ -495,13 +513,17 @@ class Base(BaseEstimator):
                 else:
                     Z = Phi_X
 
-                self.scaler, scaled_Z = mo.scale_covariates(Z, choice=self.type_scaling[0])
+                self.scaler, scaled_Z = mo.scale_covariates(
+                    Z, choice=self.type_scaling[0]
+                )
 
             else:  # no hidden layer
 
                 Z = augmented_X
-                
-                self.scaler, scaled_Z = mo.scale_covariates(Z, choice=self.type_scaling[0])
+
+                self.scaler, scaled_Z = mo.scale_covariates(
+                    Z, choice=self.type_scaling[0]
+                )
 
         # Returning model inputs -----
 

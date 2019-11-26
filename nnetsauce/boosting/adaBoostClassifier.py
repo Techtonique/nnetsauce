@@ -124,12 +124,13 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         self.type_fit = "classification"
         self.alpha = []
         self.w = []
-        self.base_learners = dict.fromkeys(range(n_estimators))
+        self.base_learners = dict.fromkeys(
+            range(n_estimators)
+        )
         self.verbose = verbose
         self.method = method
         self.reg_lambda = reg_lambda
         self.reg_alpha = reg_alpha
-        
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit Boosting model to training data (X, y).
@@ -215,9 +216,13 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                     **kwargs
                 ).predict(X)
 
-                self.base_learners.update({m: pickle.loads(
+                self.base_learners.update(
+                    {
+                        m: pickle.loads(
                             pickle.dumps(base_learner, -1)
-                        )})
+                        )
+                    }
+                )
 
                 cond = [y[i] != preds[i] for i in x_range_n]
 
@@ -296,9 +301,13 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                     out=probs,
                 )
 
-                self.base_learners.update({m: pickle.loads(
+                self.base_learners.update(
+                    {
+                        m: pickle.loads(
                             pickle.dumps(base_learner, -1)
-                        )})
+                        )
+                    }
+                )
 
                 w_m *= np.exp(
                     -1.0
@@ -323,7 +332,6 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
             return self
 
-
     def predict(self, X, **kwargs):
         """Predict test data X.
         
@@ -344,7 +352,6 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         return self.predict_proba(X, **kwargs).argmax(
             axis=1
         )
-        
 
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
@@ -374,7 +381,10 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             if self.verbose == 1:
                 pbar = Progbar(n_iter)
 
-            for idx, base_learner in self.base_learners.items():
+            for (
+                idx,
+                base_learner,
+            ) in self.base_learners.items():
 
                 preds = base_learner.predict(X, **kwargs)
 
@@ -440,7 +450,6 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         return (
             expit_ensemble_learner / sum_ensemble[:, None]
         )
-        
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """

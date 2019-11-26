@@ -9,8 +9,8 @@ def merge_two_dicts(x, y):
 
 
 # check if x is int
-@memoize        
-def is_int(x):    
+@memoize
+def is_int(x):
     try:
         return int(x) == x
     except:
@@ -18,28 +18,28 @@ def is_int(x):
 
 
 # check if x is float
-@memoize            
-def is_float(x):    
+@memoize
+def is_float(x):
     return isinstance(x, float)
 
 
 # check if the response contains only integers
-@memoize    
+@memoize
 def is_factor(y):
-    
+
     n = len(y)
     ans = True
     idx = 0
-    
-    while (idx < n):
-        if (is_int(y[idx]) & (is_float(y[idx])==False)):
+
+    while idx < n:
+        if is_int(y[idx]) & (is_float(y[idx]) == False):
             idx += 1
         else:
             ans = False
-            break            
-    
+            break
+
     return ans
-    
+
 
 # flatten list of lists
 flatten = lambda l: [
