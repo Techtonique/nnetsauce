@@ -61,8 +61,11 @@ class TimeSeriesSplit(TimeSeriesSplit):
         # assert initial_window
         # assert horizon
         # assert fixed_window
-
-        n = X.shape[0]
+        
+        try:
+            n = X.shape[0]
+        except:
+            n = len(X)
 
         # Initialization of indices -----
 
