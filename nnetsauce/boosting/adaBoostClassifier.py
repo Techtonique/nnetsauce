@@ -171,7 +171,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
         # training
         n, p = X.shape
-        self.n_classes = len(np.unique(y))
+        self.n_classes = len(np.unique(y))        
 
         if sample_weight is None:
 
@@ -204,6 +204,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         if self.method == "SAMME":
 
             err_m = 1e6
+            err_bound = 1 - 1/self.n_classes
             self.alpha.append(1.0)
             x_range_n = range(n)
 
@@ -245,7 +246,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                         * sum([abs(x) for x in w_m])
                     )
                     
-                err_m = min(err_m, 1 - 1/self.n_classes)
+                err_m = min(err_m, err_bound)
 
                 alpha_m = self.learning_rate * log(
                     (self.n_classes - 1)
