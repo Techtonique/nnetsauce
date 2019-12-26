@@ -1,3 +1,9 @@
+# version 0.3.0
+
+- Implement ridge2 (regressor and classifier)
+- Upper bound on Adaboost error
+- Test Time series split
+
 # version 0.2.0
 
 - Add AdaBoost classifier 
