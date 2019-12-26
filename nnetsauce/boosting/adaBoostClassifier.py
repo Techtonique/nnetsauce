@@ -244,6 +244,8 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                         + self.reg_alpha
                         * sum([abs(x) for x in w_m])
                     )
+                    
+                err_m = min(err_m, 1 - 1/self.n_classes)
 
                 alpha_m = self.learning_rate * log(
                     (self.n_classes - 1)
