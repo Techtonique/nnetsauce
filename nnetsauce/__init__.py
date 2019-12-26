@@ -9,6 +9,7 @@ from .randombag.randomBagClassifier import (
 )
 from .ridge.ridgeClassifier import RidgeClassifier
 from .ridge.ridgeRegressor import RidgeRegressor
+from .ridge.ridgeClassifierMtask import RidgeClassifierMtask
 
 # from .rnn.rnnRegressor import RNNRegressor
 # from .rnn.rnnClassifier import RNNClassifier
@@ -31,6 +32,7 @@ __all__ = [
     "RandomBagClassifier",
     "RidgeRegressor",
     "RidgeClassifier",
+    "RidgeClassifierMtask",
     #    "RNNRegressor",
     #    "RNNClassifier",
     "MTS",
