@@ -17,7 +17,6 @@ X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 print(Z.shape)
 
 fit_obj = ns.RidgeClassifierMtask(n_hidden_features=2,
-                                  col_sample=0.9, row_sample=0.9,
                                   dropout=0.3, n_clusters=2)
 
 start = time()
@@ -43,9 +42,8 @@ np.random.seed(123)
 Z_train, Z_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
 fit_obj = ns.RidgeClassifierMtask(n_hidden_features=15,
-                                col_sample=0.9, row_sample=0.9,
-                                dropout=0.1, n_clusters=3, 
-                                type_clust="gmm")
+                                  dropout=0.1, n_clusters=3, 
+                                  type_clust="gmm")
 
 start = time()
 fit_obj.fit(Z_train, y_train)
@@ -67,7 +65,6 @@ Z_train, Z_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
 
 fit_obj = ns.RidgeClassifierMtask(n_hidden_features=10,
-                                  col_sample=0.9, row_sample=0.9,
                                   dropout=0.1, n_clusters=2)
 
 start = time()
@@ -86,7 +83,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
 
 
 fit_obj = ns.RidgeClassifierMtask(n_hidden_features=5,
-                                  col_sample=0.9, row_sample=0.9,
                                   dropout=0.1, n_clusters=3, 
                                   type_clust="gmm")
 
@@ -109,7 +105,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
                                                     random_state=123)
 
 fit_obj = ns.RidgeClassifierMtask(n_hidden_features=25,
-                                  col_sample=0.9, row_sample=0.9,
                                   dropout=0.1, n_clusters=3, 
                                   type_clust="gmm")
 
