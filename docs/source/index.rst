@@ -1,4 +1,4 @@
-Welcome to querier's documentation!
+Welcome to nnetsauce's documentation!
 =========================================
 
 Contents:
