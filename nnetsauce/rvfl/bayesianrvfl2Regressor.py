@@ -136,9 +136,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         self: object
         """
 
-        centered_y, scaled_Z = self.cook_training_set(
-            y=y, X=X, **kwargs
-        )
+        centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
         n, p = X.shape
         q = self.n_hidden_features
@@ -153,8 +151,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
             block22 = (self.s2 ** 2) * np.eye(q)
 
             Sigma_prior = mo.rbind(
-                mo.cbind(block11, block12),
-                mo.cbind(block21, block22),
+                mo.cbind(block11, block12), mo.cbind(block21, block22)
             )
 
         else:
@@ -196,9 +193,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         model predictions: {array-like}
         """
 
-        if (
-            len(X.shape) == 1
-        ):  # one observation in the test set only
+        if len(X.shape) == 1:  # one observation in the test set only
             n_features = X.shape[0]
             new_X = mo.rbind(
                 X.reshape(1, n_features),
@@ -213,10 +208,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
 
                 return (
                     self.y_mean
-                    + np.dot(
-                        self.cook_test_set(new_X, **kwargs),
-                        self.beta,
-                    )
+                    + np.dot(self.cook_test_set(new_X, **kwargs), self.beta)
                 )[0]
 
             return self.y_mean + np.dot(
@@ -250,19 +242,14 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
                 Sigma_hat_=self.Sigma,
             )
 
-            return (
-                self.y_mean + pred_obj["preds"],
-                pred_obj["preds_std"],
-            )
+            return (self.y_mean + pred_obj["preds"], pred_obj["preds_std"])
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
 
         preds = self.predict(X)
 
-        if (
-            self.return_std
-        ):  # if there are std. devs in the predictions
+        if self.return_std:  # if there are std. devs in the predictions
             preds = preds[0]
 
         if mx.is_factor(y):  # classification

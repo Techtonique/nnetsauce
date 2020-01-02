@@ -115,21 +115,19 @@ class RidgeClassifierMtask(Ridge, ClassifierMixin):
         -------
         self: object
         """
-        
-        assert mx.is_factor(y), "y must contain only integers"                 
-        
-        output_y, scaled_Z = self.cook_training_set(
-            y=y, X=X, **kwargs
-        )
-        
+
+        assert mx.is_factor(y), "y must contain only integers"
+
+        output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
+
         n_X, p_X = X.shape
         n_Z, p_Z = scaled_Z.shape
-        
+
         self.n_classes = len(np.unique(y))
-        
+
         # multitask response
-        Y = mo.one_hot_encode2(y, self.n_classes)                
-        
+        Y = mo.one_hot_encode2(y, self.n_classes)
+
         if self.n_clusters > 0:
             if self.encode_clusters == True:
                 n_features = p_X + self.n_clusters
@@ -139,11 +137,9 @@ class RidgeClassifierMtask(Ridge, ClassifierMixin):
             n_features = p_X
 
         X_ = scaled_Z[:, 0:n_features]
-        Phi_X_ = scaled_Z[:, n_features:p_Z]                
+        Phi_X_ = scaled_Z[:, n_features:p_Z]
 
-        B = mo.crossprod(X_) + self.lambda1 * np.diag(
-            np.repeat(1, X_.shape[1])
-        )
+        B = mo.crossprod(X_) + self.lambda1 * np.diag(np.repeat(1, X_.shape[1]))
         C = mo.crossprod(Phi_X_, X_)
         D = mo.crossprod(Phi_X_) + self.lambda2 * np.diag(
             np.repeat(1, Phi_X_.shape[1])
@@ -154,15 +150,11 @@ class RidgeClassifierMtask(Ridge, ClassifierMixin):
         S_inv = pinv(S_mat)
         Y2 = np.dot(S_inv, W)
         inv = mo.rbind(
-            mo.cbind(
-                B_inv + mo.crossprod(W, Y2), -np.transpose(Y2)
-            ),
+            mo.cbind(B_inv + mo.crossprod(W, Y2), -np.transpose(Y2)),
             mo.cbind(-Y2, S_inv),
         )
-            
-        self.beta = np.dot(
-            inv, mo.crossprod(scaled_Z, Y)
-        )
+
+        self.beta = np.dot(inv, mo.crossprod(scaled_Z, Y))
 
         return self
 
@@ -183,9 +175,7 @@ class RidgeClassifierMtask(Ridge, ClassifierMixin):
         model predictions: {array-like}
         """
 
-        return np.argmax(
-            self.predict_proba(X, **kwargs), axis=1
-        )
+        return np.argmax(self.predict_proba(X, **kwargs), axis=1)
 
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
@@ -202,8 +192,8 @@ class RidgeClassifierMtask(Ridge, ClassifierMixin):
         Returns
         -------
         probability estimates for test data: {array-like}        
-        """        
-        
+        """
+
         if len(X.shape) == 1:
 
             n_features = X.shape[0]
@@ -219,7 +209,7 @@ class RidgeClassifierMtask(Ridge, ClassifierMixin):
             Z = self.cook_test_set(X, **kwargs)
 
         ZB = mo.safe_sparse_dot(Z, self.beta)
-        
+
         exp_ZB = np.exp(ZB)
 
         return exp_ZB / exp_ZB.sum(axis=1)[:, None]

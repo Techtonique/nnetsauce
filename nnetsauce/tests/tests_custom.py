@@ -11,9 +11,7 @@ class TestCustom(ut.TestCase):
     def test_custom(self):
 
         np.random.seed(123)
-        X, y = datasets.make_regression(
-            n_samples=15, n_features=3
-        )
+        X, y = datasets.make_regression(n_samples=15, n_features=3)
 
         breast_cancer = datasets.load_breast_cancer()
         Z = breast_cancer.data
@@ -167,50 +165,24 @@ class TestCustom(ut.TestCase):
         err9 = fit_obj9.predict(X_test) - y_test
         rmse9 = np.sqrt(np.mean(err9 ** 2))
 
-        self.assertTrue(
-            np.allclose(rmse, 64.933610490495667)
-        )
-        self.assertTrue(
-            np.allclose(rmse2, 12.968755131423396)
-        )
-        self.assertTrue(
-            np.allclose(rmse3, 26.716371782298673)
-        )
-        self.assertTrue(
-            np.allclose(rmse4, 3.3480684032382375)
-        )
-        self.assertTrue(
-            np.allclose(rmse4_1, 3.4339085800638713e-05)
-        )
-        self.assertTrue(
-            np.allclose(rmse8, 64.93379560651447)
-        )
+        self.assertTrue(np.allclose(rmse, 64.933610490495667))
+        self.assertTrue(np.allclose(rmse2, 12.968755131423396))
+        self.assertTrue(np.allclose(rmse3, 26.716371782298673))
+        self.assertTrue(np.allclose(rmse4, 3.3480684032382375))
+        self.assertTrue(np.allclose(rmse4_1, 3.4339085800638713e-05))
+        self.assertTrue(np.allclose(rmse8, 64.93379560651447))
         self.assertTrue(np.allclose(pred5, 1))
         self.assertTrue(np.allclose(pred6, 1))
-        self.assertTrue(
-            np.allclose(
-                pred6_proba1[0], 0.50507336437937767
-            )
-        )
-        self.assertTrue(
-            np.allclose(
-                pred6_proba2[3, 0], 0.4836233209751839
-            )
-        )
-        self.assertTrue(
-            np.allclose(score6, 0.94999999999999996)
-        )
+        self.assertTrue(np.allclose(pred6_proba1[0], 0.50507336437937767))
+        self.assertTrue(np.allclose(pred6_proba2[3, 0], 0.4836233209751839))
+        self.assertTrue(np.allclose(score6, 0.94999999999999996))
         self.assertTrue(np.allclose(score7, 0.85))
-        self.assertTrue(
-            np.allclose(rmse9, 76.12747461579583)
-        )
+        self.assertTrue(np.allclose(rmse9, 76.12747461579583))
 
     def test_score(self):
 
         np.random.seed(123)
-        X, y = datasets.make_regression(
-            n_samples=15, n_features=3
-        )
+        X, y = datasets.make_regression(n_samples=15, n_features=3)
         breast_cancer = datasets.load_breast_cancer()
         Z = breast_cancer.data
         t = breast_cancer.target
@@ -266,15 +238,9 @@ class TestCustom(ut.TestCase):
         fit_obj4.fit(Z, t)
 
         self.assertTrue(
-            np.allclose(
-                fit_obj.score(X, y), 4846.2057110929481
-            )
-            & np.allclose(
-                fit_obj2.score(Z, t), 0.99648506151142358
-            )
-            & np.allclose(
-                fit_obj3.score(X, y), 2.1668647954067132e-11
-            )
+            np.allclose(fit_obj.score(X, y), 4846.2057110929481)
+            & np.allclose(fit_obj2.score(Z, t), 0.99648506151142358)
+            & np.allclose(fit_obj3.score(X, y), 2.1668647954067132e-11)
             & np.allclose(fit_obj4.score(Z, t), 1.0)
         )
 

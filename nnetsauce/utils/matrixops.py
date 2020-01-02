@@ -2,10 +2,7 @@ import numpy as np
 
 from .memoize import memoize
 from scipy import sparse
-from sklearn.preprocessing import (
-    StandardScaler,
-    MinMaxScaler,
-)
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
 
@@ -25,17 +22,11 @@ def center_response(y):
 
 
 # cluster the covariates
-def cluster_covariates(
-    X, n_clusters, seed, type_clust="kmeans", **kwargs
-):
+def cluster_covariates(X, n_clusters, seed, type_clust="kmeans", **kwargs):
 
     if type_clust == "kmeans":
 
-        kmeans = KMeans(
-            n_clusters=n_clusters,
-            random_state=seed,
-            **kwargs
-        )
+        kmeans = KMeans(n_clusters=n_clusters, random_state=seed, **kwargs)
         kmeans.fit(X)
 
         return kmeans, kmeans.predict(X)
@@ -43,9 +34,7 @@ def cluster_covariates(
     if type_clust == "gmm":
 
         gmm = GaussianMixture(
-            n_components=n_clusters,
-            random_state=seed,
-            **kwargs
+            n_components=n_clusters, random_state=seed, **kwargs
         )
         gmm.fit(X)
 
@@ -100,9 +89,9 @@ def one_hot_encode(x_clusters, n_clusters):
 # one-hot encoding
 @memoize
 def one_hot_encode2(y, n_classes):
-    
+
     n_obs = len(y)
-    
+
     res = np.zeros((n_obs, n_classes))
 
     for i in range(n_obs):
@@ -148,14 +137,10 @@ def safe_sparse_dot(a, b, dense_output=False):
 
 
 # scale... covariates
-def scale_covariates(
-    X, choice="std", training=True, scaler=None
-):
+def scale_covariates(X, choice="std", training=True, scaler=None):
 
     scaling_options = {
-        "std": StandardScaler(
-            copy=True, with_mean=True, with_std=True
-        ),
+        "std": StandardScaler(copy=True, with_mean=True, with_std=True),
         "minmax": MinMaxScaler(),
     }
 

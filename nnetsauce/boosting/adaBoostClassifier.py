@@ -124,9 +124,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         self.type_fit = "classification"
         self.alpha = []
         self.w = []
-        self.base_learners = dict.fromkeys(
-            range(n_estimators)
-        )
+        self.base_learners = dict.fromkeys(range(n_estimators))
         self.verbose = verbose
         self.method = method
         self.reg_lambda = reg_lambda
@@ -152,9 +150,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         self: object
         """
 
-        assert mx.is_factor(
-            y
-        ), "y must contain only integers"
+        assert mx.is_factor(y), "y must contain only integers"
 
         assert self.method in (
             "SAMME",
@@ -171,7 +167,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
         # training
         n, p = X.shape
-        self.n_classes = len(np.unique(y))        
+        self.n_classes = len(np.unique(y))
 
         if sample_weight is None:
 
@@ -204,70 +200,46 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         if self.method == "SAMME":
 
             err_m = 1e6
-            err_bound = 1 - 1/self.n_classes
+            err_bound = 1 - 1 / self.n_classes
             self.alpha.append(1.0)
             x_range_n = range(n)
 
             for m in range(self.n_estimators):
 
                 preds = base_learner.fit(
-                    X,
-                    y,
-                    sample_weight=np.asarray(w_m),
-                    **kwargs
+                    X, y, sample_weight=np.asarray(w_m), **kwargs
                 ).predict(X)
 
                 self.base_learners.update(
-                    {
-                        m: pickle.loads(
-                            pickle.dumps(base_learner, -1)
-                        )
-                    }
+                    {m: pickle.loads(pickle.dumps(base_learner, -1))}
                 )
 
                 cond = [y[i] != preds[i] for i in x_range_n]
 
                 err_m = max(
-                    sum(
-                        [
-                            elt[0] * elt[1]
-                            for elt in zip(cond, w_m)
-                        ]
-                    ),
+                    sum([elt[0] * elt[1] for elt in zip(cond, w_m)]),
                     2.220446049250313e-16,
                 )  # sum(w_m) == 1
 
                 if self.reg_lambda > 0:
                     err_m += self.reg_lambda * (
-                        (1 - self.reg_alpha)
-                        * 0.5
-                        * sum([x ** 2 for x in w_m])
-                        + self.reg_alpha
-                        * sum([abs(x) for x in w_m])
+                        (1 - self.reg_alpha) * 0.5 * sum([x ** 2 for x in w_m])
+                        + self.reg_alpha * sum([abs(x) for x in w_m])
                     )
-                    
+
                 err_m = min(err_m, err_bound)
 
                 alpha_m = self.learning_rate * log(
-                    (self.n_classes - 1)
-                    * (1 - err_m)
-                    / err_m
+                    (self.n_classes - 1) * (1 - err_m) / err_m
                 )
 
                 self.alpha.append(alpha_m)
 
-                w_m_temp = [
-                    exp(alpha_m * cond[i])
-                    for i in x_range_n
-                ]
+                w_m_temp = [exp(alpha_m * cond[i]) for i in x_range_n]
                 sum_w_m = sum(w_m_temp)
-                w_m = [
-                    w_m_temp[i] / sum_w_m for i in x_range_n
-                ]
+                w_m = [w_m_temp[i] / sum_w_m for i in x_range_n]
 
-                base_learner.set_params(
-                    seed=self.seed + (m + 1) * 1000
-                )
+                base_learner.set_params(seed=self.seed + (m + 1) * 1000)
 
                 if self.verbose == 1:
                     pbar.update(m)
@@ -298,18 +270,11 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                 ).predict_proba(X)
 
                 np.clip(
-                    a=probs,
-                    a_min=2.220446049250313e-16,
-                    a_max=1.0,
-                    out=probs,
+                    a=probs, a_min=2.220446049250313e-16, a_max=1.0, out=probs
                 )
 
                 self.base_learners.update(
-                    {
-                        m: pickle.loads(
-                            pickle.dumps(base_learner, -1)
-                        )
-                    }
+                    {m: pickle.loads(pickle.dumps(base_learner, -1))}
                 )
 
                 w_m *= np.exp(
@@ -321,9 +286,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
                 w_m /= np.sum(w_m)
 
-                base_learner.set_params(
-                    seed=self.seed + (m + 1) * 1000
-                )
+                base_learner.set_params(seed=self.seed + (m + 1) * 1000)
 
                 if self.verbose == 1:
                     pbar.update(m)
@@ -352,9 +315,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         model predictions: {array-like}        
         """
 
-        return self.predict_proba(X, **kwargs).argmax(
-            axis=1
-        )
+        return self.predict_proba(X, **kwargs).argmax(axis=1)
 
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
@@ -377,23 +338,16 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
         if self.method == "SAMME":
 
-            ensemble_learner = np.zeros(
-                (X.shape[0], self.n_classes)
-            )
+            ensemble_learner = np.zeros((X.shape[0], self.n_classes))
 
             if self.verbose == 1:
                 pbar = Progbar(n_iter)
 
-            for (
-                idx,
-                base_learner,
-            ) in self.base_learners.items():
+            for (idx, base_learner) in self.base_learners.items():
 
                 preds = base_learner.predict(X, **kwargs)
 
-                ensemble_learner += self.alpha[
-                    idx
-                ] * mo.one_hot_encode2(
+                ensemble_learner += self.alpha[idx] * mo.one_hot_encode2(
                     preds, self.n_classes
                 )
 
@@ -405,14 +359,9 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
             expit_ensemble_learner = expit(ensemble_learner)
 
-            sum_ensemble = expit_ensemble_learner.sum(
-                axis=1
-            )
+            sum_ensemble = expit_ensemble_learner.sum(axis=1)
 
-            return (
-                expit_ensemble_learner
-                / sum_ensemble[:, None]
-            )
+            return expit_ensemble_learner / sum_ensemble[:, None]
 
         # if self.method == "SAMME.R":
         ensemble_learner = 0
@@ -424,18 +373,12 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
             probs = base_learner.predict_proba(X, **kwargs)
 
-            np.clip(
-                a=probs,
-                a_min=2.220446049250313e-16,
-                a_max=1.0,
-                out=probs,
-            )
+            np.clip(a=probs, a_min=2.220446049250313e-16, a_max=1.0, out=probs)
 
             log_preds_proba = np.log(probs)
 
             ensemble_learner += (
-                log_preds_proba
-                - log_preds_proba.mean(axis=1)[:, None]
+                log_preds_proba - log_preds_proba.mean(axis=1)[:, None]
             )
 
             if self.verbose == 1:
@@ -450,9 +393,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
         sum_ensemble = expit_ensemble_learner.sum(axis=1)
 
-        return (
-            expit_ensemble_learner / sum_ensemble[:, None]
-        )
+        return expit_ensemble_learner / sum_ensemble[:, None]
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """

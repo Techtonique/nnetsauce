@@ -131,9 +131,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
         self: object
         """
 
-        centered_y, scaled_Z = self.cook_training_set(
-            y=y, X=X, **kwargs
-        )
+        centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
         fit_obj = lmf.beta_Sigma_hat_rvfl(
             X=scaled_Z,
@@ -170,9 +168,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
         model predictions: {array-like}
         """
 
-        if (
-            len(X.shape) == 1
-        ):  # one observation in the test set only
+        if len(X.shape) == 1:  # one observation in the test set only
             n_features = X.shape[0]
             new_X = mo.rbind(
                 X.reshape(1, n_features),
@@ -187,10 +183,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
 
                 return (
                     self.y_mean
-                    + np.dot(
-                        self.cook_test_set(new_X, **kwargs),
-                        self.beta,
-                    )
+                    + np.dot(self.cook_test_set(new_X, **kwargs), self.beta)
                 )[0]
 
             return self.y_mean + np.dot(
@@ -228,19 +221,14 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
                 Sigma_hat_=self.Sigma,
             )
 
-            return (
-                self.y_mean + pred_obj["preds"],
-                pred_obj["preds_std"],
-            )
+            return (self.y_mean + pred_obj["preds"], pred_obj["preds_std"])
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
 
         preds = self.predict(X)
 
-        if (
-            self.return_std
-        ):  # if there are std. devs in the predictions
+        if self.return_std:  # if there are std. devs in the predictions
             preds = preds[0]
 
         if mx.is_factor(y):  # classification

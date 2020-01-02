@@ -234,48 +234,26 @@ class TestBase(ut.TestCase):
         err13 = fit_obj13.predict(X_test) - y_test
         rmse13 = np.sqrt(np.mean(err13 ** 2))
 
-        self.assertTrue(
-            np.allclose(rmse, 63.243819280710575)
-        )
-        self.assertTrue(
-            np.allclose(rmse2, 19.404919470812349)
-        )
+        self.assertTrue(np.allclose(rmse, 63.243819280710575))
+        self.assertTrue(np.allclose(rmse2, 19.404919470812349))
         self.assertFalse(np.allclose(rmse3, 0))
         self.assertTrue(np.allclose(rmse4, 208.284))
         self.assertFalse(np.allclose(rmse5, 0))
+        self.assertTrue(np.allclose(rmse6, 62.613229649101946))
+        self.assertTrue(np.allclose(rmse7, 63.048908568696184))
         self.assertTrue(
-            np.allclose(rmse6, 62.613229649101946)
-        )
-        self.assertTrue(
-            np.allclose(rmse7, 63.048908568696184)
-        )
-        self.assertTrue(
-            np.allclose(
-                rmse7,
-                np.sqrt(fit_obj7.score(X_test, y_test)),
-            )
+            np.allclose(rmse7, np.sqrt(fit_obj7.score(X_test, y_test)))
         )
         self.assertTrue(
-            np.allclose(
-                fit_obj.predict(X_test[0, :]),
-                447.88881097463855,
-            )
+            np.allclose(fit_obj.predict(X_test[0, :]), 447.88881097463855)
         )
-        self.assertFalse(
-            np.allclose(fit_obj2.predict(X_test[0, :]), 0)
-        )
+        self.assertFalse(np.allclose(fit_obj2.predict(X_test[0, :]), 0))
 
         self.assertFalse(np.allclose(rmse8, 1.63e-13))
         self.assertFalse(np.allclose(rmse9, 1.76e-13))
-        self.assertTrue(
-            np.allclose(rmse10, 12.827880281249008)
-        )
-        self.assertTrue(
-            np.allclose(rmse11, 22.54340221323043)
-        )
-        self.assertTrue(
-            np.allclose(rmse12, 22.54340221322761)
-        )
+        self.assertTrue(np.allclose(rmse10, 12.827880281249008))
+        self.assertTrue(np.allclose(rmse11, 22.54340221323043))
+        self.assertTrue(np.allclose(rmse12, 22.54340221322761))
         self.assertFalse(np.allclose(rmse13, 1e6))
 
     def test_score(self):
@@ -296,14 +274,10 @@ class TestBase(ut.TestCase):
 
         self.assertTrue(
             np.allclose(
-                fit_obj.score(
-                    X, y, scoring="neg_mean_squared_error"
-                ),
+                fit_obj.score(X, y, scoring="neg_mean_squared_error"),
                 2244396.8658475084,
             )
-            & np.allclose(
-                fit_obj.score(X, y), 2244396.8658475084
-            )
+            & np.allclose(fit_obj.score(X, y), 2244396.8658475084)
         )
 
 

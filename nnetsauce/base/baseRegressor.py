@@ -112,13 +112,9 @@ class BaseRegressor(Base, RegressorMixin):
         -------
         self: object
         """
-        centered_y, scaled_Z = self.cook_training_set(
-            y=y, X=X, **kwargs
-        )
+        centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
-        fit_obj = lmf.beta_Sigma_hat(
-            X=scaled_Z, y=centered_y
-        )
+        fit_obj = lmf.beta_Sigma_hat(X=scaled_Z, y=centered_y)
 
         self.beta = fit_obj["beta_hat"]
 
@@ -153,24 +149,17 @@ class BaseRegressor(Base, RegressorMixin):
 
             return (
                 self.y_mean
-                + np.dot(
-                    self.cook_test_set(new_X, **kwargs),
-                    self.beta,
-                )
+                + np.dot(self.cook_test_set(new_X, **kwargs), self.beta)
             )[0]
 
-        return self.y_mean + np.dot(
-            self.cook_test_set(X, **kwargs), self.beta
-        )
+        return self.y_mean + np.dot(self.cook_test_set(X, **kwargs), self.beta)
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
 
         preds = self.predict(X)
 
-        if (
-            type(preds) == tuple
-        ):  # if there are std. devs in the predictions
+        if type(preds) == tuple:  # if there are std. devs in the predictions
             preds = preds[0]
 
         if scoring is None:

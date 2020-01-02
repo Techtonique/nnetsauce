@@ -44,8 +44,7 @@ if _swig_python_version_info < (2, 7, 0):
                     set(self, name, value)
                 else:
                     raise AttributeError(
-                        "You cannot add instance attributes to %s"
-                        % self
+                        "You cannot add instance attributes to %s" % self
                     )
 
             return set_instance_attr
@@ -58,8 +57,7 @@ if _swig_python_version_info < (2, 7, 0):
                     set(cls, name, value)
                 else:
                     raise AttributeError(
-                        "You cannot add class attributes to %s"
-                        % cls
+                        "You cannot add class attributes to %s" % cls
                     )
 
             return set_class_attr
@@ -69,9 +67,7 @@ if _swig_python_version_info < (2, 7, 0):
 
             def wrapper(cls):
                 return metaclass(
-                    cls.__name__,
-                    cls.__bases__,
-                    cls.__dict__.copy(),
+                    cls.__name__, cls.__bases__, cls.__dict__.copy()
                 )
 
             return wrapper

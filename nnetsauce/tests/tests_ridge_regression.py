@@ -246,59 +246,28 @@ class TestRidgeRegressor(ut.TestCase):
         err13 = fit_obj13.predict(X_test) - y_test
         rmse13 = np.sqrt(np.mean(err13 ** 2))
 
-        self.assertTrue(
-            np.allclose(rmse, 5.435006230994306)
-        )
-        self.assertTrue(
-            np.allclose(rmse2, 19.95472988159529)
-        )
+        self.assertTrue(np.allclose(rmse, 5.435006230994306))
+        self.assertTrue(np.allclose(rmse2, 19.95472988159529))
         self.assertFalse(np.allclose(rmse3, 1.949793))
+        self.assertTrue(np.allclose(rmse4, 13.024632782703636))
+        self.assertFalse(np.allclose(rmse5, 22.200957971900483))
+        self.assertTrue(np.allclose(rmse6, 0.614492143979095))
+        self.assertTrue(np.allclose(rmse7, 6.755116905805039))
         self.assertTrue(
-            np.allclose(rmse4, 13.024632782703636)
+            np.allclose(rmse7, np.sqrt(fit_obj7.score(X_test, y_test)))
+        )
+        self.assertTrue(
+            np.allclose(fit_obj.predict(X_test[0, :]), 335.65187002147786)
         )
         self.assertFalse(
-            np.allclose(rmse5, 22.200957971900483)
-        )
-        self.assertTrue(
-            np.allclose(rmse6, 0.614492143979095)
-        )
-        self.assertTrue(
-            np.allclose(rmse7, 6.755116905805039)
-        )
-        self.assertTrue(
-            np.allclose(
-                rmse7,
-                np.sqrt(fit_obj7.score(X_test, y_test)),
-            )
-        )
-        self.assertTrue(
-            np.allclose(
-                fit_obj.predict(X_test[0, :]),
-                335.65187002147786,
-            )
-        )
-        self.assertFalse(
-            np.allclose(
-                fit_obj2.predict(X_test[0, :]),
-                283.416245307822,
-            )
+            np.allclose(fit_obj2.predict(X_test[0, :]), 283.416245307822)
         )
 
-        self.assertFalse(
-            np.allclose(rmse8, 22.454022827189625)
-        )
-        self.assertFalse(
-            np.allclose(rmse9, 21.46698682773668)
-        )
-        self.assertTrue(
-            np.allclose(rmse10, 0.8443989968382506)
-        )
-        self.assertTrue(
-            np.allclose(rmse11, 22.26762496539322)
-        )
-        self.assertTrue(
-            np.allclose(rmse12, 22.988764118543678)
-        )
+        self.assertFalse(np.allclose(rmse8, 22.454022827189625))
+        self.assertFalse(np.allclose(rmse9, 21.46698682773668))
+        self.assertTrue(np.allclose(rmse10, 0.8443989968382506))
+        self.assertTrue(np.allclose(rmse11, 22.26762496539322))
+        self.assertTrue(np.allclose(rmse12, 22.988764118543678))
         self.assertFalse(np.allclose(rmse13, 1e6))
 
     def test_score(self):
@@ -318,14 +287,10 @@ class TestRidgeRegressor(ut.TestCase):
 
         self.assertTrue(
             np.allclose(
-                fit_obj.score(
-                    X, y, scoring="neg_mean_squared_error"
-                ),
+                fit_obj.score(X, y, scoring="neg_mean_squared_error"),
                 0.22156888076856565,
             )
-            & np.allclose(
-                fit_obj.score(X, y), 0.22156888076856565
-            )
+            & np.allclose(fit_obj.score(X, y), 0.22156888076856565)
         )
 
 

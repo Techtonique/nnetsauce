@@ -122,13 +122,11 @@ class RidgeRegressor(Ridge, RegressorMixin):
         self: object
         """
 
-        centered_y, scaled_Z = self.cook_training_set(
-            y=y, X=X, **kwargs
-        )
+        centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
         n_X, p_X = X.shape
         n_Z, p_Z = scaled_Z.shape
-        
+
         if self.n_clusters > 0:
             if self.encode_clusters == True:
                 n_features = p_X + self.n_clusters
@@ -140,9 +138,7 @@ class RidgeRegressor(Ridge, RegressorMixin):
         X_ = scaled_Z[:, 0:n_features]
         Phi_X_ = scaled_Z[:, n_features:p_Z]
 
-        B = mo.crossprod(X_) + self.lambda1 * np.diag(
-            np.repeat(1, n_features)
-        )
+        B = mo.crossprod(X_) + self.lambda1 * np.diag(np.repeat(1, n_features))
         C = mo.crossprod(Phi_X_, X_)
         D = mo.crossprod(Phi_X_) + self.lambda2 * np.diag(
             np.repeat(1, Phi_X_.shape[1])
@@ -153,15 +149,11 @@ class RidgeRegressor(Ridge, RegressorMixin):
         S_inv = pinv(S_mat)
         Y = np.dot(S_inv, W)
         inv = mo.rbind(
-            mo.cbind(
-                B_inv + mo.crossprod(W, Y), -np.transpose(Y)
-            ),
+            mo.cbind(B_inv + mo.crossprod(W, Y), -np.transpose(Y)),
             mo.cbind(-Y, S_inv),
         )
 
-        self.beta = np.dot(
-            inv, mo.crossprod(scaled_Z, centered_y)
-        )
+        self.beta = np.dot(inv, mo.crossprod(scaled_Z, centered_y))
 
         return self
 
@@ -192,24 +184,17 @@ class RidgeRegressor(Ridge, RegressorMixin):
 
             return (
                 self.y_mean
-                + np.dot(
-                    self.cook_test_set(new_X, **kwargs),
-                    self.beta,
-                )
+                + np.dot(self.cook_test_set(new_X, **kwargs), self.beta)
             )[0]
 
-        return self.y_mean + np.dot(
-            self.cook_test_set(X, **kwargs), self.beta
-        )
+        return self.y_mean + np.dot(self.cook_test_set(X, **kwargs), self.beta)
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
 
         preds = self.predict(X)
 
-        if (
-            type(preds) == tuple
-        ):  # if there are std. devs in the predictions
+        if type(preds) == tuple:  # if there are std. devs in the predictions
             preds = preds[0]
 
         if scoring is None:

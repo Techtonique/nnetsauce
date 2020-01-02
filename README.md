@@ -284,7 +284,7 @@ In Pull Requests, let's strive to use [`black`](https://black.readthedocs.io/en/
 
 ```bash
 pip install black
-black --line-length=60 file_submitted_for_pr.py
+black --line-length=80 file_submitted_for_pr.py
 ```
 
 A few things that we could explore are:

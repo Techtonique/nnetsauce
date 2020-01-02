@@ -11,9 +11,7 @@ class TestRVFL(ut.TestCase):
     def test_rvfl(self):
 
         np.random.seed(123)
-        X, y = datasets.make_regression(
-            n_samples=25, n_features=3
-        )
+        X, y = datasets.make_regression(n_samples=25, n_features=3)
 
         fit_obj = ns.BayesianRVFLRegressor(
             n_hidden_features=10,
@@ -74,55 +72,32 @@ class TestRVFL(ut.TestCase):
         y_test = y[index_test]
 
         fit_obj.fit(X_train, y_train)
-        err = (
-            fit_obj.predict(X_test, return_std=True)[0]
-            - y_test
-        )
+        err = fit_obj.predict(X_test, return_std=True)[0] - y_test
         rmse = np.sqrt(np.mean(err ** 2))
 
         fit_obj2.fit(X_train, y_train)
-        err2 = (
-            fit_obj2.predict(X_test, return_std=True)[0]
-            - y_test
-        )
+        err2 = fit_obj2.predict(X_test, return_std=True)[0] - y_test
         rmse2 = np.sqrt(np.mean(err2 ** 2))
 
         fit_obj3.fit(X_train, y_train)
-        err3 = (
-            fit_obj3.predict(X_test, return_std=True)[0]
-            - y_test
-        )
+        err3 = fit_obj3.predict(X_test, return_std=True)[0] - y_test
         rmse3 = np.sqrt(np.mean(err3 ** 2))
 
         fit_obj4.fit(X_train, y_train)
-        err4 = (
-            fit_obj4.predict(X_test, return_std=True)[0]
-            - y_test
-        )
+        err4 = fit_obj4.predict(X_test, return_std=True)[0] - y_test
         rmse4 = np.sqrt(np.mean(err4 ** 2))
 
         fit_obj5.fit(X_train, y_train)
-        err5 = (
-            fit_obj5.predict(X_test, return_std=True)[0]
-            - y_test
-        )
+        err5 = fit_obj5.predict(X_test, return_std=True)[0] - y_test
         rmse5 = np.sqrt(np.mean(err5 ** 2))
 
-        pred1 = fit_obj.predict(
-            X_test[0, :], return_std=True
-        )[0]
+        pred1 = fit_obj.predict(X_test[0, :], return_std=True)[0]
 
-        pred2 = fit_obj2.predict(
-            X_test[0, :], return_std=True
-        )[0]
+        pred2 = fit_obj2.predict(X_test[0, :], return_std=True)[0]
 
-        pred3 = fit_obj.predict(
-            X_test[0, :], return_std=False
-        )
+        pred3 = fit_obj.predict(X_test[0, :], return_std=False)
 
-        pred4 = fit_obj4.predict(
-            X_test[0, :], return_std=False
-        )
+        pred4 = fit_obj4.predict(X_test[0, :], return_std=False)
 
         self.assertTrue(
             np.allclose(rmse, 0.81893186154747988)
@@ -195,9 +170,7 @@ class TestRVFL(ut.TestCase):
     def test_score(self):
 
         np.random.seed(123)
-        X, y = datasets.make_regression(
-            n_samples=100, n_features=3
-        )
+        X, y = datasets.make_regression(n_samples=100, n_features=3)
 
         fit_obj = ns.BayesianRVFLRegressor(
             n_hidden_features=10,
@@ -249,29 +222,17 @@ class TestRVFL(ut.TestCase):
 
         self.assertTrue(
             np.allclose(
-                fit_obj.score(
-                    X, y, scoring="neg_mean_squared_error"
-                ),
+                fit_obj.score(X, y, scoring="neg_mean_squared_error"),
                 0.023104115093245361,
             )
+            & np.allclose(fit_obj.score(X, y), 0.023104115093245361)
             & np.allclose(
-                fit_obj.score(X, y), 0.023104115093245361
-            )
-            & np.allclose(
-                fit_obj2.score(
-                    X, y, scoring="neg_mean_squared_error"
-                ),
+                fit_obj2.score(X, y, scoring="neg_mean_squared_error"),
                 51.485414634058536,
             )
-            & np.allclose(
-                fit_obj2.score(X, y), 51.485414634058536
-            )
-            & np.allclose(
-                fit_obj3.score(X, y), 0.20023262498412012
-            )
-            & np.allclose(
-                fit_obj4.score(X, y), 0.17517631177933579
-            )
+            & np.allclose(fit_obj2.score(X, y), 51.485414634058536)
+            & np.allclose(fit_obj3.score(X, y), 0.20023262498412012)
+            & np.allclose(fit_obj4.score(X, y), 0.17517631177933579)
         )
 
 

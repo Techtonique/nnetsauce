@@ -119,9 +119,7 @@ class CustomClassifier(Custom, ClassifierMixin):
         self: object
         """
 
-        output_y, scaled_Z = self.cook_training_set(
-            y=y, X=X, **kwargs
-        )
+        output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
         # if sample_weights, else: (must use self.row_index)
 
@@ -167,15 +165,10 @@ class CustomClassifier(Custom, ClassifierMixin):
             )
 
             return (
-                self.obj.predict(
-                    self.cook_test_set(new_X, **kwargs),
-                    **kwargs
-                )
+                self.obj.predict(self.cook_test_set(new_X, **kwargs), **kwargs)
             )[0]
 
-        return self.obj.predict(
-            self.cook_test_set(X, **kwargs), **kwargs
-        )
+        return self.obj.predict(self.cook_test_set(X, **kwargs), **kwargs)
 
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
@@ -204,14 +197,11 @@ class CustomClassifier(Custom, ClassifierMixin):
 
             return (
                 self.obj.predict_proba(
-                    self.cook_test_set(new_X, **kwargs),
-                    **kwargs
+                    self.cook_test_set(new_X, **kwargs), **kwargs
                 )
             )[0]
 
-        return self.obj.predict_proba(
-            self.cook_test_set(X, **kwargs), **kwargs
-        )
+        return self.obj.predict_proba(self.cook_test_set(X, **kwargs), **kwargs)
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """

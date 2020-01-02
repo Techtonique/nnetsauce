@@ -18,9 +18,7 @@ class TestMTS(ut.TestCase):
         regr = linear_model.BayesianRidge()
         regr2 = gaussian_process.GaussianProcessRegressor()
         regr3 = ns.BayesianRVFLRegressor(s=0.01)
-        regr4 = ns.BayesianRVFL2Regressor(
-            s1=0.01, s2=0.01, n_hidden_features=2
-        )
+        regr4 = ns.BayesianRVFL2Regressor(s1=0.01, s2=0.01, n_hidden_features=2)
 
         fit_obj = ns.MTS(
             regr,
@@ -140,9 +138,7 @@ class TestMTS(ut.TestCase):
         rmse = np.sqrt(np.mean(err ** 2))
 
         fit_obj.fit(X_train, xreg=Xreg_train)
-        err_xreg = (
-            fit_obj.predict(new_xreg=Xreg_test) - X_test
-        )
+        err_xreg = fit_obj.predict(new_xreg=Xreg_test) - X_test
         rmse_xreg = np.sqrt(np.mean(err_xreg ** 2))
 
         fit_obj2.fit(X_train)
@@ -173,30 +169,14 @@ class TestMTS(ut.TestCase):
         fit_obj9.fit(X_train)
         preds4 = fit_obj9.predict(return_std=True)
 
-        self.assertTrue(
-            np.allclose(rmse, 10.396062391967684)
-        )
-        self.assertTrue(
-            np.allclose(rmse_xreg, 10.39593866961476)
-        )
-        self.assertTrue(
-            np.allclose(rmse2, 10.395489235411796)
-        )
-        self.assertTrue(
-            np.allclose(rmse3, 10.395986434438191)
-        )
-        self.assertTrue(
-            np.allclose(rmse4, 10.677585029352571)
-        )
-        self.assertTrue(
-            np.allclose(rmse5, 10.360814075763624)
-        )
-        self.assertTrue(
-            np.allclose(preds[2][1, 0], 49.895558528390268)
-        )
-        self.assertTrue(
-            np.allclose(preds2[2][1, 0], 50.08511339370441)
-        )
+        self.assertTrue(np.allclose(rmse, 10.396062391967684))
+        self.assertTrue(np.allclose(rmse_xreg, 10.39593866961476))
+        self.assertTrue(np.allclose(rmse2, 10.395489235411796))
+        self.assertTrue(np.allclose(rmse3, 10.395986434438191))
+        self.assertTrue(np.allclose(rmse4, 10.677585029352571))
+        self.assertTrue(np.allclose(rmse5, 10.360814075763624))
+        self.assertTrue(np.allclose(preds[2][1, 0], 49.895558528390268))
+        self.assertTrue(np.allclose(preds2[2][1, 0], 50.08511339370441))
 
         self.assertTrue(preds4[2][1, 0], 50.38107971065952)
 
@@ -250,14 +230,8 @@ class TestMTS(ut.TestCase):
 
         self.assertTrue(
             (fit_obj.get_params()["lags"] == 1)
-            & (
-                fit_obj.get_params()["type_scaling"]
-                == ("std", "std", "std")
-            )
-            & (
-                fit_obj2.get_params()["obj__lambda_1"]
-                == 1e-06
-            )
+            & (fit_obj.get_params()["type_scaling"] == ("std", "std", "std"))
+            & (fit_obj2.get_params()["obj__lambda_1"] == 1e-06)
         )
 
     def test_score(self):
@@ -288,23 +262,13 @@ class TestMTS(ut.TestCase):
                     testing_index=range(20, 25),
                     scoring="neg_mean_squared_error",
                 ),
-                (
-                    239.14320170278387,
-                    0.080854374885662481,
-                    85.010283695384985,
-                ),
+                (239.14320170278387, 0.080854374885662481, 85.010283695384985),
             )
             & np.allclose(
                 fit_obj.score(
-                    X,
-                    training_index=range(20),
-                    testing_index=range(20, 25),
+                    X, training_index=range(20), testing_index=range(20, 25)
                 ),
-                (
-                    239.14320170278387,
-                    0.080854374885662481,
-                    85.010283695384985,
-                ),
+                (239.14320170278387, 0.080854374885662481, 85.010283695384985),
             )
         )
 

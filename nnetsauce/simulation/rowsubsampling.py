@@ -20,9 +20,7 @@ def subsample(y, row_sample=0.8, seed=123):
     # preproc -----
     if mx.is_factor(y):
 
-        classes, n_elem_classes = np.unique(
-            y, return_counts=True
-        )
+        classes, n_elem_classes = np.unique(y, return_counts=True)
         n_classes = len(classes)
         y_as_classes = y.copy()
         freqs_hist = n_elem_classes / n_obs
@@ -40,9 +38,7 @@ def subsample(y, row_sample=0.8, seed=123):
         y_as_classes = np.zeros_like(y, dtype=int)
 
         for i in classes:
-            y_as_classes[
-                (y > breaks[i]) * (y <= breaks[i + 1])
-            ] = int(i)
+            y_as_classes[(y > breaks[i]) * (y <= breaks[i + 1])] = int(i)
 
     # main loop ----
     index = []
@@ -54,20 +50,14 @@ def subsample(y, row_sample=0.8, seed=123):
         bool_class_i = y_as_classes == classes[i]
 
         # index_class_i = [i for i, e in enumerate(bool_class_i) if e == True]
-        index_class_i = np.where(bool_class_i == True)[
-            0
-        ].tolist()
+        index_class_i = np.where(bool_class_i == True)[0].tolist()
 
-        if (
-            np.sum(bool_class_i) > 1
-        ):  # at least 2 elements in class  #i
+        if np.sum(bool_class_i) > 1:  # at least 2 elements in class  #i
 
             index.append(
                 np.random.choice(
                     index_class_i,
-                    size=int(
-                        n_obs_out * freqs_hist[i]
-                    ),  # output size
+                    size=int(n_obs_out * freqs_hist[i]),  # output size
                     replace=True,
                 ).tolist()
             )

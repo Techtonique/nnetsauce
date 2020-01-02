@@ -88,9 +88,7 @@ class MTS(Base):
         return_std=False,
     ):
 
-        assert (
-            np.int(lags) == lags
-        ), "parameter 'lags' should be an integer"
+        assert np.int(lags) == lags, "parameter 'lags' should be an integer"
 
         super().__init__(
             n_hidden_features=n_hidden_features,
@@ -112,9 +110,7 @@ class MTS(Base):
         self.n_series = None
         self.lags = lags
         self.fit_objs = {}
-        self.y = (
-            None
-        )  # MTS responses (most recent observations first)
+        self.y = None  # MTS responses (most recent observations first)
         self.X = None  # MTS lags
         self.xreg = None
         self.regressors_scaler = None
@@ -156,9 +152,7 @@ class MTS(Base):
 
         self.y_means.clear()
 
-        mts_input = ts.create_train_inputs(
-            X[::-1], self.lags
-        )
+        mts_input = ts.create_train_inputs(X[::-1], self.lags)
 
         self.y = mts_input[0]
 
@@ -172,14 +166,10 @@ class MTS(Base):
 
             self.xreg = xreg
 
-            xreg_input = ts.create_train_inputs(
-                xreg[::-1], self.lags
-            )
+            xreg_input = ts.create_train_inputs(xreg[::-1], self.lags)
 
             dummy_y, scaled_Z = self.cook_training_set(
-                y=np.repeat(1, n),
-                X=mo.cbind(self.X, xreg_input[1]),
-                **kwargs
+                y=np.repeat(1, n), X=mo.cbind(self.X, xreg_input[1]), **kwargs
             )
 
         else:  # xreg is None
@@ -195,12 +185,7 @@ class MTS(Base):
             self.y_means[i] = y_mean
             self.fit_objs[i] = pickle.loads(
                 pickle.dumps(
-                    self.obj.fit(
-                        scaled_Z,
-                        self.y[:, i] - y_mean,
-                        **kwargs
-                    ),
-                    -1,
+                    self.obj.fit(scaled_Z, self.y[:, i] - y_mean, **kwargs), -1
                 )
             )
 
@@ -208,9 +193,7 @@ class MTS(Base):
 
         return self
 
-    def predict(
-        self, h=5, level=95, new_xreg=None, **kwargs
-    ):
+    def predict(self, h=5, level=95, new_xreg=None, **kwargs):
         """Predict on horizon h.
         
         Parameters
@@ -235,9 +218,7 @@ class MTS(Base):
         """
 
         if self.xreg is not None:
-            assert (
-                new_xreg is not None
-            ), "'new_xreg' must be provided"
+            assert new_xreg is not None, "'new_xreg' must be provided"
 
         self.preds = None
 
@@ -253,9 +234,7 @@ class MTS(Base):
 
             qt = norm.ppf(1 - 0.5 * (1 - level / 100))
 
-        if (
-            new_xreg is not None
-        ):  # Additional regressors provided
+        if new_xreg is not None:  # Additional regressors provided
 
             try:
                 n_obs_xreg, n_features_xreg = new_xreg.shape
@@ -273,64 +252,41 @@ class MTS(Base):
 
             n_features_total = n_features + n_features_xreg
 
-            inv_new_xreg = mo.rbind(self.xreg, new_xreg)[
-                ::-1
-            ]
+            inv_new_xreg = mo.rbind(self.xreg, new_xreg)[::-1]
 
         # Loop on horizon h
         for i in range(h):
 
-            new_obs = ts.reformat_response(
-                self.preds, self.lags
-            )
+            new_obs = ts.reformat_response(self.preds, self.lags)
 
-            if (
-                new_xreg is not None
-            ):  # Additional regressors provided
+            if new_xreg is not None:  # Additional regressors provided
 
-                new_obs_xreg = ts.reformat_response(
-                    inv_new_xreg, self.lags
-                )
+                new_obs_xreg = ts.reformat_response(inv_new_xreg, self.lags)
 
                 new_X = mo.rbind(
                     np.union1d(
                         new_obs.reshape(1, n_features),
-                        new_obs_xreg.reshape(
-                            1, n_features_xreg
-                        ),
+                        new_obs_xreg.reshape(1, n_features_xreg),
                     ),
-                    np.ones(n_features_total).reshape(
-                        1, n_features_total
-                    ),
+                    np.ones(n_features_total).reshape(1, n_features_total),
                 )
 
             else:
 
                 new_X = mo.rbind(
                     new_obs.reshape(1, n_features),
-                    np.ones(n_features).reshape(
-                        1, n_features
-                    ),
+                    np.ones(n_features).reshape(1, n_features),
                 )
 
-            cooked_new_X = self.cook_test_set(
-                new_X, **kwargs
-            )
+            cooked_new_X = self.cook_test_set(new_X, **kwargs)
 
-            predicted_cooked_new_X = self.obj.predict(
-                cooked_new_X, **kwargs
-            )
+            predicted_cooked_new_X = self.obj.predict(cooked_new_X, **kwargs)
 
-            if (
-                self.return_std == False
-            ):  # std. dev. is not returned
+            if self.return_std == False:  # std. dev. is not returned
 
                 preds = np.array(
                     [
-                        (
-                            self.y_means[j]
-                            + predicted_cooked_new_X[0]
-                        )
+                        (self.y_means[j] + predicted_cooked_new_X[0])
                         for j in range(self.n_series)
                     ]
                 )
@@ -341,40 +297,31 @@ class MTS(Base):
 
                 preds = np.array(
                     [
-                        (
-                            self.y_means[j]
-                            + predicted_cooked_new_X[0][0]
-                        )
+                        (self.y_means[j] + predicted_cooked_new_X[0][0])
                         for j in range(self.n_series)
                     ]
                 )
 
                 self.preds = mo.rbind(preds, self.preds)
 
-                self.preds_std[i] = predicted_cooked_new_X[
-                    1
-                ][0]
+                self.preds_std[i] = predicted_cooked_new_X[1][0]
 
         # function's return
 
         self.preds = self.preds[0:h, :][::-1]
 
-        if (
-            self.return_std == False
-        ):  # the std. dev. is returned
+        if self.return_std == False:  # the std. dev. is returned
 
             return self.preds
 
         else:
 
-            self.preds_std = self.preds_std[::-1].reshape(
-                h, 1
-            )
+            self.preds_std = self.preds_std[::-1].reshape(h, 1)
 
             # reshape
-            self.preds_std = np.repeat(
-                self.preds_std, self.n_series
-            ).reshape(-1, self.n_series)
+            self.preds_std = np.repeat(self.preds_std, self.n_series).reshape(
+                -1, self.n_series
+            )
 
             return (
                 self.preds,
@@ -383,23 +330,11 @@ class MTS(Base):
                 self.preds + qt * self.preds_std,
             )
 
-    def score(
-        self,
-        X,
-        training_index,
-        testing_index,
-        scoring=None,
-        **kwargs
-    ):
+    def score(self, X, training_index, testing_index, scoring=None, **kwargs):
         """ Train on training_index, score on testing_index. """
 
         assert (
-            bool(
-                set(training_index).intersection(
-                    set(testing_index)
-                )
-            )
-            == False
+            bool(set(training_index).intersection(set(testing_index))) == False
         ), "Non-overlapping 'training_index' and 'testing_index' required"
 
         # Dimensions
@@ -417,9 +352,7 @@ class MTS(Base):
 
         # Fit and predict
         self.fit(X_train, **kwargs)
-        preds = self.predict(
-            h=h, return_std=False, **kwargs
-        )
+        preds = self.predict(h=h, return_std=False, **kwargs)
 
         if scoring is None:
             scoring = "neg_mean_squared_error"
@@ -447,9 +380,7 @@ class MTS(Base):
 
         return tuple(
             [
-                scoring_options[scoring](
-                    X_test[:, i], preds[:, i], **kwargs
-                )
+                scoring_options[scoring](X_test[:, i], preds[:, i], **kwargs)
                 for i in range(p)
             ]
         )

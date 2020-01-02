@@ -156,58 +156,34 @@ def generate_uniform(n_dims=2, n_points=10, seed=123):
 
 # hammersley numbers' generation
 @memoize
-def generate_hammersley(
-    n_dims=2, n_points=100, primes=None
-):
-    def func_hammersley(
-        n_dims=n_dims,
-        n_points=(n_points + 1),
-        primes=primes,
-    ):
-        primes = (
-            primes if primes is not None else saved_primes
-        )
+def generate_hammersley(n_dims=2, n_points=100, primes=None):
+    def func_hammersley(n_dims=n_dims, n_points=(n_points + 1), primes=primes):
+        primes = primes if primes is not None else saved_primes
         for k in moves.range(n_points):
             points = [k / n_points] + [
-                get_phi(primes[d], k)
-                for d in moves.range(n_dims - 1)
+                get_phi(primes[d], k) for d in moves.range(n_dims - 1)
             ]
             yield points
 
-    return np.array(list(func_hammersley()))[
-        1 : (n_points + 1), :
-    ].transpose()
+    return np.array(list(func_hammersley()))[1 : (n_points + 1), :].transpose()
 
 
 # halton numbers' generation (python)
 @memoize
 def generate_halton(n_dims=2, n_points=10, primes=None):
-    def func_halton(
-        n_dims=n_dims,
-        n_points=(n_points + 1),
-        primes=primes,
-    ):
-        primes = (
-            primes if primes is not None else saved_primes
-        )
+    def func_halton(n_dims=n_dims, n_points=(n_points + 1), primes=primes):
+        primes = primes if primes is not None else saved_primes
         for k in moves.range(n_points):
-            points = [
-                get_phi(primes[d], k)
-                for d in moves.range(n_dims)
-            ]
+            points = [get_phi(primes[d], k) for d in moves.range(n_dims)]
             yield points
 
-    return np.array(list(func_halton()))[
-        1 : (n_points + 1), :
-    ].transpose()
+    return np.array(list(func_halton()))[1 : (n_points + 1), :].transpose()
 
 
 # sobol numbers' generation (python)
 @memoize
 def generate_sobol2(n_dims=2, n_points=10):
-    return np.array(
-        i4_sobol_generate(m=n_dims, n=n_points, skip=2)
-    )
+    return np.array(i4_sobol_generate(m=n_dims, n=n_points, skip=2))
 
 
 # sobol numbers' generation (cpp)
@@ -217,9 +193,7 @@ def generate_sobol_cpp(n_dims=2, n_points=10):
         n_p = n_points * n_dims
         x = i8_sobol_generate(n_dims, n_points, 1)
         xx = (ctypes.c_double * n_p).from_address(int(x))
-        return np.transpose(
-            np.array(list(xx)).reshape(n_points, n_dims)
-        )
+        return np.transpose(np.array(list(xx)).reshape(n_points, n_dims))
     except:
         raise ValueError("_sobol.so is not imported.")
 
@@ -231,8 +205,6 @@ def generate_halton_cpp(n_dims=2, n_points=10):
         n_p = n_dims * n_points
         x = halton_sequence(1, n_points, n_dims)
         xx = (ctypes.c_double * n_p).from_address(int(x))
-        return np.transpose(
-            np.array(list(xx)).reshape(n_points, n_dims)
-        )
+        return np.transpose(np.array(list(xx)).reshape(n_points, n_dims))
     except:
         raise ValueError("_halton.so is not imported.")

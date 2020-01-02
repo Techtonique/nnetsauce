@@ -25,9 +25,7 @@ class TestAdaBoost(ut.TestCase):
             Z, t, test_size=0.2, random_state=123
         )
 
-        clf = DecisionTreeClassifier(
-            max_depth=1, random_state=123
-        )
+        clf = DecisionTreeClassifier(max_depth=1, random_state=123)
         fit_obj = ns.AdaBoostClassifier(
             clf,
             n_hidden_features=np.int(11.22338867),
@@ -45,9 +43,7 @@ class TestAdaBoost(ut.TestCase):
             method="SAMME.R",
         )
 
-        clf2 = DecisionTreeClassifier(
-            max_depth=1, random_state=123
-        )
+        clf2 = DecisionTreeClassifier(max_depth=1, random_state=123)
         fit_obj2 = ns.AdaBoostClassifier(
             clf2,
             n_hidden_features=np.int(8.21154785e01),
@@ -65,9 +61,7 @@ class TestAdaBoost(ut.TestCase):
             method="SAMME",
         )
 
-        clf3 = DecisionTreeClassifier(
-            max_depth=1, random_state=123
-        )
+        clf3 = DecisionTreeClassifier(max_depth=1, random_state=123)
         fit_obj3 = ns.AdaBoostClassifier(
             clf3,
             n_hidden_features=np.int(11.22338867),
@@ -85,9 +79,7 @@ class TestAdaBoost(ut.TestCase):
             method="SAMME.R",
         )
 
-        clf4 = DecisionTreeClassifier(
-            max_depth=1, random_state=123
-        )
+        clf4 = DecisionTreeClassifier(max_depth=1, random_state=123)
         fit_obj4 = ns.AdaBoostClassifier(
             clf4,
             n_hidden_features=np.int(11.22338867),
@@ -118,17 +110,11 @@ class TestAdaBoost(ut.TestCase):
         fit_obj4.fit(Z_train, t_train)
         preds4 = fit_obj4.predict_proba(Z_test)
 
-        self.assertTrue(
-            np.allclose(preds1[0, 0], 0.0010398157809255607)
-        )
+        self.assertTrue(np.allclose(preds1[0, 0], 0.0010398157809255607))
 
-        self.assertTrue(
-            np.allclose(preds1[0, 1], 0.9989601842190745)
-        )
+        self.assertTrue(np.allclose(preds1[0, 1], 0.9989601842190745))
 
-        self.assertTrue(
-            np.allclose(preds2[0, 0], 0.28646471034732585)
-        )
+        self.assertTrue(np.allclose(preds2[0, 0], 0.28646471034732585))
 
         self.assertFalse(np.allclose(preds3[0, 0], 1000))
 
@@ -149,9 +135,7 @@ class TestAdaBoost(ut.TestCase):
             X, y, test_size=0.2, random_state=123
         )
 
-        clf = LogisticRegression(
-            solver="liblinear", multi_class="ovr"
-        )
+        clf = LogisticRegression(solver="liblinear", multi_class="ovr")
         fit_obj = ns.AdaBoostClassifier(
             clf,
             n_hidden_features=np.int(11.22338867),
@@ -169,9 +153,7 @@ class TestAdaBoost(ut.TestCase):
             method="SAMME.R",
         )
 
-        clf2 = LogisticRegression(
-            solver="liblinear", multi_class="ovr"
-        )
+        clf2 = LogisticRegression(solver="liblinear", multi_class="ovr")
         fit_obj2 = ns.AdaBoostClassifier(
             clf2,
             n_hidden_features=np.int(8.21154785e01),

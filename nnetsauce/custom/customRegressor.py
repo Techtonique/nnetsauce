@@ -121,9 +121,7 @@ class CustomRegressor(Custom, RegressorMixin):
         self: object
         """
 
-        centered_y, scaled_Z = self.cook_training_set(
-            y=y, X=X, **kwargs
-        )
+        centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
         self.obj.fit(scaled_Z, centered_y, **kwargs)
 
@@ -157,8 +155,7 @@ class CustomRegressor(Custom, RegressorMixin):
             return (
                 self.y_mean
                 + self.obj.predict(
-                    self.cook_test_set(new_X, **kwargs),
-                    **kwargs
+                    self.cook_test_set(new_X, **kwargs), **kwargs
                 )
             )[0]
 
@@ -171,9 +168,7 @@ class CustomRegressor(Custom, RegressorMixin):
 
         preds = self.predict(X)
 
-        if (
-            type(preds) == tuple
-        ):  # if there are std. devs in the predictions
+        if type(preds) == tuple:  # if there are std. devs in the predictions
             preds = preds[0]
 
         if scoring is None:

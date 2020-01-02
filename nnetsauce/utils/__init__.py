@@ -1,20 +1,11 @@
 from .lmfuncs import beta_hat, inv_penalized_cov
-from .matrixops import (
-    cbind,
-    rbind,
-    crossprod,
-    tcrossprod,
-    to_np_array,
-)
+from .matrixops import cbind, rbind, crossprod, tcrossprod, to_np_array
 from .memoize import memoize
 from .misc import merge_two_dicts, is_factor
 from .model_selection import TimeSeriesSplit
 from .progress_bar import Progbar
 from .psdcheck import isPD, nearestPD
-from .timeseries import (
-    create_train_inputs,
-    reformat_response,
-)
+from .timeseries import create_train_inputs, reformat_response
 
 
 __all__ = [

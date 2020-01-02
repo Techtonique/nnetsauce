@@ -133,9 +133,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         self: object
         """
 
-        assert mx.is_factor(
-            y.tolist()
-        ), "y must contain only integers"
+        assert mx.is_factor(y.tolist()), "y must contain only integers"
 
         # training
         n, p = X.shape
@@ -165,27 +163,17 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
         if self.n_jobs is None:
 
-            for idx, m in enumerate(
-                range(self.n_estimators)
-            ):
+            for idx, m in enumerate(range(self.n_estimators)):
 
                 try:
 
                     base_learner.fit(X, y, **kwargs)
 
                     self.voter.update(
-                        {
-                            m: pickle.loads(
-                                pickle.dumps(
-                                    base_learner, -1
-                                )
-                            )
-                        }
+                        {m: pickle.loads(pickle.dumps(base_learner, -1))}
                     )
 
-                    base_learner.set_params(
-                        seed=self.seed + (m + 1) * 1000
-                    )
+                    base_learner.set_params(seed=self.seed + (m + 1) * 1000)
 
                     if self.verbose == 1:
                         pbar.update(m)
@@ -225,13 +213,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
                 seed=self.seed + m * 1000,
             )
             base_learner.fit(X, y, **kwargs)
-            self.voter.update(
-                {
-                    m: pickle.loads(
-                        pickle.dumps(base_learner, -1)
-                    )
-                }
-            )
+            self.voter.update({m: pickle.loads(pickle.dumps(base_learner, -1))})
 
         if self.verbose == 1:
 
@@ -242,8 +224,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         else:
 
             Parallel(n_jobs=self.n_jobs, prefer="threads")(
-                delayed(fit_estimators)(m)
-                for m in range(self.n_estimators)
+                delayed(fit_estimators)(m) for m in range(self.n_estimators)
             )
 
         self.n_estimators = len(self.voter)
@@ -266,9 +247,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         -------
         model predictions: {array-like}        
         """
-        return self.predict_proba(
-            X, weights, **kwargs
-        ).argmax(axis=1)
+        return self.predict_proba(X, weights, **kwargs).argmax(axis=1)
 
     def predict_proba(self, X, weights=None, **kwargs):
         """Predict probabilities for test data X.
@@ -287,17 +266,13 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         probability estimates for test data: {array-like}        
         """
 
-        def calculate_probas(
-            voter, weights=None, verbose=None
-        ):
+        def calculate_probas(voter, weights=None, verbose=None):
 
             ensemble_proba = 0
 
             n_iter = len(voter)
 
-            assert (
-                n_iter > 0
-            ), "no estimator found in `RandomBag` ensemble"
+            assert n_iter > 0, "no estimator found in `RandomBag` ensemble"
 
             if weights is None:
 
@@ -316,9 +291,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             # if weights is not None:
             for idx, elt in voter.items():
 
-                ensemble_proba += weights[
-                    idx
-                ] * elt.predict_proba(X)
+                ensemble_proba += weights[idx] * elt.predict_proba(X)
 
                 if verbose == 1:
                     pbar.update(idx)
@@ -337,16 +310,12 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
             if weights is None:
 
-                return calculate_probas(
-                    self.voter, verbose=self.verbose
-                )
+                return calculate_probas(self.voter, verbose=self.verbose)
 
             # if weights is not None:
             self.weights = weights
 
-            return calculate_probas(
-                self.voter, weights, verbose=self.verbose
-            )
+            return calculate_probas(self.voter, weights, verbose=self.verbose)
 
         # if self.n_jobs is not None:
         def predict_estimator(m):
@@ -354,20 +323,15 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
         if self.verbose == 1:
 
-            preds = Parallel(
-                n_jobs=self.n_jobs, prefer="threads"
-            )(
+            preds = Parallel(n_jobs=self.n_jobs, prefer="threads")(
                 delayed(predict_estimator)(m)
                 for m in tqdm(range(self.n_estimators))
             )
 
         else:
 
-            preds = Parallel(
-                n_jobs=self.n_jobs, prefer="threads"
-            )(
-                delayed(predict_estimator)(m)
-                for m in range(self.n_estimators)
+            preds = Parallel(n_jobs=self.n_jobs, prefer="threads")(
+                delayed(predict_estimator)(m) for m in range(self.n_estimators)
             )
 
         ensemble_proba = 0
@@ -386,9 +350,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
         return ensemble_proba
 
-    def score(
-        self, X, y, weights=None, scoring=None, **kwargs
-    ):
+    def score(self, X, y, weights=None, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
 
         preds = self.predict(X, weights, **kwargs)

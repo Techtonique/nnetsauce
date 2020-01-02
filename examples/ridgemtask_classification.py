@@ -113,5 +113,7 @@ fit_obj.fit(X_train, y_train)
 print(time() - start)
 print(fit_obj.score(X_test, y_test))
 
+start = time()
 preds = fit_obj.predict(X_test)
+print(time() - start)
 print(metrics.classification_report(preds, y_test))

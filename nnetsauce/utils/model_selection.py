@@ -13,12 +13,8 @@ from sklearn.model_selection import TimeSeriesSplit
 class TimeSeriesSplit(TimeSeriesSplit):
     """Time Series cross-validator"""
 
-    def __init__(
-        self, n_splits="warn", max_train_size=None
-    ):
-        super().__init__(
-            n_splits=n_splits, max_train_size=max_train_size
-        )
+    def __init__(self, n_splits="warn", max_train_size=None):
+        super().__init__(n_splits=n_splits, max_train_size=max_train_size)
 
     def split(
         self,
@@ -61,7 +57,7 @@ class TimeSeriesSplit(TimeSeriesSplit):
         # assert initial_window
         # assert horizon
         # assert fixed_window
-        
+
         try:
             n = X.shape[0]
         except:
@@ -87,9 +83,7 @@ class TimeSeriesSplit(TimeSeriesSplit):
             while max_index_test <= n:
 
                 yield (
-                    indices[
-                        min_index_train:max_index_train
-                    ],
+                    indices[min_index_train:max_index_train],
                     indices[min_index_test:max_index_test],
                 )
 
@@ -105,9 +99,7 @@ class TimeSeriesSplit(TimeSeriesSplit):
             while max_index_test <= n:
 
                 yield (
-                    indices[
-                        min_index_train:max_index_train
-                    ],
+                    indices[min_index_train:max_index_train],
                     indices[min_index_test:max_index_test],
                 )
 

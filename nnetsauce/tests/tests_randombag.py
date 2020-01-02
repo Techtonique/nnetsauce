@@ -25,9 +25,7 @@ class TestRandomBag(ut.TestCase):
             Z, t, test_size=0.2, random_state=12736
         )
 
-        clf = DecisionTreeClassifier(
-            max_depth=1, random_state=14235
-        )
+        clf = DecisionTreeClassifier(max_depth=1, random_state=14235)
         fit_obj = ns.RandomBagClassifier(
             clf,
             n_estimators=3,
@@ -48,9 +46,7 @@ class TestRandomBag(ut.TestCase):
             verbose=0,
         )
 
-        clf2 = DecisionTreeClassifier(
-            max_depth=1, random_state=15243
-        )
+        clf2 = DecisionTreeClassifier(max_depth=1, random_state=15243)
         fit_obj2 = ns.RandomBagClassifier(
             clf2,
             n_estimators=3,
@@ -71,9 +67,7 @@ class TestRandomBag(ut.TestCase):
             verbose=0,
         )
 
-        clf3 = DecisionTreeClassifier(
-            max_depth=1, random_state=15243
-        )
+        clf3 = DecisionTreeClassifier(max_depth=1, random_state=15243)
         fit_obj3 = ns.RandomBagClassifier(
             clf3,
             n_estimators=3,
@@ -104,21 +98,13 @@ class TestRandomBag(ut.TestCase):
         fit_obj3.fit(Z_train, t_train)
         preds3 = fit_obj3.predict_proba(Z_test)
 
-        self.assertTrue(
-            np.allclose(preds1[0, 0], 0.043789295499125226)
-        )
+        self.assertTrue(np.allclose(preds1[0, 0], 0.043789295499125226))
 
-        self.assertTrue(
-            np.allclose(preds1[0, 1], 0.9562107045008749)
-        )
+        self.assertTrue(np.allclose(preds1[0, 1], 0.9562107045008749))
 
-        self.assertTrue(
-            np.allclose(preds2[0, 0], 0.04650031359722393)
-        )
+        self.assertTrue(np.allclose(preds2[0, 0], 0.04650031359722393))
 
-        self.assertTrue(
-            np.allclose(preds3[0, 0], 0.04650031359722393)
-        )
+        self.assertTrue(np.allclose(preds3[0, 0], 0.04650031359722393))
 
         self.assertTrue(
             np.allclose(fit_obj.predict(X_test)[0], 1)
@@ -135,9 +121,7 @@ class TestRandomBag(ut.TestCase):
             X, y, test_size=0.2, random_state=123
         )
 
-        clf = DecisionTreeClassifier(
-            max_depth=1, random_state=14235
-        )
+        clf = DecisionTreeClassifier(max_depth=1, random_state=14235)
         fit_obj = ns.RandomBagClassifier(
             clf,
             n_estimators=3,
@@ -158,9 +142,7 @@ class TestRandomBag(ut.TestCase):
             verbose=0,
         )
 
-        clf2 = DecisionTreeClassifier(
-            max_depth=1, random_state=15243
-        )
+        clf2 = DecisionTreeClassifier(max_depth=1, random_state=15243)
         fit_obj2 = ns.RandomBagClassifier(
             clf2,
             n_estimators=3,

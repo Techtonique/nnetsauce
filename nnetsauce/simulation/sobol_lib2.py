@@ -13539,14 +13539,9 @@ def i4_sobol(dim_num, seed):
         #
         if dim_num < 1 or dim_max < dim_num:
             print("I4_SOBOL - Fatal error!")
-            print(
-                "	The spatial dimension DIM_NUM should satisfy:"
-            )
+            print("	The spatial dimension DIM_NUM should satisfy:")
             print("		1 <= DIM_NUM <= %d" % dim_max)
-            print(
-                "	But this input value is DIM_NUM = %d"
-                % dim_num
-            )
+            print("	But this input value is DIM_NUM = %d" % dim_num)
             return
 
         dim_num_save = dim_num
@@ -13586,8 +13581,7 @@ def i4_sobol(dim_num, seed):
                     l = 2 * l
                     if includ[k - 1]:
                         newv = np.bitwise_xor(
-                            int(newv),
-                            int(l * v[i - 1, j - k - 1]),
+                            int(newv), int(l * v[i - 1, j - k - 1])
                         )
                 v[i - 1, j - 1] = newv
         #
@@ -13635,9 +13629,7 @@ def i4_sobol(dim_num, seed):
 
     elif seed_save + 1 < seed:
 
-        for seed_temp in range(
-            int(seed_save + 1), int(seed)
-        ):
+        for seed_temp in range(int(seed_save + 1), int(seed)):
             l = i4_bit_lo0(seed_temp)
             for i in range(1, dim_num + 1):
                 lastq[i - 1] = np.bitwise_xor(
@@ -13660,9 +13652,7 @@ def i4_sobol(dim_num, seed):
     quasi = np.zeros(dim_num)
     for i in range(1, dim_num + 1):
         quasi[i - 1] = lastq[i - 1] * recipd
-        lastq[i - 1] = np.bitwise_xor(
-            int(lastq[i - 1]), int(v[i - 1, l - 1])
-        )
+        lastq[i - 1] = np.bitwise_xor(int(lastq[i - 1]), int(v[i - 1, l - 1]))
 
     seed_save = seed
     seed = seed + 1
@@ -13751,9 +13741,7 @@ def i4_uniform(a, b, seed):
     #
     # 	Scale R to lie between A-0.5 and B+0.5.
     #
-    r = (1.0 - r) * (min(a, b) - 0.5) + r * (
-        max(a, b) + 0.5
-    )
+    r = (1.0 - r) * (min(a, b) - 0.5) + r * (max(a, b) + 0.5)
     #
     # 	Use rounding to convert R to an integer between A and B.
     #

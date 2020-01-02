@@ -9,13 +9,9 @@ from . import matrixops as mo
 def beta_hat(x, y, lam=None):
     # assert on dimensions
     if lam is None:
-        return np.dot(
-            inv_penalized_cov(x), mo.crossprod(x, y)
-        )
+        return np.dot(inv_penalized_cov(x), mo.crossprod(x, y))
     else:
-        return np.dot(
-            inv_penalized_cov(x, lam), mo.crossprod(x, y)
-        )
+        return np.dot(inv_penalized_cov(x, lam), mo.crossprod(x, y))
 
 
 # computes (t(x)%*%x + lam*I)^{-1}
@@ -24,9 +20,7 @@ def inv_penalized_cov(x, lam=None):
     if lam is None:
         return la.inv(mo.crossprod(x))
     else:
-        return la.inv(
-            mo.crossprod(x) + lam * np.eye(x.shape[1])
-        )
+        return la.inv(mo.crossprod(x) + lam * np.eye(x.shape[1]))
 
 
 # linear regression with no regularization
@@ -54,9 +48,7 @@ def beta_Sigma_hat(
         if fit_intercept == True:
             X = mo.cbind(np.ones(n), X)
             if X_star is not None:
-                X_star = mo.cbind(
-                    np.ones(X_star.shape[0]), X_star
-                )
+                X_star = mo.cbind(np.ones(X_star.shape[0]), X_star)
 
         Cn = inv_penalized_cov(X)
 
@@ -65,12 +57,8 @@ def beta_Sigma_hat(
             if X_star is None:
 
                 beta_hat_ = np.dot(Cn, mo.crossprod(X, y))
-                Sigma_hat_ = np.eye(X.shape[1]) - np.dot(
-                    Cn, mo.crossprod(X)
-                )
-                temp = np.dot(
-                    Cn, mo.tcrossprod(Sigma_hat_, X)
-                )
+                Sigma_hat_ = np.eye(X.shape[1]) - np.dot(Cn, mo.crossprod(X))
+                temp = np.dot(Cn, mo.tcrossprod(Sigma_hat_, X))
                 smoothing_matrix = np.dot(X, temp)
                 y_hat = np.dot(smoothing_matrix, y)
 
@@ -78,14 +66,7 @@ def beta_Sigma_hat(
                     "beta_hat": beta_hat_,
                     "Sigma_hat": Sigma_hat_,
                     "GCV": np.mean(
-                        (
-                            (y - y_hat)
-                            / (
-                                1
-                                - np.trace(smoothing_matrix)
-                                / n
-                            )
-                        )
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
                         ** 2
                     ),
                 }
@@ -93,18 +74,14 @@ def beta_Sigma_hat(
             else:
 
                 if beta_hat_ is None:
-                    beta_hat_ = np.dot(
-                        Cn, mo.crossprod(X, y)
-                    )
+                    beta_hat_ = np.dot(Cn, mo.crossprod(X, y))
 
                 if Sigma_hat_ is None:
-                    Sigma_hat_ = np.eye(
-                        X.shape[1]
-                    ) - np.dot(Cn, mo.crossprod(X))
+                    Sigma_hat_ = np.eye(X.shape[1]) - np.dot(
+                        Cn, mo.crossprod(X)
+                    )
 
-                temp = np.dot(
-                    Cn, mo.tcrossprod(Sigma_hat_, X)
-                )
+                temp = np.dot(Cn, mo.tcrossprod(Sigma_hat_, X))
                 smoothing_matrix = np.dot(X, temp)
                 y_hat = np.dot(smoothing_matrix, y)
 
@@ -112,25 +89,13 @@ def beta_Sigma_hat(
                     "beta_hat": beta_hat_,
                     "Sigma_hat": Sigma_hat_,
                     "GCV": np.mean(
-                        (
-                            (y - y_hat)
-                            / (
-                                1
-                                - np.trace(smoothing_matrix)
-                                / n
-                            )
-                        )
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
                         ** 2
                     ),
                     "preds": np.dot(X_star, beta_hat_),
                     "preds_std": np.sqrt(
                         np.diag(
-                            np.dot(
-                                X_star,
-                                mo.tcrossprod(
-                                    Sigma_hat_, X_star
-                                ),
-                            )
+                            np.dot(X_star, mo.tcrossprod(Sigma_hat_, X_star))
                         )
                     ),
                 }
@@ -140,26 +105,15 @@ def beta_Sigma_hat(
             if X_star is None:
 
                 beta_hat_ = np.dot(Cn, mo.crossprod(X, y))
-                Sigma_hat_ = np.eye(X.shape[1]) - np.dot(
-                    Cn, mo.crossprod(X)
-                )
-                temp = np.dot(
-                    Cn, mo.tcrossprod(Sigma_hat_, X)
-                )
+                Sigma_hat_ = np.eye(X.shape[1]) - np.dot(Cn, mo.crossprod(X))
+                temp = np.dot(Cn, mo.tcrossprod(Sigma_hat_, X))
                 smoothing_matrix = np.dot(X, temp)
                 y_hat = np.dot(smoothing_matrix, y)
 
                 return {
                     "beta_hat": beta_hat_,
                     "GCV": np.mean(
-                        (
-                            (y - y_hat)
-                            / (
-                                1
-                                - np.trace(smoothing_matrix)
-                                / n
-                            )
-                        )
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
                         ** 2
                     ),
                 }
@@ -168,26 +122,17 @@ def beta_Sigma_hat(
 
                 if beta_hat_ is None:
                     beta_hat_ = beta_hat(X, y)
-                    Sigma_hat_ = np.eye(
-                        X.shape[1]
-                    ) - np.dot(Cn, mo.crossprod(X))
-                    temp = np.dot(
-                        Cn, mo.tcrossprod(Sigma_hat_, X)
+                    Sigma_hat_ = np.eye(X.shape[1]) - np.dot(
+                        Cn, mo.crossprod(X)
                     )
+                    temp = np.dot(Cn, mo.tcrossprod(Sigma_hat_, X))
                     smoothing_matrix = np.dot(X, temp)
                     y_hat = np.dot(smoothing_matrix, y)
 
                 return {
                     "beta_hat": beta_hat_,
                     "GCV": np.mean(
-                        (
-                            (y - y_hat)
-                            / (
-                                1
-                                - np.trace(smoothing_matrix)
-                                / n
-                            )
-                        )
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
                         ** 2
                     ),
                     "preds": np.dot(X_star, beta_hat_),
@@ -195,9 +140,7 @@ def beta_Sigma_hat(
 
     else:  # X is None | y is None  # predict
 
-        assert (beta_hat_ is not None) & (
-            X_star is not None
-        )
+        assert (beta_hat_ is not None) & (X_star is not None)
 
         if return_cov == True:
 
@@ -206,14 +149,7 @@ def beta_Sigma_hat(
             return {
                 "preds": np.dot(X_star, beta_hat_),
                 "preds_std": np.sqrt(
-                    np.diag(
-                        np.dot(
-                            X_star,
-                            mo.tcrossprod(
-                                Sigma_hat_, X_star
-                            ),
-                        )
-                    )
+                    np.diag(np.dot(X_star, mo.tcrossprod(Sigma_hat_, X_star)))
                 ),
             }
 
@@ -250,9 +186,7 @@ def beta_Sigma_hat_rvfl(
         if fit_intercept == True:
             X = mo.cbind(np.ones(n), X)
             if X_star is not None:
-                X_star = mo.cbind(
-                    np.ones(X_star.shape[0]), X_star
-                )
+                X_star = mo.cbind(np.ones(X_star.shape[0]), X_star)
 
         s2 = s ** 2
         lambda_ = (sigma ** 2) / s2
@@ -264,12 +198,9 @@ def beta_Sigma_hat_rvfl(
 
                 beta_hat_ = np.dot(Cn, mo.crossprod(X, y))
                 Sigma_hat_ = s2 * (
-                    np.eye(X.shape[1])
-                    - np.dot(Cn, mo.crossprod(X))
+                    np.eye(X.shape[1]) - np.dot(Cn, mo.crossprod(X))
                 )
-                temp = np.dot(
-                    Cn, mo.tcrossprod(Sigma_hat_, X)
-                )
+                temp = np.dot(Cn, mo.tcrossprod(Sigma_hat_, X))
                 smoothing_matrix = np.dot(X, temp)
                 y_hat = np.dot(smoothing_matrix, y)
 
@@ -277,14 +208,7 @@ def beta_Sigma_hat_rvfl(
                     "beta_hat": beta_hat_,
                     "Sigma_hat": Sigma_hat_,
                     "GCV": np.mean(
-                        (
-                            (y - y_hat)
-                            / (
-                                1
-                                - np.trace(smoothing_matrix)
-                                / n
-                            )
-                        )
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
                         ** 2
                     ),
                 }
@@ -292,19 +216,14 @@ def beta_Sigma_hat_rvfl(
             else:
 
                 if beta_hat_ is None:
-                    beta_hat_ = np.dot(
-                        Cn, mo.crossprod(X, y)
-                    )
+                    beta_hat_ = np.dot(Cn, mo.crossprod(X, y))
 
                 if Sigma_hat_ is None:
                     Sigma_hat_ = s2 * (
-                        np.eye(X.shape[1])
-                        - np.dot(Cn, mo.crossprod(X))
+                        np.eye(X.shape[1]) - np.dot(Cn, mo.crossprod(X))
                     )
 
-                temp = np.dot(
-                    Cn, mo.tcrossprod(Sigma_hat_, X)
-                )
+                temp = np.dot(Cn, mo.tcrossprod(Sigma_hat_, X))
                 smoothing_matrix = np.dot(X, temp)
                 y_hat = np.dot(smoothing_matrix, y)
 
@@ -312,27 +231,14 @@ def beta_Sigma_hat_rvfl(
                     "beta_hat": beta_hat_,
                     "Sigma_hat": Sigma_hat_,
                     "GCV": np.mean(
-                        (
-                            (y - y_hat)
-                            / (
-                                1
-                                - np.trace(smoothing_matrix)
-                                / n
-                            )
-                        )
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
                         ** 2
                     ),
                     "preds": np.dot(X_star, beta_hat_),
                     "preds_std": np.sqrt(
                         np.diag(
-                            np.dot(
-                                X_star,
-                                mo.tcrossprod(
-                                    Sigma_hat_, X_star
-                                ),
-                            )
-                            + (sigma ** 2)
-                            * np.eye(X_star.shape[0])
+                            np.dot(X_star, mo.tcrossprod(Sigma_hat_, X_star))
+                            + (sigma ** 2) * np.eye(X_star.shape[0])
                         )
                     ),
                 }
@@ -343,26 +249,16 @@ def beta_Sigma_hat_rvfl(
 
                 beta_hat_ = np.dot(Cn, mo.crossprod(X, y))
                 Sigma_hat_ = s2 * (
-                    np.eye(X.shape[1])
-                    - np.dot(Cn, mo.crossprod(X))
+                    np.eye(X.shape[1]) - np.dot(Cn, mo.crossprod(X))
                 )
-                temp = np.dot(
-                    Cn, mo.tcrossprod(Sigma_hat_, X)
-                )
+                temp = np.dot(Cn, mo.tcrossprod(Sigma_hat_, X))
                 smoothing_matrix = np.dot(X, temp)
                 y_hat = np.dot(smoothing_matrix, y)
 
                 return {
                     "beta_hat": beta_hat_,
                     "GCV": np.mean(
-                        (
-                            (y - y_hat)
-                            / (
-                                1
-                                - np.trace(smoothing_matrix)
-                                / n
-                            )
-                        )
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
                         ** 2
                     ),
                 }
@@ -372,26 +268,16 @@ def beta_Sigma_hat_rvfl(
                 if beta_hat_ is None:
                     beta_hat_ = beta_hat(X, y, lam=lambda_)
                     Sigma_hat_ = s2 * (
-                        np.eye(X.shape[1])
-                        - np.dot(Cn, mo.crossprod(X))
+                        np.eye(X.shape[1]) - np.dot(Cn, mo.crossprod(X))
                     )
-                    temp = np.dot(
-                        Cn, mo.tcrossprod(Sigma_hat_, X)
-                    )
+                    temp = np.dot(Cn, mo.tcrossprod(Sigma_hat_, X))
                     smoothing_matrix = np.dot(X, temp)
                     y_hat = np.dot(smoothing_matrix, y)
 
                 return {
                     "beta_hat": beta_hat_,
                     "GCV": np.mean(
-                        (
-                            (y - y_hat)
-                            / (
-                                1
-                                - np.trace(smoothing_matrix)
-                                / n
-                            )
-                        )
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
                         ** 2
                     ),
                     "preds": np.dot(X_star, beta_hat_),
@@ -399,9 +285,7 @@ def beta_Sigma_hat_rvfl(
 
     else:  # X is None | y is None  # predict
 
-        assert (beta_hat_ is not None) & (
-            X_star is not None
-        )
+        assert (beta_hat_ is not None) & (X_star is not None)
 
         if return_cov == True:
 
@@ -411,14 +295,8 @@ def beta_Sigma_hat_rvfl(
                 "preds": np.dot(X_star, beta_hat_),
                 "preds_std": np.sqrt(
                     np.diag(
-                        np.dot(
-                            X_star,
-                            mo.tcrossprod(
-                                Sigma_hat_, X_star
-                            ),
-                        )
-                        + (sigma ** 2)
-                        * np.eye(X_star.shape[0])
+                        np.dot(X_star, mo.tcrossprod(Sigma_hat_, X_star))
+                        + (sigma ** 2) * np.eye(X_star.shape[0])
                     )
                 ),
             }
@@ -463,19 +341,15 @@ def beta_Sigma_hat_rvfl2(
 
             X = mo.cbind(np.ones(n), X)
             Cn = la.inv(
-                np.dot(Sigma, mo.crossprod(X))
-                + (sigma ** 2) * np.eye(p + 1)
+                np.dot(Sigma, mo.crossprod(X)) + (sigma ** 2) * np.eye(p + 1)
             )
 
             if X_star is not None:
-                X_star = mo.cbind(
-                    np.ones(X_star.shape[0]), X_star
-                )
+                X_star = mo.cbind(np.ones(X_star.shape[0]), X_star)
         else:
             # rename to invCn
             Cn = la.inv(
-                np.dot(Sigma, mo.crossprod(X))
-                + (sigma ** 2) * np.eye(p)
+                np.dot(Sigma, mo.crossprod(X)) + (sigma ** 2) * np.eye(p)
             )
 
         temp = np.dot(Cn, mo.tcrossprod(Sigma, X))
@@ -488,17 +362,9 @@ def beta_Sigma_hat_rvfl2(
 
                 return {
                     "beta_hat": np.dot(temp, y),
-                    "Sigma_hat": Sigma
-                    - np.dot(temp, np.dot(X, Sigma)),
+                    "Sigma_hat": Sigma - np.dot(temp, np.dot(X, Sigma)),
                     "GCV": np.mean(
-                        (
-                            (y - y_hat)
-                            / (
-                                1
-                                - np.trace(smoothing_matrix)
-                                / n
-                            )
-                        )
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
                         ** 2
                     ),
                 }
@@ -509,35 +375,20 @@ def beta_Sigma_hat_rvfl2(
                     beta_hat_ = np.dot(temp, y)
 
                 if Sigma_hat_ is None:
-                    Sigma_hat_ = Sigma - np.dot(
-                        temp, np.dot(X, Sigma)
-                    )
+                    Sigma_hat_ = Sigma - np.dot(temp, np.dot(X, Sigma))
 
                 return {
                     "beta_hat": beta_hat_,
                     "Sigma_hat": Sigma_hat_,
                     "GCV": np.mean(
-                        (
-                            (y - y_hat)
-                            / (
-                                1
-                                - np.trace(smoothing_matrix)
-                                / n
-                            )
-                        )
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
                         ** 2
                     ),
                     "preds": np.dot(X_star, beta_hat_),
                     "preds_std": np.sqrt(
                         np.diag(
-                            np.dot(
-                                X_star,
-                                mo.tcrossprod(
-                                    Sigma_hat_, X_star
-                                ),
-                            )
-                            + (sigma ** 2)
-                            * np.eye(X_star.shape[0])
+                            np.dot(X_star, mo.tcrossprod(Sigma_hat_, X_star))
+                            + (sigma ** 2) * np.eye(X_star.shape[0])
                         )
                     ),
                 }
@@ -549,14 +400,7 @@ def beta_Sigma_hat_rvfl2(
                 return {
                     "beta_hat": np.dot(temp, y),
                     "GCV": np.mean(
-                        (
-                            (y - y_hat)
-                            / (
-                                1
-                                - np.trace(smoothing_matrix)
-                                / n
-                            )
-                        )
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
                         ** 2
                     ),
                 }
@@ -569,14 +413,7 @@ def beta_Sigma_hat_rvfl2(
                 return {
                     "beta_hat": beta_hat_,
                     "GCV": np.mean(
-                        (
-                            (y - y_hat)
-                            / (
-                                1
-                                - np.trace(smoothing_matrix)
-                                / n
-                            )
-                        )
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
                         ** 2
                     ),
                     "preds": np.dot(X_star, beta_hat_),
@@ -584,9 +421,7 @@ def beta_Sigma_hat_rvfl2(
 
     else:  # (X is None) | (y is None) # predict
 
-        assert (beta_hat_ is not None) & (
-            X_star is not None
-        )
+        assert (beta_hat_ is not None) & (X_star is not None)
 
         if return_cov == True:
 
@@ -596,14 +431,8 @@ def beta_Sigma_hat_rvfl2(
                 "preds": np.dot(X_star, beta_hat_),
                 "preds_std": np.sqrt(
                     np.diag(
-                        np.dot(
-                            X_star,
-                            mo.tcrossprod(
-                                Sigma_hat_, X_star
-                            ),
-                        )
-                        + (sigma ** 2)
-                        * np.eye(X_star.shape[0])
+                        np.dot(X_star, mo.tcrossprod(Sigma_hat_, X_star))
+                        + (sigma ** 2) * np.eye(X_star.shape[0])
                     )
                 ),
             }

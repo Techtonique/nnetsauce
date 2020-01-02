@@ -124,9 +124,7 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         -------
         """
 
-        def loglik_grad_hess(
-            Y, X, B, XB, hessian=True, **kwargs
-        ):
+        def loglik_grad_hess(Y, X, B, XB, hessian=True, **kwargs):
             # nobs, n_classes
             n, K = Y.shape
 
@@ -147,14 +145,8 @@ class RidgeClassifier(Ridge, ClassifierMixin):
             # (K, n) %*% (n, p) -> (K, p)
             if hessian is False:
                 grad = -np.dot((Y - probs).T, X) / n
-                grad += (
-                    self.lambda1
-                    * B[0:init_p, :].sum(axis=0)[:, None]
-                )
-                grad += (
-                    self.lambda2
-                    * B[init_p:p, :].sum(axis=0)[:, None]
-                )
+                grad += self.lambda1 * B[0:init_p, :].sum(axis=0)[:, None]
+                grad += self.lambda2 * B[init_p:p, :].sum(axis=0)[:, None]
 
                 return grad.flatten()
 
@@ -165,29 +157,18 @@ class RidgeClassifier(Ridge, ClassifierMixin):
                 for k1 in range(K):
                     x_index = range(k1 * p, (k1 + 1) * p)
                     for k2 in range(k1, K):
-                        y_index = range(
-                            k2 * p, (k2 + 1) * p
-                        )
+                        y_index = range(k2 * p, (k2 + 1) * p)
                         H_sub = (
                             -np.dot(
-                                X.T,
-                                (
-                                    probs[:, k1]
-                                    * probs[:, k2]
-                                )[:, None]
-                                * X,
+                                X.T, (probs[:, k1] * probs[:, k2])[:, None] * X
                             )
                             / n
                         )  # do not store
-                        hess[
-                            np.ix_(x_index, y_index)
-                        ] = hess[
+                        hess[np.ix_(x_index, y_index)] = hess[
                             np.ix_(y_index, x_index)
                         ] = H_sub
 
-                return hess + (
-                    self.lambda1 + self.lambda2
-                ) * np.identity(Kp)
+                return hess + (self.lambda1 + self.lambda2) * np.identity(Kp)
 
         # total number of covariates
         p = X.shape[1]
@@ -203,20 +184,10 @@ class RidgeClassifier(Ridge, ClassifierMixin):
             # (n, K)
             XB = mo.safe_sparse_dot(X, B)
 
-            res = -(
-                np.sum(Y * XB, axis=1) - logsumexp(XB)
-            ).mean()
+            res = -(np.sum(Y * XB, axis=1) - logsumexp(XB)).mean()
 
-            res += (
-                0.5
-                * self.lambda1
-                * mo.squared_norm(B[0:init_p, :])
-            )
-            res += (
-                0.5
-                * self.lambda2
-                * mo.squared_norm(B[init_p:p, :])
-            )
+            res += 0.5 * self.lambda1 * mo.squared_norm(B[0:init_p, :])
+            res += 0.5 * self.lambda2 * mo.squared_norm(B[init_p:p, :])
 
             return res
 
@@ -275,29 +246,21 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         self: object
         """
 
-        assert mx.is_factor(
-            y
-        ), "y must contain only integers"
+        assert mx.is_factor(y), "y must contain only integers"
 
-        output_y, scaled_Z = self.cook_training_set(
-            y=y, X=X, **kwargs
-        )
+        output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
         self.n_classes = len(np.unique(y))
 
         Y = mo.one_hot_encode2(output_y, self.n_classes)
 
         # optimize for beta, minimize self.loglik (maximize loglik) -----
-        loglik_func, grad_func, hessian_func = self.loglik(
-            X=scaled_Z, Y=Y
-        )
+        loglik_func, grad_func, hessian_func = self.loglik(X=scaled_Z, Y=Y)
 
         if solver == "L-BFGS-B":
             self.beta = minimize(
                 fun=loglik_func,
-                x0=np.zeros(
-                    scaled_Z.shape[1] * self.n_classes
-                ),
+                x0=np.zeros(scaled_Z.shape[1] * self.n_classes),
                 jac=grad_func,
                 method=solver,
             ).x
@@ -305,9 +268,7 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         if solver in ("Newton-CG", "trust-ncg"):
             self.beta = minimize(
                 fun=loglik_func,
-                x0=np.zeros(
-                    scaled_Z.shape[1] * self.n_classes
-                ),
+                x0=np.zeros(scaled_Z.shape[1] * self.n_classes),
                 jac=grad_func,
                 hess=hessian_func,
                 method=solver,
@@ -332,9 +293,7 @@ class RidgeClassifier(Ridge, ClassifierMixin):
         model predictions: {array-like}
         """
 
-        return np.argmax(
-            self.predict_proba(X, **kwargs), axis=1
-        )
+        return np.argmax(self.predict_proba(X, **kwargs), axis=1)
 
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
@@ -370,9 +329,7 @@ class RidgeClassifier(Ridge, ClassifierMixin):
             Z,
             self.beta.reshape(
                 self.n_classes,
-                X.shape[1]
-                + self.n_hidden_features
-                + self.n_clusters,
+                X.shape[1] + self.n_hidden_features + self.n_clusters,
             ).T,
         )
         exp_ZB = np.exp(ZB)
