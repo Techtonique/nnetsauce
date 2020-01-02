@@ -70,7 +70,6 @@ def dropout(x, drop_prob=0, seed=123):
 
 
 # one-hot encoding
-@memoize
 def one_hot_encode(x_clusters, n_clusters):
 
     assert (
@@ -87,10 +86,12 @@ def one_hot_encode(x_clusters, n_clusters):
 
 
 # one-hot encoding
-@memoize
 def one_hot_encode2(y, n_classes):
 
     n_obs = len(y)
+    
+    print("n_obs")
+    print(n_obs)
 
     res = np.zeros((n_obs, n_classes))
 

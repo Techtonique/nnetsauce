@@ -126,7 +126,7 @@ class RidgeClassifierMtask(Ridge, ClassifierMixin):
         self.n_classes = len(np.unique(y))
 
         # multitask response
-        Y = mo.one_hot_encode2(y, self.n_classes)
+        Y = mo.one_hot_encode2(output_y, self.n_classes)
 
         if self.n_clusters > 0:
             if self.encode_clusters == True:
@@ -153,7 +153,7 @@ class RidgeClassifierMtask(Ridge, ClassifierMixin):
             mo.cbind(B_inv + mo.crossprod(W, Y2), -np.transpose(Y2)),
             mo.cbind(-Y2, S_inv),
         )
-
+        
         self.beta = np.dot(inv, mo.crossprod(scaled_Z, Y))
 
         return self

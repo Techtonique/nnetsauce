@@ -89,7 +89,7 @@ fit_obj = ns.RidgeClassifierMtask(n_hidden_features=5,
 start = time()
 fit_obj.fit(X_train, y_train)
 print(time() - start)
-# 5.983736038208008
+
 print(fit_obj.score(X_test, y_test))
 
 preds = fit_obj.predict(X_test)
