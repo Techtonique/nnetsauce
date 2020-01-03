@@ -1,3 +1,8 @@
+# version 0.3.1
+
+- one-hot encoding not cached (caused errs on multitask ridge2 classifier)
+- rename ridge to ridge2 (2 shrinkage params compared to ridge)
+
 # version 0.3.0
 
 - Implement ridge2 (regressor and classifier)
