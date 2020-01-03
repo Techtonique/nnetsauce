@@ -14,7 +14,7 @@ install_requires = [x.strip() for x in all_reqs if 'git+' not in x]
 
 setup(
     name="nnetsauce",
-    version="0.3.0",
+    version="0.3.1",
     url="https://github.com/thierrymoudiki/nnetsauce",
     packages=find_packages(),
     author="Thierry Moudiki",
