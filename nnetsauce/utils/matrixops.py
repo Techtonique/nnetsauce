@@ -90,9 +90,6 @@ def one_hot_encode2(y, n_classes):
 
     n_obs = len(y)
     
-    print("n_obs")
-    print(n_obs)
-
     res = np.zeros((n_obs, n_classes))
 
     for i in range(n_obs):

@@ -1,4 +1,4 @@
-"""Ridge model with 2 constraints"""
+"""Ridge model with 2 shrinkage parameters"""
 
 # Authors: Thierry Moudiki
 #
@@ -7,8 +7,8 @@
 from ..base import Base
 
 
-class Ridge(Base):
-    """Ridge model class derived from class Base
+class Ridge2(Base):
+    """Ridge model class derived from class Base with 2 shrinkage parameters
     
        Parameters
        ----------

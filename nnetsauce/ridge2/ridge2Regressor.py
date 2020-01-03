@@ -1,4 +1,4 @@
-"""Ridge model for regression"""
+"""Ridge model for regression with 2 regularization parameters"""
 
 # Authors: Thierry Moudiki
 #
@@ -6,16 +6,16 @@
 
 import numpy as np
 from scipy.optimize import minimize
-import sklearn.metrics as skm2
-from .ridge import Ridge
+import sklearn.metrics as skm
+from .ridge2 import Ridge2
 from ..utils import matrixops as mo
 from ..utils import misc as mx
-from sklearn.base import ClassifierMixin
+from sklearn.base import RegressorMixin
 from scipy.special import logsumexp
 from scipy.linalg import pinv
 
 
-class RidgeClassifierMtask(Ridge, ClassifierMixin):
+class Ridge2Regressor(Ridge2, RegressorMixin):
     """Ridge regression model class with 2 regularization parameters derived from class Ridge
     
        Parameters
@@ -48,6 +48,10 @@ class RidgeClassifierMtask(Ridge, ClassifierMixin):
            scaling methods for inputs, hidden layer, and clustering respectively
            (and when relevant). 
            Currently available: standardization ('std') or MinMax scaling ('minmax')
+       col_sample: float
+           percentage of covariates randomly chosen for training   
+       row_sample: float
+           percentage of rows chosen for training, by stratified bootstrapping    
        lambda1: float
            regularization parameter on direct link
        lambda2: float
@@ -70,6 +74,8 @@ class RidgeClassifierMtask(Ridge, ClassifierMixin):
         cluster_encode=True,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
+        col_sample=1,
+        row_sample=1,
         lambda1=0.1,
         lambda2=0.1,
         seed=123,
@@ -86,8 +92,8 @@ class RidgeClassifierMtask(Ridge, ClassifierMixin):
             cluster_encode=cluster_encode,
             type_clust=type_clust,
             type_scaling=type_scaling,
-            col_sample=1,
-            row_sample=1,
+            col_sample=col_sample,
+            row_sample=row_sample,
             lambda1=lambda1,
             lambda2=lambda2,
             seed=seed,
@@ -116,17 +122,10 @@ class RidgeClassifierMtask(Ridge, ClassifierMixin):
         self: object
         """
 
-        assert mx.is_factor(y), "y must contain only integers"
-
-        output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
+        centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
         n_X, p_X = X.shape
         n_Z, p_Z = scaled_Z.shape
-
-        self.n_classes = len(np.unique(y))
-
-        # multitask response
-        Y = mo.one_hot_encode2(output_y, self.n_classes)
 
         if self.n_clusters > 0:
             if self.encode_clusters == True:
@@ -139,7 +138,7 @@ class RidgeClassifierMtask(Ridge, ClassifierMixin):
         X_ = scaled_Z[:, 0:n_features]
         Phi_X_ = scaled_Z[:, n_features:p_Z]
 
-        B = mo.crossprod(X_) + self.lambda1 * np.diag(np.repeat(1, X_.shape[1]))
+        B = mo.crossprod(X_) + self.lambda1 * np.diag(np.repeat(1, n_features))
         C = mo.crossprod(Phi_X_, X_)
         D = mo.crossprod(Phi_X_) + self.lambda2 * np.diag(
             np.repeat(1, Phi_X_.shape[1])
@@ -148,13 +147,13 @@ class RidgeClassifierMtask(Ridge, ClassifierMixin):
         W = np.dot(C, B_inv)
         S_mat = D - mo.tcrossprod(W, C)
         S_inv = pinv(S_mat)
-        Y2 = np.dot(S_inv, W)
+        Y = np.dot(S_inv, W)
         inv = mo.rbind(
-            mo.cbind(B_inv + mo.crossprod(W, Y2), -np.transpose(Y2)),
-            mo.cbind(-Y2, S_inv),
+            mo.cbind(B_inv + mo.crossprod(W, Y), -np.transpose(Y)),
+            mo.cbind(-Y, S_inv),
         )
-        
-        self.beta = np.dot(inv, mo.crossprod(scaled_Z, Y))
+
+        self.beta = np.dot(inv, mo.crossprod(scaled_Z, centered_y))
 
         return self
 
@@ -175,25 +174,6 @@ class RidgeClassifierMtask(Ridge, ClassifierMixin):
         model predictions: {array-like}
         """
 
-        return np.argmax(self.predict_proba(X, **kwargs), axis=1)
-
-    def predict_proba(self, X, **kwargs):
-        """Predict probabilities for test data X.
-        
-        Parameters
-        ----------
-        X: {array-like}, shape = [n_samples, n_features]
-            Training vectors, where n_samples is the number 
-            of samples and n_features is the number of features.
-        
-        **kwargs: additional parameters to be passed to 
-                  self.cook_test_set
-               
-        Returns
-        -------
-        probability estimates for test data: {array-like}        
-        """
-
         if len(X.shape) == 1:
 
             n_features = X.shape[0]
@@ -202,59 +182,43 @@ class RidgeClassifierMtask(Ridge, ClassifierMixin):
                 np.ones(n_features).reshape(1, n_features),
             )
 
-            Z = self.cook_test_set(new_X, **kwargs)
+            return (
+                self.y_mean
+                + np.dot(self.cook_test_set(new_X, **kwargs), self.beta)
+            )[0]
 
-        else:
-
-            Z = self.cook_test_set(X, **kwargs)
-
-        ZB = mo.safe_sparse_dot(Z, self.beta)
-
-        exp_ZB = np.exp(ZB)
-
-        return exp_ZB / exp_ZB.sum(axis=1)[:, None]
+        return self.y_mean + np.dot(self.cook_test_set(X, **kwargs), self.beta)
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set covariates X and response y. """
 
         preds = self.predict(X)
 
+        if type(preds) == tuple:  # if there are std. devs in the predictions
+            preds = preds[0]
+
         if scoring is None:
-            scoring = "accuracy"
+            scoring = "neg_mean_squared_error"
 
         # check inputs
         assert scoring in (
-            "accuracy",
-            "average_precision",
-            "brier_score_loss",
-            "f1",
-            "f1_micro",
-            "f1_macro",
-            "f1_weighted",
-            "f1_samples",
-            "neg_log_loss",
-            "precision",
-            "recall",
-            "roc_auc",
-        ), "'scoring' should be in ('accuracy', 'average_precision', \
-                           'brier_score_loss', 'f1', 'f1_micro', \
-                           'f1_macro', 'f1_weighted',  'f1_samples', \
-                           'neg_log_loss', 'precision', 'recall', \
-                           'roc_auc')"
+            "explained_variance",
+            "neg_mean_absolute_error",
+            "neg_mean_squared_error",
+            "neg_mean_squared_log_error",
+            "neg_median_absolute_error",
+            "r2",
+        ), "'scoring' should be in ('explained_variance', 'neg_mean_absolute_error', \
+                           'neg_mean_squared_error', 'neg_mean_squared_log_error', \
+                           'neg_median_absolute_error', 'r2')"
 
         scoring_options = {
-            "accuracy": skm2.accuracy_score,
-            "average_precision": skm2.average_precision_score,
-            "brier_score_loss": skm2.brier_score_loss,
-            "f1": skm2.f1_score,
-            "f1_micro": skm2.f1_score,
-            "f1_macro": skm2.f1_score,
-            "f1_weighted": skm2.f1_score,
-            "f1_samples": skm2.f1_score,
-            "neg_log_loss": skm2.log_loss,
-            "precision": skm2.precision_score,
-            "recall": skm2.recall_score,
-            "roc_auc": skm2.roc_auc_score,
+            "explained_variance": skm.explained_variance_score,
+            "neg_mean_absolute_error": skm.median_absolute_error,
+            "neg_mean_squared_error": skm.mean_squared_error,
+            "neg_mean_squared_log_error": skm.mean_squared_log_error,
+            "neg_median_absolute_error": skm.median_absolute_error,
+            "r2": skm.r2_score,
         }
 
         return scoring_options[scoring](y, preds, **kwargs)

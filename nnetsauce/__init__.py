@@ -5,9 +5,9 @@ from .custom.customClassifier import CustomClassifier
 from .custom.customRegressor import CustomRegressor
 from .mts import MTS
 from .randombag.randomBagClassifier import RandomBagClassifier
-from .ridge.ridgeClassifier import RidgeClassifier
-from .ridge.ridgeRegressor import RidgeRegressor
-from .ridge.ridgeClassifierMtask import RidgeClassifierMtask
+from .ridge2.ridge2Classifier import Ridge2Classifier
+from .ridge2.ridge2Regressor import Ridge2Regressor
+from .ridge2.ridge2ClassifierMtask import Ridge2ClassifierMtask
 
 # from .rnn.rnnRegressor import RNNRegressor
 # from .rnn.rnnClassifier import RNNClassifier
@@ -24,9 +24,9 @@ __all__ = [
     "CustomClassifier",
     "CustomRegressor",
     "RandomBagClassifier",
-    "RidgeRegressor",
-    "RidgeClassifier",
-    "RidgeClassifierMtask",
+    "Ridge2Regressor",
+    "Ridge2Classifier",
+    "Ridge2ClassifierMtask",
     #    "RNNRegressor",
     #    "RNNClassifier",
     "MTS",

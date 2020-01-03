@@ -13,7 +13,7 @@ from sklearn.model_selection import TimeSeriesSplit
 class TimeSeriesSplit(TimeSeriesSplit):
     """Time Series cross-validator"""
 
-    def __init__(self, n_splits="warn", max_train_size=None):
+    def __init__(self, n_splits=5, max_train_size=None):
         super().__init__(n_splits=n_splits, max_train_size=max_train_size)
 
     def split(

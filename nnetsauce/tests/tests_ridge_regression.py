@@ -7,14 +7,14 @@ import nnetsauce as ns
 # Basic tests
 
 
-class TestRidgeRegressor(ut.TestCase):
-    def test_ridgeregressor(self):
+class TestRidge2Regressor(ut.TestCase):
+    def test_Ridge2Regressor(self):
 
         X, y = datasets.make_regression(
             n_samples=25, n_features=3, random_state=123
         )
 
-        fit_obj = ns.RidgeRegressor(
+        fit_obj = ns.Ridge2Regressor(
             n_hidden_features=10,
             bias=False,
             nodes_sim="sobol",
@@ -35,7 +35,7 @@ class TestRidgeRegressor(ut.TestCase):
             type_scaling=("std", "std", "minmax"),
         )
 
-        fit_obj2 = ns.RidgeRegressor(
+        fit_obj2 = ns.Ridge2Regressor(
             n_hidden_features=9,
             bias=True,
             nodes_sim="halton",
@@ -45,7 +45,7 @@ class TestRidgeRegressor(ut.TestCase):
             n_clusters=2,
         )
 
-        fit_obj3 = ns.RidgeRegressor(
+        fit_obj3 = ns.Ridge2Regressor(
             n_hidden_features=8,
             bias=False,
             nodes_sim="uniform",
@@ -55,7 +55,7 @@ class TestRidgeRegressor(ut.TestCase):
             n_clusters=3,
         )
 
-        fit_obj4 = ns.RidgeRegressor(
+        fit_obj4 = ns.Ridge2Regressor(
             n_hidden_features=7,
             bias=True,
             nodes_sim="hammersley",
@@ -65,7 +65,7 @@ class TestRidgeRegressor(ut.TestCase):
             n_clusters=4,
         )
 
-        fit_obj5 = ns.RidgeRegressor(
+        fit_obj5 = ns.Ridge2Regressor(
             n_hidden_features=2,
             bias=True,
             nodes_sim="hammersley",
@@ -75,7 +75,7 @@ class TestRidgeRegressor(ut.TestCase):
             n_clusters=0,
         )
 
-        fit_obj6 = ns.RidgeRegressor(
+        fit_obj6 = ns.Ridge2Regressor(
             n_hidden_features=2,
             bias=True,
             nodes_sim="hammersley",
@@ -98,7 +98,7 @@ class TestRidgeRegressor(ut.TestCase):
             type_scaling=("std", "std", "minmax"),
         )
 
-        fit_obj7 = ns.RidgeRegressor(
+        fit_obj7 = ns.Ridge2Regressor(
             n_hidden_features=2,
             bias=True,
             nodes_sim="hammersley",
@@ -119,7 +119,7 @@ class TestRidgeRegressor(ut.TestCase):
             type_scaling=("std", "std", "minmax"),
         )
 
-        fit_obj8 = ns.RidgeRegressor(
+        fit_obj8 = ns.Ridge2Regressor(
             n_hidden_features=2,
             bias=False,
             nodes_sim="hammersley",
@@ -129,7 +129,7 @@ class TestRidgeRegressor(ut.TestCase):
             lambda2=0.1,
         )
 
-        fit_obj9 = ns.RidgeRegressor(
+        fit_obj9 = ns.Ridge2Regressor(
             n_hidden_features=2,
             bias=False,
             nodes_sim="halton",
@@ -139,7 +139,7 @@ class TestRidgeRegressor(ut.TestCase):
             lambda2=0.01,
         )
 
-        fit_obj10 = ns.RidgeRegressor(
+        fit_obj10 = ns.Ridge2Regressor(
             n_hidden_features=3,
             bias=True,
             nodes_sim="uniform",
@@ -150,7 +150,7 @@ class TestRidgeRegressor(ut.TestCase):
             lambda2=0.1,
         )
 
-        fit_obj11 = ns.RidgeRegressor(
+        fit_obj11 = ns.Ridge2Regressor(
             n_hidden_features=3,
             bias=True,
             nodes_sim="uniform",
@@ -162,7 +162,7 @@ class TestRidgeRegressor(ut.TestCase):
             lambda2=0.01,
         )
 
-        fit_obj12 = ns.RidgeRegressor(
+        fit_obj12 = ns.Ridge2Regressor(
             n_hidden_features=3,
             bias=True,
             nodes_sim="uniform",
@@ -174,7 +174,7 @@ class TestRidgeRegressor(ut.TestCase):
             lambda2=0.1,
         )
 
-        fit_obj13 = ns.RidgeRegressor(
+        fit_obj13 = ns.Ridge2Regressor(
             n_hidden_features=3,
             bias=True,
             nodes_sim="uniform",
@@ -247,12 +247,12 @@ class TestRidgeRegressor(ut.TestCase):
         rmse13 = np.sqrt(np.mean(err13 ** 2))
 
         self.assertTrue(np.allclose(rmse, 5.435006230994306))
-        self.assertTrue(np.allclose(rmse2, 19.95472988159529))
+        self.assertTrue(np.allclose(rmse2, 19.94736851103316))
         self.assertFalse(np.allclose(rmse3, 1.949793))
-        self.assertTrue(np.allclose(rmse4, 13.024632782703636))
-        self.assertFalse(np.allclose(rmse5, 22.200957971900483))
-        self.assertTrue(np.allclose(rmse6, 0.614492143979095))
-        self.assertTrue(np.allclose(rmse7, 6.755116905805039))
+        self.assertTrue(np.allclose(rmse4, 10.097663333494756))
+        self.assertTrue(np.allclose(rmse5, 22.2009579718986))
+        self.assertTrue(np.allclose(rmse6, 0.6140788865723033))
+        self.assertTrue(np.allclose(rmse7, 6.789338113346345))
         self.assertTrue(
             np.allclose(rmse7, np.sqrt(fit_obj7.score(X_test, y_test)))
         )
@@ -263,12 +263,12 @@ class TestRidgeRegressor(ut.TestCase):
             np.allclose(fit_obj2.predict(X_test[0, :]), 283.416245307822)
         )
 
-        self.assertFalse(np.allclose(rmse8, 22.454022827189625))
-        self.assertFalse(np.allclose(rmse9, 21.46698682773668))
-        self.assertTrue(np.allclose(rmse10, 0.8443989968382506))
-        self.assertTrue(np.allclose(rmse11, 22.26762496539322))
-        self.assertTrue(np.allclose(rmse12, 22.988764118543678))
-        self.assertFalse(np.allclose(rmse13, 1e6))
+        self.assertTrue(np.allclose(rmse8, 22.454022827189572))
+        self.assertTrue(np.allclose(rmse9, 21.466986827736815))
+        self.assertTrue(np.allclose(rmse10, 0.8446477775597262))
+        self.assertTrue(np.allclose(rmse11, 22.26762496538532))
+        self.assertTrue(np.allclose(rmse12, 22.988764118548282))
+        self.assertTrue(np.allclose(rmse13, 2.8462188301137354))
 
     def test_score(self):
 
@@ -276,7 +276,7 @@ class TestRidgeRegressor(ut.TestCase):
             n_samples=100, n_features=3, random_state=123
         )
 
-        fit_obj = ns.RidgeRegressor(
+        fit_obj = ns.Ridge2Regressor(
             n_hidden_features=5,
             bias=True,
             nodes_sim="sobol",

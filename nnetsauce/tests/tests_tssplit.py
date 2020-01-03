@@ -47,8 +47,8 @@ class TestTimeSeriesSplit(ut.TestCase):
         self.assertTrue(np.allclose(test[1], 5))
         # assert_array_equal(train, [1, 2, 3])
         # assert_array_equal(test, [4, 5)
-        assert tscv2.get_n_splits() == 3
-        assert tscv3.get_n_splits() == 3
+        assert tscv2.get_n_splits() == 5
+        assert tscv3.get_n_splits() == 5
 
 
 if __name__ == "__main__":

@@ -23,7 +23,7 @@ np.random.seed(123)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
 # create the model with nnetsauce
-fit_obj = ns.RidgeClassifier(lambda1 = 6.90185578e+04, 
+fit_obj = ns.Ridge2Classifier(lambda1 = 6.90185578e+04, 
                              lambda2 = 3.17392781e+02, 
                              n_hidden_features=95, 
                              n_clusters=2, 
@@ -50,7 +50,7 @@ np.random.seed(123)
 Z_train, Z_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
 # create the model with nnetsauce
-fit_obj = ns.RidgeClassifier(lambda1 = 8.64135756e+04, 
+fit_obj = ns.Ridge2Classifier(lambda1 = 8.64135756e+04, 
                              lambda2 = 8.27514666e+04, 
                              n_hidden_features=109, 
                              n_clusters=3, 
@@ -74,7 +74,7 @@ np.random.seed(123)
 Z_train, Z_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
 # create the model with nnetsauce
-fit_obj = ns.RidgeClassifier(lambda1 = 1.87500081e+04, 
+fit_obj = ns.Ridge2Classifier(lambda1 = 1.87500081e+04, 
                              lambda2 = 3.12500069e+04, 
                              n_hidden_features=47, 
                              n_clusters=3, 
@@ -98,7 +98,7 @@ np.random.seed(123)
 Z_train, Z_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
 # create the model with nnetsauce
-fit_obj = ns.RidgeClassifier(lambda1 = 7.11914091e+04, 
+fit_obj = ns.Ridge2Classifier(lambda1 = 7.11914091e+04, 
                              lambda2 = 4.63867241e+04, 
                              n_hidden_features=13, 
                              n_clusters=0, 

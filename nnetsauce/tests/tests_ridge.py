@@ -23,19 +23,19 @@ class TestRidge(ut.TestCase):
             Z, t, test_size=0.2, random_state=61283
         )
 
-        fit_obj = ns.RidgeClassifier(
+        fit_obj = ns.Ridge2Classifier(
             lambda1=0.025, lambda2=0.5, n_hidden_features=5, n_clusters=0
         )
 
-        fit_obj2 = ns.RidgeClassifier(
+        fit_obj2 = ns.Ridge2Classifier(
             lambda1=0.01, lambda2=0.01, n_hidden_features=10, n_clusters=2
         )
 
-        fit_obj3 = ns.RidgeClassifier(
+        fit_obj3 = ns.Ridge2Classifier(
             lambda1=0.025, lambda2=0.05, n_hidden_features=5, n_clusters=0
         )
 
-        fit_obj4 = ns.RidgeClassifier(
+        fit_obj4 = ns.Ridge2Classifier(
             lambda1=0.001, lambda2=0.01, n_hidden_features=10, n_clusters=2
         )
 
@@ -76,19 +76,19 @@ class TestRidge(ut.TestCase):
         np.random.seed(123)
         Z_train, Z_test, t_train, t_test = train_test_split(Z, t, test_size=0.2)
 
-        fit_obj = ns.RidgeClassifier(
+        fit_obj = ns.Ridge2Classifier(
             lambda1=0.025, lambda2=0.5, n_hidden_features=5, n_clusters=2
         )
 
-        fit_obj2 = ns.RidgeClassifier(
+        fit_obj2 = ns.Ridge2Classifier(
             lambda1=0.01, lambda2=0.01, n_hidden_features=10, n_clusters=2
         )
 
-        fit_obj3 = ns.RidgeClassifier(
+        fit_obj3 = ns.Ridge2Classifier(
             lambda1=0.025, lambda2=0.05, n_hidden_features=5, n_clusters=2
         )
 
-        fit_obj4 = ns.RidgeClassifier(
+        fit_obj4 = ns.Ridge2Classifier(
             lambda1=0.001, lambda2=0.01, n_hidden_features=10, n_clusters=2
         )
 

@@ -7,14 +7,14 @@
 import numpy as np
 from scipy.optimize import minimize
 import sklearn.metrics as skm2
-from .ridge import Ridge
+from .ridge2 import Ridge2
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 from sklearn.base import ClassifierMixin
 from scipy.special import logsumexp
 
 
-class RidgeClassifier(Ridge, ClassifierMixin):
+class Ridge2Classifier(Ridge2, ClassifierMixin):
     """Ridge Classification model class with 2 regularization parameters derived from class Ridge
     
        Parameters
