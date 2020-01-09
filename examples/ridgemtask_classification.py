@@ -16,8 +16,10 @@ X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
 print(Z.shape)
 
-fit_obj = ns.Ridge2ClassifierMtask(n_hidden_features=2,
-                                  dropout=0.3, n_clusters=2)
+fit_obj = ns.Ridge2ClassifierMtask(n_hidden_features=np.int(9.83730469e+01), 
+                                   dropout=4.31054687e-01, 
+                                   n_clusters=np.int(1.71484375e+00),
+                                   lambda1=1.24023438e+01, lambda2=7.30263672e+03)
 
 start = time()
 fit_obj.fit(X_train, y_train)
