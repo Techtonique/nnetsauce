@@ -16,7 +16,7 @@ X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
 print(Z.shape)
 
-fit_obj = ns.RidgeClassifierMtask(n_hidden_features=2,
+fit_obj = ns.Ridge2ClassifierMtask(n_hidden_features=2,
                                   dropout=0.3, n_clusters=2)
 
 start = time()
@@ -41,7 +41,7 @@ t = wine.target
 np.random.seed(123)
 Z_train, Z_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
-fit_obj = ns.RidgeClassifierMtask(n_hidden_features=15,
+fit_obj = ns.Ridge2ClassifierMtask(n_hidden_features=15,
                                   dropout=0.1, n_clusters=3, 
                                   type_clust="gmm")
 
@@ -64,7 +64,7 @@ np.random.seed(123)
 Z_train, Z_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
 
-fit_obj = ns.RidgeClassifierMtask(n_hidden_features=10,
+fit_obj = ns.Ridge2ClassifierMtask(n_hidden_features=10,
                                   dropout=0.1, n_clusters=2)
 
 start = time()
@@ -82,7 +82,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
                                                     random_state=351452)
 
 
-fit_obj = ns.RidgeClassifierMtask(n_hidden_features=5,
+fit_obj = ns.Ridge2ClassifierMtask(n_hidden_features=5,
                                   dropout=0.1, n_clusters=3, 
                                   type_clust="gmm")
 
@@ -104,7 +104,7 @@ y = digits.target
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
                                                     random_state=123)
 
-fit_obj = ns.RidgeClassifierMtask(n_hidden_features=25,
+fit_obj = ns.Ridge2ClassifierMtask(n_hidden_features=25,
                                   dropout=0.1, n_clusters=3, 
                                   type_clust="gmm")
 
