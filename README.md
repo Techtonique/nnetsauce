@@ -293,7 +293,7 @@ A few things that we could explore are:
 - Find other ways to combine `Custom` objects, using your fertile imagination (including [tests](#Tests))
 - Better management of dates for MTS objects (including [tests](#Tests))
 - Enrich the [tests](#Tests)
-- Make `nnetsauce` available to `R` users 
+- Make `nnetsauce` available to `R` users --> [here](./R-package)
 - Any benchmarking of `nnetsauce` models (notebooks, files, etc.) can be stored in [demo](/nnetsauce/demo), with the following naming convention:  `yourgithubname_ddmmyy_shortdescriptionofdemo.[py|ipynb]`
 
 
