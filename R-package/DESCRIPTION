@@ -1,0 +1,10 @@
+Package: nnetsauce
+Title: Randomized and Quasi-Randomized networks
+Version: 0.3.1
+Author: T. Moudiki
+Maintainer: Thierry Moudiki <thierry.moudiki@gmail.com>
+Description: Randomized and Quasi-Randomized networks
+Depends: R (>= 3.3.3)
+License: BSD_3_clause Clear + file LICENSE 
+Encoding: UTF-8
+LazyData: true
