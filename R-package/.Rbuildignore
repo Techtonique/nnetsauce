@@ -1,0 +1,5 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^nnetsauce\.Rcheck$
+^nnetsauce.*\.tar\.gz$
+^nnetsauce.*\.tgz$

@@ -4,9 +4,10 @@ Version: 0.3.1
 Author: T. Moudiki
 Maintainer: Thierry Moudiki <thierry.moudiki@gmail.com>
 Description: Randomized and Quasi-Randomized networks
-Depends: R (>= 3.3.3)
-License: BSD_3_clause Clear + file LICENSE
 Depends: reticulate, R6
+License: BSD_3_clause Clear + file LICENSE
 Collate: 'zzz.R' 'Ridge2Classifier.R'
 Encoding: UTF-8
 LazyData: true
+NeedsCompilation: no
+Packaged: 2020-01-14 22:59:54 UTC; rstudio-user
