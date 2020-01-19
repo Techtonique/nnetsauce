@@ -3,7 +3,7 @@ numpy <- NULL
 scipy <- NULL
 sklearn <- NULL
 tqdm <- NULL
-nnetsauce <- NULL
+ns <- NULL
 
 .onLoad <- function(libname, pkgname) {
   # use superassignment to update global reference to numpy
@@ -11,7 +11,5 @@ nnetsauce <- NULL
   scipy <<- reticulate::import("scipy", delay_load = TRUE)
   sklearn <<- reticulate::import("sklearn", delay_load = TRUE)
   tqdm <<- reticulate::import("tqdm", delay_load = TRUE)
-  nnetsauce <<- reticulate::import("nnetsauce", delay_load = TRUE)
+  ns <<- reticulate::import("nnetsauce", delay_load = TRUE)
 }
-
-# nnetsauce::nnetsauce$AdaBoostClassifier
