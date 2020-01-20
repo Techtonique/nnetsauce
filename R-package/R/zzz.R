@@ -9,7 +9,7 @@ ns <- NULL
 install_nnetsauce <- function(pip = TRUE) {
   has_nnetsauce <- reticulate::py_module_available("nnetsauce")
   if (has_nnetsauce == FALSE)
-    reticulate::py_install("nnetsauce", pip = pip)
+      reticulate::py_install("nnetsauce", pip = pip)
 }
 install_nnetsauce <- memoise::memoise(install_nnetsauce)
 
