@@ -31,7 +31,7 @@
 #' X <- matrix(rnorm(n * p), n, p) # no intercept!
 #' y <- rnorm(n)
 #'
-#' obj <- nnetsauce::BayesianRVFLRegressor(n_hidden_features = 5L)
+#' obj <- BayesianRVFLRegressor(n_hidden_features = 5L)
 #' print(obj$fit(X, y))
 #' print(obj$score(X, y))
 #'
@@ -99,7 +99,7 @@ BayesianRVFLRegressor <- function(n_hidden_features=5L,
 #' X <- matrix(rnorm(n * p), n, p) # no intercept!
 #' y <- rnorm(n)
 #'
-#' obj <- nnetsauce::BayesianRVFL2Regressor(n_hidden_features = 5L, s1=0.01)
+#' obj <- BayesianRVFL2Regressor(n_hidden_features = 5L, s1=0.01)
 #' print(obj$fit(X, y))
 #' print(obj$score(X, y))
 #'

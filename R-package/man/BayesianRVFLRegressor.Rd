@@ -38,7 +38,7 @@ n <- 50 ; p <- 3
 X <- matrix(rnorm(n * p), n, p) # no intercept!
 y <- rnorm(n)
 
-obj <- nnetsauce::BayesianRVFLRegressor(n_hidden_features = 5L)
+obj <- BayesianRVFLRegressor(n_hidden_features = 5L)
 print(obj$fit(X, y))
 print(obj$score(X, y))
 
