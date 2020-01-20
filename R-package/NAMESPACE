@@ -1,2 +1,6 @@
 export(Ridge2Classifier)
+export(Ridge2ClassifierMtask)
+export(Ridge2Regressor)
+export(BayesianRVFLRegressor)
+export(BayesianRVFL2Regressor)
 
