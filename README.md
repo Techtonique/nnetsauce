@@ -5,7 +5,9 @@
 This package does Statistical/Machine Learning by using various -- advanced -- combinations of single layer 'neural' networks. 
 
 
-## Installation 
+## Installation (for Python and R)
+
+### Python 
 
 - __1st method__: by using `pip` at the command line for the stable version
 
@@ -19,6 +21,18 @@ pip install nnetsauce
 ```bash
 pip install git+https://github.com/thierrymoudiki/nnetsauce.git
 ```
+
+### R 
+
+- __1st method__: From Github, in R console:
+
+```r
+library(devtools)
+devtools::install_github("thierrymoudiki/nnetsauce/R-package")
+library(nnetsauce)
+```
+
+__General rule for using the package in R__:  object accesses with `.`'s are replaced by `$`'s.
 
 
 

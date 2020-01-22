@@ -39,10 +39,6 @@ install_packages <- function(pip = TRUE) {
 
 .onLoad <- function(libname, pkgname) {
 
-  # has_reticulate <- "reticulate" %in% rownames(utils::installed.packages())
-  # if (has_reticulate == FALSE)
-  #  utils::install.packages("reticulate")
-
   do.call("install_miniconda_", list(silent=TRUE))
 
   do.call("install_packages", list(pip=TRUE))
