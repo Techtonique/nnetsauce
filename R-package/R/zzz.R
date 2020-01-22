@@ -8,17 +8,11 @@ ns <- NULL
 
 install_packages <- function(pip = TRUE) {
 
-  has_reticulate <- "reticulate" %in% rownames(utils::installed.packages())
-  if (has_reticulate == FALSE)
-    utils::install.packages("reticulate")
-
   has_numpy <- reticulate::py_module_available("numpy")
   has_scipy <- reticulate::py_module_available("scipy")
   has_sklearn <- reticulate::py_module_available("sklearn")
   has_tqdm <- reticulate::py_module_available("tqdm")
   has_nnetsauce <- reticulate::py_module_available("nnetsauce")
-
-  try(reticulate::install_miniconda(), silent = TRUE)
 
   if (has_numpy == FALSE)
     reticulate::py_install("numpy", pip = pip)
@@ -39,6 +33,13 @@ install_packages <- memoise::memoise(install_packages)
 
 
 .onLoad <- function(libname, pkgname) {
+
+  has_reticulate <- "reticulate" %in% rownames(utils::installed.packages())
+  if (has_reticulate == FALSE)
+    utils::install.packages("reticulate")
+
+  try(reticulate::install_miniconda(), silent = TRUE)
+
   do.call("install_packages", list(pip=TRUE))
   # use superassignment to update global reference to packages
   numpy <<- reticulate::import("numpy", delay_load = TRUE)
