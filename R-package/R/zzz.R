@@ -8,15 +8,17 @@ ns <- NULL
 
 install_packages <- function(pip = TRUE) {
 
-  has_reticulate <- "reticulate" %in% rownames(installed.packages())
+  has_reticulate <- "reticulate" %in% rownames(utils::installed.packages())
+  if (has_reticulate == FALSE)
+    utils::install.packages("reticulate")
+
   has_numpy <- reticulate::py_module_available("numpy")
   has_scipy <- reticulate::py_module_available("scipy")
   has_sklearn <- reticulate::py_module_available("sklearn")
   has_tqdm <- reticulate::py_module_available("tqdm")
   has_nnetsauce <- reticulate::py_module_available("nnetsauce")
 
-  if (has_reticulate == FALSE)
-    install.packages("reticulate")
+  try(reticulate::install_miniconda(), silent = TRUE)
 
   if (has_numpy == FALSE)
     reticulate::py_install("numpy", pip = pip)
