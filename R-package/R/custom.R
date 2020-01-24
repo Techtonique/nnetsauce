@@ -29,7 +29,7 @@
 #' X <- as.matrix(iris[, 1:4])
 #' y <- as.integer(iris[, 5]) - 1L
 #'
-#' obj <- Ridge2Classifier()
+#' obj <- sklearn$tree$DecisionTreeClassifier()
 #' obj2 <- CustomClassifier(obj)
 #' obj2$fit(X, y)
 #' print(obj2$score(X, y))
@@ -96,8 +96,8 @@ CustomClassifier <- function(obj,
 #' X <- matrix(rnorm(n * p), n, p) # no intercept!
 #' y <- rnorm(n)
 #'
-#' obj <- Ridge2Regressor()
-#' obj2 <- nnetsauce::CustomRegressor(obj)
+#' obj <- sklearn$linear_model$ElasticNet()
+#' obj2 <- CustomRegressor(obj)
 #' obj2$fit(X, y)
 #' print(obj2$score(X, y))
 #'
