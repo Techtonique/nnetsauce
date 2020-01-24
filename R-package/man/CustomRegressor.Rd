@@ -2,7 +2,7 @@
 % Please edit documentation in R/custom.R
 \name{CustomRegressor}
 \alias{CustomRegressor}
-\title{Title}
+\title{Custom regressor with quasi-randomized layer}
 \usage{
 CustomRegressor(
   obj,
@@ -28,7 +28,7 @@ CustomRegressor(
 
 }
 \description{
-Title
+Custom regressor with quasi-randomized layer
 }
 \examples{
 

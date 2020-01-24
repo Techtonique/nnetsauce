@@ -2,7 +2,7 @@
 % Please edit documentation in R/custom.R
 \name{CustomClassifier}
 \alias{CustomClassifier}
-\title{Title}
+\title{Custom classifier with quasi-randomized layer}
 \usage{
 CustomClassifier(
   obj,
@@ -28,7 +28,7 @@ CustomClassifier(
 
 }
 \description{
-Title
+Custom classifier with quasi-randomized layer
 }
 \examples{
 

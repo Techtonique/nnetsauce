@@ -2,7 +2,7 @@
 # 1 - Classifiers ---------------------------------------------------------
 
 
-#' Title
+#' Custom classifier with quasi-randomized layer
 #'
 #' @param obj
 #' @param n_hidden_features
@@ -69,7 +69,7 @@ CustomClassifier <- function(obj,
 # 2 - Regressors ---------------------------------------------------------
 
 
-#' Title
+#'  Custom regressor with quasi-randomized layer
 #'
 #' @param obj
 #' @param n_hidden_features
