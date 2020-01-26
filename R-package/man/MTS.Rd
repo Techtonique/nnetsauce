@@ -2,7 +2,7 @@
 % Please edit documentation in R/mts.R
 \name{MTS}
 \alias{MTS}
-\title{Title}
+\title{Multivariate Time Series}
 \usage{
 MTS(
   obj,
@@ -29,7 +29,7 @@ MTS(
 
 }
 \description{
-Title
+Multivariate Time Series
 }
 \examples{
 
@@ -46,7 +46,6 @@ obj2$predict()
 
 
 # Example 2 -----
-
 
 set.seed(123)
 X <- matrix(rnorm(300), 100, 2)

@@ -1,4 +1,4 @@
-#' Title
+#' Multivariate Time Series
 #'
 #' @param obj
 #' @param n_hidden_features
