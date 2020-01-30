@@ -1,13 +1,25 @@
+# version 0.3.3
+
+- Use "return_std" only in predict for MTS object
+
+
+# version 0.3.2
+
+- Fix for potential error "Sample weights must be 1D array or scalar"
+
+
 # version 0.3.1
 
 - One-hot encoding not cached (caused errs on multitask ridge2 classifier)
 - Rename ridge to ridge2 (2 shrinkage params compared to ridge)
+
 
 # version 0.3.0
 
 - Implement ridge2 (regressor and classifier)
 - Upper bound on Adaboost error
 - Test Time series split
+
 
 # version 0.2.0
 

@@ -133,7 +133,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         self: object
         """
 
-        assert mx.is_factor(y.tolist()), "y must contain only integers"
+        assert mx.is_factor(y), "y must contain only integers"
 
         # training
         n, p = X.shape

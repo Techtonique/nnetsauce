@@ -105,7 +105,7 @@ def rbind(x, y):
     return np.row_stack((x, y))
 
 
-# from sklearn.utils.exmath
+# adapted from sklearn.utils.exmath
 def safe_sparse_dot(a, b, dense_output=False):
     """Dot product that handle the sparse matrix case correctly
 
@@ -130,8 +130,7 @@ def safe_sparse_dot(a, b, dense_output=False):
         if dense_output and hasattr(ret, "toarray"):
             ret = ret.toarray()
         return ret
-    else:
-        return np.dot(a, b)
+    return np.dot(a, b)
 
 
 # scale... covariates
