@@ -207,7 +207,8 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             for m in range(self.n_estimators):
 
                 preds = base_learner.fit(
-                    X, y, sample_weight=np.asarray(w_m), **kwargs
+                    X, y, sample_weight=np.array(w_m, ndmin=1), 
+                    **kwargs
                 ).predict(X)
 
                 self.base_learners.update(
@@ -257,11 +258,12 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
             if sample_weight is None:
 
-                w_m = np.repeat(1.0 / n, n)  # (N, 1)
+                w_m = np.array(np.repeat(1.0 / n, n), 
+                               ndmin=1)   # (N, 1)
 
             else:
 
-                w_m = np.asarray(sample_weight)
+                w_m = np.array(sample_weight, ndmin=1)
 
             for m in range(self.n_estimators):
 
@@ -285,6 +287,8 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                 )
 
                 w_m /= np.sum(w_m)
+                
+                w_m = np.array(w_m, ndmin=1)
 
                 base_learner.set_params(seed=self.seed + (m + 1) * 1000)
 
