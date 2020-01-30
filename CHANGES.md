@@ -1,3 +1,8 @@
+# version 0.3.3
+
+- Use "return_std" only in predict for MTS object
+
+
 # version 0.3.2
 
 - Fix for potential error "Sample weights must be 1D array or scalar"
