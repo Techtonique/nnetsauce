@@ -85,7 +85,6 @@ class MTS(Base):
         col_sample=1,
         seed=123,
         lags=1,
-        return_std=False,
     ):
 
         assert np.int(lags) == lags, "parameter 'lags' should be an integer"
@@ -113,10 +112,9 @@ class MTS(Base):
         self.y = None  # MTS responses (most recent observations first)
         self.X = None  # MTS lags
         self.xreg = None
-        self.regressors_scaler = None
         self.y_means = {}
         self.preds = None
-        self.return_std = return_std
+        self.return_std = False
         self.preds_std = []
         self.row_sample = 1
 
@@ -139,12 +137,14 @@ class MTS(Base):
         -------
         self: object
         """
+                
+        n, p = X.shape
+        
+        rep_1_n = np.repeat(1, n)
 
         self.y = None
 
-        self.X = None
-
-        n, p = X.shape
+        self.X = None        
 
         self.n_series = p
 
@@ -156,7 +156,7 @@ class MTS(Base):
 
         self.y = mts_input[0]
 
-        self.X = mts_input[1]
+        self.X = mts_input[1]                
 
         if xreg is not None:
 
@@ -169,14 +169,14 @@ class MTS(Base):
             xreg_input = ts.create_train_inputs(xreg[::-1], self.lags)
 
             dummy_y, scaled_Z = self.cook_training_set(
-                y=np.repeat(1, n), X=mo.cbind(self.X, xreg_input[1]), **kwargs
+                y=rep_1_n, X=mo.cbind(self.X, xreg_input[1]), **kwargs
             )
 
         else:  # xreg is None
 
             # avoids scaling X p times in the loop
             dummy_y, scaled_Z = self.cook_training_set(
-                y=np.repeat(1, n), X=self.X, **kwargs
+                y=rep_1_n, X=self.X, **kwargs
             )
 
         # loop on all the time series and adjust self.obj.fit
@@ -216,7 +216,7 @@ class MTS(Base):
         -------
         model predictions for horizon = h: {array-like}
         """
-
+        
         if self.xreg is not None:
             assert new_xreg is not None, "'new_xreg' must be provided"
 
@@ -254,81 +254,108 @@ class MTS(Base):
 
             inv_new_xreg = mo.rbind(self.xreg, new_xreg)[::-1]
 
-        # Loop on horizon h
-        for i in range(h):
-
-            new_obs = ts.reformat_response(self.preds, self.lags)
-
-            if new_xreg is not None:  # Additional regressors provided
-
+            # Loop on horizon h
+            for i in range(h):
+    
+                new_obs = ts.reformat_response(self.preds, self.lags)            
+    
                 new_obs_xreg = ts.reformat_response(inv_new_xreg, self.lags)
-
+    
                 new_X = mo.rbind(
                     np.union1d(
                         new_obs.reshape(1, n_features),
                         new_obs_xreg.reshape(1, n_features_xreg),
                     ),
                     np.ones(n_features_total).reshape(1, n_features_total),
-                )
+                )            
+    
+                cooked_new_X = self.cook_test_set(new_X, **kwargs)
+    
+                predicted_cooked_new_X = self.obj.predict(cooked_new_X, **kwargs)
+    
+                if self.return_std == False:  # std. dev. is not returned
+    
+                    preds = np.array(
+                        [
+                            (self.y_means[j] + predicted_cooked_new_X[0])
+                            for j in range(self.n_series)
+                        ]
+                    )
+    
+                    self.preds = mo.rbind(preds, self.preds)
+    
+                else:  # std. dev. is returned
+    
+                    preds = np.array(
+                        [
+                            (self.y_means[j] + predicted_cooked_new_X[0][0])
+                            for j in range(self.n_series)
+                        ]
+                    )
+    
+                    self.preds = mo.rbind(preds, self.preds)
+    
+                    self.preds_std[i] = predicted_cooked_new_X[1][0]
 
-            else:
-
+        else: # No additional regressor provided
+            
+            for i in range(h):
+    
+                new_obs = ts.reformat_response(self.preds, self.lags)
+                
                 new_X = mo.rbind(
                     new_obs.reshape(1, n_features),
                     np.ones(n_features).reshape(1, n_features),
                 )
-
-            cooked_new_X = self.cook_test_set(new_X, **kwargs)
-
-            predicted_cooked_new_X = self.obj.predict(cooked_new_X, **kwargs)
-
-            if self.return_std == False:  # std. dev. is not returned
-
-                preds = np.array(
-                    [
-                        (self.y_means[j] + predicted_cooked_new_X[0])
-                        for j in range(self.n_series)
-                    ]
-                )
-
-                self.preds = mo.rbind(preds, self.preds)
-
-            else:  # std. dev. is returned
-
-                preds = np.array(
-                    [
-                        (self.y_means[j] + predicted_cooked_new_X[0][0])
-                        for j in range(self.n_series)
-                    ]
-                )
-
-                self.preds = mo.rbind(preds, self.preds)
-
-                self.preds_std[i] = predicted_cooked_new_X[1][0]
+    
+                cooked_new_X = self.cook_test_set(new_X, **kwargs)
+    
+                predicted_cooked_new_X = self.obj.predict(cooked_new_X, **kwargs)
+    
+                if self.return_std == False:  # std. dev. is not returned
+    
+                    preds = np.array(
+                        [
+                            (self.y_means[j] + predicted_cooked_new_X[0])
+                            for j in range(self.n_series)
+                        ]
+                    )
+    
+                    self.preds = mo.rbind(preds, self.preds)
+    
+                else:  # std. dev. is returned
+    
+                    preds = np.array(
+                        [
+                            (self.y_means[j] + predicted_cooked_new_X[0][0])
+                            for j in range(self.n_series)
+                        ]
+                    )
+    
+                    self.preds = mo.rbind(preds, self.preds)
+    
+                    self.preds_std[i] = predicted_cooked_new_X[1][0]
 
         # function's return
 
         self.preds = self.preds[0:h, :][::-1]
 
-        if self.return_std == False:  # the std. dev. is returned
+        if self.return_std == False:  # std. dev. is returned
 
             return self.preds
+        
+        # std. dev. is not returned
+        self.preds_std = self.preds_std[::-1].reshape(h, 1)
 
-        else:
+        self.preds_std = np.repeat(self.preds_std, self.n_series).reshape(
+            -1, self.n_series)
 
-            self.preds_std = self.preds_std[::-1].reshape(h, 1)
-
-            # reshape
-            self.preds_std = np.repeat(self.preds_std, self.n_series).reshape(
-                -1, self.n_series
-            )
-
-            return (
-                self.preds,
-                self.preds_std,
-                self.preds - qt * self.preds_std,
-                self.preds + qt * self.preds_std,
-            )
+        return (
+            self.preds,
+            self.preds_std,
+            self.preds - qt * self.preds_std,
+            self.preds + qt * self.preds_std,
+        )
 
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):
         """ Train on training_index, score on testing_index. """

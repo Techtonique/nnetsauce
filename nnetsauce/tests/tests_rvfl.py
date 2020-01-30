@@ -146,7 +146,7 @@ class TestRVFL(ut.TestCase):
             seed=123,
             s=0.1,
             sigma=0.05,
-            return_std=True,
+            #return_std=True,
         )
 
         fit_obj2.set_params(
@@ -164,7 +164,7 @@ class TestRVFL(ut.TestCase):
             s1=0.1,
             s2=0.1,
             sigma=0.05,  # optim
-            return_std=True,
+            #return_std=True,
         )
 
     def test_score(self):
@@ -218,7 +218,7 @@ class TestRVFL(ut.TestCase):
         fit_obj2.fit(X, y)
         fit_obj3.fit(X, y)
         fit_obj4.fit(X, y)
-        fit_obj4.set_params(return_std=True)
+        #fit_obj4.set_params(return_std=True)
 
         self.assertTrue(
             np.allclose(
