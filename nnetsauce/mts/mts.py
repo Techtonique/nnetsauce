@@ -4,12 +4,6 @@
 #
 # License: BSD 3
 
-# ts objects with rpy2
-# ts objects with rpy2
-# ts objects with rpy2
-# ts objects with rpy2
-# ts objects with rpy2
-
 import numpy as np
 from ..base import Base
 from scipy.stats import norm
@@ -114,7 +108,6 @@ class MTS(Base):
         self.xreg = None
         self.y_means = {}
         self.preds = None
-        self.return_std = False
         self.preds_std = []
         self.row_sample = 1
 
@@ -216,6 +209,8 @@ class MTS(Base):
         -------
         model predictions for horizon = h: {array-like}
         """
+        
+        self.return_std = False
         
         if self.xreg is not None:
             assert new_xreg is not None, "'new_xreg' must be provided"
