@@ -34,8 +34,8 @@
 #' X <- as.matrix(iris[, 1:4])
 #' y <- as.integer(iris[, 5]) - 1L
 #'
-#' # obj <- sklearn$tree$DecisionTreeClassifier()
-#' # obj2 <- AdaBoostClassifier(obj)
+#' obj <- sklearn$tree$DecisionTreeClassifier()
+#' obj2 <- AdaBoostClassifier(obj)
 #' # obj2$fit(X, y)
 #' # print(obj2$score(X, y))
 #' # print(obj2$predict_proba(X))

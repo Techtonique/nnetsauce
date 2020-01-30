@@ -14,7 +14,6 @@
 #' @param col_sample
 #' @param seed
 #' @param lags
-#' @param return_std
 #'
 #' @return
 #' @export
@@ -42,7 +41,7 @@
 #' obj2 <- MTS(obj)
 #'
 #' obj2$fit(X)
-#' obj2$predict(return_std=TRUE)
+#' obj2$predict()
 #'
 MTS <- function(obj,
                 n_hidden_features=5L,
@@ -57,8 +56,7 @@ MTS <- function(obj,
                 type_clust="kmeans",
                 col_sample=1,
                 seed=123L,
-                lags=1L,
-                return_std=FALSE)
+                lags=1L)
 {
   ns$MTS(obj,
          n_hidden_features=n_hidden_features,
@@ -73,6 +71,5 @@ MTS <- function(obj,
          type_clust=type_clust,
          col_sample=col_sample,
          seed=seed,
-         lags=lags,
-         return_std=return_std)
+         lags=lags)
 }

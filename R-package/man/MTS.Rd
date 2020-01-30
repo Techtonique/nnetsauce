@@ -18,12 +18,11 @@ MTS(
   type_clust = "kmeans",
   col_sample = 1,
   seed = 123L,
-  lags = 1L,
-  return_std = FALSE
+  lags = 1L
 )
 }
 \arguments{
-\item{return_std}{}
+\item{lags}{}
 }
 \value{
 
@@ -54,6 +53,6 @@ obj <- sklearn$linear_model$BayesianRidge()
 obj2 <- MTS(obj)
 
 obj2$fit(X)
-obj2$predict(return_std=TRUE)
+obj2$predict()
 
 }
