@@ -11,6 +11,7 @@ from ..utils import matrixops as mo
 from ..utils import timeseries as ts
 import sklearn.metrics as skm2
 import pickle
+from functools import partial 
 
 
 class MTS(Base):
@@ -374,27 +375,29 @@ class MTS(Base):
 
         # Fit and predict
         self.fit(X_train, **kwargs)
-        preds = self.predict(h=h, return_std=False, **kwargs)
+        preds = self.predict(h=h, **kwargs)
 
         if scoring is None:
-            scoring = "neg_mean_squared_error"
+            scoring = "neg_root_mean_squared_error"
 
         # check inputs
         assert scoring in (
             "explained_variance",
             "neg_mean_absolute_error",
             "neg_mean_squared_error",
+            "neg_root_mean_squared_error",
             "neg_mean_squared_log_error",
             "neg_median_absolute_error",
             "r2",
         ), "'scoring' should be in ('explained_variance', 'neg_mean_absolute_error', \
-                               'neg_mean_squared_error', 'neg_mean_squared_log_error', \
+                               'neg_mean_squared_error', 'neg_root_mean_squared_error', 'neg_mean_squared_log_error', \
                                'neg_median_absolute_error', 'r2')"
 
         scoring_options = {
             "explained_variance": skm2.explained_variance_score,
             "neg_mean_absolute_error": skm2.mean_absolute_error,
             "neg_mean_squared_error": skm2.mean_squared_error,
+            "neg_root_mean_squared_error": lambda x, y: np.sqrt(skm2.mean_squared_error(x, y)),
             "neg_mean_squared_log_error": skm2.mean_squared_log_error,
             "neg_median_absolute_error": skm2.median_absolute_error,
             "r2": skm2.r2_score,
