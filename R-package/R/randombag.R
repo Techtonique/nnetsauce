@@ -31,11 +31,11 @@
 #' X <- as.matrix(iris[, 1:4])
 #' y <- as.integer(iris[, 5]) - 1L
 #'
-#' # obj <- sklearn$tree$DecisionTreeClassifier()
-#' # obj2 <- RandomBagClassifier(obj)
-#' # obj2$fit(X, y)
-#' # print(obj2$score(X, y))
-#' # print(obj2$predict_proba(X))
+#' obj <- sklearn$tree$DecisionTreeClassifier()
+#' obj2 <- RandomBagClassifier(obj)
+#' obj2$fit(X, y)
+#' print(obj2$score(X, y))
+#' print(obj2$predict_proba(X))
 #'
 RandomBagClassifier <- function(obj,
                                 n_estimators=10L,
