@@ -269,7 +269,7 @@ class TestMTS(ut.TestCase):
         
         self.assertTrue(
             np.allclose([np.round(x) for x in scores], [239.0, 0.0, 85.0])
-            & np.allclose([np.round(x) for x in scores2] ,[15.0, 0.0, 9.0])
+            & np.allclose([np.round(x) for x in scores2], [15.0, 0.0, 9.0])
         )
 
 
