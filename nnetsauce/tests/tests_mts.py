@@ -253,23 +253,23 @@ class TestMTS(ut.TestCase):
             activation_name="relu",
             n_clusters=0,
         )
-
-        self.assertTrue(
-            np.allclose(
-                fit_obj.score(
+        
+        scores = fit_obj.score(
                     X,
                     training_index=range(20),
                     testing_index=range(20, 25),
                     scoring="neg_mean_squared_error",
-                ),
-                (239.14320170278387, 0.080854374885662481, 85.010283695384985),
-            )
-            & np.allclose(
-                fit_obj.score(
-                    X, training_index=range(20), testing_index=range(20, 25)
-                ),
-                (239.14320170278387, 0.080854374885662481, 85.010283695384985),
-            )
+                )
+        
+        scores2 = fit_obj.score(
+                    X,
+                    training_index=range(20),
+                    testing_index=range(20, 25)
+                )
+        
+        self.assertTrue(
+            np.allclose([np.round(x) for x in scores], [239.0, 0.0, 85.0])
+            & np.allclose([np.round(x) for x in scores2] ,[15.0, 0.0, 9.0])
         )
 
 

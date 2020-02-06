@@ -275,9 +275,7 @@ class MTS(Base):
                             for j in range(self.n_series)
                         ]
                     )
-    
-                    self.preds = mo.rbind(preds, self.preds)
-    
+                        
                 else:  # std. dev. is returned
     
                     preds = np.array(
@@ -286,10 +284,10 @@ class MTS(Base):
                             for j in range(self.n_series)
                         ]
                     )
-    
-                    self.preds = mo.rbind(preds, self.preds)
-    
+                    
                     self.preds_std[i] = predicted_cooked_new_X[1][0]
+    
+                self.preds = mo.rbind(preds, self.preds)                        
 
         else: # No additional regressor provided
             
@@ -314,9 +312,7 @@ class MTS(Base):
                             for j in range(self.n_series)
                         ]
                     )
-    
-                    self.preds = mo.rbind(preds, self.preds)
-    
+        
                 else:  # std. dev. is returned
     
                     preds = np.array(
@@ -324,11 +320,11 @@ class MTS(Base):
                             (self.y_means[j] + predicted_cooked_new_X[0][0])
                             for j in range(self.n_series)
                         ]
-                    )
-    
-                    self.preds = mo.rbind(preds, self.preds)
+                    )                        
     
                     self.preds_std[i] = predicted_cooked_new_X[1][0]
+                    
+                self.preds = mo.rbind(preds, self.preds)
 
         # function's return
 
