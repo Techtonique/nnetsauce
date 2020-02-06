@@ -183,8 +183,6 @@ class MTS(Base):
                 )
             )
 
-        self.y_mean = None
-
         return self
 
     def predict(self, h=5, level=95, new_xreg=None, **kwargs):
