@@ -2,7 +2,21 @@
 
 <hr>
 
-This package does Statistical/Machine Learning by using various -- advanced -- combinations of single layer 'neural' networks. 
+This package does Statistical/Machine Learning, using advanced combinations of _neural_ networks layers. It contains models for regression, classification, and time series forecasting.
+
+[![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce)
+
+## Contents 
+ [Installation for Python and R](#installation-for-Python-and-R) |
+ [Package description](#package-description) |
+ [Quick start](#quick-start) |
+ [Model Validation](#model-validation) |
+ [Contributing](#Contributing) |
+ [Tests](#Tests) |
+ [Dependencies](#dependencies) |
+ [Citing `nnetsauce`](#Citation) |
+ [References](#References) |
+ [License](#License) 
 
 
 ## Installation (for Python and R)

@@ -9,7 +9,6 @@ from sklearn.mixture import GaussianMixture
 
 # column bind
 def cbind(x, y):
-
     # if len(x.shape) == 1 or len(y.shape) == 1:
     return np.column_stack((x, y))
 
@@ -100,7 +99,6 @@ def one_hot_encode2(y, n_classes):
 
 # row bind
 def rbind(x, y):
-
     # if len(x.shape) == 1 or len(y.shape) == 1:
     return np.row_stack((x, y))
 
