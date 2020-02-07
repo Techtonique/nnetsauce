@@ -6,6 +6,7 @@ This package does Statistical/Machine Learning, using advanced combinations of _
 
 [![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce)
 
+
 ## Contents 
  [Installation for Python and R](#installation-for-Python-and-R) |
  [Package description](#package-description) |
@@ -70,7 +71,15 @@ __Currently__, 5 models are implemented in the `nnetsauce`. If your response var
 
 ## Quick start
 
-Here, we present examples of use of `Base`, `BayesianRVFL`, `BayesianRVFL2`, an example of `Custom` model using `scikit-learn`, and an example of `MTS` forecasting. We start by importing the packages and datasets necessary for the demo:
+Here, we present Python examples of use of `Base`, `BayesianRVFL`, `BayesianRVFL2`, an example of `CustomRegressor` model using `scikit-learn`, and an example of `MTS` forecasting. Multiple examples of use can also be found in [demo](/nnetsauce/demo) (where you can [contribute](#Contributing)), and [examples](/examples). __For R examples__, you can type the following command in R console:
+
+```r
+help("CustomRegressor")
+```
+
+And read the __Examples__ section in the Help page displayed (any other class name can be used instead of `CustomRegressor`). 
+
+We start by importing the packages and datasets necessary for our demo:
 
 ````python
 import nnetsauce as ns
@@ -290,7 +299,7 @@ print(obj_MTS4.predict())
 
 ````
 
-__There are certainly many other creative ways of combining these objects__, that you can (including **[tests](#Tests)**) [contribute](#Contributing) !
+ __There are certainly many other creative ways of combining these objects__, that you can (including **[tests](#Tests)**) [contribute](#Contributing) !
 
 ## Model validation
 
@@ -306,7 +315,7 @@ cross_val_score(fit_obj3, X = Z, y = t, cv=3)
 
 ## Contributing
 
-Your contributions are welcome, and valuable. Please, make sure to __read__ the [Code of Conduct](CONTRIBUTING.md) first.
+Your contributions are welcome, and valuable. Please, make sure to __read__ the [Code of Conduct](CONTRIBUTING.md) first. If you're not comfortable with Git/Version Control yet, please use [this form](https://forms.gle/HQVbrUsvZE7o8xco8) to provide a feedback.
 
 In Pull Requests, let's strive to use [`black`](https://black.readthedocs.io/en/stable/) for formatting: 
 
