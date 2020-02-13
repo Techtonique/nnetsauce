@@ -4,7 +4,7 @@
 
 This package does Statistical/Machine Learning, using advanced combinations of _neural_ networks layers. It contains models for regression, classification, and time series forecasting.
 
-[![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce)
+![PyPI](https://img.shields.io/pypi/v/nnetsauce) [![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce) 
 
 
 ## Contents 
@@ -47,7 +47,7 @@ devtools::install_github("thierrymoudiki/nnetsauce/R-package")
 library(nnetsauce)
 ```
 
-__General rule for using the package in R__:  object accesses with `.`'s are replaced by `$`'s.
+__General rule for using the package in R__:  object accesses with `.`'s are replaced by `$`'s. See also [Quick start](#quick-start).
 
 
 
