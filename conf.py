@@ -1,2 +1,2 @@
 # Add napoleon to the extensions list
-extensions = ['sphinxcontrib.napoleon']
+extensions = ['sphinxcontrib.napoleon', 'recommonmark']
