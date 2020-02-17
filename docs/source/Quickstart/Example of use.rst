@@ -10,7 +10,7 @@ In these examples, we use `nnetsauce` classes  ``CustomRegressor`` and ``CustomC
 	help("CustomRegressor")
 
 
-And read the **Examples** section in the Help page displayed. Any other class name from the API Documentation (see section) can be used instead of ``CustomRegressor``. 
+And read the **Examples** section in the Help page displayed. Any other class name from the API Documentation (see sections :ref:`ref-regression-models`, :ref:`ref-classification-models` and :ref:`ref-time-series-models`) can be used instead of ``CustomRegressor``. 
 
 
 **Example 1:**

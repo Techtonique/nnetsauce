@@ -40,6 +40,6 @@ In R console, type:
 	help("CustomRegressor")
 
 
-And read the **Examples** section in the Help page displayed. Any other class name of the API Documentation (see section) can be used instead of ``CustomRegressor``. 
+And read the **Examples** section in the Help page displayed. Any other class name of the API Documentation (see sections :ref:`ref-regression-models`, :ref:`ref-classification-models` and :ref:`ref-time-series-models`) can be used instead of ``CustomRegressor``. 
 
 Next section presents some **examples of use of nnetsauce** in Python, that are representative of its general philosophy, but not exhaustive. For more examples, you can refer to `these notebooks <https://github.com/thierrymoudiki/nnetsauce/tree/master/nnetsauce/demo>`_ or `this directory <https://github.com/thierrymoudiki/nnetsauce/tree/master/examples>`_.
