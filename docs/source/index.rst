@@ -8,6 +8,7 @@ nnetsauce's documentation
 - **b** is an optional bias parameter.
 - **g** is an *activation function* such as the hyperbolic tangent or the sigmoid function, that renders the combination of explanatory variables  -- through **W** -- nonlinear. 
 
+`nnetsauce`'s **source code** is `available on GitHub <https://github.com/thierrymoudiki/nnetsauce>`_. 
 
 .. toctree::
    :maxdepth: 1

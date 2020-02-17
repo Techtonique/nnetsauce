@@ -10,7 +10,7 @@ In these examples, we use `nnetsauce` classes  ``CustomRegressor`` and ``CustomC
 	help("CustomRegressor")
 
 
-And read the **Examples** section in the Help page displayed. Any other class name from the API Documentation (see next section) can be used instead of ``CustomRegressor``. 
+And read the **Examples** section in the Help page displayed. Any other class name from the API Documentation (see section) can be used instead of ``CustomRegressor``. 
 
 
 **Example 1:**
@@ -21,7 +21,7 @@ In this **first example**, the models created all have one layer, and  are respe
 
     pip install sklearn
 
-Now, we can use `nnetsauce` to add one hidden layer to these models: 
+Now, we can use `nnetsauce` to add **one hidden layer** to these models: 
 
 .. code-block:: python
 
@@ -84,7 +84,7 @@ Now, we can use `nnetsauce` to add one hidden layer to these models:
 
 **Example 2:**
 
-In this **second example**, the model created has three layers and is based on Bayesian Ridge regression: 
+In this **second example**, the model created has **three hidden layers** and is based on Bayesian Ridge regression: 
 
 .. code-block:: python
 
@@ -118,3 +118,5 @@ In this **second example**, the model created has three layers and is based on B
 
 	# RMSE score on test set
 	print(np.sqrt(layer3_regr.score(X[index_test,:], y[index_test])))
+
+The entire **API documentation is presented in the next section**. You can also refer to Indices and tables in the homepage, or use the search feature. 
