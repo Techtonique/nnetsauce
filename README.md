@@ -2,9 +2,9 @@
 
 <hr>
 
-This package does Statistical/Machine Learning, using advanced combinations of _neural_ networks layers. It contains models for regression, classification, and time series forecasting.
+This package does Statistical/Machine Learning, using advanced combinations of randomized and quasi-randomized _neural_ networks layers. It contains models for regression, classification, and time series forecasting.
 
-![PyPI](https://img.shields.io/pypi/v/nnetsauce) [![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce) 
+![PyPI](https://img.shields.io/pypi/v/nnetsauce) [![PyPI - License](https://img.shields.io/pypi/l/nnetsauce)](https://github.com/thierrymoudiki/nnetsauce/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce) 
 
 
 ## Contents 
@@ -60,24 +60,17 @@ Every model in the `nnetsauce` is based on the component __g(XW + b)__, where:
 - __b__ is an optional bias parameter.
 - __g__ is an _activation function_ such as the hyperbolic tangent or the sigmoid function (among others), that renders the combination of explanatory variables (through __W__) nonlinear.  
 
-__Currently__, 5 models are implemented in the `nnetsauce`. If your response variable (the one that you want to explain) is __y__, then:
-
-- `Base` adjusts a linear regression to __y__, as a function of __X__ (optional) and __g(XW + b)__; without regularization of the regression coefficients. 
-- `BayesianRVFL` (currently, `BayesianRVFLRegressor`) adds a ridge regularization parameter to the regression coefficients of `Base`, which prevents overfitting. Confidence intervals around the prediction can also be obtained.  
-- `BayesianRVFL2` (currently, `BayesianRVFL2Regressor`) adds 2 regularization parameters to `Base`. As with `BayesianRVFL`, confidence intervals around the prediction can be obtained.
-- `Custom` (`CustomRegressor` and `CustomClassifier`) works with any object `fit_obj` possessing methods `fit_obj.fit()` and `fit_obj.predict()`. Notably, the model can be applied to any [`scikit-learn`](https://scikit-learn.org)'s model, and to [`xgboost`](https://github.com/dmlc/xgboost), [`LightGBM`](https://github.com/Microsoft/LightGBM), [`CatBoost`](https://github.com/catboost/catboost) models. It adjusts `fit_obj` to __y__, as a function of __X__ (optional) and __g(XW + b)__. `Custom` objects can also be combined to form __deeper learning architectures__, as it will be shown in the next section. 
-- `MTS` does multivariate time series forecasting. Like `Custom`, it works with any object `fit_obj` possessing methods `fit_obj.fit()` and `fit_obj.predict()`.
-
+The complete __API documentation__ is available [online](#), and you can read blog posts about `nnetsauce` [here](https://thierrymoudiki.github.io/blog/#QuasiRandomizedNN).
 
 ## Quick start
 
-Here, we present Python examples of use of `Base`, `BayesianRVFL`, `BayesianRVFL2`, an example of `CustomRegressor` model using `scikit-learn`, and an example of `MTS` forecasting. Multiple examples of use can also be found in [demo](/nnetsauce/demo) (where you can [contribute](#Contributing)), and [examples](/examples). __For R examples__, you can type the following command in R console:
+We present Python examples of use of `CustomRegressor` and  `CustomClassifier`, and an example of Multivariate Time Series `MTS` forecasting. Multiple examples of use can also be found in [demo](/nnetsauce/demo) (notebooks), and [examples](/examples) (flat files); where you can contribute yours too. __For R examples__, you can type the following command in R console:
 
 ```r
 help("CustomRegressor")
 ```
 
-And read the __Examples__ section in the Help page displayed (any other class name can be used instead of `CustomRegressor`). 
+And read the __Examples__ section in the Help page displayed (any other class name from the [__API documentation__](#) can be used instead of `CustomRegressor`). 
 
 We start by importing the packages and datasets necessary for our demo:
 
@@ -96,93 +89,26 @@ Z = breast_cancer.data
 t = breast_cancer.target
 ````
 
-`Base` (no regularization):
-
-````python
-# create object Base 
-
-# X is not used directly, but only g(XW+b) ('direct_link' parameter)
-# W is drawn from a deterministic Sobol sequence ('nodes_sim' parameter)
-# b is equal to 0 ('bias' parameter)
-# The activation function g is the hyperbolic tangent ('activation_name' parameter)
-# The data in X is clustered: 2 clusters are obtained with k-means before fitting the model ('type_clust', 'n_clusters' parameters)
-
-fit_obj = ns.BaseRegressor(n_hidden_features=100, 
-                  direct_link=False,
-                  nodes_sim='sobol',
-                  bias=False,
-                  activation_name='tanh', 
-                  type_clust='kmeans',
-                  n_clusters=2) 
-
-# fit training set 
-fit_obj.fit(X[0:350,:], y[0:350])
-
-# predict on test set 
-x = np.linspace(351, 442, num = 442-351+1)
-plt.scatter(x = x, y = y[350:442], color='black')
-plt.plot(x, fit_obj.predict(X[350:442,:]), color='red')
-plt.title('preds vs test set obs')
-plt.xlabel('x')
-plt.ylabel('preds')
-plt.show()
-````
-
-`BayesianRVFL` (one regularization parameter):
-
-````python
-# create object BayesianRVFL  
-# regularization is controlled by 's' and 'sigma'
-# here, nodes_sim='halton' is used in the hidden layer
-fit_obj = ns.BayesianRVFLRegressor(n_hidden_features=100,
-                          nodes_sim='halton', 
-                          direct_link=True,
-                          bias=False,
-                          activation_name='relu',
-                          n_clusters=3, s=0.01,sigma=0.1)
-
-# fit training set 
-fit_obj.fit(X[0:350,:], y[0:350])
-
-# predict on test set 
-x = np.linspace(351, 375, num = 375-351+1)
-plt.scatter(x = x, y = y[350:375], color='black')
-plt.plot(x, fit_obj.predict(X[350:375,:]), color='blue')
-plt.title('preds vs test set obs')
-plt.xlabel('x')
-plt.ylabel('preds')
-plt.show()
-````
-
-`BayesianRVFL2` (two regularization parameters):
-
-````python
-# create object BayesianRVFL2 
-# regularization is controlled by 's1', 's2' and 'sigma'
-fit_obj = ns.BayesianRVFL2Regressor(n_hidden_features=100, 
-                  direct_link=True,
-                  activation_name='tanh', 
-                  n_clusters=3, 
-                  s1=0.5, s2=0.1, sigma=0.1)
-
-# fit training set 
-fit_obj.fit(X[0:350,:], y[0:350])
-
-# predict on test set 
-x = np.linspace(351, 375, num = 375-351+1)
-plt.scatter(x = x, y = y[350:375], color='black')
-plt.plot(x, fit_obj.predict(X[350:375,:]), color='blue')
-plt.title('preds vs test set obs')
-plt.xlabel('x')
-plt.ylabel('preds')
-plt.show()
-````
-
 `Custom` (using `scikit-learn`):
 
 ````python
+import nnetsauce as ns
+import numpy as np      
+import matplotlib.pyplot as plt
+
+from sklearn import datasets, metrics
 from sklearn import linear_model, gaussian_process
 
+# load datasets
+diabetes = datasets.load_diabetes()
+X = diabetes.data 
+y = diabetes.target
+
+breast_cancer = datasets.load_breast_cancer()
+Z = breast_cancer.data
+t = breast_cancer.target
+
+# Base models for nnetsauce's Custom class
 regr = linear_model.BayesianRidge()
 regr2 = linear_model.ElasticNet()
 regr3 = gaussian_process.GaussianProcessClassifier()
@@ -192,43 +118,50 @@ fit_obj = ns.CustomRegressor(obj=regr, n_hidden_features=100,
                     direct_link=False, bias=True,
                     activation_name='tanh', n_clusters=2)
 
-fit_obj2 = ns.CustomRegressor(obj=regr2, n_hidden_features=500, 
+fit_obj2 = ns.CustomRegressor(obj=regr2, n_hidden_features=5, 
                     direct_link=True, bias=False,
                     activation_name='relu', n_clusters=0)
 
-fit_obj3 = ns.CustomClassifier(obj = regr3, n_hidden_features=100, 
+fit_obj3 = ns.CustomClassifier(obj = regr3, n_hidden_features=5, 
                     direct_link=True, bias=True,
-                    activation_name='relu', n_clusters=0)
+                    activation_name='relu', n_clusters=2)
 
-# fit training set 
-fit_obj.fit(X[0:350,:], y[0:350])
-fit_obj2.fit(X[0:350,:], y[0:350])
-fit_obj3.fit(Z[0:455,:], t[0:455])
+# fit model 1 on training set
+index_train_1 = range(350)
+index_test_1 = range(350, 442)
+fit_obj.fit(X[index_train_1,:], y[index_train_1])
 
 # predict on test set 
-x = np.linspace(351, 442, num = 442-351+1)
-plt.scatter(x = x, y = y[350:442], color='black')
-plt.plot(x, fit_obj.predict(X[350:442,:]), color='red')
-plt.plot(x, fit_obj2.predict(X[350:442,:]), color='blue')
-plt.title('preds vs test set obs')
-plt.xlabel('x')
-plt.ylabel('preds')
-plt.show()
+print(fit_obj.predict(X[index_test_1,:]))
 
-# predict classes 
-print(fit_obj3.predict(Z[456:569,:]))
+# fit model 2 on training set
+fit_obj2.fit(X[index_train_1,:], y[index_train_1])
 
+# predict on test set 
+print(fit_obj2.predict(X[index_test_1,:]))
+
+# fit model 3 on training set
+index_train_2 = range(455)
+index_test_2 = range(455, 569)
+fit_obj3.fit(Z[index_train_2,:], t[index_train_2])
+
+# accuracy on test set 
+print(fit_obj3.score(Z[index_test_2,:], t[index_test_2]))
 ````
 
-We can also __combine `Custom` building blocks__. __In the following example, doing that increases the accuracy__, as new layers are added to the stack:
+We can __combine `Custom` building blocks__. __In the following example, doing that increases model accuracy__, as new layers are added to the stack:
 
 ````python
 
+index_train = range(100)
+index_test = range(100, 125)
+
 # layer 1 (base layer) ----
 layer1_regr = linear_model.BayesianRidge()
-layer1_regr.fit(X[0:100,:], y[0:100])
-# RMSE score
-np.sqrt(metrics.mean_squared_error(y[100:125], layer1_regr.predict(X[100:125,:])))
+layer1_regr.fit(X[index_train,:], y[index_train])
+
+# RMSE score on test set
+print(np.sqrt(metrics.mean_squared_error(y[index_test], layer1_regr.predict(X[index_test,:]))))
 
 
 # layer 2 using layer 1 ----
@@ -236,20 +169,20 @@ layer2_regr = ns.CustomRegressor(obj = layer1_regr, n_hidden_features=3,
                         direct_link=True, bias=True, 
                         nodes_sim='sobol', activation_name='tanh', 
                         n_clusters=2)
-layer2_regr.fit(X[0:100,:], y[0:100])
+layer2_regr.fit(X[index_train,:], y[index_train])
 
-# RMSE score
-np.sqrt(layer2_regr.score(X[100:125,:], y[100:125]))
+# RMSE score on test set
+print(np.sqrt(layer2_regr.score(X[index_test,:], y[index_test])))
 
 # layer 3 using layer 2 ----
 layer3_regr = ns.CustomRegressor(obj = layer2_regr, n_hidden_features=5, 
                         direct_link=True, bias=True, 
                         nodes_sim='hammersley', activation_name='sigmoid', 
                         n_clusters=2)
-layer3_regr.fit(X[0:100,:], y[0:100])
+layer3_regr.fit(X[index_test,:], y[index_test])
 
-# RMSE score
-np.sqrt(layer3_regr.score(X[100:125,:], y[100:125]))
+# RMSE score on test set
+print(np.sqrt(layer3_regr.score(X[index_test,:], y[index_test])))
 
 ````
 
@@ -281,7 +214,7 @@ print(obj_MTS2.predict())
 # of tuple 'type_scaling') , hidden layer (second input
 # of tuple 'type_scaling'), and clustering (third input
 # of tuple 'type_scaling'). 
-# This is also available for models Base, Custom etc.
+# This is also available for models Base, Custom, etc.
 
 # 'minmax', 'minmax', 'std' scalings
 regr6 = linear_model.BayesianRidge()
@@ -317,7 +250,7 @@ cross_val_score(fit_obj3, X = Z, y = t, cv=3)
 
 Your contributions are welcome, and valuable. Please, make sure to __read__ the [Code of Conduct](CONTRIBUTING.md) first. If you're not comfortable with Git/Version Control yet, please use [this form](https://forms.gle/HQVbrUsvZE7o8xco8) to provide a feedback.
 
-In Pull Requests, let's strive to use [`black`](https://black.readthedocs.io/en/stable/) for formatting: 
+In Pull Requests, let's strive to use [`black`](https://black.readthedocs.io/en/stable/) for formatting files: 
 
 ```bash
 pip install black
@@ -326,12 +259,12 @@ black --line-length=80 file_submitted_for_pr.py
 
 A few things that we could explore are:
 
-- Creating a great documentation on [readthedocs.org](https://readthedocs.org/) 
+- Creating a great documentation on [readthedocs.org](https://readthedocs.org/) --> [here](./docs) 
 - Find other ways to combine `Custom` objects, using your fertile imagination (including [tests](#Tests))
 - Better management of dates for MTS objects (including [tests](#Tests))
 - Enrich the [tests](#Tests)
 - Make `nnetsauce` available to `R` users --> [here](./R-package)
-- Any benchmarking of `nnetsauce` models (notebooks, files, etc.) can be stored in [demo](/nnetsauce/demo), with the following naming convention:  `yourgithubname_ddmmyy_shortdescriptionofdemo.[py|ipynb]`
+- Any benchmarking of `nnetsauce` models can be stored in [demo](/nnetsauce/demo) (notebooks) or [examples](./examples) (flat files), with the following naming convention:  `yourgithubname_ddmmyy_shortdescriptionofdemo.[py|ipynb|R|Rmd]`
 
 
 ## Tests

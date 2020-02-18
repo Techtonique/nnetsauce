@@ -4,7 +4,8 @@ Installation
 
 `nnetsauce` is currently available for Python and R. 
 
-**For Python**
+For Python
+----------
 
 
 **Stable version** From Pypi: 
@@ -21,7 +22,8 @@ Installation
     pip install git+https://github.com/thierrymoudiki/nnetsauce.git
 
 
-**For R**
+For R
+-----
 
 In R console, type: 
 
@@ -42,4 +44,4 @@ In R console, type:
 
 And read the **Examples** section in the Help page displayed. Any other class name of the API Documentation (see sections :ref:`ref-regression-models`, :ref:`ref-classification-models` and :ref:`ref-time-series-models`) can be used instead of ``CustomRegressor``. 
 
-Next section presents some **examples of use of nnetsauce** in Python, that are representative of its general philosophy, but not exhaustive. For more examples, you can refer to `these notebooks <https://github.com/thierrymoudiki/nnetsauce/tree/master/nnetsauce/demo>`_ or `this directory <https://github.com/thierrymoudiki/nnetsauce/tree/master/examples>`_.
+Next section presents some **examples of use of nnetsauce** in Python, that are representative of its general philosophy, but not exhaustive. For more examples, you can refer to `these notebooks <https://github.com/thierrymoudiki/nnetsauce/tree/master/nnetsauce/demo>`_ or `this directory <https://github.com/thierrymoudiki/nnetsauce/tree/master/examples>`_; feel free to contribute yours in there too.

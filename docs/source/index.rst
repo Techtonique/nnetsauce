@@ -1,6 +1,21 @@
 nnetsauce's documentation
 =========================================
 
+.. image:: https://img.shields.io/pypi/v/nnetsauce
+      :target: https://pypi.org/project/nnetsauce/
+      :alt: Latest PyPI version
+
+
+.. image:: https://img.shields.io/pypi/l/nnetsauce
+      :target: https://github.com/thierrymoudiki/nnetsauce/blob/master/LICENSE   
+      :alt: PyPI - License
+
+
+.. image:: https://pepy.tech/badge/nnetsauce
+      :target: https://pepy.tech/project/nnetsauce
+      :alt: Number of PyPI downloads
+
+
 `nnetsauce` does Statistical/Machine Learning (ML) using advanced combinations of randomized and quasi-randomized *neural* networks layers. It contains models for **regression**, **classification**, and **time series forecasting**. Every ML model in `nnetsauce` is based on components **g(XW + b)**, where:
 
 - **X** is a matrix containing explanatory variables and optional clustering information. Clustering the inputs helps in taking into account data's heterogeneity before model fitting.
@@ -28,6 +43,15 @@ nnetsauce's documentation
 .. toctree::
    :maxdepth: 1
    :caption: Contributing
+
+   Contributing/Guidelines
+   Contributing/Testing
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Citing nnetsauce
+
+   Citation
 
 .. toctree::
    :maxdepth: 1

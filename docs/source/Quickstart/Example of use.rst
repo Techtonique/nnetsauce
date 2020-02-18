@@ -2,7 +2,7 @@
 Example of use
 ''''''''''''''
 
-In these examples, we use `nnetsauce` classes  ``CustomRegressor`` and ``CustomClassifier`` in Python, to create new models with **one hidden layer** and **three hidden layers**. There are more examples `in these notebooks <https://github.com/thierrymoudiki/nnetsauce/tree/master/nnetsauce/demo>`_ or `this directory <https://github.com/thierrymoudiki/nnetsauce/tree/master/examples>`_, and you can contribute yours in there too. For **R examples**, you can type in R console: 
+In these examples, we use `nnetsauce` classes  ``CustomRegressor`` and ``CustomClassifier`` in Python, to create new models with **one hidden layer** and **three hidden layers**. There are more examples `in these notebooks <https://github.com/thierrymoudiki/nnetsauce/tree/master/nnetsauce/demo>`_ or `this directory <https://github.com/thierrymoudiki/nnetsauce/tree/master/examples>`_; feel free to contribute yours in there too. For **R examples**, you can type the following commands in R console: 
 
 .. code-block:: r
 
@@ -13,7 +13,8 @@ In these examples, we use `nnetsauce` classes  ``CustomRegressor`` and ``CustomC
 And read the **Examples** section in the Help page displayed. Any other class name from the API Documentation (see sections :ref:`ref-regression-models`, :ref:`ref-classification-models` and :ref:`ref-time-series-models`) can be used instead of ``CustomRegressor``. 
 
 
-**Example 1:**
+Example 1 (one layer)
+---------------------
 
 In this **first example**, the models created all have one layer, and  are respectively based on Bayesian Ridge regression, Elastic Net regression, and a Gaussian Process Classifier. We start by installing `sklearn` at the command line -- though `nnetsauce` will work with any object having methods ``fit`` and ``predict`` : 
 
@@ -82,7 +83,8 @@ Now, we can use `nnetsauce` to add **one hidden layer** to these models:
 	print(fit_obj3.score(Z[index_test_2,:], t[index_test_2]))
 
 
-**Example 2:**
+Example 2 (three layers)
+------------------------
 
 In this **second example**, the model created has **three hidden layers** and is based on Bayesian Ridge regression: 
 
