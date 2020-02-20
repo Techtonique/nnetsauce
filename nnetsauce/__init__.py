@@ -3,6 +3,7 @@ from .base.baseRegressor import BaseRegressor
 from .boosting.adaBoostClassifier import AdaBoostClassifier
 from .custom.customClassifier import CustomClassifier
 from .custom.customRegressor import CustomRegressor
+from .multitask.mtaskClassifier import MtaskClassifier
 from .mts import MTS
 from .randombag.randomBagClassifier import RandomBagClassifier
 from .ridge2.ridge2Classifier import Ridge2Classifier
@@ -23,6 +24,7 @@ __all__ = [
     "BayesianRVFL2Regressor",
     "CustomClassifier",
     "CustomRegressor",
+    "MtaskClassifier",
     "RandomBagClassifier",
     "Ridge2Regressor",
     "Ridge2Classifier",
