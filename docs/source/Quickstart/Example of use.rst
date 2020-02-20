@@ -2,7 +2,7 @@
 Example of use
 ''''''''''''''
 
-In these examples, we use `nnetsauce` classes  ``CustomRegressor`` and ``CustomClassifier`` in Python, to create new models with **one hidden layer** and **three hidden layers**. There are more examples `in these notebooks <https://github.com/thierrymoudiki/nnetsauce/tree/master/nnetsauce/demo>`_ or `this directory <https://github.com/thierrymoudiki/nnetsauce/tree/master/examples>`_; feel free to contribute yours in there too. For **R examples**, you can type the following commands in R console: 
+In these examples, we use `nnetsauce` classes  ``CustomRegressor`` and ``CustomClassifier`` in Python, to create new models with **one hidden layer** and **three hidden layers**. There are more examples `in these notebooks <https://github.com/thierrymoudiki/nnetsauce/tree/master/nnetsauce/demo>`_ or `this directory <https://github.com/thierrymoudiki/nnetsauce/tree/master/examples>`_; feel free to contribute yours in there too, with the following naming convention:  ``yourgithubname_ddmmyy_shortdescriptionofdemo.[py|ipynb|R|Rmd]``. For **R examples**, you can type the following commands in R console: 
 
 .. code-block:: r
 
@@ -10,7 +10,7 @@ In these examples, we use `nnetsauce` classes  ``CustomRegressor`` and ``CustomC
 	help("CustomRegressor")
 
 
-And read the **Examples** section in the Help page displayed. Any other class name from the API Documentation (see sections :ref:`ref-regression-models`, :ref:`ref-classification-models` and :ref:`ref-time-series-models`) can be used instead of ``CustomRegressor``. 
+And read section **Examples** in the Help page displayed. Any other class name from the API Documentation (see sections :ref:`ref-regression-models`, :ref:`ref-classification-models` and :ref:`ref-time-series-models`) can be used instead of ``CustomRegressor``. 
 
 
 Example 1 (one layer)
@@ -121,4 +121,4 @@ In this **second example**, the model created has **three hidden layers** and is
 	# RMSE score on test set
 	print(np.sqrt(layer3_regr.score(X[index_test,:], y[index_test])))
 
-The entire **API documentation is presented in the next section**. You can also refer to Indices and tables in the homepage, or use the search feature. 
+Next section presents the entire **API documentation**. You can also refer to section Indices and tables in the homepage :ref:`ref-homepage`, or use the search feature. 

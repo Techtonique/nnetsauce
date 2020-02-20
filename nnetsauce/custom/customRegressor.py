@@ -1,4 +1,3 @@
-"""Custom model"""
 
 # Authors: Thierry Moudiki
 #
@@ -12,7 +11,7 @@ from sklearn.base import RegressorMixin
 
 
 class CustomRegressor(Custom, RegressorMixin):
-    """Custom Regression model class derived from class Custom
+    """Custom Regression model 
     
        Parameters
        ----------
@@ -164,7 +163,28 @@ class CustomRegressor(Custom, RegressorMixin):
         )
 
     def score(self, X, y, scoring=None, **kwargs):
-        """ Score the model on test set covariates X and response y. """
+        """ Score the model on test set features X and response y. 
+
+        Parameters
+        ----------
+        X: {array-like}, shape = [n_samples, n_features]
+            Training vectors, where n_samples is the number 
+            of samples and n_features is the number of features
+
+        y: array-like, shape = [n_samples]
+            Target values
+
+        scoring: str
+            must be in ('explained_variance', 'neg_mean_absolute_error', \
+                        'neg_mean_squared_error', 'neg_mean_squared_log_error', \
+                        'neg_median_absolute_error', 'r2')
+        
+        **kwargs: additional parameters to be passed to scoring functions
+               
+        Returns
+        -------
+        model scores: {array-like}
+        """
 
         preds = self.predict(X)
 

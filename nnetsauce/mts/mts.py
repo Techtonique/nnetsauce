@@ -1,4 +1,3 @@
-"""MTS model"""
 
 # Authors: Thierry Moudiki
 #
@@ -38,11 +37,9 @@ class MTS(Base):
            regularization parameter; (random) percentage of nodes dropped out 
            of the training
        direct_link: boolean
-           indicates if the original predictors are included (True) in model's 
-           fitting or not (False)
+           indicates if the original predictors are included (True) in model's fitting or not (False)
        n_clusters: int
-           number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
-               no clustering)
+           number of clusters for 'kmeans' or 'gmm' clustering (could be 0: no clustering)
        cluster_encode: bool
            defines how the variable containing clusters is treated (default is one-hot)
            if `False`, then labels are used, without one-hot encoding
@@ -58,7 +55,7 @@ class MTS(Base):
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
        lags: int
-           number of lags for the time series 
+           number of lags used for each time series 
     """
 
     # construct the object -----
@@ -113,13 +110,13 @@ class MTS(Base):
         self.row_sample = 1
 
     def fit(self, X, xreg=None, **kwargs):
-        """Fit MTS model to training data (X, y).
+        """Fit MTS model to training data X, with optional regressors xreg
         
         Parameters
         ----------
         X: {array-like}, shape = [n_samples, n_features]
             Training time series, where n_samples is the number 
-            of samples and n_features is the number of features.
+            of samples and n_features is the number of features;
             X must be in increasing order (most recent observations last)
         xreg: {array-like}, shape = [n_samples, n_features_xreg]
               Additional regressors to be passed to obj
@@ -186,7 +183,7 @@ class MTS(Base):
         return self
 
     def predict(self, h=5, level=95, new_xreg=None, **kwargs):
-        """Predict on horizon h.
+        """Forecast all the time series, h steps ahead
         
         Parameters
         ----------

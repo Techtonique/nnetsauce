@@ -64,13 +64,13 @@ The complete __API documentation__ is available [online](#), and you can read bl
 
 ## Quick start
 
-We present Python examples of use of `CustomRegressor` and  `CustomClassifier`, and an example of Multivariate Time Series `MTS` forecasting. Multiple examples of use can also be found in [demo](/nnetsauce/demo) (notebooks), and [examples](/examples) (flat files); where you can contribute yours too. __For R examples__, you can type the following command in R console:
+We present Python examples of use of `CustomRegressor` and  `CustomClassifier`, and an example of Multivariate Time Series `MTS` forecasting. Multiple examples of use can also be found in [demo](/nnetsauce/demo) (notebooks), and [examples](/examples) (flat files); where you can contribute yours too with the following naming convention:  `yourgithubname_ddmmyy_shortdescriptionofdemo.[py|ipynb|R|Rmd]`. __For R examples__, you can type the following command in R console:
 
 ```r
 help("CustomRegressor")
 ```
 
-And read the __Examples__ section in the Help page displayed (any other class name from the [__API documentation__](#) can be used instead of `CustomRegressor`). 
+And read section __Examples__ in the Help page displayed (any other class name from the [__API documentation__](#) can be used instead of `CustomRegressor`). 
 
 We start by importing the packages and datasets necessary for our demo:
 

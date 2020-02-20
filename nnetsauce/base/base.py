@@ -1,4 +1,3 @@
-"""Base class."""
 
 # Authors: Thierry Moudiki
 #
@@ -19,9 +18,9 @@ from ..simulation import rowsubsampling as rs
 
 
 class Base(BaseEstimator):
-    """Base model with direct link and nonlinear activation.
+    """Base model from which all the other classes inherit. Contains mainly data preprocessing methods. 
         
-       Parameters
+       Attributes
        ----------
        n_hidden_features: int
            number of nodes in the hidden layer
@@ -30,7 +29,7 @@ class Base(BaseEstimator):
        a: float
            hyperparameter for 'prelu' or 'elu' activation function
        nodes_sim: str
-           type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+           type of simulation for hidden layer nodes: 'sobol', 'hammersley', 'halton', 
            'uniform'
        bias: boolean
            indicates if the hidden layer contains a bias term (True) or 
@@ -39,13 +38,13 @@ class Base(BaseEstimator):
            regularization parameter; (random) percentage of nodes dropped out 
            of the training
        direct_link: boolean
-           indicates if the original predictors are included (True) in model's 
+           indicates if the original features are included (True) in model's 
            fitting or not (False)
        n_clusters: int
            number of clusters for type_clust='kmeans' or type_clust='gmm' 
            clustering (could be 0: no clustering)
        cluster_encode: bool
-           defines how the variable containing clusters is treated (default is one-hot)
+           defines how the variable containing clusters is treated (default is one-hot);
            if `False`, then labels are used, without one-hot encoding
        type_clust: str
            type of clustering method: currently k-means ('kmeans') or Gaussian 
@@ -55,7 +54,7 @@ class Base(BaseEstimator):
            (and when relevant). 
            Currently available: standardization ('std') or MinMax scaling ('minmax')
        col_sample: float
-           percentage of covariates randomly chosen for training    
+           percentage of features randomly chosen for training
        row_sample: float
            percentage of rows chosen for training, by stratified bootstrapping    
        seed: int 
@@ -154,7 +153,7 @@ class Base(BaseEstimator):
     # "preprocessing" methods to be inherited -----
 
     def encode_clusters(self, X=None, predict=False, **kwargs):  #
-        """ Create new covariates with kmeans or GMM clustering. 
+        """ Create new covariates with kmeans or GMM clustering 
 
         Parameters
         ----------
@@ -171,7 +170,7 @@ class Base(BaseEstimator):
             
         Returns
         -------
-        clusters' matrix, one-hot encoded: {array-like}        
+        Clusters' matrix, one-hot encoded: {array-like}        
         """
 
         if X is None:
@@ -228,7 +227,22 @@ class Base(BaseEstimator):
         return X_clustered
 
     def create_layer(self, scaled_X, W=None):
-        """ Create hidden layer. """
+        """ Create hidden layer. 
+        
+        Parameters
+        ----------
+        scaled_X: {array-like}, shape = [n_samples, n_features]
+            Training vectors, where n_samples is the number 
+            of samples and n_features is the number of features
+        
+        W: {array-like}, shape = [n_features, hidden_features]
+            if provided, constructs the hidden layer with W; otherwise computed internally
+            
+        Returns
+        -------
+        Hidden layer matrix: {array-like}        
+
+        """        
 
         n_features = scaled_X.shape[1]
 
@@ -348,7 +362,25 @@ class Base(BaseEstimator):
         )
 
     def cook_training_set(self, y=None, X=None, W=None, **kwargs):
-        """ Create new data for training set, with hidden layer, center the response. """
+        """ Create new hidden features for training set, with hidden layer, center the response. 
+
+        Parameters
+        ----------
+        y: array-like, shape = [n_samples]
+               Target values
+
+        X: {array-like}, shape = [n_samples, n_features]
+            Training vectors, where n_samples is the number 
+            of samples and n_features is the number of features                
+        
+        W: {array-like}, shape = [n_features, hidden_features]
+            if provided, constructs the hidden layer via W
+            
+        Returns
+        -------
+        (centered response, direct link + hidden layer matrix): {tuple}
+
+        """        
 
         # either X and y are stored or not
         # assert ((y is None) & (X is None)) | ((y is not None) & (X is not None))
@@ -517,7 +549,20 @@ class Base(BaseEstimator):
         return (y, self.scaler.transform(Z))
 
     def cook_test_set(self, X, **kwargs):
-        """ Transform data from test set, with hidden layer. """
+        """ Transform data from test set, with hidden layer. 
+        
+        Parameters
+        ----------
+        X: {array-like}, shape = [n_samples, n_features]
+            Training vectors, where n_samples is the number 
+            of samples and n_features is the number of features
+        
+        **kwargs: additional parameters to be passed to self.encode_cluster
+               
+        Returns
+        -------
+        Transformed test set : {array-like}        
+        """        
 
         if (
             self.n_clusters == 0

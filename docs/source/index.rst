@@ -1,3 +1,5 @@
+.. _ref-homepage:
+
 nnetsauce's documentation
 =========================================
 
@@ -23,7 +25,7 @@ nnetsauce's documentation
 - **b** is an optional bias parameter.
 - **g** is an *activation function* such as the hyperbolic tangent or the sigmoid function, that renders the combination of explanatory variables  -- through **W** -- nonlinear. 
 
-`nnetsauce`'s **source code** is `available on GitHub <https://github.com/thierrymoudiki/nnetsauce>`_. You can also read blog posts about `nnetsauce` `here <https://thierrymoudiki.github.io/blog/#QuasiRandomizedNN>`_.
+`nnetsauce`'s **source code** is `available on GitHub <https://github.com/thierrymoudiki/nnetsauce>`_. You can read blog posts about `nnetsauce` `here <https://thierrymoudiki.github.io/blog/#QuasiRandomizedNN>`_, and for current references, consult section :ref:`ref-references`. 
 
 .. toctree::
    :maxdepth: 1
@@ -36,6 +38,7 @@ nnetsauce's documentation
    :maxdepth: 1
    :caption: API Documentation
 
+   APIDocumentation/Base model
    APIDocumentation/Regression models
    APIDocumentation/Classification models
    APIDocumentation/Time series models
