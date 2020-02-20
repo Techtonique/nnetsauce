@@ -1,4 +1,3 @@
-
 # Authors: Thierry Moudiki
 #
 # License: BSD 3
@@ -121,8 +120,8 @@ class MtaskClassifier(Base, ClassifierMixin):
         -------
         self: object
         """
-        
-        assert mx.is_factor(y), "y must contain only integers"                
+
+        assert mx.is_factor(y), "y must contain only integers"
 
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
@@ -130,15 +129,15 @@ class MtaskClassifier(Base, ClassifierMixin):
 
         # multitask response
         Y = mo.one_hot_encode2(output_y, self.n_classes)
-        
+
         # if sample_weight is None:
         for i in range(self.n_classes):
-            
+
             self.fit_objs[i] = pickle.loads(
-                pickle.dumps(self.obj.fit(scaled_Z, Y[:,i], **kwargs), -1))
+                pickle.dumps(self.obj.fit(scaled_Z, Y[:, i], **kwargs), -1)
+            )
 
         return self
-
 
     def predict(self, X, **kwargs):
         """Predict test data X.
@@ -159,7 +158,6 @@ class MtaskClassifier(Base, ClassifierMixin):
 
         return np.argmax(self.predict_proba(X, **kwargs), axis=1)
 
-
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
         
@@ -176,40 +174,39 @@ class MtaskClassifier(Base, ClassifierMixin):
         -------
         probability estimates for test data: {array-like}        
         """
-        
+
         shape_X = X.shape
-        
+
         probs = np.zeros((shape_X[0], self.n_classes))
-        
+
         if len(shape_X) == 1:
-    
+
             n_features = shape_X[0]
-            
+
             new_X = mo.rbind(
-                    X.reshape(1, n_features),
-                    np.ones(n_features).reshape(1, n_features),
-                )
-    
+                X.reshape(1, n_features),
+                np.ones(n_features).reshape(1, n_features),
+            )
+
             Z = self.cook_test_set(new_X, **kwargs)
-            
-            # loop on all the classes         
+
+            # loop on all the classes
             for i in range(self.n_classes):
-                
+
                 probs[:, i] = self.fit_objs[i].predict(Z, **kwargs)[0]
-    
+
         else:
-    
-            Z = self.cook_test_set(X, **kwargs)                                                                
-            
-            # loop on all the classes         
+
+            Z = self.cook_test_set(X, **kwargs)
+
+            # loop on all the classes
             for i in range(self.n_classes):
-                
+
                 probs[:, i] = self.fit_objs[i].predict(Z, **kwargs)
-        
-        expit_raw_probs = expit(probs)                  
-        
+
+        expit_raw_probs = expit(probs)
+
         return expit_raw_probs / expit_raw_probs.sum(axis=1)[:, None]
-    
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 

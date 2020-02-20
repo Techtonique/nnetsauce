@@ -11,6 +11,7 @@ Subpackages
    nnetsauce.custom
    nnetsauce.demo
    nnetsauce.mts
+   nnetsauce.multitask
    nnetsauce.randombag
    nnetsauce.ridge2
    nnetsauce.rvfl

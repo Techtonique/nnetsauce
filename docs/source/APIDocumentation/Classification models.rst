@@ -22,6 +22,14 @@ CustomClassifier
    :undoc-members:
 
 
+MtaskClassifier
+------------------------------------------
+
+.. automodule:: nnetsauce.multitask.mtaskClassifier
+   :members:
+   :undoc-members:
+
+
 RandomBagClassifier
 --------------------
 
