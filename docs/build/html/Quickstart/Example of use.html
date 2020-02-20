@@ -1,0 +1,344 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Example of use &mdash; nnetsauce 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Base model" href="../APIDocumentation/Base model.html" />
+    <link rel="prev" title="Installation" href="Installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> nnetsauce
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Quickstart</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Example of use</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#example-1-one-layer">Example 1 (one layer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-2-three-layers">Example 2 (three layers)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../APIDocumentation/Base model.html">Base model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../APIDocumentation/Regression models.html">Regression models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../APIDocumentation/Classification models.html">Classification models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../APIDocumentation/Time series models.html">Time series models</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Contributing/Guidelines.html">Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contributing/Testing.html">Testing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Citing nnetsauce</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Citation.html">Citation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">License</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../References/References.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">nnetsauce</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Example of use</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/Quickstart/Example of use.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="example-of-use">
+<h1>Example of use<a class="headerlink" href="#example-of-use" title="Permalink to this headline">¶</a></h1>
+<p>In these examples, we use <cite>nnetsauce</cite> classes  <code class="docutils literal notranslate"><span class="pre">CustomRegressor</span></code> and <code class="docutils literal notranslate"><span class="pre">CustomClassifier</span></code> in Python, to create new models with <strong>one hidden layer</strong> and <strong>three hidden layers</strong>. There are more examples <a class="reference external" href="https://github.com/thierrymoudiki/nnetsauce/tree/master/nnetsauce/demo">in these notebooks</a> or <a class="reference external" href="https://github.com/thierrymoudiki/nnetsauce/tree/master/examples">this directory</a>; feel free to contribute yours in there too, with the following naming convention:  <code class="docutils literal notranslate"><span class="pre">yourgithubname_ddmmyy_shortdescriptionofdemo.[py|ipynb|R|Rmd]</span></code>. For <strong>R examples</strong>, you can type the following commands in R console:</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1"># CustomRegressor is a nnetsauce class</span>
+<span class="nf">help</span><span class="p">(</span><span class="s">&quot;CustomRegressor&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And read section <strong>Examples</strong> in the Help page displayed. Any other class name from the API Documentation (see sections <a class="reference internal" href="../APIDocumentation/Regression models.html#ref-regression-models"><span class="std std-ref">Regression models</span></a>, <a class="reference internal" href="../APIDocumentation/Classification models.html#ref-classification-models"><span class="std std-ref">Classification models</span></a> and <a class="reference internal" href="../APIDocumentation/Time series models.html#ref-time-series-models"><span class="std std-ref">Time series models</span></a>) can be used instead of <code class="docutils literal notranslate"><span class="pre">CustomRegressor</span></code>.</p>
+<div class="section" id="example-1-one-layer">
+<h2>Example 1 (one layer)<a class="headerlink" href="#example-1-one-layer" title="Permalink to this headline">¶</a></h2>
+<p>In this <strong>first example</strong>, the models created all have one layer, and  are respectively based on Bayesian Ridge regression, Elastic Net regression, and a Gaussian Process Classifier. We start by installing <cite>sklearn</cite> at the command line – though <cite>nnetsauce</cite> will work with any object having methods <code class="docutils literal notranslate"><span class="pre">fit</span></code> and <code class="docutils literal notranslate"><span class="pre">predict</span></code> :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install sklearn</span>
+</pre></div>
+</div>
+<p>Now, we can use <cite>nnetsauce</cite> to add <strong>one hidden layer</strong> to these models:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nnetsauce</span> <span class="kn">as</span> <span class="nn">ns</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">metrics</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">linear_model</span><span class="p">,</span> <span class="n">gaussian_process</span>
+
+<span class="c1"># load datasets</span>
+<span class="n">diabetes</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_diabetes</span><span class="p">()</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">diabetes</span><span class="o">.</span><span class="n">data</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">diabetes</span><span class="o">.</span><span class="n">target</span>
+
+<span class="n">breast_cancer</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_breast_cancer</span><span class="p">()</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">breast_cancer</span><span class="o">.</span><span class="n">data</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">breast_cancer</span><span class="o">.</span><span class="n">target</span>
+
+<span class="c1"># Base models for nnetsauce&#39;s Custom class</span>
+<span class="n">regr</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">BayesianRidge</span><span class="p">()</span>
+<span class="n">regr2</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">ElasticNet</span><span class="p">()</span>
+<span class="n">regr3</span> <span class="o">=</span> <span class="n">gaussian_process</span><span class="o">.</span><span class="n">GaussianProcessClassifier</span><span class="p">()</span>
+
+<span class="c1"># create object Custom</span>
+<span class="n">fit_obj</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">CustomRegressor</span><span class="p">(</span><span class="n">obj</span><span class="o">=</span><span class="n">regr</span><span class="p">,</span> <span class="n">n_hidden_features</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                    <span class="n">direct_link</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                    <span class="n">activation_name</span><span class="o">=</span><span class="s1">&#39;tanh&#39;</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">fit_obj2</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">CustomRegressor</span><span class="p">(</span><span class="n">obj</span><span class="o">=</span><span class="n">regr2</span><span class="p">,</span> <span class="n">n_hidden_features</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                    <span class="n">direct_link</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                    <span class="n">activation_name</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">fit_obj3</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">CustomClassifier</span><span class="p">(</span><span class="n">obj</span> <span class="o">=</span> <span class="n">regr3</span><span class="p">,</span> <span class="n">n_hidden_features</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                    <span class="n">direct_link</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                    <span class="n">activation_name</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># fit model 1 on training set</span>
+<span class="n">index_train_1</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">350</span><span class="p">)</span>
+<span class="n">index_test_1</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">350</span><span class="p">,</span> <span class="mi">442</span><span class="p">)</span>
+<span class="n">fit_obj</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">index_train_1</span><span class="p">,:],</span> <span class="n">y</span><span class="p">[</span><span class="n">index_train_1</span><span class="p">])</span>
+
+<span class="c1"># predict on test set</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fit_obj</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">index_test_1</span><span class="p">,:]))</span>
+
+<span class="c1"># fit model 2 on training set</span>
+<span class="n">fit_obj2</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">index_train_1</span><span class="p">,:],</span> <span class="n">y</span><span class="p">[</span><span class="n">index_train_1</span><span class="p">])</span>
+
+<span class="c1"># predict on test set</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fit_obj2</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">index_test_1</span><span class="p">,:]))</span>
+
+<span class="c1"># fit model 3 on training set</span>
+<span class="n">index_train_2</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">455</span><span class="p">)</span>
+<span class="n">index_test_2</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">455</span><span class="p">,</span> <span class="mi">569</span><span class="p">)</span>
+<span class="n">fit_obj3</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">index_train_2</span><span class="p">,:],</span> <span class="n">t</span><span class="p">[</span><span class="n">index_train_2</span><span class="p">])</span>
+
+<span class="c1"># accuracy on test set</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fit_obj3</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">index_test_2</span><span class="p">,:],</span> <span class="n">t</span><span class="p">[</span><span class="n">index_test_2</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-2-three-layers">
+<h2>Example 2 (three layers)<a class="headerlink" href="#example-2-three-layers" title="Permalink to this headline">¶</a></h2>
+<p>In this <strong>second example</strong>, the model created has <strong>three hidden layers</strong> and is based on Bayesian Ridge regression:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">index_train</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">index_test</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">125</span><span class="p">)</span>
+
+<span class="c1"># layer 1 (base layer) ----</span>
+<span class="n">layer1_regr</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">BayesianRidge</span><span class="p">()</span>
+<span class="n">layer1_regr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">index_train</span><span class="p">,:],</span> <span class="n">y</span><span class="p">[</span><span class="n">index_train</span><span class="p">])</span>
+
+<span class="c1"># RMSE score on test set</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">index_test</span><span class="p">],</span> <span class="n">layer1_regr</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">index_test</span><span class="p">,:]))))</span>
+
+
+<span class="c1"># layer 2 using layer 1 ----</span>
+<span class="n">layer2_regr</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">CustomRegressor</span><span class="p">(</span><span class="n">obj</span> <span class="o">=</span> <span class="n">layer1_regr</span><span class="p">,</span> <span class="n">n_hidden_features</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                        <span class="n">direct_link</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                        <span class="n">nodes_sim</span><span class="o">=</span><span class="s1">&#39;sobol&#39;</span><span class="p">,</span> <span class="n">activation_name</span><span class="o">=</span><span class="s1">&#39;tanh&#39;</span><span class="p">,</span>
+                        <span class="n">n_clusters</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">layer2_regr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">index_train</span><span class="p">,:],</span> <span class="n">y</span><span class="p">[</span><span class="n">index_train</span><span class="p">])</span>
+
+<span class="c1"># RMSE score on test set</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">layer2_regr</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">index_test</span><span class="p">,:],</span> <span class="n">y</span><span class="p">[</span><span class="n">index_test</span><span class="p">])))</span>
+
+<span class="c1"># layer 3 using layer 2 ----</span>
+<span class="n">layer3_regr</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">CustomRegressor</span><span class="p">(</span><span class="n">obj</span> <span class="o">=</span> <span class="n">layer2_regr</span><span class="p">,</span> <span class="n">n_hidden_features</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                        <span class="n">direct_link</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                        <span class="n">nodes_sim</span><span class="o">=</span><span class="s1">&#39;hammersley&#39;</span><span class="p">,</span> <span class="n">activation_name</span><span class="o">=</span><span class="s1">&#39;sigmoid&#39;</span><span class="p">,</span>
+                        <span class="n">n_clusters</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">layer3_regr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">index_test</span><span class="p">,:],</span> <span class="n">y</span><span class="p">[</span><span class="n">index_test</span><span class="p">])</span>
+
+<span class="c1"># RMSE score on test set</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">layer3_regr</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">index_test</span><span class="p">,:],</span> <span class="n">y</span><span class="p">[</span><span class="n">index_test</span><span class="p">])))</span>
+</pre></div>
+</div>
+<p>Next section presents the entire <strong>API documentation</strong>. You can also refer to section Indices and tables in the homepage <a class="reference internal" href="../index.html#ref-homepage"><span class="std std-ref">nnetsauce’s documentation</span></a>, or use the search feature.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../APIDocumentation/Base model.html" class="btn btn-neutral float-right" title="Base model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="Installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Thierry Moudiki
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
