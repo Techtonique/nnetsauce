@@ -1,0 +1,515 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>nnetsauce.randombag package &mdash; nnetsauce 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> nnetsauce
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Quickstart/Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Quickstart/Example of use.html">Example of use</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="APIDocumentation/Base model.html">Base model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="APIDocumentation/Regression models.html">Regression models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="APIDocumentation/Classification models.html">Classification models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="APIDocumentation/Time series models.html">Time series models</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Contributing/Guidelines.html">Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contributing/Testing.html">Testing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Citing nnetsauce</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Citation.html">Citation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">License</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="References/References.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">nnetsauce</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>nnetsauce.randombag package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/nnetsauce.randombag.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="nnetsauce-randombag-package">
+<h1>nnetsauce.randombag package<a class="headerlink" href="#nnetsauce-randombag-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-nnetsauce.randombag.bag">
+<span id="nnetsauce-randombag-bag-module"></span><h2>nnetsauce.randombag.bag module<a class="headerlink" href="#module-nnetsauce.randombag.bag" title="Permalink to this headline">¶</a></h2>
+<p>RandomBag model</p>
+<dl class="class">
+<dt id="nnetsauce.randombag.bag.RandomBag">
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.randombag.bag.</code><code class="sig-name descname">RandomBag</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_estimators=10</em>, <em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.randombag.bag.RandomBag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="nnetsauce.base.html#nnetsauce.base.base.Base" title="nnetsauce.base.base.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">nnetsauce.base.base.Base</span></code></a></p>
+<p>RandomBag model class derived from class Base</p>
+<dl class="simple">
+<dt>obj: object</dt><dd><p>any object containing a method fit (obj.fit()) and a method predict 
+(obj.predict())</p>
+</dd>
+<dt>n_estimators: int</dt><dd><p>number of estimators</p>
+</dd>
+<dt>n_hidden_features: int</dt><dd><p>number of nodes in the hidden layer</p>
+</dd>
+<dt>activation_name: str</dt><dd><p>activation function: ‘relu’, ‘tanh’, ‘sigmoid’, ‘prelu’ or ‘elu’</p>
+</dd>
+<dt>a: float</dt><dd><p>hyperparameter for ‘prelu’ or ‘elu’ activation function</p>
+</dd>
+<dt>nodes_sim: str</dt><dd><p>type of simulation for the nodes: ‘sobol’, ‘hammersley’, ‘halton’, 
+‘uniform’</p>
+</dd>
+<dt>bias: boolean</dt><dd><p>indicates if the hidden layer contains a bias term (True) or not 
+(False)</p>
+</dd>
+<dt>dropout: float</dt><dd><p>regularization parameter; (random) percentage of nodes dropped out 
+of the training</p>
+</dd>
+<dt>direct_link: boolean</dt><dd><p>indicates if the original predictors are included (True) in model’s 
+fitting or not (False)</p>
+</dd>
+<dt>n_clusters: int</dt><dd><dl class="simple">
+<dt>number of clusters for ‘kmeans’ or ‘gmm’ clustering (could be 0: </dt><dd><p>no clustering)</p>
+</dd>
+</dl>
+</dd>
+<dt>cluster_encode: bool</dt><dd><p>defines how the variable containing clusters is treated (default is one-hot)
+if <cite>False</cite>, then labels are used, without one-hot encoding</p>
+</dd>
+<dt>type_clust: str</dt><dd><p>type of clustering method: currently k-means (‘kmeans’) or Gaussian 
+Mixture Model (‘gmm’)</p>
+</dd>
+<dt>type_scaling: a tuple of 3 strings</dt><dd><p>scaling methods for inputs, hidden layer, and clustering respectively
+(and when relevant). 
+Currently available: standardization (‘std’) or MinMax scaling (‘minmax’)</p>
+</dd>
+<dt>col_sample: float</dt><dd><p>percentage of covariates randomly chosen for training</p>
+</dd>
+<dt>row_sample: float</dt><dd><p>percentage of rows chosen for training, by stratified bootstrapping</p>
+</dd>
+<dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-nnetsauce.randombag.randomBagClassifier">
+<span id="nnetsauce-randombag-randombagclassifier-module"></span><h2>nnetsauce.randombag.randomBagClassifier module<a class="headerlink" href="#module-nnetsauce.randombag.randomBagClassifier" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="nnetsauce.randombag.randomBagClassifier.RandomBagClassifier">
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.randombag.randomBagClassifier.</code><code class="sig-name descname">RandomBagClassifier</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_estimators=10</em>, <em class="sig-param">n_hidden_features=1</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=False</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">n_jobs=None</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">verbose=1</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.randombag.randomBagClassifier.RandomBagClassifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nnetsauce.randombag.bag.RandomBag" title="nnetsauce.randombag.bag.RandomBag"><code class="xref py py-class docutils literal notranslate"><span class="pre">nnetsauce.randombag.bag.RandomBag</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.ClassifierMixin</span></code></p>
+<p>Randomized ‘Bagging’ Classification model</p>
+<dl class="simple">
+<dt>obj: object</dt><dd><p>any object containing a method fit (obj.fit()) and a method predict 
+(obj.predict())</p>
+</dd>
+<dt>n_estimators: int</dt><dd><p>number of boosting iterations</p>
+</dd>
+<dt>n_hidden_features: int</dt><dd><p>number of nodes in the hidden layer</p>
+</dd>
+<dt>activation_name: str</dt><dd><p>activation function: ‘relu’, ‘tanh’, ‘sigmoid’, ‘prelu’ or ‘elu’</p>
+</dd>
+<dt>a: float</dt><dd><p>hyperparameter for ‘prelu’ or ‘elu’ activation function</p>
+</dd>
+<dt>nodes_sim: str</dt><dd><p>type of simulation for the nodes: ‘sobol’, ‘hammersley’, ‘halton’, 
+‘uniform’</p>
+</dd>
+<dt>bias: boolean</dt><dd><p>indicates if the hidden layer contains a bias term (True) or not 
+(False)</p>
+</dd>
+<dt>dropout: float</dt><dd><p>regularization parameter; (random) percentage of nodes dropped out 
+of the training</p>
+</dd>
+<dt>direct_link: boolean</dt><dd><p>indicates if the original predictors are included (True) in model’s 
+fitting or not (False)</p>
+</dd>
+<dt>n_clusters: int</dt><dd><dl class="simple">
+<dt>number of clusters for ‘kmeans’ or ‘gmm’ clustering (could be 0: </dt><dd><p>no clustering)</p>
+</dd>
+</dl>
+</dd>
+<dt>cluster_encode: bool</dt><dd><p>defines how the variable containing clusters is treated (default is one-hot)
+if <cite>False</cite>, then labels are used, without one-hot encoding</p>
+</dd>
+<dt>type_clust: str</dt><dd><p>type of clustering method: currently k-means (‘kmeans’) or Gaussian 
+Mixture Model (‘gmm’)</p>
+</dd>
+<dt>type_scaling: a tuple of 3 strings</dt><dd><p>scaling methods for inputs, hidden layer, and clustering respectively
+(and when relevant). 
+Currently available: standardization (‘std’) or MinMax scaling (‘minmax’)</p>
+</dd>
+<dt>col_sample: float</dt><dd><p>percentage of covariates randomly chosen for training</p>
+</dd>
+<dt>row_sample: float</dt><dd><p>percentage of rows chosen for training, by stratified bootstrapping</p>
+</dd>
+<dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="nnetsauce.randombag.randomBagClassifier.RandomBagClassifier.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.randombag.randomBagClassifier.RandomBagClassifier.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit Random ‘Forest’ model to training data (X, y).</p>
+<dl class="simple">
+<dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
+of samples and n_features is the number of features.</p>
+</dd>
+<dt>y: array-like, shape = [n_samples]</dt><dd><p>Target values.</p>
+</dd>
+<dt><a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set or self.obj.fit</p>
+</dd>
+</dl>
+<p>self: object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nnetsauce.randombag.randomBagClassifier.RandomBagClassifier.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">weights=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.randombag.randomBagClassifier.RandomBagClassifier.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict test data X.</p>
+<dl class="simple">
+<dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
+of samples and n_features is the number of features.</p>
+</dd>
+<dt><a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
+</dd>
+</dl>
+<p>model predictions: {array-like}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nnetsauce.randombag.randomBagClassifier.RandomBagClassifier.predict_proba">
+<code class="sig-name descname">predict_proba</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">weights=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.randombag.randomBagClassifier.RandomBagClassifier.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict probabilities for test data X.</p>
+<dl class="simple">
+<dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
+of samples and n_features is the number of features.</p>
+</dd>
+<dt><a href="#id5"><span class="problematic" id="id6">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
+</dd>
+</dl>
+<p>probability estimates for test data: {array-like}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nnetsauce.randombag.randomBagClassifier.RandomBagClassifier.score">
+<code class="sig-name descname">score</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">weights=None</em>, <em class="sig-param">scoring=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.randombag.randomBagClassifier.RandomBagClassifier.score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Score the model on test set features X and response y.</p>
+<dl class="simple">
+<dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
+of samples and n_features is the number of features</p>
+</dd>
+<dt>y: array-like, shape = [n_samples]</dt><dd><p>Target values</p>
+</dd>
+<dt>scoring: str</dt><dd><p>must be in (‘explained_variance’, ‘neg_mean_absolute_error’,                         ‘neg_mean_squared_error’, ‘neg_mean_squared_log_error’,                         ‘neg_median_absolute_error’, ‘r2’)</p>
+</dd>
+</dl>
+<p><a href="#id7"><span class="problematic" id="id8">**</span></a>kwargs: additional parameters to be passed to scoring functions</p>
+<p>model scores: {array-like}</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-nnetsauce.randombag">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-nnetsauce.randombag" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="nnetsauce.randombag.RandomBagClassifier">
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.randombag.</code><code class="sig-name descname">RandomBagClassifier</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_estimators=10</em>, <em class="sig-param">n_hidden_features=1</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=False</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">n_jobs=None</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">verbose=1</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.randombag.RandomBagClassifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nnetsauce.randombag.bag.RandomBag" title="nnetsauce.randombag.bag.RandomBag"><code class="xref py py-class docutils literal notranslate"><span class="pre">nnetsauce.randombag.bag.RandomBag</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.ClassifierMixin</span></code></p>
+<p>Randomized ‘Bagging’ Classification model</p>
+<dl class="simple">
+<dt>obj: object</dt><dd><p>any object containing a method fit (obj.fit()) and a method predict 
+(obj.predict())</p>
+</dd>
+<dt>n_estimators: int</dt><dd><p>number of boosting iterations</p>
+</dd>
+<dt>n_hidden_features: int</dt><dd><p>number of nodes in the hidden layer</p>
+</dd>
+<dt>activation_name: str</dt><dd><p>activation function: ‘relu’, ‘tanh’, ‘sigmoid’, ‘prelu’ or ‘elu’</p>
+</dd>
+<dt>a: float</dt><dd><p>hyperparameter for ‘prelu’ or ‘elu’ activation function</p>
+</dd>
+<dt>nodes_sim: str</dt><dd><p>type of simulation for the nodes: ‘sobol’, ‘hammersley’, ‘halton’, 
+‘uniform’</p>
+</dd>
+<dt>bias: boolean</dt><dd><p>indicates if the hidden layer contains a bias term (True) or not 
+(False)</p>
+</dd>
+<dt>dropout: float</dt><dd><p>regularization parameter; (random) percentage of nodes dropped out 
+of the training</p>
+</dd>
+<dt>direct_link: boolean</dt><dd><p>indicates if the original predictors are included (True) in model’s 
+fitting or not (False)</p>
+</dd>
+<dt>n_clusters: int</dt><dd><dl class="simple">
+<dt>number of clusters for ‘kmeans’ or ‘gmm’ clustering (could be 0: </dt><dd><p>no clustering)</p>
+</dd>
+</dl>
+</dd>
+<dt>cluster_encode: bool</dt><dd><p>defines how the variable containing clusters is treated (default is one-hot)
+if <cite>False</cite>, then labels are used, without one-hot encoding</p>
+</dd>
+<dt>type_clust: str</dt><dd><p>type of clustering method: currently k-means (‘kmeans’) or Gaussian 
+Mixture Model (‘gmm’)</p>
+</dd>
+<dt>type_scaling: a tuple of 3 strings</dt><dd><p>scaling methods for inputs, hidden layer, and clustering respectively
+(and when relevant). 
+Currently available: standardization (‘std’) or MinMax scaling (‘minmax’)</p>
+</dd>
+<dt>col_sample: float</dt><dd><p>percentage of covariates randomly chosen for training</p>
+</dd>
+<dt>row_sample: float</dt><dd><p>percentage of rows chosen for training, by stratified bootstrapping</p>
+</dd>
+<dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="nnetsauce.randombag.RandomBagClassifier.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.randombag.RandomBagClassifier.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit Random ‘Forest’ model to training data (X, y).</p>
+<dl class="simple">
+<dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
+of samples and n_features is the number of features.</p>
+</dd>
+<dt>y: array-like, shape = [n_samples]</dt><dd><p>Target values.</p>
+</dd>
+<dt><a href="#id9"><span class="problematic" id="id10">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set or self.obj.fit</p>
+</dd>
+</dl>
+<p>self: object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nnetsauce.randombag.RandomBagClassifier.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">weights=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.randombag.RandomBagClassifier.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict test data X.</p>
+<dl class="simple">
+<dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
+of samples and n_features is the number of features.</p>
+</dd>
+<dt><a href="#id11"><span class="problematic" id="id12">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
+</dd>
+</dl>
+<p>model predictions: {array-like}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nnetsauce.randombag.RandomBagClassifier.predict_proba">
+<code class="sig-name descname">predict_proba</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">weights=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.randombag.RandomBagClassifier.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict probabilities for test data X.</p>
+<dl class="simple">
+<dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
+of samples and n_features is the number of features.</p>
+</dd>
+<dt><a href="#id13"><span class="problematic" id="id14">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
+</dd>
+</dl>
+<p>probability estimates for test data: {array-like}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nnetsauce.randombag.RandomBagClassifier.score">
+<code class="sig-name descname">score</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">weights=None</em>, <em class="sig-param">scoring=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.randombag.RandomBagClassifier.score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Score the model on test set features X and response y.</p>
+<dl class="simple">
+<dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
+of samples and n_features is the number of features</p>
+</dd>
+<dt>y: array-like, shape = [n_samples]</dt><dd><p>Target values</p>
+</dd>
+<dt>scoring: str</dt><dd><p>must be in (‘explained_variance’, ‘neg_mean_absolute_error’,                         ‘neg_mean_squared_error’, ‘neg_mean_squared_log_error’,                         ‘neg_median_absolute_error’, ‘r2’)</p>
+</dd>
+</dl>
+<p><a href="#id15"><span class="problematic" id="id16">**</span></a>kwargs: additional parameters to be passed to scoring functions</p>
+<p>model scores: {array-like}</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Thierry Moudiki
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
