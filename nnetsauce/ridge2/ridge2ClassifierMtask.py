@@ -1,4 +1,3 @@
-"""Ridge model for regression"""
 
 # Authors: Thierry Moudiki
 #
@@ -16,7 +15,7 @@ from scipy.linalg import pinv
 
 
 class Ridge2ClassifierMtask(Ridge2, ClassifierMixin):
-    """Ridge regression model class with 2 regularization parameters derived from class Ridge
+    """Multitask Ridge classification with 2 regularization parameters
     
        Parameters
        ----------

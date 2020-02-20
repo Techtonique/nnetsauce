@@ -1,4 +1,3 @@
-"""Random Vector Functional Link Network regression with regularization."""
 
 # Authors: Thierry Moudiki
 #
@@ -14,7 +13,7 @@ from sklearn.base import RegressorMixin
 
 
 class BayesianRVFLRegressor(Base, RegressorMixin):
-    """Bayesian RVFL model class derived from class Base
+    """Bayesian Random Vector Functional Link Network regression with one prior
     
        Parameters
        ----------
@@ -32,7 +31,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
            regularization parameter; (random) percentage of nodes dropped out 
            of the training
        direct_link: boolean
-           indicates if the original predictors are included (True) in model's fitting or not (False)
+           indicates if the original features are included (True) in model's fitting or not (False)
        n_clusters: int
            number of clusters for 'kmeans' or 'gmm' clustering (could be 0: no clustering)
        cluster_encode: bool
@@ -45,7 +44,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
            (and when relevant). 
            Currently available: standardization ('std') or MinMax scaling ('minmax')
        col_sample: float
-           percentage of covariates randomly chosen for training  
+           percentage of features randomly chosen for training  
        row_sample: float
            percentage of rows chosen for training, by stratified bootstrapping    
        seed: int 
@@ -112,7 +111,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
         self.return_std = return_std
 
     def fit(self, X, y, **kwargs):
-        """Fit regularized RVFL to training data (X, y).
+        """Fit BayesianRVFLRegressor to training data (X, y).
         
         Parameters
         ----------
@@ -224,7 +223,28 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
             return (self.y_mean + pred_obj["preds"], pred_obj["preds_std"])
 
     def score(self, X, y, scoring=None, **kwargs):
-        """ Score the model on test set covariates X and response y. """
+        """ Score the model on test set features X and response y. 
+
+        Parameters
+        ----------
+        X: {array-like}, shape = [n_samples, n_features]
+            Training vectors, where n_samples is the number 
+            of samples and n_features is the number of features
+
+        y: array-like, shape = [n_samples]
+            Target values
+
+        scoring: str
+            must be in ('explained_variance', 'neg_mean_absolute_error', \
+                        'neg_mean_squared_error', 'neg_mean_squared_log_error', \
+                        'neg_median_absolute_error', 'r2')
+        
+        **kwargs: additional parameters to be passed to scoring functions
+               
+        Returns
+        -------
+        model scores: {array-like}
+        """
 
         preds = self.predict(X)
 
