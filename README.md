@@ -16,6 +16,7 @@ This package does Statistical/Machine Learning, using advanced combinations of r
  [Tests](#Tests) |
  [Dependencies](#dependencies) |
  [Citing `nnetsauce`](#Citation) |
+ [API Documentation](#api-documentation) |
  [References](#References) |
  [License](#License) 
 
@@ -299,6 +300,10 @@ coverage report -m
 ```bash
 coverage html
 ```
+
+## API Documentation
+
+[https://nnetsauce.readthedocs.io/en/latest/](https://nnetsauce.readthedocs.io/en/latest/)
 
 ## Dependencies 
 
