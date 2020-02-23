@@ -60,7 +60,7 @@ Every model in the `nnetsauce` is based on the component __g(XW + b)__, where:
 - __b__ is an optional bias parameter.
 - __g__ is an _activation function_ such as the hyperbolic tangent or the sigmoid function (among others), that renders the combination of explanatory variables (through __W__) nonlinear.  
 
-The complete __API documentation__ is available [online](#), and you can read blog posts about `nnetsauce` [here](https://thierrymoudiki.github.io/blog/#QuasiRandomizedNN).
+The complete __API documentation__ is available [online](https://nnetsauce.readthedocs.io/), and you can read blog posts about `nnetsauce` [here](https://thierrymoudiki.github.io/blog/#QuasiRandomizedNN).
 
 ## Quick start
 
@@ -70,7 +70,7 @@ We present Python examples of use of `CustomRegressor` and  `CustomClassifier`, 
 help("CustomRegressor")
 ```
 
-And read section __Examples__ in the Help page displayed (any other class name from the [__API documentation__](#) can be used instead of `CustomRegressor`). 
+And read section __Examples__ in the Help page displayed (any other class name from the [__API documentation__](https://nnetsauce.readthedocs.io/) can be used instead of `CustomRegressor`). 
 
 We start by importing the packages and datasets necessary for our demo:
 
