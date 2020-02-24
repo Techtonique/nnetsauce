@@ -21,7 +21,7 @@ nnetsauce.ridge2.ridge2Classifier module
    :show-inheritance:
 
 nnetsauce.ridge2.ridge2MultitaskClassifier module
----------------------------------------------
+-------------------------------------------------
 
 .. automodule:: nnetsauce.ridge2.ridge2MultitaskClassifier
    :members:

@@ -5,9 +5,9 @@ Submodules
 ----------
 
 nnetsauce.multitask.multitaskClassifier module
-------------------------------------------
+----------------------------------------------
 
-.. automodule:: nnetsauce.multitask.mtaskClassifier
+.. automodule:: nnetsauce.multitask.multitaskClassifier
    :members:
    :undoc-members:
    :show-inheritance:
