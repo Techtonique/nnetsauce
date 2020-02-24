@@ -96,10 +96,10 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Classification models</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-nnetsauce.boosting.adaBoostClassifier">AdaBoostClassifier</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-nnetsauce.custom.customClassifier">CustomClassifier</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-nnetsauce.multitask.mtaskClassifier">MtaskClassifier</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-nnetsauce.multitask.multitaskClassifier">MultitaskClassifier</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-nnetsauce.randombag.randomBagClassifier">RandomBagClassifier</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-nnetsauce.ridge2.ridge2Classifier">Ridge2Classifier</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-nnetsauce.ridge2.ridge2ClassifierMtask">Ridge2ClassifierMtask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ridge2multitaskclassifier">Ridge2MultitaskClassifier</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Time series models.html">Time series models</a></li>
@@ -425,11 +425,11 @@ of samples and n_features is the number of features</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-nnetsauce.multitask.mtaskClassifier">
-<span id="mtaskclassifier"></span><h2>MtaskClassifier<a class="headerlink" href="#module-nnetsauce.multitask.mtaskClassifier" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-nnetsauce.multitask.multitaskClassifier">
+<span id="multitaskclassifier"></span><h2>MultitaskClassifier<a class="headerlink" href="#module-nnetsauce.multitask.multitaskClassifier" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="nnetsauce.multitask.mtaskClassifier.MtaskClassifier">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.multitask.mtaskClassifier.</code><code class="sig-name descname">MtaskClassifier</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.multitask.mtaskClassifier.MtaskClassifier" title="Permalink to this definition">¶</a></dt>
+<dt id="nnetsauce.multitask.multitaskClassifier.MultitaskClassifier">
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.multitask.multitaskClassifier.</code><code class="sig-name descname">MultitaskClassifier</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.multitask.multitaskClassifier.MultitaskClassifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Multitask Classification model based on regression models, with shared covariates</p>
 <dl class="simple">
 <dt>obj: object</dt><dd><p>any object (must be a regression model) containing a method fit (obj.fit()) 
@@ -476,9 +476,9 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 </dd>
 </dl>
 <dl class="method">
-<dt id="nnetsauce.multitask.mtaskClassifier.MtaskClassifier.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">sample_weight=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.multitask.mtaskClassifier.MtaskClassifier.fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fit MtaskClassifier to training data (X, y).</p>
+<dt id="nnetsauce.multitask.multitaskClassifier.MultitaskClassifier.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">sample_weight=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.multitask.multitaskClassifier.MultitaskClassifier.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit MultitaskClassifier to training data (X, y).</p>
 <dl class="simple">
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
 of samples and n_features is the number of features.</p>
@@ -492,8 +492,8 @@ of samples and n_features is the number of features.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="nnetsauce.multitask.mtaskClassifier.MtaskClassifier.predict">
-<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.multitask.mtaskClassifier.MtaskClassifier.predict" title="Permalink to this definition">¶</a></dt>
+<dt id="nnetsauce.multitask.multitaskClassifier.MultitaskClassifier.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.multitask.multitaskClassifier.MultitaskClassifier.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predict test data X.</p>
 <dl class="simple">
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
@@ -506,8 +506,8 @@ of samples and n_features is the number of features.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="nnetsauce.multitask.mtaskClassifier.MtaskClassifier.predict_proba">
-<code class="sig-name descname">predict_proba</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.multitask.mtaskClassifier.MtaskClassifier.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dt id="nnetsauce.multitask.multitaskClassifier.MultitaskClassifier.predict_proba">
+<code class="sig-name descname">predict_proba</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.multitask.multitaskClassifier.MultitaskClassifier.predict_proba" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predict probabilities for test data X.</p>
 <dl class="simple">
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
@@ -520,8 +520,8 @@ of samples and n_features is the number of features.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="nnetsauce.multitask.mtaskClassifier.MtaskClassifier.score">
-<code class="sig-name descname">score</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">scoring=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.multitask.mtaskClassifier.MtaskClassifier.score" title="Permalink to this definition">¶</a></dt>
+<dt id="nnetsauce.multitask.multitaskClassifier.MultitaskClassifier.score">
+<code class="sig-name descname">score</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">scoring=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.multitask.multitaskClassifier.MultitaskClassifier.score" title="Permalink to this definition">¶</a></dt>
 <dd><p>Score the model on test set features X and response y.</p>
 <dl class="simple">
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
@@ -789,11 +789,11 @@ of samples and n_features is the number of features</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-nnetsauce.ridge2.ridge2ClassifierMtask">
-<span id="ridge2classifiermtask"></span><h2>Ridge2ClassifierMtask<a class="headerlink" href="#module-nnetsauce.ridge2.ridge2ClassifierMtask" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="nnetsauce.ridge2.ridge2ClassifierMtask.Ridge2ClassifierMtask">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.ridge2.ridge2ClassifierMtask.</code><code class="sig-name descname">Ridge2ClassifierMtask</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">lambda1=0.1</em>, <em class="sig-param">lambda2=0.1</em>, <em class="sig-param">seed=123</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.ridge2.ridge2ClassifierMtask.Ridge2ClassifierMtask" title="Permalink to this definition">¶</a></dt>
+<div class="section" id="ridge2multitaskclassifier">
+<h2>Ridge2MultitaskClassifier<a class="headerlink" href="#ridge2multitaskclassifier" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-nnetsauce.ridge2.ridge2MultitaskClassifier"></span><dl class="class">
+<dt id="nnetsauce.ridge2.ridge2MultitaskClassifier.Ridge2MultitaskClassifier">
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.ridge2.ridge2MultitaskClassifier.</code><code class="sig-name descname">Ridge2MultitaskClassifier</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">lambda1=0.1</em>, <em class="sig-param">lambda2=0.1</em>, <em class="sig-param">seed=123</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.ridge2.ridge2MultitaskClassifier.Ridge2MultitaskClassifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Multitask Ridge classification with 2 regularization parameters</p>
 <dl class="simple">
 <dt>n_hidden_features: int</dt><dd><p>number of nodes in the hidden layer</p>
@@ -834,8 +834,8 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 </dd>
 </dl>
 <dl class="method">
-<dt id="nnetsauce.ridge2.ridge2ClassifierMtask.Ridge2ClassifierMtask.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.ridge2.ridge2ClassifierMtask.Ridge2ClassifierMtask.fit" title="Permalink to this definition">¶</a></dt>
+<dt id="nnetsauce.ridge2.ridge2MultitaskClassifier.Ridge2MultitaskClassifier.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.ridge2.ridge2MultitaskClassifier.Ridge2MultitaskClassifier.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit Ridge model to training data (X, y).</p>
 <dl class="simple">
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
@@ -850,8 +850,8 @@ of samples and n_features is the number of features.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="nnetsauce.ridge2.ridge2ClassifierMtask.Ridge2ClassifierMtask.predict">
-<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.ridge2.ridge2ClassifierMtask.Ridge2ClassifierMtask.predict" title="Permalink to this definition">¶</a></dt>
+<dt id="nnetsauce.ridge2.ridge2MultitaskClassifier.Ridge2MultitaskClassifier.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.ridge2.ridge2MultitaskClassifier.Ridge2MultitaskClassifier.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predict test data X.</p>
 <dl class="simple">
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
@@ -864,8 +864,8 @@ of samples and n_features is the number of features.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="nnetsauce.ridge2.ridge2ClassifierMtask.Ridge2ClassifierMtask.predict_proba">
-<code class="sig-name descname">predict_proba</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.ridge2.ridge2ClassifierMtask.Ridge2ClassifierMtask.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dt id="nnetsauce.ridge2.ridge2MultitaskClassifier.Ridge2MultitaskClassifier.predict_proba">
+<code class="sig-name descname">predict_proba</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.ridge2.ridge2MultitaskClassifier.Ridge2MultitaskClassifier.predict_proba" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predict probabilities for test data X.</p>
 <dl class="simple">
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
@@ -878,8 +878,8 @@ of samples and n_features is the number of features.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="nnetsauce.ridge2.ridge2ClassifierMtask.Ridge2ClassifierMtask.score">
-<code class="sig-name descname">score</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">scoring=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.ridge2.ridge2ClassifierMtask.Ridge2ClassifierMtask.score" title="Permalink to this definition">¶</a></dt>
+<dt id="nnetsauce.ridge2.ridge2MultitaskClassifier.Ridge2MultitaskClassifier.score">
+<code class="sig-name descname">score</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">scoring=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.ridge2.ridge2MultitaskClassifier.Ridge2MultitaskClassifier.score" title="Permalink to this definition">¶</a></dt>
 <dd><p>Score the model on test set covariates X and response y.</p>
 </dd></dl>
 

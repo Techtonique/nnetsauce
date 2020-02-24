@@ -17,7 +17,7 @@ X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
 # Linear Regression is used 
 regr = LinearRegression()
-fit_obj = ns.MtaskClassifier(regr, n_hidden_features=5, 
+fit_obj = ns.MultitaskClassifier(regr, n_hidden_features=5, 
                              n_clusters=2, type_clust="gmm")
 
 start = time()

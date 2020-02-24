@@ -1,3 +1,3 @@
-from .mtaskClassifier import MtaskClassifier
+from .multitaskClassifier import MultitaskClassifier
 
-__all__ = ["MtaskClassifier"]
+__all__ = ["MultitaskClassifier"]

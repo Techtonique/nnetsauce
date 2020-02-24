@@ -4,7 +4,7 @@ nnetsauce.multitask package
 Submodules
 ----------
 
-nnetsauce.multitask.mtaskClassifier module
+nnetsauce.multitask.multitaskClassifier module
 ------------------------------------------
 
 .. automodule:: nnetsauce.multitask.mtaskClassifier

@@ -22,10 +22,10 @@ CustomClassifier
    :undoc-members:
 
 
-MtaskClassifier
+MultitaskClassifier
 ------------------------------------------
 
-.. automodule:: nnetsauce.multitask.mtaskClassifier
+.. automodule:: nnetsauce.multitask.multitaskClassifier
    :members:
    :undoc-members:
 
@@ -46,9 +46,9 @@ Ridge2Classifier
    :undoc-members:
 
 
-Ridge2ClassifierMtask
+Ridge2MultitaskClassifier
 ---------------------
 
-.. automodule:: nnetsauce.ridge2.ridge2ClassifierMtask
+.. automodule:: nnetsauce.ridge2.ridge2MultitaskClassifier
    :members:
    :undoc-members:

@@ -20,10 +20,10 @@ nnetsauce.ridge2.ridge2Classifier module
    :undoc-members:
    :show-inheritance:
 
-nnetsauce.ridge2.ridge2ClassifierMtask module
+nnetsauce.ridge2.ridge2MultitaskClassifier module
 ---------------------------------------------
 
-.. automodule:: nnetsauce.ridge2.ridge2ClassifierMtask
+.. automodule:: nnetsauce.ridge2.ridge2MultitaskClassifier
    :members:
    :undoc-members:
    :show-inheritance:

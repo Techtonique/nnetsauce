@@ -115,7 +115,7 @@ Ridge2Classifier <- function(n_hidden_features = 5L,
 #' X <- as.matrix(iris[, 1:4])
 #' y <- as.integer(iris[, 5]) - 1L
 #'
-#' obj <- Ridge2ClassifierMtask()
+#' obj <- Ridge2MultitaskClassifier()
 #' obj$fit(X, y)
 #' print(obj$score(X, y))
 #' print(obj$predict_proba(X))
@@ -130,12 +130,12 @@ Ridge2Classifier <- function(n_hidden_features = 5L,
 #' X <- matrix(rnorm(n * p), nrow = n, ncol = p)
 #' y <- sample(c(0L, 1L), n, replace = TRUE)
 #'
-#' obj2 <- Ridge2ClassifierMtask()
+#' obj2 <- Ridge2MultitaskClassifier()
 #' obj2$fit(X, y)
 #' print(obj2$score(X, y))
 #' print(obj2$predict_proba(X))
 #'
-Ridge2ClassifierMtask <- function(n_hidden_features=5L,
+Ridge2MultitaskClassifier <- function(n_hidden_features=5L,
                                   activation_name="relu",
                                   a=0.01,
                                   nodes_sim="sobol",
@@ -148,7 +148,7 @@ Ridge2ClassifierMtask <- function(n_hidden_features=5L,
                                   lambda2=0.1,
                                   seed=123L)
 {
-  ns$Ridge2ClassifierMtask(n_hidden_features=n_hidden_features,
+  ns$Ridge2MultitaskClassifier(n_hidden_features=n_hidden_features,
                            activation_name=activation_name,
                            a=a,
                            nodes_sim=nodes_sim,

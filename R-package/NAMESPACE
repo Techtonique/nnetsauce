@@ -8,6 +8,6 @@ export(CustomRegressor)
 export(MTS)
 export(RandomBagClassifier)
 export(Ridge2Classifier)
-export(Ridge2ClassifierMtask)
+export(Ridge2MultitaskClassifier)
 export(Ridge2Regressor)
 

@@ -1,3 +1,11 @@
+# version 0.4.0
+
+- (Work in progress) documentation in `/docs`
+- `MultitaskClassifier`
+- Rename `Mtask` to `Multitask`
+- Rename `Ridge2ClassifierMtask` to `Ridge2 MultitaskClassifier`
+
+
 # version 0.3.3
 
 - Use "return_std" only in predict for MTS object

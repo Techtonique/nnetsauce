@@ -7,8 +7,8 @@ from sklearn.datasets import load_breast_cancer, load_wine
 from sklearn.linear_model import ElasticNet, LinearRegression
 
 
-class TestMtask(ut.TestCase):
-    def test_Mtask(self):
+class TestMultitask(ut.TestCase):
+    def test_Multitask(self):
 
         breast_cancer = load_breast_cancer()
         X = breast_cancer.data
@@ -26,16 +26,16 @@ class TestMtask(ut.TestCase):
         
         regr = LinearRegression()
 
-        fit_obj = ns.MtaskClassifier(regr, n_hidden_features=5, n_clusters=0
+        fit_obj = ns.MultitaskClassifier(regr, n_hidden_features=5, n_clusters=0
         )
 
-        fit_obj2 = ns.MtaskClassifier(regr, n_hidden_features=10, n_clusters=3
+        fit_obj2 = ns.MultitaskClassifier(regr, n_hidden_features=10, n_clusters=3
         )
 
-        fit_obj3 = ns.MtaskClassifier(regr, n_hidden_features=5, n_clusters=0
+        fit_obj3 = ns.MultitaskClassifier(regr, n_hidden_features=5, n_clusters=0
         )
 
-        fit_obj4 = ns.MtaskClassifier(regr, n_hidden_features=8, n_clusters=2
+        fit_obj4 = ns.MultitaskClassifier(regr, n_hidden_features=8, n_clusters=2
         )
 
         fit_obj.fit(X_train, y_train)
@@ -77,16 +77,16 @@ class TestMtask(ut.TestCase):
         
         regr = LinearRegression()
         
-        fit_obj = ns.MtaskClassifier(regr, n_hidden_features=3, n_clusters=2
+        fit_obj = ns.MultitaskClassifier(regr, n_hidden_features=3, n_clusters=2
         )
 
-        fit_obj2 = ns.MtaskClassifier(regr, n_hidden_features=7, n_clusters=2
+        fit_obj2 = ns.MultitaskClassifier(regr, n_hidden_features=7, n_clusters=2
         )
 
-        fit_obj3 = ns.MtaskClassifier(regr, n_hidden_features=5, n_clusters=2
+        fit_obj3 = ns.MultitaskClassifier(regr, n_hidden_features=5, n_clusters=2
         )
 
-        fit_obj4 = ns.MtaskClassifier(regr, n_hidden_features=4, n_clusters=2
+        fit_obj4 = ns.MultitaskClassifier(regr, n_hidden_features=4, n_clusters=2
         )
 
         fit_obj.fit(X_train, y_train)
