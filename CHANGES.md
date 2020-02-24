@@ -3,7 +3,7 @@
 - (Work in progress) documentation in `/docs`
 - `MultitaskClassifier`
 - Rename `Mtask` to `Multitask`
-- Rename `Ridge2ClassifierMtask` to `Ridge2 MultitaskClassifier`
+- Rename `Ridge2ClassifierMtask` to `Ridge2MultitaskClassifier`
 
 
 # version 0.3.3
