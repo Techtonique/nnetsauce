@@ -59,6 +59,14 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
            regularization parameter on hidden layer
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
+
+       References
+       ----------
+       
+       .. [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
+
+       .. [2] Moudiki, T. (2019). Multinomial logistic regression using quasi-randomized networks. Available at: https://www.researchgate.net/publication/334706878_Multinomial_logistic_regression_using_quasi-randomized_networks 
+
     """
 
     # construct the object -----

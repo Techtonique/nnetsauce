@@ -743,6 +743,11 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 </dl>
 <p>GCV: float
 return_std: boolean</p>
+<dl class="footnote brackets">
+<dt class="label" id="id25"><span class="brackets">1</span></dt>
+<dd><p>Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: <a class="reference external" href="https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters">https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters</a></p>
+</dd>
+</dl>
 <dl class="method">
 <dt id="nnetsauce.BayesianRVFL2Regressor.fit">
 <code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.BayesianRVFL2Regressor.fit" title="Permalink to this definition">¶</a></dt>
@@ -753,7 +758,7 @@ of samples and n_features is the number of features</p>
 </dd>
 <dt>y: array-like, shape = [n_samples]</dt><dd><p>Target values</p>
 </dd>
-<dt><a href="#id25"><span class="problematic" id="id26">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set</p>
+<dt><a href="#id26"><span class="problematic" id="id27">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set</p>
 </dd>
 </dl>
 <p>self: object</p>
@@ -769,7 +774,7 @@ of samples and n_features is the number of features.</p>
 </dd>
 </dl>
 <p>return_std: {boolean}, standard dev. is returned or not
-<a href="#id27"><span class="problematic" id="id28">**</span></a>kwargs: additional parameters to be passed to</p>
+<a href="#id28"><span class="problematic" id="id29">**</span></a>kwargs: additional parameters to be passed to</p>
 <blockquote>
 <div><p>self.cook_test_set</p>
 </div></blockquote>
@@ -789,7 +794,7 @@ of samples and n_features is the number of features</p>
 <dt>scoring: str</dt><dd><p>must be in (‘explained_variance’, ‘neg_mean_absolute_error’,                         ‘neg_mean_squared_error’, ‘neg_mean_squared_log_error’,                         ‘neg_median_absolute_error’, ‘r2’)</p>
 </dd>
 </dl>
-<p><a href="#id29"><span class="problematic" id="id30">**</span></a>kwargs: additional parameters to be passed to scoring functions</p>
+<p><a href="#id30"><span class="problematic" id="id31">**</span></a>kwargs: additional parameters to be passed to scoring functions</p>
 <p>model scores: {array-like}</p>
 </dd></dl>
 
@@ -854,7 +859,7 @@ of samples and n_features is the number of features.</p>
 </dd>
 <dt>y: array-like, shape = [n_samples]</dt><dd><p>Target values.</p>
 </dd>
-<dt><a href="#id31"><span class="problematic" id="id32">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set or self.obj.fit</p>
+<dt><a href="#id32"><span class="problematic" id="id33">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set or self.obj.fit</p>
 </dd>
 </dl>
 <p>self: object</p>
@@ -868,7 +873,7 @@ of samples and n_features is the number of features.</p>
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
 of samples and n_features is the number of features.</p>
 </dd>
-<dt><a href="#id33"><span class="problematic" id="id34">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
+<dt><a href="#id34"><span class="problematic" id="id35">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
 </dd>
 </dl>
 <p>model predictions: {array-like}</p>
@@ -882,7 +887,7 @@ of samples and n_features is the number of features.</p>
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
 of samples and n_features is the number of features.</p>
 </dd>
-<dt><a href="#id35"><span class="problematic" id="id36">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
+<dt><a href="#id36"><span class="problematic" id="id37">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
 </dd>
 </dl>
 <p>probability estimates for test data: {array-like}</p>
@@ -901,7 +906,7 @@ of samples and n_features is the number of features</p>
 <dt>scoring: str</dt><dd><p>must be in (‘explained_variance’, ‘neg_mean_absolute_error’,                         ‘neg_mean_squared_error’, ‘neg_mean_squared_log_error’,                         ‘neg_median_absolute_error’, ‘r2’)</p>
 </dd>
 </dl>
-<p><a href="#id37"><span class="problematic" id="id38">**</span></a>kwargs: additional parameters to be passed to scoring functions</p>
+<p><a href="#id38"><span class="problematic" id="id39">**</span></a>kwargs: additional parameters to be passed to scoring functions</p>
 <p>model scores: {array-like}</p>
 </dd></dl>
 
@@ -968,7 +973,7 @@ of samples and n_features is the number of features.</p>
 </dd>
 <dt>y: array-like, shape = [n_samples]</dt><dd><p>Target values.</p>
 </dd>
-<dt><a href="#id39"><span class="problematic" id="id40">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set or self.obj.fit</p>
+<dt><a href="#id40"><span class="problematic" id="id41">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set or self.obj.fit</p>
 </dd>
 </dl>
 <p>self: object</p>
@@ -982,7 +987,7 @@ of samples and n_features is the number of features.</p>
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
 of samples and n_features is the number of features.</p>
 </dd>
-<dt><a href="#id41"><span class="problematic" id="id42">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
+<dt><a href="#id42"><span class="problematic" id="id43">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
 </dd>
 </dl>
 <p>model predictions: {array-like}</p>
@@ -1001,7 +1006,7 @@ of samples and n_features is the number of features</p>
 <dt>scoring: str</dt><dd><p>must be in (‘explained_variance’, ‘neg_mean_absolute_error’,                         ‘neg_mean_squared_error’, ‘neg_mean_squared_log_error’,                         ‘neg_median_absolute_error’, ‘r2’)</p>
 </dd>
 </dl>
-<p><a href="#id43"><span class="problematic" id="id44">**</span></a>kwargs: additional parameters to be passed to scoring functions</p>
+<p><a href="#id44"><span class="problematic" id="id45">**</span></a>kwargs: additional parameters to be passed to scoring functions</p>
 <p>model scores: {array-like}</p>
 </dd></dl>
 
@@ -1056,6 +1061,11 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
 </dd>
 </dl>
+<dl class="footnote brackets">
+<dt class="label" id="id46"><span class="brackets">1</span></dt>
+<dd><p>Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: <a class="reference external" href="https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters">https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters</a></p>
+</dd>
+</dl>
 <dl class="method">
 <dt id="nnetsauce.MultitaskClassifier.fit">
 <code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">sample_weight=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.MultitaskClassifier.fit" title="Permalink to this definition">¶</a></dt>
@@ -1066,7 +1076,7 @@ of samples and n_features is the number of features.</p>
 </dd>
 <dt>y: array-like, shape = [n_samples]</dt><dd><p>Target values.</p>
 </dd>
-<dt><a href="#id45"><span class="problematic" id="id46">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set or self.obj.fit</p>
+<dt><a href="#id47"><span class="problematic" id="id48">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set or self.obj.fit</p>
 </dd>
 </dl>
 <p>self: object</p>
@@ -1080,7 +1090,7 @@ of samples and n_features is the number of features.</p>
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
 of samples and n_features is the number of features.</p>
 </dd>
-<dt><a href="#id47"><span class="problematic" id="id48">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
+<dt><a href="#id49"><span class="problematic" id="id50">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
 </dd>
 </dl>
 <p>model predictions: {array-like}</p>
@@ -1094,7 +1104,7 @@ of samples and n_features is the number of features.</p>
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
 of samples and n_features is the number of features.</p>
 </dd>
-<dt><a href="#id49"><span class="problematic" id="id50">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
+<dt><a href="#id51"><span class="problematic" id="id52">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
 </dd>
 </dl>
 <p>probability estimates for test data: {array-like}</p>
@@ -1113,7 +1123,7 @@ of samples and n_features is the number of features</p>
 <dt>scoring: str</dt><dd><p>must be in (‘explained_variance’, ‘neg_mean_absolute_error’,                         ‘neg_mean_squared_error’, ‘neg_mean_squared_log_error’,                         ‘neg_median_absolute_error’, ‘r2’)</p>
 </dd>
 </dl>
-<p><a href="#id51"><span class="problematic" id="id52">**</span></a>kwargs: additional parameters to be passed to scoring functions</p>
+<p><a href="#id53"><span class="problematic" id="id54">**</span></a>kwargs: additional parameters to be passed to scoring functions</p>
 <p>model scores: {array-like}</p>
 </dd></dl>
 
@@ -1180,7 +1190,7 @@ of samples and n_features is the number of features.</p>
 </dd>
 <dt>y: array-like, shape = [n_samples]</dt><dd><p>Target values.</p>
 </dd>
-<dt><a href="#id53"><span class="problematic" id="id54">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set or self.obj.fit</p>
+<dt><a href="#id55"><span class="problematic" id="id56">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set or self.obj.fit</p>
 </dd>
 </dl>
 <p>self: object</p>
@@ -1194,7 +1204,7 @@ of samples and n_features is the number of features.</p>
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
 of samples and n_features is the number of features.</p>
 </dd>
-<dt><a href="#id55"><span class="problematic" id="id56">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
+<dt><a href="#id57"><span class="problematic" id="id58">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
 </dd>
 </dl>
 <p>model predictions: {array-like}</p>
@@ -1208,7 +1218,7 @@ of samples and n_features is the number of features.</p>
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
 of samples and n_features is the number of features.</p>
 </dd>
-<dt><a href="#id57"><span class="problematic" id="id58">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
+<dt><a href="#id59"><span class="problematic" id="id60">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
 </dd>
 </dl>
 <p>probability estimates for test data: {array-like}</p>
@@ -1227,7 +1237,7 @@ of samples and n_features is the number of features</p>
 <dt>scoring: str</dt><dd><p>must be in (‘explained_variance’, ‘neg_mean_absolute_error’,                         ‘neg_mean_squared_error’, ‘neg_mean_squared_log_error’,                         ‘neg_median_absolute_error’, ‘r2’)</p>
 </dd>
 </dl>
-<p><a href="#id59"><span class="problematic" id="id60">**</span></a>kwargs: additional parameters to be passed to scoring functions</p>
+<p><a href="#id61"><span class="problematic" id="id62">**</span></a>kwargs: additional parameters to be passed to scoring functions</p>
 <p>model scores: {array-like}</p>
 </dd></dl>
 
@@ -1280,6 +1290,11 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
 </dd>
 </dl>
+<dl class="footnote brackets">
+<dt class="label" id="id63"><span class="brackets">1</span></dt>
+<dd><p>Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: <a class="reference external" href="https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters">https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters</a></p>
+</dd>
+</dl>
 <dl class="method">
 <dt id="nnetsauce.Ridge2Regressor.fit">
 <code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.Ridge2Regressor.fit" title="Permalink to this definition">¶</a></dt>
@@ -1290,7 +1305,7 @@ of samples and n_features is the number of features.</p>
 </dd>
 <dt>y: array-like, shape = [n_samples]</dt><dd><p>Target values.</p>
 </dd>
-<dt><a href="#id61"><span class="problematic" id="id62">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set or self.obj.fit</p>
+<dt><a href="#id64"><span class="problematic" id="id65">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set or self.obj.fit</p>
 </dd>
 </dl>
 <p>self: object</p>
@@ -1304,7 +1319,7 @@ of samples and n_features is the number of features.</p>
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
 of samples and n_features is the number of features.</p>
 </dd>
-<dt><a href="#id63"><span class="problematic" id="id64">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
+<dt><a href="#id66"><span class="problematic" id="id67">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
 </dd>
 </dl>
 <p>model predictions: {array-like}</p>
@@ -1323,7 +1338,7 @@ of samples and n_features is the number of features</p>
 <dt>scoring: str</dt><dd><p>must be in (‘explained_variance’, ‘neg_mean_absolute_error’,                         ‘neg_mean_squared_error’, ‘neg_mean_squared_log_error’,                         ‘neg_median_absolute_error’, ‘r2’)</p>
 </dd>
 </dl>
-<p><a href="#id65"><span class="problematic" id="id66">**</span></a>kwargs: additional parameters to be passed to scoring functions</p>
+<p><a href="#id68"><span class="problematic" id="id69">**</span></a>kwargs: additional parameters to be passed to scoring functions</p>
 <p>model scores: {array-like}</p>
 </dd></dl>
 
@@ -1379,6 +1394,14 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
 </dd>
 </dl>
+<dl class="footnote brackets">
+<dt class="label" id="id70"><span class="brackets">1</span></dt>
+<dd><p>Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: <a class="reference external" href="https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters">https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters</a></p>
+</dd>
+<dt class="label" id="id71"><span class="brackets">2</span></dt>
+<dd><p>Moudiki, T. (2019). Multinomial logistic regression using quasi-randomized networks. Available at: <a class="reference external" href="https://www.researchgate.net/publication/334706878_Multinomial_logistic_regression_using_quasi-randomized_networks">https://www.researchgate.net/publication/334706878_Multinomial_logistic_regression_using_quasi-randomized_networks</a></p>
+</dd>
+</dl>
 <dl class="method">
 <dt id="nnetsauce.Ridge2Classifier.fit">
 <code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">solver='L-BFGS-B'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.Ridge2Classifier.fit" title="Permalink to this definition">¶</a></dt>
@@ -1393,7 +1416,7 @@ of samples and n_features is the number of features.</p>
 </dd>
 <dt>y: array-like, shape = [n_samples]</dt><dd><p>Target values.</p>
 </dd>
-<dt><a href="#id67"><span class="problematic" id="id68">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set or self.obj.fit</p>
+<dt><a href="#id72"><span class="problematic" id="id73">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set or self.obj.fit</p>
 </dd>
 </dl>
 <p>self: object</p>
@@ -1409,7 +1432,7 @@ of samples and n_features is the number of features.</p>
 </dd>
 <dt>Y: array-like, shape = [n_samples]</dt><dd><p>One-hot encode target values.</p>
 </dd>
-<dt><a href="#id69"><span class="problematic" id="id70">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set or self.obj.fit</p>
+<dt><a href="#id74"><span class="problematic" id="id75">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set or self.obj.fit</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1422,7 +1445,7 @@ of samples and n_features is the number of features.</p>
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
 of samples and n_features is the number of features.</p>
 </dd>
-<dt><a href="#id71"><span class="problematic" id="id72">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
+<dt><a href="#id76"><span class="problematic" id="id77">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
 </dd>
 </dl>
 <p>model predictions: {array-like}</p>
@@ -1436,7 +1459,7 @@ of samples and n_features is the number of features.</p>
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
 of samples and n_features is the number of features.</p>
 </dd>
-<dt><a href="#id73"><span class="problematic" id="id74">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
+<dt><a href="#id78"><span class="problematic" id="id79">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
 </dd>
 </dl>
 <p>probability estimates for test data: {array-like}</p>
@@ -1455,7 +1478,7 @@ of samples and n_features is the number of features</p>
 <dt>scoring: str</dt><dd><p>must be in (‘explained_variance’, ‘neg_mean_absolute_error’,                         ‘neg_mean_squared_error’, ‘neg_mean_squared_log_error’,                         ‘neg_median_absolute_error’, ‘r2’)</p>
 </dd>
 </dl>
-<p><a href="#id75"><span class="problematic" id="id76">**</span></a>kwargs: additional parameters to be passed to scoring functions</p>
+<p><a href="#id80"><span class="problematic" id="id81">**</span></a>kwargs: additional parameters to be passed to scoring functions</p>
 <p>model scores: {array-like}</p>
 </dd></dl>
 
@@ -1504,6 +1527,11 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
 </dd>
 </dl>
+<dl class="footnote brackets">
+<dt class="label" id="id82"><span class="brackets">1</span></dt>
+<dd><p>Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: <a class="reference external" href="https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters">https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters</a></p>
+</dd>
+</dl>
 <dl class="method">
 <dt id="nnetsauce.Ridge2MultitaskClassifier.fit">
 <code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.Ridge2MultitaskClassifier.fit" title="Permalink to this definition">¶</a></dt>
@@ -1514,7 +1542,7 @@ of samples and n_features is the number of features.</p>
 </dd>
 <dt>y: array-like, shape = [n_samples]</dt><dd><p>Target values.</p>
 </dd>
-<dt><a href="#id77"><span class="problematic" id="id78">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set or self.obj.fit</p>
+<dt><a href="#id83"><span class="problematic" id="id84">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set or self.obj.fit</p>
 </dd>
 </dl>
 <p>self: object</p>
@@ -1528,7 +1556,7 @@ of samples and n_features is the number of features.</p>
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
 of samples and n_features is the number of features.</p>
 </dd>
-<dt><a href="#id79"><span class="problematic" id="id80">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
+<dt><a href="#id85"><span class="problematic" id="id86">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
 </dd>
 </dl>
 <p>model predictions: {array-like}</p>
@@ -1542,7 +1570,7 @@ of samples and n_features is the number of features.</p>
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
 of samples and n_features is the number of features.</p>
 </dd>
-<dt><a href="#id81"><span class="problematic" id="id82">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
+<dt><a href="#id87"><span class="problematic" id="id88">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
 </dd>
 </dl>
 <p>probability estimates for test data: {array-like}</p>
@@ -1613,7 +1641,7 @@ X must be in increasing order (most recent observations last)</p>
 <dt>xreg: {array-like}, shape = [n_samples, n_features_xreg]</dt><dd><p>Additional regressors to be passed to obj
 xreg must be in increasing order (most recent observations last)</p>
 </dd>
-<dt><a href="#id83"><span class="problematic" id="id84">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set</p>
+<dt><a href="#id89"><span class="problematic" id="id90">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_training_set</p>
 </dd>
 </dl>
 <p>self: object</p>
@@ -1632,7 +1660,7 @@ posterior is gaussian)</p>
 <dt>new_xreg: {array-like}, shape = [n_samples = h, n_new_xreg]</dt><dd><p>New values of additional (deterministic) regressors on horizon = h
 new_xreg must be in increasing order (most recent observations last)</p>
 </dd>
-<dt><a href="#id85"><span class="problematic" id="id86">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
+<dt><a href="#id91"><span class="problematic" id="id92">**</span></a>kwargs: additional parameters to be passed to </dt><dd><p>self.cook_test_set</p>
 </dd>
 </dl>
 <p>model predictions for horizon = h: {array-like}</p>
