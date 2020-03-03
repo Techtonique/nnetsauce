@@ -1,13 +1,13 @@
 Package: nnetsauce
 Title: Randomized and Quasi-Randomized networks
-Version: 0.3.3
+Version: 0.4.0
 Author: T. Moudiki
 Maintainer: T. Moudiki <thierry.moudiki@gmail.com>
 Description: Randomized and Quasi-Randomized networks
 Depends: R (>= 3.3.3)
 License: BSD_3_clause Clear + file LICENSE
 Imports: reticulate, R6
-Collate: 'zzz.R' 'adaboost.R' 'base.R' 'custom.R' 'mts.R' 'randombag.R' 'ridge2.R' 'rvfl.R'
+Collate: 'zzz.R' 'adaboost.R' 'base.R' 'custom.R' 'mts.R' 'multitask.R' 'randombag.R' 'ridge2.R' 'rvfl.R'
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.0.2
