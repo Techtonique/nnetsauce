@@ -187,7 +187,7 @@ print(np.sqrt(layer3_regr.score(X[index_test,:], y[index_test])))
 
 ````
 
-`MTS` (multivariate time series forecasting):
+`MTS` (univariate and multivariate time series forecasting):
 
 ````python
 np.random.seed(123)
