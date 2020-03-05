@@ -168,6 +168,9 @@ class TestMTS(ut.TestCase):
 
         fit_obj9.fit(X_train)
         preds4 = fit_obj9.predict(return_std=True)
+        
+        fit_obj9.fit(X_train[:,0])
+        preds5 = fit_obj9.predict(return_std=True)
 
         self.assertTrue(np.allclose(rmse, 10.396062391967684))
         self.assertTrue(np.allclose(rmse_xreg, 10.39593866961476))
@@ -179,6 +182,8 @@ class TestMTS(ut.TestCase):
         self.assertTrue(np.allclose(preds2[2][1, 0], 50.08511339370441))
 
         self.assertTrue(preds4[2][1, 0], 50.38107971065952)
+        
+        self.assertTrue(preds5[2][1, 0], 51.0175425305647)
 
         self.assertTrue(abs(preds3[2][1, 0] - 50.0) <= 0.05)
 

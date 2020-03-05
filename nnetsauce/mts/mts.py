@@ -14,7 +14,7 @@ from functools import partial
 
 
 class MTS(Base):
-    """MTS model class derived from class Base
+    """Univariate and multivariate time series (MTS) forecasting with Quasi-Randomized networks
     
        Parameters
        ----------
@@ -128,8 +128,14 @@ class MTS(Base):
         -------
         self: object
         """
-                
-        n, p = X.shape
+        
+        try: 
+            # multivariate time series                  
+            n, p = X.shape            
+        except: 
+            # univariate time series                      
+            n = X.shape[0]
+            p = 1
         
         rep_1_n = np.repeat(1, n)
 
@@ -142,12 +148,19 @@ class MTS(Base):
         self.fit_objs.clear()
 
         self.y_means.clear()
-
-        mts_input = ts.create_train_inputs(X[::-1], self.lags)
-
-        self.y = mts_input[0]
-
-        self.X = mts_input[1]                
+        
+        if p > 1: 
+            # multivariate time series         
+            mts_input = ts.create_train_inputs(X[::-1], 
+                                               self.lags)                        
+        else: 
+            # univariate time series             
+            mts_input = ts.create_train_inputs(X.reshape(-1, 1)[::-1], 
+                                               self.lags)
+        
+        self.y = mts_input[0]        
+            
+        self.X = mts_input[1]                        
 
         if xreg is not None:
 
