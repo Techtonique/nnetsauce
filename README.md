@@ -4,7 +4,8 @@
 
 This package does Statistical/Machine Learning, using advanced combinations of randomized and quasi-randomized _neural_ networks layers. It contains models for regression, classification, and time series forecasting.
 
-![PyPI](https://img.shields.io/pypi/v/nnetsauce) [![PyPI - License](https://img.shields.io/pypi/l/nnetsauce)](https://github.com/thierrymoudiki/nnetsauce/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce) 
+![PyPI](https://img.shields.io/pypi/v/nnetsauce) [![PyPI - License](https://img.shields.io/pypi/l/nnetsauce)](https://github.com/thierrymoudiki/nnetsauce/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce) [![Documentation Status](https://readthedocs.org/projects/nnetsauce/badge/?version=latest)](https://nnetsauce.readthedocs.io/en/latest/?badge=latest)
+
 
 
 ## Contents 
