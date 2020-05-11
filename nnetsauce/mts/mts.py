@@ -56,6 +56,8 @@ class MTS(Base):
            reproducibility seed for nodes_sim=='uniform'
        lags: int
            number of lags used for each time series 
+       alpha: float
+           smoothing parameter
     """
 
     # construct the object -----
@@ -77,6 +79,7 @@ class MTS(Base):
         col_sample=1,
         seed=123,
         lags=1,
+        alpha=None
     ):
 
         assert np.int(lags) == lags, "parameter 'lags' should be an integer"
@@ -99,7 +102,7 @@ class MTS(Base):
 
         self.obj = obj
         self.n_series = None
-        self.lags = lags
+        self.lags = lags        
         self.fit_objs = {}
         self.y = None  # MTS responses (most recent observations first)
         self.X = None  # MTS lags
@@ -108,6 +111,8 @@ class MTS(Base):
         self.preds = None
         self.preds_std = []
         self.row_sample = 1
+        self.alpha = alpha            
+            
 
     def fit(self, X, xreg=None, **kwargs):
         """Fit MTS model to training data X, with optional regressors xreg
@@ -195,6 +200,7 @@ class MTS(Base):
 
         return self
 
+
     def predict(self, h=5, level=95, new_xreg=None, **kwargs):
         """Forecast all the time series, h steps ahead
         
@@ -224,19 +230,29 @@ class MTS(Base):
         if self.xreg is not None:
             assert new_xreg is not None, "'new_xreg' must be provided"
 
-        self.preds = None
+        self.preds = None # do not remove (!)
 
-        self.preds = pickle.loads(pickle.dumps(self.y, -1))
+        self.preds = pickle.loads(pickle.dumps(self.y, -1))                
+
+        if self.alpha is not None:
+            if(len(self.preds) > 1):
+                # multivariate            
+                previous_pred = self.preds[0,:]       
+            else:
+                # univariate
+                previous_pred = self.preds[0]             
 
         n_features = self.n_series * self.lags
-
-        self.preds_std = np.zeros(h)
+        
 
         if "return_std" in kwargs:
+            
+            self.preds_std = np.zeros(h)
 
             self.return_std = kwargs["return_std"]
 
             qt = norm.ppf(1 - 0.5 * (1 - level / 100))
+            
 
         if new_xreg is not None:  # Additional regressors provided
 
@@ -258,6 +274,7 @@ class MTS(Base):
 
             inv_new_xreg = mo.rbind(self.xreg, new_xreg)[::-1]
 
+
             # Loop on horizon h
             for i in range(h):
     
@@ -273,33 +290,66 @@ class MTS(Base):
                     np.ones(n_features_total).reshape(1, n_features_total),
                 )            
     
-                cooked_new_X = self.cook_test_set(new_X, **kwargs)
+                cooked_new_X = self.cook_test_set(new_X, 
+                                                  **kwargs)
     
-                predicted_cooked_new_X = self.obj.predict(cooked_new_X, **kwargs)
+                predicted_cooked_new_X = self.obj.predict(cooked_new_X, 
+                                                          **kwargs)
+                
     
                 if self.return_std == False:  # std. dev. is not returned
-    
-                    preds = np.array(
-                        [
-                            (self.y_means[j] + predicted_cooked_new_X[0])
-                            for j in range(self.n_series)
-                        ]
-                    )
+                    
+                    if self.alpha is not None:
+                        
+                        preds = self.alpha*np.array(
+                            [
+                                (self.y_means[j] + predicted_cooked_new_X[0])
+                                for j in range(self.n_series)
+                            ]
+                        ) + (1 - self.alpha)*previous_pred
+                    
+                    else:
+                        
+                        preds = np.array(
+                            [
+                                (self.y_means[j] + predicted_cooked_new_X[0])
+                                for j in range(self.n_series)
+                            ]
+                        )
                         
                 else:  # std. dev. is returned
     
-                    preds = np.array(
-                        [
-                            (self.y_means[j] + predicted_cooked_new_X[0][0])
-                            for j in range(self.n_series)
-                        ]
-                    )
+                    if self.alpha is not None:
+
+                        preds = self.alpha*np.array(
+                            [
+                                (self.y_means[j] + predicted_cooked_new_X[0][0])
+                                for j in range(self.n_series)
+                            ]
+                        ) + (1 - self.alpha)*previous_pred
+                    
+                    else:
+                        
+                        preds = np.array(
+                            [
+                                (self.y_means[j] + predicted_cooked_new_X[0][0])
+                                for j in range(self.n_series)
+                            ]
+                        )                                             
                     
                     self.preds_std[i] = predicted_cooked_new_X[1][0]
+                 
+                    
+                if self.alpha is not None:
+                    
+                        previous_pred = pickle.loads(pickle.dumps(preds, -1))                                                   
+    
     
                 self.preds = mo.rbind(preds, self.preds)                        
 
+
         else: # No additional regressor provided
+            
             
             for i in range(h):
     
@@ -308,33 +358,64 @@ class MTS(Base):
                 new_X = mo.rbind(
                     new_obs.reshape(1, n_features),
                     np.ones(n_features).reshape(1, n_features),
-                )
+                )                                
     
-                cooked_new_X = self.cook_test_set(new_X, **kwargs)
+                cooked_new_X = self.cook_test_set(new_X, 
+                                                  **kwargs)
     
                 predicted_cooked_new_X = self.obj.predict(cooked_new_X, **kwargs)
     
-                if self.return_std == False:  # std. dev. is not returned
     
-                    preds = np.array(
-                        [
-                            (self.y_means[j] + predicted_cooked_new_X[0])
-                            for j in range(self.n_series)
-                        ]
-                    )
+                if self.return_std == False:  # std. dev. is not returned
+                    
+                    if self.alpha is not None:
+                        
+                        preds = self.alpha*np.array(
+                            [
+                                (self.y_means[j] + predicted_cooked_new_X[0])
+                                for j in range(self.n_series)
+                            ]
+                        ) + (1 - self.alpha)*previous_pred                       
+                        
+                    else:
+                        
+                        preds = np.array(
+                            [
+                                (self.y_means[j] + predicted_cooked_new_X[0])
+                                for j in range(self.n_series)
+                            ]
+                        )
+                        
         
                 else:  # std. dev. is returned
-    
-                    preds = np.array(
-                        [
-                            (self.y_means[j] + predicted_cooked_new_X[0][0])
-                            for j in range(self.n_series)
-                        ]
-                    )                        
+                    
+                    if self.alpha is not None:
+                        
+                        preds = self.alpha*np.array(
+                            [
+                                (self.y_means[j] + predicted_cooked_new_X[0][0])
+                                for j in range(self.n_series)
+                            ]
+                        ) + (1 - self.alpha)*previous_pred
+                        
+                    else:
+                        
+                        preds = np.array(
+                            [
+                                (self.y_means[j] + predicted_cooked_new_X[0][0])
+                                for j in range(self.n_series)
+                            ]
+                        )                        
     
                     self.preds_std[i] = predicted_cooked_new_X[1][0]
+                
+                
+                if self.alpha is not None:
+                    previous_pred = pickle.loads(pickle.dumps(preds, -1)) 
+                                              
                     
                 self.preds = mo.rbind(preds, self.preds)
+
 
         # function's return
 
@@ -356,6 +437,7 @@ class MTS(Base):
             self.preds - qt * self.preds_std,
             self.preds + qt * self.preds_std,
         )
+        
 
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):
         """ Train on training_index, score on testing_index. """
