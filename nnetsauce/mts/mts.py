@@ -52,12 +52,12 @@ class MTS(Base):
            Currently available: standardization ('std') or MinMax scaling ('minmax')
        col_sample: float
            percentage of covariates randomly chosen for training    
-       seed: int 
-           reproducibility seed for nodes_sim=='uniform'
        lags: int
            number of lags used for each time series 
        alpha: float
-           smoothing parameter
+           smoothing parameter           
+       seed: int 
+           reproducibility seed for nodes_sim=='uniform'
     """
 
     # construct the object -----
@@ -77,9 +77,9 @@ class MTS(Base):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         col_sample=1,
-        seed=123,
         lags=1,
-        alpha=None
+        alpha=None,
+        seed=123      
     ):
 
         assert np.int(lags) == lags, "parameter 'lags' should be an integer"
@@ -141,18 +141,17 @@ class MTS(Base):
             # univariate time series                      
             n = X.shape[0]
             p = 1
+
         
         rep_1_n = np.repeat(1, n)
 
+
         self.y = None
-
         self.X = None        
-
         self.n_series = p
-
         self.fit_objs.clear()
-
         self.y_means.clear()
+        
         
         if p > 1: 
             # multivariate time series         
@@ -162,10 +161,15 @@ class MTS(Base):
             # univariate time series             
             mts_input = ts.create_train_inputs(X.reshape(-1, 1)[::-1], 
                                                self.lags)
+
         
-        self.y = mts_input[0]        
-            
-        self.X = mts_input[1]                        
+        self.y = mts_input[0]                        
+        if self.alpha is not None:  
+            alphas_seq = np.array([np.repeat(self.alpha*((1 - self.alpha)**i), p) for i in range(self.lags)]).flatten()
+            self.X = mts_input[1]*np.tile(alphas_seq, (mts_input[1].shape[0], 1))
+        else:    
+            self.X = mts_input[1]                        
+
 
         if xreg is not None:
 
@@ -187,6 +191,7 @@ class MTS(Base):
             dummy_y, scaled_Z = self.cook_training_set(
                 y=rep_1_n, X=self.X, **kwargs
             )
+
 
         # loop on all the time series and adjust self.obj.fit
         for i in range(p):
