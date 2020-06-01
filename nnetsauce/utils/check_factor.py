@@ -10,9 +10,9 @@ import os
 from ctypes import c_double
 
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
+dir_path = os.path.dirname(os.path.abspath(__file__))
 print(f"dir_path check_factor: {dir_path}")
-check_factorer = ctypes.cdll.LoadLibrary("nnetsauce/" + dir_path + "/check_factorer.so")
+check_factorer = ctypes.cdll.LoadLibrary(dir_path + "/check_factorer.so")
 
 def is_factor2(x):
   
