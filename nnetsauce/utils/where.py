@@ -12,7 +12,7 @@ from ctypes import c_double, c_long
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 print(f"dir_path where: {dir_path}")
-wherer = ctypes.cdll.LoadLibrary(dir_path + "/wherer.so")  
+wherer = ctypes.cdll.LoadLibrary("nnetsauce/" + dir_path + "/wherer.so")  
 
 def index_where(x, elt):
   
