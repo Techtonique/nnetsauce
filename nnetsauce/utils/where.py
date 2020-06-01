@@ -10,9 +10,23 @@ import os
 from ctypes import c_double, c_long
 
 
-dir_path = os.path.dirname(os.path.abspath(__file__))
-print(f"dir_path where: {dir_path}")
-wherer = ctypes.cdll.LoadLibrary(dir_path + "/wherer.so")  
+try:
+	dir_path = os.path.dirname(__file__)
+	print(f"dir_path where: {dir_path}")
+	wherer = ctypes.cdll.LoadLibrary(dir_path + "/wherer.so")  
+except:
+	try:
+		dir_path = ctypes.util.find_library("wherer")
+		print(f"dir_path where: {dir_path}")
+		wherer = ctypes.cdll.LoadLibrary(dir_path + "/wherer.so")  
+	except:
+		try:
+			dir_path = ctypes.util.find_library("./wherer")
+			print(f"dir_path where: {dir_path}")
+			wherer = ctypes.cdll.LoadLibrary(dir_path + "/wherer.so")  
+		except:
+			wherer = ctypes.CDLL('./wherer.so')
+
 
 def index_where(x, elt):
   
