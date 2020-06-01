@@ -226,6 +226,7 @@ class Base(BaseEstimator):
 
         return X_clustered
 
+
     def create_layer(self, scaled_X, W=None):
         """ Create hidden layer. 
         
@@ -360,6 +361,7 @@ class Base(BaseEstimator):
             drop_prob=self.dropout,
             seed=self.seed,
         )
+
 
     def cook_training_set(self, y=None, X=None, W=None, **kwargs):
         """ Create new hidden features for training set, with hidden layer, center the response. 
@@ -547,6 +549,7 @@ class Base(BaseEstimator):
 
         # classification
         return (y, self.scaler.transform(Z))
+
 
     def cook_test_set(self, X, **kwargs):
         """ Transform data from test set, with hidden layer. 
