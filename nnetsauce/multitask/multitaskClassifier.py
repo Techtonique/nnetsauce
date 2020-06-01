@@ -7,6 +7,7 @@ import pickle
 import sklearn.metrics as skm2
 from ..utils import matrixops as mo
 from ..utils import misc as mx
+from ..utils import is_factor2
 from ..base import Base
 from scipy.special import expit
 from sklearn.base import ClassifierMixin
@@ -127,7 +128,7 @@ class MultitaskClassifier(Base, ClassifierMixin):
         self: object
         """
 
-        assert mx.is_factor(y), "y must contain only integers"
+        assert is_factor2(y), "y must contain only integers"
 
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 

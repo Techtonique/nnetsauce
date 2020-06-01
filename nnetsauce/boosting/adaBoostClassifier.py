@@ -10,6 +10,7 @@ from ..custom import CustomClassifier
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 from ..utils import Progbar
+from ..utils import is_factor2
 from math import exp, log
 from sklearn.base import ClassifierMixin
 from scipy.special import xlogy, expit
@@ -150,7 +151,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         self: object
         """
 
-        assert mx.is_factor(y), "y must contain only integers"
+        assert is_factor2(y), "y must contain only integers"
 
         assert self.method in (
             "SAMME",
