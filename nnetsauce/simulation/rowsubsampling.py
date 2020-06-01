@@ -5,20 +5,20 @@
 
 import numpy as np
 from ..utils import misc as mx
-from collections import Counter
+from ..utils import is_factor2
+from ..utils import index_where
 
 # stratified subsampling
 def subsample(y, row_sample=0.8, seed=123):
-
-    assert (row_sample < 1) & (
-        row_sample >= 0
-    ), "'row_sample' must be < 1 and >= 0"
-
-    n_obs = len(y)
+    
+    assert (row_sample < 1) & (row_sample >= 0),\
+    "'row_sample' must be < 1 and >= 0"
+    n_obs = len(y)    
     n_obs_out = np.ceil(n_obs * row_sample)
+    
 
-    # preproc -----
-    if mx.is_factor(y):
+    # preproc -----    
+    if is_factor2(y):
 
         classes, n_elem_classes = np.unique(y, return_counts=True)
         n_classes = len(classes)
@@ -34,46 +34,36 @@ def subsample(y, row_sample=0.8, seed=123):
 
         n_breaks_1 = len(breaks) - 1
         classes = range(n_breaks_1)
-        n_classes = n_breaks_1
-        y_as_classes = np.zeros_like(y, dtype=int)
+        n_classes = n_breaks_1        
+        y_as_classes=np.asarray([int(i) if ((y > breaks[i]) & (y <= breaks[i + 1])) else None for i in classes])
 
-        for i in classes:
-            y_as_classes[(y > breaks[i]) * (y <= breaks[i + 1])] = int(i)
-
-    # main loop ----
+    # main loop ----    
     index = []
 
     np.random.seed(seed)
 
     for i in range(n_classes):
 
-        bool_class_i = y_as_classes == classes[i]
-
         # index_class_i = [i for i, e in enumerate(bool_class_i) if e == True]
-        index_class_i = np.where(bool_class_i == True)[0].tolist()
+        index_class_i = index_where(y_as_classes, classes[i])
 
-        if np.sum(bool_class_i) > 1:  # at least 2 elements in class  #i
-
-            index.append(
-                np.random.choice(
-                    index_class_i,
-                    size=int(n_obs_out * freqs_hist[i]),  # output size
-                    replace=True,
-                ).tolist()
-            )
-
-        else:  # only one element in class
-
-            try:
-
-                index.append(index_class_i[0])
-
-            except:
-
-                0
+        # at least 2 elements in class  #i
+        # or only one element in class        
+        index.append(
+            np.random.choice(
+                index_class_i,
+                size=int(n_obs_out * freqs_hist[i]),  # output size
+                replace=True,
+            ).tolist()
+        ) if len(index_class_i) > 1 else index.append(index_class_i[0])
+        
+        
     try:
+        
         return np.asarray(mx.flatten(index))
+    
     except:
+        
         return np.asarray(index)
 
 
