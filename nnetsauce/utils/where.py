@@ -4,12 +4,14 @@
 #
 # License: BSD 3 Clause Clear
 
+import ctypes
 import numpy as np
 import os 
-from ctypes import * 
+from ctypes import c_double, c_long
 
-#dir_path = os.path.dirname(os.path.realpath(__file__))
-wherer = CDLL('nnetsauce/utils/cfiles/wherer.so')
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+wherer = ctypes.cdll.LoadLibrary(dir_path + "/wherer.so")  
 
 def index_where(x, elt):
   

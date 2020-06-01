@@ -1,3 +1,4 @@
+import ctypes
 from .check_factor import is_factor2
 from .lmfuncs import beta_hat, inv_penalized_cov
 from .matrixops import cbind, rbind, crossprod, tcrossprod, to_np_array

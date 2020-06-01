@@ -4,12 +4,14 @@
 #
 # License: BSD 3 Clause Clear
 
+import ctypes
 import numpy as np
 import os 
-from ctypes import * 
+from ctypes import c_double
 
-#dir_path = os.path.dirname(os.path.realpath(__file__))
-check_factorer = CDLL('nnetsauce/utils/cfiles/check_factorer.so')
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+check_factorer = ctypes.cdll.LoadLibrary(dir_path + "/check_factorer.so")
 
 def is_factor2(x):
   
