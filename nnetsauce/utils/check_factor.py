@@ -10,22 +10,11 @@ import os
 from ctypes import c_double
 
 
+dir_path = os.path.dirname(__file__)
 try:
-	dir_path = os.path.dirname(__file__)
-	print(f"dir_path check_factor: {dir_path}")
-	check_factorer = ctypes.cdll.LoadLibrary(dir_path + "/check_factorer.so")
-except:
-	try:
-		dir_path = ctypes.util.find_library("check_factorer")
-		print(f"dir_path check_factor: {dir_path}")
-		check_factorer = ctypes.cdll.LoadLibrary(dir_path + "/check_factorer.so")
-	except:
-		try:
-			dir_path = ctypes.util.find_library("./check_factorer")
-			print(f"dir_path check_factor: {dir_path}")
-			check_factorer = ctypes.cdll.LoadLibrary(dir_path + "/check_factorer.so")
-		except:
-			check_factorer = ctypes.CDLL('./check_factorer.so')
+	check_factorer = ctypes.cdll.LoadLibrary(dir_path + "/check_factor.so")  
+except:	
+	check_factorer = ctypes.CDLL(dir_path + '/check_factor.so')
 
 
 def is_factor2(x):
