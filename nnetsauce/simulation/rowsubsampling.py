@@ -34,13 +34,8 @@ def subsample(y, row_sample=0.8, seed=123):
 
         n_breaks_1 = len(breaks) - 1
         classes = range(n_breaks_1)
-        n_classes = n_breaks_1
-        y_as_classes = np.zeros_like(y, dtype=int)
-
-        for i in classes: # vectorize
-            
-            y_as_classes[(y > breaks[i]) * (y <= breaks[i + 1])] = int(i)
-            
+        n_classes = n_breaks_1        
+        y_as_classes=np.asarray([int(i) if ((y > breaks[i]) & (y <= breaks[i + 1])) else None for i in classes])
 
     # main loop ----    
     index = []
