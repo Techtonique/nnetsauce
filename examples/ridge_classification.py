@@ -32,10 +32,14 @@ fit_obj = ns.Ridge2Classifier(lambda1 = 6.90185578e+04,
                              type_clust = "gmm")
 
 # fit the model on training set
+start = time()
 fit_obj.fit(X_train, y_train)
+print(time() - start)
 
 # get the accuracy on test set
+start = time()
 print(fit_obj.score(X_test, y_test))
+print(time() - start)
 
 # get area under the curve on test set (auc)
 print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
@@ -83,10 +87,14 @@ fit_obj = ns.Ridge2Classifier(lambda1 = 1.87500081e+04,
                              type_clust = "gmm")
 
 # fit the model on training set
+start = time()
 fit_obj.fit(Z_train, y_train)
+print(time() - start)
 
 # get the accuracy on test set
+start = time()
 print(fit_obj.score(Z_test, y_test))
+print(time() - start)
 
 
 # dataset no. 4 ----------
