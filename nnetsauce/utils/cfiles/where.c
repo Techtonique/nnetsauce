@@ -1,3 +1,7 @@
+/* Authors: T. Moudiki <thierry.moudiki@gmail.com>
+ 
+ License: BSD 3 Clause Clear */
+
 //find indices of an element
 
 // gcc -shared -Wl,-install_name,wherer.so -o wherer.so -fPIC where.c

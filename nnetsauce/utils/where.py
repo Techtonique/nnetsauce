@@ -8,8 +8,8 @@ import numpy as np
 import os 
 from ctypes import * 
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-wherer = CDLL(dir_path + '/cfiles/wherer.so')
+#dir_path = os.path.dirname(os.path.realpath(__file__))
+wherer = CDLL('nnetsauce/utils/cfiles/wherer.so')
 
 def index_where(x, elt):
   

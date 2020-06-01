@@ -8,8 +8,8 @@ import numpy as np
 import os 
 from ctypes import * 
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-check_factorer = CDLL(dir_path + '/cfiles/check_factorer.so')
+#dir_path = os.path.dirname(os.path.realpath(__file__))
+check_factorer = CDLL('nnetsauce/utils/cfiles/check_factorer.so')
 
 def is_factor2(x):
   

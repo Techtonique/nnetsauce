@@ -1,3 +1,7 @@
+/* Authors: T. Moudiki <thierry.moudiki@gmail.com>
+
+ License: BSD 3 Clause Clear */
+
 //check if vector is a factor
 
 // gcc -shared -Wl,-install_name,check_factorer.so -o check_factorer.so -fPIC check_factor.c
