@@ -13,7 +13,6 @@ from ..utils import activations as ac
 from ..utils import memoize
 from ..utils import matrixops as mo
 from ..utils import misc as mx
-from ..utils import is_factor2
 from ..simulation import nodesimulation as ns
 from ..simulation import rowsubsampling as rs
 
@@ -392,7 +391,7 @@ class Base(BaseEstimator):
             assert len(self.type_scaling) >= 2, ""
 
         # center y
-        if is_factor2(y) == False:  # regression
+        if mx.is_factor(y) == False:  # regression
 
             if y is None:
                 self.y_mean, centered_y = mo.center_response(self.y)
@@ -526,7 +525,7 @@ class Base(BaseEstimator):
 
             n_row_sample = len(self.index_row)
 
-            if is_factor2(y) == False:  # regression
+            if mx.is_factor(y) == False:  # regression
 
                 return (
                     centered_y[self.index_row].reshape(n_row_sample),
@@ -544,7 +543,7 @@ class Base(BaseEstimator):
             )
 
         # y is not subsampled
-        if is_factor2(y) == False:  # regression
+        if mx.is_factor(y) == False:  # regression
 
             return (centered_y, self.scaler.transform(Z))
 

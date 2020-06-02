@@ -7,6 +7,7 @@ from .base import Base
 import sklearn.metrics as skm
 from ..utils import matrixops as mo
 from ..utils import lmfuncs as lmf
+from ..utils import misc as mx
 from sklearn.base import RegressorMixin
 
 

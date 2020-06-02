@@ -1,3 +1,4 @@
+from math import floor
 from .memoize import memoize
 
 
@@ -28,17 +29,12 @@ def is_float(x):
 def is_factor(y):
 
     n = len(y)
-    ans = True
-    idx = 0
 
-    while idx < n:
-        if is_int(y[idx]) & (is_float(y[idx]) == False):
-            idx += 1
-        else:
-            ans = False
-            break
+    for idx in range(n):
+        if ((y[idx] - floor(y[idx])) != 0):            
+            return False
 
-    return ans
+    return True
 
 
 # flatten list of lists

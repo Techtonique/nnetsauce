@@ -9,7 +9,6 @@ import sklearn.metrics as skm2
 from .ridge2 import Ridge2
 from ..utils import matrixops as mo
 from ..utils import misc as mx
-from ..utils import is_factor2
 from sklearn.base import ClassifierMixin
 from scipy.special import logsumexp
 
@@ -254,7 +253,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
         self: object
         """
 
-        assert is_factor2(y), "y must contain only integers"
+        assert mx.is_factor(y), "y must contain only integers"
 
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 

@@ -9,7 +9,6 @@ from ..base import Base
 from ..utils import misc as mx
 from ..utils import matrixops as mo
 from ..utils import lmfuncs as lmf
-from ..utils import is_factor2
 from sklearn.base import RegressorMixin
 
 
@@ -279,7 +278,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         if self.return_std:  # if there are std. devs in the predictions
             preds = preds[0]
 
-        if is_factor2(y):  # classification
+        if mx.is_factor(y):  # classification
 
             if scoring is None:
                 scoring = "accuracy"

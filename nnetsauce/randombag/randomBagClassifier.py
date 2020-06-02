@@ -9,7 +9,6 @@ from .bag import RandomBag
 from ..custom import CustomClassifier
 from ..utils import misc as mx
 from ..utils import Progbar
-from ..utils import is_factor2
 from sklearn.base import ClassifierMixin
 import pickle
 from joblib import Parallel, delayed
@@ -133,7 +132,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         self: object
         """
 
-        assert is_factor2(y), "y must contain only integers"
+        assert mx.is_factor(y), "y must contain only integers"
 
         # training
         n, p = X.shape

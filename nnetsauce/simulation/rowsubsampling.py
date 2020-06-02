@@ -5,7 +5,6 @@
 
 import numpy as np
 from ..utils import misc as mx
-from ..utils import is_factor2
 from ..utils import index_where
 
 # stratified subsampling
@@ -18,7 +17,7 @@ def subsample(y, row_sample=0.8, seed=123):
     
 
     # preproc -----    
-    if is_factor2(y):
+    if mx.is_factor(y):
 
         classes, n_elem_classes = np.unique(y, return_counts=True)
         n_classes = len(classes)
@@ -45,7 +44,7 @@ def subsample(y, row_sample=0.8, seed=123):
     for i in range(n_classes):
 
         # index_class_i = [i for i, e in enumerate(bool_class_i) if e == True]
-        index_class_i = index_where(y_as_classes, classes[i])
+        index_class_i = np.where(y_as_classes == classes[i])[0]
 
         # at least 2 elements in class  #i
         # or only one element in class        

@@ -1,6 +1,3 @@
-import ctypes
-from ctypes import c_double, c_int, c_long
-from .check_factor import is_factor2
 from .lmfuncs import beta_hat, inv_penalized_cov
 from .matrixops import cbind, rbind, crossprod, tcrossprod, to_np_array
 from .memoize import memoize
@@ -12,15 +9,8 @@ from .timeseries import create_train_inputs, reformat_response
 from .where import index_where
 
 
-is_factor2.arg_types = ctypes.POINTER(ctypes.c_double)
-is_factor2.restype = c_int
-
-index_where.arg_types = [ctypes.POINTER(ctypes.c_double), c_double]
-index_where.restype = ctypes.POINTER(ctypes.c_long)
-
 __all__ = [
     "beta_hat",
-    "is_factor2",
     "inv_penalized_cov",
     "cbind",
     "rbind",
