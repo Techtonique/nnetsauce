@@ -171,11 +171,11 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
         if sample_weight is None:
 
-            w_m = [1.0 / n] * n
+            w_m = np.repeat(1.0 / n, n)
 
         else:
 
-            w_m = sample_weight
+            w_m = np.asarray(sample_weight)
 
         base_learner = CustomClassifier(
             self.obj,
@@ -242,7 +242,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                 
                 sum_w_m = sum(w_m_temp)
                 
-                w_m = [w_m_temp[i] / sum_w_m for i in x_range_n]
+                w_m = np.asarray([w_m_temp[i] / sum_w_m for i in x_range_n])
 
                 base_learner.set_params(seed=self.seed + (m + 1) * 1000)
 
@@ -267,7 +267,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
             else:
 
-                w_m = sample_weight
+                w_m = np.asarray(sample_weight)
 
             for m in range(self.n_estimators):
 
