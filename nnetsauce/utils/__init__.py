@@ -6,7 +6,6 @@ from .model_selection import TimeSeriesSplit
 from .progress_bar import Progbar
 from .psdcheck import isPD, nearestPD
 from .timeseries import create_train_inputs, reformat_response
-from .where import index_where
 
 
 __all__ = [
@@ -18,7 +17,6 @@ __all__ = [
     "tcrossprod",
     "to_np_array",
     "merge_two_dicts",
-    "index_where",
     "is_factor",
     "isPD",
     "memoize",

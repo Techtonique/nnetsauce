@@ -5,7 +5,7 @@
 
 import numpy as np
 from ..utils import misc as mx
-from ..utils import index_where
+
 
 # stratified subsampling
 def subsample(y, row_sample=0.8, seed=123):
