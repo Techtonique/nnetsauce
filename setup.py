@@ -23,7 +23,7 @@ setup(
     description="Machine Learning using combinations of Neural Networks' layers",
     download_url="https://github.com/thierrymoudiki/nnetsauce",
     install_requires=["joblib>=0.13.2", "numpy >= 1.13.0", "scipy >= 0.19.0", 
-                      "scikit-learn >= 0.18.0", "tqdm>=4.28.1"].append(install_requires),
+                      "scikit-learn >= 0.18.0", "six >= 1.12.0", "tqdm>=4.28.1"].append(install_requires),
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: BSD License",
