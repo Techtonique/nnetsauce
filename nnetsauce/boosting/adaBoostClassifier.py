@@ -208,7 +208,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             for m in range(self.n_estimators):
 
                 preds = base_learner.fit(
-                    X, y, sample_weight=w_m, 
+                    X, y, sample_weight=np.ravel(w_m), 
                     **kwargs
                 ).predict(X)
 
@@ -272,7 +272,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             for m in range(self.n_estimators):
 
                 probs = base_learner.fit(
-                    X, y, sample_weight=w_m, **kwargs
+                    X, y, sample_weight=np.ravel(w_m), **kwargs
                 ).predict_proba(X)
 
                 np.clip(
