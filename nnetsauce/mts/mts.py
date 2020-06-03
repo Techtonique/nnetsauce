@@ -54,8 +54,10 @@ class MTS(Base):
            percentage of covariates randomly chosen for training    
        lags: int
            number of lags used for each time series 
-       alpha: float
-           smoothing parameter           
+       alpha1: float
+           smoothing weight (training set)
+       alpha2: float
+           smoothing parameter (testing set)           
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
     """
@@ -78,7 +80,8 @@ class MTS(Base):
         type_scaling=("std", "std", "std"),
         col_sample=1,
         lags=1,
-        alpha=None,
+        alpha1=None,
+        alpha2=None,
         seed=123      
     ):
 
@@ -111,7 +114,8 @@ class MTS(Base):
         self.preds = None
         self.preds_std = []
         self.row_sample = 1
-        self.alpha = alpha            
+        self.alpha1 = alpha1            
+        self.alpha2 = alpha2
             
 
     def fit(self, X, xreg=None, **kwargs):
@@ -163,10 +167,12 @@ class MTS(Base):
                                                self.lags)
 
         
-        self.y = mts_input[0]                        
-        if self.alpha is not None:  
-            alphas_seq = np.array([np.repeat(self.alpha*((1 - self.alpha)**i), p) for i in range(self.lags)]).flatten()
-            self.X = mts_input[1]*np.tile(alphas_seq, (mts_input[1].shape[0], 1))
+        self.y = mts_input[0]  
+        n_y = len(self.y)                      
+        if self.alpha1 is not None:
+            alphas_seq = np.array([self.alpha1*((1 - self.alpha1)**i) for i in range(n_y)])
+            n_inputs = self.n_series*self.lags
+            self.X = mts_input[1]*np.exp(np.tile(alphas_seq, n_inputs).reshape(n_inputs, n_y).T)
         else:    
             self.X = mts_input[1]                        
 
@@ -239,7 +245,7 @@ class MTS(Base):
 
         self.preds = pickle.loads(pickle.dumps(self.y, -1))                
 
-        if self.alpha is not None:
+        if self.alpha2 is not None:
             if(len(self.preds) > 1):
                 # multivariate            
                 previous_pred = self.preds[0,:]       
@@ -304,14 +310,14 @@ class MTS(Base):
     
                 if self.return_std == False:  # std. dev. is not returned
                     
-                    if self.alpha is not None:
+                    if self.alpha2 is not None:
                         
-                        preds = self.alpha*np.array(
+                        preds = self.alpha2*np.array(
                             [
                                 (self.y_means[j] + predicted_cooked_new_X[0])
                                 for j in range(self.n_series)
                             ]
-                        ) + (1 - self.alpha)*previous_pred
+                        ) + (1 - self.alpha2)*previous_pred
                     
                     else:
                         
@@ -324,14 +330,14 @@ class MTS(Base):
                         
                 else:  # std. dev. is returned
     
-                    if self.alpha is not None:
+                    if self.alpha2 is not None:
 
-                        preds = self.alpha*np.array(
+                        preds = self.alpha2*np.array(
                             [
                                 (self.y_means[j] + predicted_cooked_new_X[0][0])
                                 for j in range(self.n_series)
                             ]
-                        ) + (1 - self.alpha)*previous_pred
+                        ) + (1 - self.alpha2)*previous_pred
                     
                     else:
                         
@@ -345,7 +351,7 @@ class MTS(Base):
                     self.preds_std[i] = predicted_cooked_new_X[1][0]
                  
                     
-                if self.alpha is not None:
+                if self.alpha2 is not None:
                     
                         previous_pred = pickle.loads(pickle.dumps(preds, -1))                                                   
     
@@ -373,14 +379,14 @@ class MTS(Base):
     
                 if self.return_std == False:  # std. dev. is not returned
                     
-                    if self.alpha is not None:
+                    if self.alpha2 is not None:
                         
-                        preds = self.alpha*np.array(
+                        preds = self.alpha2*np.array(
                             [
                                 (self.y_means[j] + predicted_cooked_new_X[0])
                                 for j in range(self.n_series)
                             ]
-                        ) + (1 - self.alpha)*previous_pred                       
+                        ) + (1 - self.alpha2)*previous_pred                       
                         
                     else:
                         
@@ -394,14 +400,14 @@ class MTS(Base):
         
                 else:  # std. dev. is returned
                     
-                    if self.alpha is not None:
+                    if self.alpha2 is not None:
                         
-                        preds = self.alpha*np.array(
+                        preds = self.alpha2*np.array(
                             [
                                 (self.y_means[j] + predicted_cooked_new_X[0][0])
                                 for j in range(self.n_series)
                             ]
-                        ) + (1 - self.alpha)*previous_pred
+                        ) + (1 - self.alpha2)*previous_pred
                         
                     else:
                         
@@ -415,7 +421,7 @@ class MTS(Base):
                     self.preds_std[i] = predicted_cooked_new_X[1][0]
                 
                 
-                if self.alpha is not None:
+                if self.alpha2 is not None:
                     previous_pred = pickle.loads(pickle.dumps(preds, -1)) 
                                               
                     
