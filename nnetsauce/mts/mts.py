@@ -168,12 +168,12 @@ class MTS(Base):
 
         
         self.y = mts_input[0] 
-        print(f"self.y: \n {self.y} \n ")
-        print(f"mts_input[1]: \n {mts_input[1]} \n ")                 
+        # print(f"self.y: \n {self.y} \n ")
+        # print(f"mts_input[1]: \n {mts_input[1]} \n ")                 
         if self.alpha1 is not None:
             alphas_seq = np.asarray([self.alpha1*((1 - self.alpha1)**i) for i in range(n-1, -1, -1)])  # first to last          
             alphas_seq_lags = ts.create_lags(alphas_seq, self.lags - 1, self.n_series)[:-1, :]
-            print(f"alphas_seq_lags: \n {alphas_seq_lags}") 
+            # print(f"alphas_seq_lags: \n {alphas_seq_lags}") 
             self.X = mts_input[1]*np.exp(alphas_seq_lags)
         else:    
             self.X = mts_input[1]       
