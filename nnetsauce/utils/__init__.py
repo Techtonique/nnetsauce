@@ -5,7 +5,7 @@ from .misc import merge_two_dicts, is_factor
 from .model_selection import TimeSeriesSplit
 from .progress_bar import Progbar
 from .psdcheck import isPD, nearestPD
-from .timeseries import create_train_inputs, reformat_response
+from .timeseries import create_lags, create_train_inputs, reformat_response
 
 
 __all__ = [
@@ -21,6 +21,7 @@ __all__ = [
     "isPD",
     "memoize",
     "nearestPD",
+    "create_lags",
     "create_train_inputs",
     "reformat_response",
     "TimeSeriesSplit",
