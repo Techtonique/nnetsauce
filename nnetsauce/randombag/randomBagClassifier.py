@@ -195,24 +195,27 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
         # if self.n_jobs is not None:
         def fit_estimators(m):
-            base_learner = CustomClassifier(
-                self.obj,
-                n_hidden_features=self.n_hidden_features,
-                activation_name=self.activation_name,
-                a=self.a,
-                nodes_sim=self.nodes_sim,
-                bias=self.bias,
-                dropout=self.dropout,
-                direct_link=self.direct_link,
-                n_clusters=self.n_clusters,
-                type_clust=self.type_clust,
-                type_scaling=self.type_scaling,
-                col_sample=self.col_sample,
-                row_sample=self.row_sample,
-                seed=self.seed + m * 1000,
-            )
-            base_learner.fit(X, y, **kwargs)
-            self.voter.update({m: pickle.loads(pickle.dumps(base_learner, -1))})
+            try:
+                base_learner = CustomClassifier(
+                    self.obj,
+                    n_hidden_features=self.n_hidden_features,
+                    activation_name=self.activation_name,
+                    a=self.a,
+                    nodes_sim=self.nodes_sim,
+                    bias=self.bias,
+                    dropout=self.dropout,
+                    direct_link=self.direct_link,
+                    n_clusters=self.n_clusters,
+                    type_clust=self.type_clust,
+                    type_scaling=self.type_scaling,
+                    col_sample=self.col_sample,
+                    row_sample=self.row_sample,
+                    seed=self.seed + m * 1000,
+                )
+                base_learner.fit(X, y, **kwargs)
+                self.voter.update({m: pickle.loads(pickle.dumps(base_learner, -1))})
+            except:
+                pass
 
         if self.verbose == 1:
 
@@ -318,7 +321,10 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
         # if self.n_jobs is not None:
         def predict_estimator(m):
-            return self.voter[m].predict_proba(X)
+            try:
+                return self.voter[m].predict_proba(X)
+            except:
+                pass
 
         if self.verbose == 1:
 
