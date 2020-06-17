@@ -1,6 +1,12 @@
 # Dev/Deployment
+joblib
+numpy
+scipy
+scikit-learn
+six
+tqdm
 sphinx
 sphinx_rtd_theme
-nose
+nose2
 coverage
 pypi-publisher
