@@ -29,4 +29,5 @@ jobs:
         pip install -r requirements.txt
     - name: Test with nose2
       run: |
+        pip install nose2 coverage
         nose2
