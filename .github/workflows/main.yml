@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.5, 3.6, 3.7]
+        python-version: [3.5, 3.6, 3.7, 3.8]
 
     steps:
     - uses: actions/checkout@v2
@@ -29,5 +29,4 @@ jobs:
         pip install -r requirements.txt
     - name: Test with nose2
       run: |
-        pip install nose2 coverage
         nose2
