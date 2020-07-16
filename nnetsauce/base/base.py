@@ -230,23 +230,41 @@ class Base(BaseEstimator):
         if self.bias is False:  # no bias term in the hidden layer
 
             if W is None:
-
-                h_sim = {
-                    "sobol": ns.generate_sobol_randtoolbox(
-                        n_dims=n_features, n_points=self.n_hidden_features
-                    ),
-                    "hammersley": ns.generate_hammersley(
-                        n_dims=n_features, n_points=self.n_hidden_features
-                    ),
-                    "uniform": ns.generate_uniform(
-                        n_dims=n_features,
-                        n_points=self.n_hidden_features,
-                        seed=self.seed,
-                    ),
-                    "halton": ns.generate_halton_randtoolbox(
-                        n_dims=n_features, n_points=self.n_hidden_features
-                    ),
-                }
+                
+                try:
+                    h_sim = {
+                        "sobol": ns.generate_sobol_randtoolbox(
+                            n_dims=n_features, n_points=self.n_hidden_features
+                        ),
+                        "hammersley": ns.generate_hammersley(
+                            n_dims=n_features, n_points=self.n_hidden_features
+                        ),
+                        "uniform": ns.generate_uniform(
+                            n_dims=n_features,
+                            n_points=self.n_hidden_features,
+                            seed=self.seed,
+                        ),
+                        "halton": ns.generate_halton_randtoolbox(
+                            n_dims=n_features, n_points=self.n_hidden_features
+                        ),
+                    }
+                except:
+                    h_sim = {
+                        "sobol": ns.generate_sobol2(
+                            n_dims=n_features, n_points=self.n_hidden_features
+                        ),
+                        "hammersley": ns.generate_hammersley(
+                            n_dims=n_features, n_points=self.n_hidden_features
+                        ),
+                        "uniform": ns.generate_uniform(
+                            n_dims=n_features,
+                            n_points=self.n_hidden_features,
+                            seed=self.seed,
+                        ),
+                        "halton": ns.generate_halton(
+                            n_dims=n_features, n_points=self.n_hidden_features
+                        ),
+                    }
 
                 self.W = h_sim[self.nodes_sim]
 
@@ -276,23 +294,42 @@ class Base(BaseEstimator):
         if W is None:
 
             n_features_1 = n_features + 1
-
-            h_sim = {
-                "sobol": ns.generate_sobol_randtoolbox(
-                    n_dims=n_features_1, n_points=self.n_hidden_features
-                ),
-                "hammersley": ns.generate_hammersley(
-                    n_dims=n_features_1, n_points=self.n_hidden_features
-                ),
-                "uniform": ns.generate_uniform(
-                    n_dims=n_features_1,
-                    n_points=self.n_hidden_features,
-                    seed=self.seed,
-                ),
-                "halton": ns.generate_halton_randtoolbox(
-                    n_dims=n_features_1, n_points=self.n_hidden_features
-                ),
-            }
+            
+            try:
+                h_sim = {
+                    "sobol": ns.generate_sobol_randtoolbox(
+                        n_dims=n_features_1, n_points=self.n_hidden_features
+                    ),
+                    "hammersley": ns.generate_hammersley(
+                        n_dims=n_features_1, n_points=self.n_hidden_features
+                    ),
+                    "uniform": ns.generate_uniform(
+                        n_dims=n_features_1,
+                        n_points=self.n_hidden_features,
+                        seed=self.seed,
+                    ),
+                    "halton": ns.generate_halton_randtoolbox(
+                        n_dims=n_features_1, n_points=self.n_hidden_features
+                    ),
+                }
+            except:
+                h_sim = {
+                    "sobol": ns.generate_sobol2(
+                        n_dims=n_features_1, n_points=self.n_hidden_features
+                    ),
+                    "hammersley": ns.generate_hammersley(
+                        n_dims=n_features_1, n_points=self.n_hidden_features
+                    ),
+                    "uniform": ns.generate_uniform(
+                        n_dims=n_features_1,
+                        n_points=self.n_hidden_features,
+                        seed=self.seed,
+                    ),
+                    "halton": ns.generate_halton(
+                        n_dims=n_features_1, n_points=self.n_hidden_features
+                    ),
+                }
+                
 
             self.W = h_sim[self.nodes_sim]
 
