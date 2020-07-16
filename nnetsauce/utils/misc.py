@@ -1,4 +1,4 @@
-from math import floor
+import numpy as np
 from .memoize import memoize
 
 
@@ -26,15 +26,8 @@ def is_float(x):
 
 # check if the response contains only integers
 @memoize
-def is_factor(y):
-
-    n = len(y)
-
-    for idx in range(n):
-        if ((y[idx] - floor(y[idx])) != 0):            
-            return False
-
-    return True
+def is_factor(y):    
+    return (not np.mod(y, 1).any())
 
 
 # flatten list of lists

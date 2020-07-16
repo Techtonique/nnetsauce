@@ -250,7 +250,7 @@ class Base(BaseEstimator):
         if self.bias is False:  # no bias term in the hidden layer
 
             if W is None:
-
+                
                 if self.nodes_sim == "sobol":
                     try:  # try cpp version
                         self.W = ns.generate_sobol_cpp(
@@ -309,7 +309,7 @@ class Base(BaseEstimator):
         if W is None:
 
             n_features_1 = n_features + 1
-
+            
             if self.nodes_sim == "sobol":
                 try:  # try cpp version
                     self.W = ns.generate_sobol_cpp(
@@ -389,7 +389,7 @@ class Base(BaseEstimator):
         if self.n_hidden_features > 0:  # has a hidden layer
 
             assert len(self.type_scaling) >= 2, ""
-
+                
         # center y
         if mx.is_factor(y) == False:  # regression
 
