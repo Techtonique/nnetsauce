@@ -6,30 +6,30 @@
 
 import ctypes
 import numpy as np
-import os 
+import os
 from ctypes import c_double, c_long
 
 
 dir_path = os.path.dirname(__file__)
 try:
-	wherer = ctypes.cdll.LoadLibrary(dir_path + "/wherer.so")  
-except:	
-	wherer = ctypes.CDLL(dir_path + '/wherer.so')
+    wherer = ctypes.cdll.LoadLibrary(dir_path + "/wherer.so")
+except:
+    wherer = ctypes.CDLL(dir_path + "/wherer.so")
 
 
 def index_where(x, elt):
-  
-  x_ = x.tolist() if isinstance(x, np.ndarray) else x.copy()
-    
-  n = len(x_)
-  x_c = (c_double * n)(*x_)  #Create ctypes pointer to underlying memory
-  res = (c_long * n)(*([0]*n))
 
-  wherer.where(x_c, c_double(elt), n, res)
+    x_ = x.tolist() if isinstance(x, np.ndarray) else x.copy()
 
-  z = np.asarray(list(res))
+    n = len(x_)
+    x_c = (c_double * n)(*x_)  # Create ctypes pointer to underlying memory
+    res = (c_long * n)(*([0] * n))
 
-  return (z[z != -1])
+    wherer.where(x_c, c_double(elt), n, res)
+
+    z = np.asarray(list(res))
+
+    return z[z != -1]
 
 
 # if __name__=="__main__":

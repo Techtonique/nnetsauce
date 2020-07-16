@@ -1,4 +1,3 @@
-
 # Authors: Thierry Moudiki
 #
 # License: BSD 3

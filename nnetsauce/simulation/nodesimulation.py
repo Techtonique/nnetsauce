@@ -9,23 +9,133 @@ from ..utils import memoize
 from rpy2.robjects import numpy2ri
 from rpy2.robjects.packages import importr
 
-randtoolbox = importr('randtoolbox', lib_loc=".")
-
+randtoolbox = importr("randtoolbox")
 
 
 # From: https://github.com/PhaethonPrime/hammersley/blob/master/hammersley/sequences.py
 
 # this list of primes allows up to a size 120 vector
 saved_primes = [
-2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,
-67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,
-139,149,151,157,163,167,173,179,181,191,193,197,199,
-211,223,227,229,233,239,241,251,257,263,269,271,277,
-281,283,293,307,311,313,317,331,337,347,349,353,359,
-367,373,379,383,389,397,401,409,419,421,431,433,439,
-443,449,457,461,463,467,479,487,491,499,503,509,521,
-523,541,547,557,563,569,571,577,587,593,599,601,607,
-613,617,619,631,641,643,647,653,659,
+    2,
+    3,
+    5,
+    7,
+    11,
+    13,
+    17,
+    19,
+    23,
+    29,
+    31,
+    37,
+    41,
+    43,
+    47,
+    53,
+    59,
+    61,
+    67,
+    71,
+    73,
+    79,
+    83,
+    89,
+    97,
+    101,
+    103,
+    107,
+    109,
+    113,
+    127,
+    131,
+    137,
+    139,
+    149,
+    151,
+    157,
+    163,
+    167,
+    173,
+    179,
+    181,
+    191,
+    193,
+    197,
+    199,
+    211,
+    223,
+    227,
+    229,
+    233,
+    239,
+    241,
+    251,
+    257,
+    263,
+    269,
+    271,
+    277,
+    281,
+    283,
+    293,
+    307,
+    311,
+    313,
+    317,
+    331,
+    337,
+    347,
+    349,
+    353,
+    359,
+    367,
+    373,
+    379,
+    383,
+    389,
+    397,
+    401,
+    409,
+    419,
+    421,
+    431,
+    433,
+    439,
+    443,
+    449,
+    457,
+    461,
+    463,
+    467,
+    479,
+    487,
+    491,
+    499,
+    503,
+    509,
+    521,
+    523,
+    541,
+    547,
+    557,
+    563,
+    569,
+    571,
+    577,
+    587,
+    593,
+    599,
+    601,
+    607,
+    613,
+    617,
+    619,
+    631,
+    641,
+    643,
+    647,
+    653,
+    659,
 ]
 
 
@@ -103,20 +213,17 @@ def generate_halton_cpp(n_dims=2, n_points=10):
         return np.transpose(np.array(list(xx)).reshape(n_points, n_dims))
     except:
         raise ValueError("_halton.so is not imported.")
-        
-        
+
+
 # randtoolbox exports -----
 
 # sobol numbers' generation (cpp)
 @memoize
 def generate_sobol_randtoolbox(n_dims=2, n_points=10):
-    return np.asarray(randtoolbox.sobol(n=n_points, 
-                                        dim=n_dims)).T        
+    return np.asarray(randtoolbox.sobol(n=n_points, dim=n_dims)).T
 
 
 # halton numbers' generation (cpp)
 @memoize
 def generate_halton_randtoolbox(n_dims=2, n_points=10):
-    return np.asarray(randtoolbox.halton(n=n_points, 
-                                        dim=n_dims)).T        
-
+    return np.asarray(randtoolbox.halton(n=n_points, dim=n_dims)).T

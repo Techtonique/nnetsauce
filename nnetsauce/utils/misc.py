@@ -26,8 +26,8 @@ def is_float(x):
 
 # check if the response contains only integers
 @memoize
-def is_factor(y):    
-    return (not np.mod(y, 1).any())
+def is_factor(y):
+    return not np.mod(y, 1).any()
 
 
 # flatten list of lists

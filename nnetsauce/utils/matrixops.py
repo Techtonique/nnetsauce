@@ -88,7 +88,7 @@ def one_hot_encode(x_clusters, n_clusters):
 def one_hot_encode2(y, n_classes):
 
     n_obs = len(y)
-    
+
     res = np.zeros((n_obs, n_classes))
 
     for i in range(n_obs):
@@ -120,7 +120,7 @@ def safe_sparse_dot(a, b, dense_output=False, backend="cpu"):
     dot_product : array or sparse matrix
         sparse if ``a`` and ``b`` are sparse and ``dense_output=False``.
     """
-    
+
     if a.ndim > 2 or b.ndim > 2:
         if sparse.issparse(a):
             # sparse is always 2D. Implies b is 3D+
@@ -140,8 +140,12 @@ def safe_sparse_dot(a, b, dense_output=False, backend="cpu"):
     else:
         ret = a @ b
 
-    if (sparse.issparse(a) and sparse.issparse(b)
-            and dense_output and hasattr(ret, "toarray")):
+    if (
+        sparse.issparse(a)
+        and sparse.issparse(b)
+        and dense_output
+        and hasattr(ret, "toarray")
+    ):
         return ret.toarray()
     return ret
 

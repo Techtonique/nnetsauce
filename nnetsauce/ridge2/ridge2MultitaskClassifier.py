@@ -1,4 +1,3 @@
-
 # Authors: Thierry Moudiki
 #
 # License: BSD 3
@@ -158,7 +157,7 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
             mo.cbind(B_inv + mo.crossprod(W, Y2), -np.transpose(Y2)),
             mo.cbind(-Y2, S_inv),
         )
-        
+
         self.beta = np.dot(inv, mo.crossprod(scaled_Z, Y))
 
         return self

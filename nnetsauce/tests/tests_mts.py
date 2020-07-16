@@ -124,7 +124,7 @@ class TestMTS(ut.TestCase):
             n_clusters=4,
             cluster_encode=False,
         )
-        
+
         fit_obj10 = ns.MTS(
             regr4,
             n_hidden_features=0,
@@ -135,11 +135,10 @@ class TestMTS(ut.TestCase):
             type_scaling=("minmax", "minmax", "minmax"),
             activation_name="elu",
             n_clusters=4,
-            alpha1=0.2, alpha2=0.4,
+            alpha1=0.2,
+            alpha2=0.4,
             cluster_encode=False,
         )
-        
-        
 
         index_train = range(20)
         index_test = range(20, 25)
@@ -184,10 +183,10 @@ class TestMTS(ut.TestCase):
 
         fit_obj9.fit(X_train)
         preds4 = fit_obj9.predict(return_std=True)
-        
-        fit_obj9.fit(X_train[:,0])
+
+        fit_obj9.fit(X_train[:, 0])
         preds5 = fit_obj9.predict(return_std=True)
-        
+
         fit_obj10.fit(X_train)
         preds6 = fit_obj10.predict(return_std=True)
 
@@ -200,9 +199,9 @@ class TestMTS(ut.TestCase):
         self.assertTrue(np.allclose(preds[2][1, 0], 49.895558528390268))
         self.assertTrue(np.allclose(preds2[2][1, 0], 50.08511339370441))
         self.assertTrue(np.allclose(preds6[2][1, 0], 55.518442331652956))
-        
+
         self.assertTrue(preds4[2][1, 0], 50.38107971065952)
-        
+
         self.assertTrue(preds5[2][1, 0], 51.0175425305647)
 
         self.assertTrue(abs(preds3[2][1, 0] - 50.0) <= 0.05)
@@ -278,20 +277,18 @@ class TestMTS(ut.TestCase):
             activation_name="relu",
             n_clusters=0,
         )
-        
+
         scores = fit_obj.score(
-                    X,
-                    training_index=range(20),
-                    testing_index=range(20, 25),
-                    scoring="neg_mean_squared_error",
-                )
-        
+            X,
+            training_index=range(20),
+            testing_index=range(20, 25),
+            scoring="neg_mean_squared_error",
+        )
+
         scores2 = fit_obj.score(
-                    X,
-                    training_index=range(20),
-                    testing_index=range(20, 25)
-                )
-        
+            X, training_index=range(20), testing_index=range(20, 25)
+        )
+
         self.assertTrue(
             np.allclose([np.round(x) for x in scores], [239.0, 0.0, 85.0])
             & np.allclose([np.round(x) for x in scores2], [15.0, 0.0, 9.0])

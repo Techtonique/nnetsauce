@@ -35,6 +35,6 @@ except:
         "generate_uniform",
         "generate_hammersley",
         "generate_halton",
-        "generate_halton_randtoolbox",        
+        "generate_halton_randtoolbox",
         "subsample",
     ]

@@ -1,4 +1,3 @@
-
 # Authors: Thierry Moudiki
 #
 # License: BSD 3
@@ -213,7 +212,9 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
                     seed=self.seed + m * 1000,
                 )
                 base_learner.fit(X, y, **kwargs)
-                self.voter.update({m: pickle.loads(pickle.dumps(base_learner, -1))})
+                self.voter.update(
+                    {m: pickle.loads(pickle.dumps(base_learner, -1))}
+                )
             except:
                 pass
 
