@@ -181,39 +181,21 @@ class Base(BaseEstimator):
             # scale input data before clustering
             self.clustering_scaler, scaled_X = mo.scale_covariates(
                 X, choice=self.type_scaling[2]
-            )
-
-            if self.type_clust == "kmeans":
-
-                self.clustering_obj, X_kmeans = mo.cluster_covariates(
+            )                        
+            
+            self.clustering_obj, X_clustered = mo.cluster_covariates(
                     scaled_X,
                     self.n_clusters,
                     self.seed,
-                    type_clust="kmeans",
+                    type_clust=self.type_clust,
                     **kwargs
                 )
+            
+            if self.cluster_encode == True:
 
-                if self.cluster_encode == True:
+                    return mo.one_hot_encode(X_clustered, self.n_clusters)
 
-                    return mo.one_hot_encode(X_kmeans, self.n_clusters)
-
-                return X_kmeans
-
-            if self.type_clust == "gmm":
-
-                self.clustering_obj, X_gmm = mo.cluster_covariates(
-                    scaled_X,
-                    self.n_clusters,
-                    self.seed,
-                    type_clust="gmm",
-                    **kwargs
-                )
-
-                if self.cluster_encode == True:
-
-                    return mo.one_hot_encode(X_gmm, self.n_clusters)
-
-                return X_gmm
+            return X_clustered
 
         # if predict == True, encode test set
         X_clustered = self.clustering_obj.predict(
