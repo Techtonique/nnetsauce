@@ -329,12 +329,9 @@ class Base(BaseEstimator):
         # either X and y are stored or not
         # assert ((y is None) & (X is None)) | ((y is not None) & (X is not None))
         if self.n_hidden_features > 0:  # has a hidden layer
-            assert len(self.type_scaling) >= 2, ""
+            assert len(self.type_scaling) >= 2, \
+            "must have len(self.type_scaling) >= 2 when self.n_hidden_features > 0"
                 
-        # center y
-        if mx.is_factor(y) == False:  # regression
-            self.y_mean, centered_y = mo.center_response(self.y) if y is None else mo.center_response(y)
-
         if X is None:
             if self.col_sample == 1:
                 input_X = self.X
@@ -350,7 +347,7 @@ class Base(BaseEstimator):
                 )
                 self.index_col = index_col
                 input_X = self.X[:, self.index_col]
-        else:  # X is not None
+        else:  # X is not None # keep X vs self.X
             if self.col_sample == 1:
                 input_X = X
             else:
@@ -366,8 +363,7 @@ class Base(BaseEstimator):
                 self.index_col = index_col
                 input_X = X[:, self.index_col]
 
-        if (self.n_clusters <= 0):  # data without any clustering: self.n_clusters is None -----
-            
+        if (self.n_clusters <= 0):  # data without any clustering: self.n_clusters is None -----            
             if self.n_hidden_features > 0:  # with hidden layer
                 self.nn_scaler, scaled_X = mo.scale_covariates(
                     input_X, choice=self.type_scaling[1]
@@ -379,9 +375,7 @@ class Base(BaseEstimator):
                 Z = input_X
                 self.scaler, scaled_Z = mo.scale_covariates(
                     Z, choice=self.type_scaling[0])
-
-        else:  # data with clustering: self.n_clusters is not None -----
-
+        else:  # data with clustering: self.n_clusters is not None ----- # keep
             augmented_X = mo.cbind(
                 input_X, self.encode_clusters(input_X, **kwargs)
             )
@@ -398,28 +392,39 @@ class Base(BaseEstimator):
                     Z, choice=self.type_scaling[0]
                 )
 
-        # Returning model inputs -----
-
-        # y is subsampled
-        if self.row_sample < 1:
-
-            n, p = Z.shape
-            if y is None:
+        # Returning model inputs -----                
+        if mx.is_factor(y) == False:  # regression
+            # center y
+            self.y_mean, centered_y = mo.center_response(self.y) if y is None else mo.center_response(y)            
+            # y is subsampled
+            if self.row_sample < 1:
+                n, p = Z.shape
                 self.index_row = rs.subsample(
                     y=self.y, row_sample=self.row_sample, seed=self.seed
-                )
-            else:
-                self.index_row = rs.subsample(
+                ) if y is None else rs.subsample(
                     y=y, row_sample=self.row_sample, seed=self.seed
                 )
-            n_row_sample = len(self.index_row)
-            if mx.is_factor(y) == False:  # regression
+                n_row_sample = len(self.index_row)
+                # regression
                 return (
                     centered_y[self.index_row].reshape(n_row_sample),
                     self.scaler.transform(
                         Z[self.index_row, :].reshape(n_row_sample, p)
                     ),
                 )
+            # y is not subsampled
+            # regression
+            return (centered_y, self.scaler.transform(Z))                
+        # classification    
+        # y is subsampled
+        if self.row_sample < 1:
+            n, p = Z.shape
+            self.index_row = rs.subsample(
+                    y=self.y, row_sample=self.row_sample, seed=self.seed
+                ) if y is None else rs.subsample(
+                    y=y, row_sample=self.row_sample, seed=self.seed
+                )
+            n_row_sample = len(self.index_row)
             # classification
             return (
                 y[self.index_row].reshape(n_row_sample),
@@ -427,11 +432,7 @@ class Base(BaseEstimator):
                     Z[self.index_row, :].reshape(n_row_sample, p)
                 ),
             )
-
         # y is not subsampled
-        if mx.is_factor(y) == False:  # regression
-            return (centered_y, self.scaler.transform(Z))
-
         # classification
         return (y, self.scaler.transform(Z))
 
@@ -452,26 +453,14 @@ class Base(BaseEstimator):
         Transformed test set : {array-like}        
         """        
 
-        if (
-            self.n_clusters == 0
-        ):  # data without clustering: self.n_clusters is None -----
+        if (self.n_clusters == 0):  # data without clustering: self.n_clusters is None -----
 
-            if self.n_hidden_features > 0:  # if hidden layer
-
-                if self.col_sample == 1:
-
-                    scaled_X = self.nn_scaler.transform(X)
-
-                else:
-
-                    scaled_X = self.nn_scaler.transform(X[:, self.index_col])
-
+            if self.n_hidden_features > 0:  
+                # if hidden layer
+                scaled_X = self.nn_scaler.transform(X) if (self.col_sample == 1) else self.nn_scaler.transform(X[:, self.index_col])
                 Phi_X = self.create_layer(scaled_X, self.W)
-
                 if self.direct_link == True:
-
                     return self.scaler.transform(mo.cbind(scaled_X, Phi_X))
-
                 # when self.direct_link == False
                 return self.scaler.transform(Phi_X)
 
@@ -480,27 +469,19 @@ class Base(BaseEstimator):
 
         # data with clustering: self.n_clusters > 0 -----
         if self.col_sample == 1:
-
-            predicted_clusters = self.encode_clusters(
-                X=X, predict=True, **kwargs
-            )
+            predicted_clusters = self.encode_clusters(X=X, predict=True, 
+                                                      **kwargs)
             augmented_X = mo.cbind(X, predicted_clusters)
-
         else:
-
-            predicted_clusters = self.encode_clusters(
-                X=X[:, self.index_col], predict=True, **kwargs
-            )
+            predicted_clusters = self.encode_clusters(X=X[:, self.index_col], 
+                                                      predict=True, **kwargs)
             augmented_X = mo.cbind(X[:, self.index_col], predicted_clusters)
 
         if self.n_hidden_features > 0:  # if hidden layer
-
             scaled_X = self.nn_scaler.transform(augmented_X)
             Phi_X = self.create_layer(scaled_X, self.W)
-
             if self.direct_link == True:
                 return self.scaler.transform(mo.cbind(augmented_X, Phi_X))
-
             return self.scaler.transform(Phi_X)
 
         # if no hidden layer
