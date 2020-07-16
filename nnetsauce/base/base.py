@@ -233,15 +233,15 @@ class Base(BaseEstimator):
 
             if W is None:
                 
-                h_sim = {"sobol": ns.generate_sobol2(n_dims=n_features, 
-                                                 n_points=self.n_hidden_features),
-                     "hammersley": ns.generate_hammersley(n_dims=n_features, 
-                                                          n_points=self.n_hidden_features),
-                     "uniform": ns.generate_uniform(n_dims=n_features,
-                                                    n_points=self.n_hidden_features,
-                                                    seed=self.seed),
-                     "halton": ns.generate_halton(n_dims=n_features, 
-                                                  n_points=self.n_hidden_features)}
+                h_sim = {"sobol": ns.generate_sobol_randtoolbox(n_dims=n_features, 
+                                                                n_points=self.n_hidden_features),
+                         "hammersley": ns.generate_hammersley(n_dims=n_features, 
+                                                              n_points=self.n_hidden_features),
+                         "uniform": ns.generate_uniform(n_dims=n_features,
+                                                        n_points=self.n_hidden_features,
+                                                        seed=self.seed),
+                         "halton": ns.generate_halton_randtoolbox(n_dims=n_features, 
+                                                      n_points=self.n_hidden_features)}
                      
                 self.W = h_sim[self.nodes_sim]     
 
@@ -272,14 +272,14 @@ class Base(BaseEstimator):
 
             n_features_1 = n_features + 1
             
-            h_sim = {"sobol": ns.generate_sobol2(n_dims=n_features_1, 
-                                                 n_points=self.n_hidden_features),
+            h_sim = {"sobol": ns.generate_sobol_randtoolbox(n_dims=n_features_1, 
+                                                            n_points=self.n_hidden_features),
                      "hammersley": ns.generate_hammersley(n_dims=n_features_1, 
                                                           n_points=self.n_hidden_features),
                      "uniform": ns.generate_uniform(n_dims=n_features_1,
                                                     n_points=self.n_hidden_features,
                                                     seed=self.seed),
-                     "halton": ns.generate_halton(n_dims=n_features_1, 
+                     "halton": ns.generate_halton_randtoolbox(n_dims=n_features_1, 
                                                   n_points=self.n_hidden_features)}
             
             self.W = h_sim[self.nodes_sim]
@@ -454,7 +454,6 @@ class Base(BaseEstimator):
         """        
 
         if (self.n_clusters == 0):  # data without clustering: self.n_clusters is None -----
-
             if self.n_hidden_features > 0:  
                 # if hidden layer
                 scaled_X = self.nn_scaler.transform(X) if (self.col_sample == 1) else self.nn_scaler.transform(X[:, self.index_col])
@@ -463,7 +462,6 @@ class Base(BaseEstimator):
                     return self.scaler.transform(mo.cbind(scaled_X, Phi_X))
                 # when self.direct_link == False
                 return self.scaler.transform(Phi_X)
-
             # if no hidden layer # self.n_hidden_features == 0
             return self.scaler.transform(X)
 
