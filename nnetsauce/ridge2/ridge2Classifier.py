@@ -1,6 +1,6 @@
 # Authors: Thierry Moudiki
 #
-# License: BSD 3
+# License: BSD 3 Clear
 
 import numpy as np
 from scipy.optimize import minimize
@@ -150,7 +150,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
             # X -> (n, p)
             # (K, n) %*% (n, p) -> (K, p)
             if hessian is False:
-                grad = -np.dot((Y - probs).T, X) / n
+                grad = -mo.safe_sparse_dot(a=(Y - probs).T, b=X, backend=self.backend) / n
                 grad += self.lambda1 * B[0:init_p, :].sum(axis=0)[:, None]
                 grad += self.lambda2 * B[init_p:p, :].sum(axis=0)[:, None]
 
@@ -165,9 +165,9 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
                     for k2 in range(k1, K):
                         y_index = range(k2 * p, (k2 + 1) * p)
                         H_sub = (
-                            -np.dot(
-                                X.T, (probs[:, k1] * probs[:, k2])[:, None] * X
-                            )
+                            -mo.safe_sparse_dot(a=
+                                X.T, b=(probs[:, k1] * probs[:, k2])[:, None] * X, 
+                  backend=self.backend)
                             / n
                         )  # do not store
                         hess[np.ix_(x_index, y_index)] = hess[

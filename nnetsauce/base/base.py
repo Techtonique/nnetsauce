@@ -1,6 +1,6 @@
 # Authors: Thierry Moudiki
 #
-# License: BSD 3
+# License: BSD 3 Clear
 
 import numpy as np
 from functools import partial
@@ -58,6 +58,8 @@ class Base(BaseEstimator):
            percentage of rows chosen for training, by stratified bootstrapping    
        seed: int 
            reproducibility seed for nodes_sim=='uniform', clustering and dropout
+       backend: str
+           "cpu" or "gpu" or "tpu"                
     """
 
     # construct the object -----
@@ -78,6 +80,7 @@ class Base(BaseEstimator):
         col_sample=1,
         row_sample=1,
         seed=123,
+        backend="cpu"
     ):
 
         # input checks -----
@@ -111,6 +114,9 @@ class Base(BaseEstimator):
             col_sample <= 1
         ), "'col_sample' must be comprised between 0 and 1 (both included)"
 
+        assert backend in ("cpu", "gpu", "tpu"
+        ), "must have 'backend' in ('cpu', 'gpu', 'tpu')"
+
         # activation function -----
 
         activation_options = {
@@ -128,6 +134,7 @@ class Base(BaseEstimator):
         self.nodes_sim = nodes_sim
         self.bias = bias
         self.seed = seed
+        self.backend = backend
         self.dropout = dropout
         self.direct_link = direct_link
         self.cluster_encode = cluster_encode
@@ -171,6 +178,8 @@ class Base(BaseEstimator):
         -------
         Clusters' matrix, one-hot encoded: {array-like}        
         """
+
+        np.random.seed(self.seed)
 
         if X is None:
             X = self.X
@@ -273,7 +282,8 @@ class Base(BaseEstimator):
                 ), "check dimensions of covariates X and matrix W"
 
                 return mo.dropout(
-                    x=self.activation_func(np.dot(scaled_X, self.W)),
+                    x=self.activation_func(mo.safe_sparse_dot(a=scaled_X, b=self.W, 
+                                                              backend=self.backend)),
                     drop_prob=self.dropout,
                     seed=self.seed,
                 )
@@ -285,7 +295,8 @@ class Base(BaseEstimator):
 
             # self.W = W
             return mo.dropout(
-                x=self.activation_func(np.dot(scaled_X, W)),
+                x=self.activation_func(mo.safe_sparse_dot(a=scaled_X, b=W, 
+                                                          backend=self.backend)),
                 drop_prob=self.dropout,
                 seed=self.seed,
             )
@@ -335,9 +346,9 @@ class Base(BaseEstimator):
 
             return mo.dropout(
                 x=self.activation_func(
-                    np.dot(
-                        mo.cbind(np.ones(scaled_X.shape[0]), scaled_X), self.W
-                    )
+                    mo.safe_sparse_dot(a=mo.cbind(np.ones(scaled_X.shape[0]), scaled_X, 
+                                                  backend=self.backend), b=self.W, 
+                                       backend=self.backend)
                 ),
                 drop_prob=self.dropout,
                 seed=self.seed,
@@ -347,7 +358,9 @@ class Base(BaseEstimator):
         # self.W = W
         return mo.dropout(
             x=self.activation_func(
-                np.dot(mo.cbind(np.ones(scaled_X.shape[0]), scaled_X), W)
+                mo.safe_sparse_dot(a=mo.cbind(np.ones(scaled_X.shape[0]), scaled_X, 
+                                              backend=self.backend), b=W, 
+                                   backend=self.backend)
             ),
             drop_prob=self.dropout,
             seed=self.seed,

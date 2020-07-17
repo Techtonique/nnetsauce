@@ -147,10 +147,12 @@ class BaseRegressor(Base, RegressorMixin):
 
             return (
                 self.y_mean
-                + np.dot(self.cook_test_set(new_X, **kwargs), self.beta)
+                + mo.safe_sparse_dot(a=self.cook_test_set(new_X, **kwargs), b=self.beta, 
+                  backend=self.backend)
             )[0]
 
-        return self.y_mean + np.dot(self.cook_test_set(X, **kwargs), self.beta)
+        return self.y_mean + mo.safe_sparse_dot(a=self.cook_test_set(X, **kwargs), b=self.beta, 
+                  backend=self.backend)
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 

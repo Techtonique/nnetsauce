@@ -6,6 +6,7 @@ import nnetsauce as ns
 
 # Basic tests
 
+np.random.seed(123)
 
 class TestMTS(ut.TestCase):
     def test_MTS(self):
@@ -190,9 +191,9 @@ class TestMTS(ut.TestCase):
         fit_obj10.fit(X_train)
         preds6 = fit_obj10.predict(return_std=True)
 
-        self.assertTrue(np.allclose(rmse, 10.396062391967684))
+        self.assertTrue(np.allclose(np.round(rmse, 3), 10.396))
         self.assertTrue(np.allclose(rmse_xreg, 10.39593866961476))
-        self.assertTrue(np.allclose(rmse2, 10.395489235411796))
+        self.assertTrue(np.allclose(np.round(rmse2, 3), 10.395))
         self.assertTrue(np.allclose(rmse3, 10.395986434438191))
         self.assertTrue(np.allclose(rmse4, 10.677585029352571))
         self.assertTrue(np.allclose(rmse5, 10.360814075763624))
@@ -291,7 +292,7 @@ class TestMTS(ut.TestCase):
 
         self.assertTrue(
             np.allclose([np.round(x) for x in scores], [239.0, 0.0, 85.0])
-            & np.allclose([np.round(x) for x in scores2], [15.0, 0.0, 9.0])
+            & np.allclose([np.round(x,3) for x in scores2], [15.464, 0.284, 9.22])
         )
 
 
