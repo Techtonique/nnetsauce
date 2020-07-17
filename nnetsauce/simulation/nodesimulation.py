@@ -1,6 +1,8 @@
 import numpy as np
 import ctypes
+import os
 import rpy2.robjects as robjects
+
 from six import moves
 from .sobol_lib2 import *  # longer sobol sequence !
 from .sobol import *
@@ -9,7 +11,9 @@ from ..utils import memoize
 from rpy2.robjects import numpy2ri
 from rpy2.robjects.packages import importr
 
-randtoolbox = importr("randtoolbox", lib_loc="./randtoolbox")
+path = os.path.abspath(__file__)
+print(path)
+randtoolbox = importr("randtoolbox", lib_loc=path+"/randtoolbox")
 
 
 # From: https://github.com/PhaethonPrime/hammersley/blob/master/hammersley/sequences.py

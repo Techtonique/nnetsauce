@@ -5,7 +5,6 @@ from sklearn.model_selection import train_test_split
 from sklearn import metrics
 from time import time
 
-
 # dataset no. 1 ---------- 
 
 breast_cancer = load_breast_cancer()
