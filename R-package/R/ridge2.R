@@ -18,6 +18,7 @@
 #' @param lambda1
 #' @param lambda2
 #' @param seed
+#' @param backend
 #'
 #' @return
 #' @export
@@ -65,7 +66,8 @@ Ridge2Classifier <- function(n_hidden_features = 5L,
                              row_sample = 1,
                              lambda1 = 0.1,
                              lambda2 = 0.1,
-                             seed = 123L)
+                             seed = 123L, 
+                             backend="cpu")
 {
   ns$Ridge2Classifier(
     n_hidden_features = n_hidden_features,
@@ -82,7 +84,8 @@ Ridge2Classifier <- function(n_hidden_features = 5L,
     row_sample = row_sample,
     lambda1 = lambda1,
     lambda2 = lambda2,
-    seed = seed
+    seed = seed,
+    backend=backend
   )
 }
 
@@ -102,6 +105,7 @@ Ridge2Classifier <- function(n_hidden_features = 5L,
 #' @param lambda1
 #' @param lambda2
 #' @param seed
+#' @param backend
 #'
 #' @return
 #' @export
@@ -146,7 +150,8 @@ Ridge2MultitaskClassifier <- function(n_hidden_features=5L,
                                   type_clust="kmeans", # type_scaling
                                   lambda1=0.1,
                                   lambda2=0.1,
-                                  seed=123L)
+                                  seed=123L, 
+                                  backend="cpu")
 {
   ns$Ridge2MultitaskClassifier(n_hidden_features=n_hidden_features,
                            activation_name=activation_name,
@@ -159,7 +164,8 @@ Ridge2MultitaskClassifier <- function(n_hidden_features=5L,
                            type_clust=type_clust, # type_scaling
                            lambda1=lambda1,
                            lambda2=lambda2,
-                           seed=seed)
+                           seed=seed,
+                           backend=backend)
 }
 
 
@@ -182,6 +188,7 @@ Ridge2MultitaskClassifier <- function(n_hidden_features=5L,
 #' @param lambda1
 #' @param lambda2
 #' @param seed
+#' @param backend
 #'
 #' @return
 #' @export
@@ -210,7 +217,8 @@ Ridge2Regressor <- function(n_hidden_features=5L,
                             row_sample=1,
                             lambda1=0.1,
                             lambda2=0.1,
-                            seed=123L)
+                            seed=123L, 
+                            backend="cpu")
 {
   ns$Ridge2Regressor(n_hidden_features=n_hidden_features,
                      activation_name=activation_name,
@@ -225,5 +233,6 @@ Ridge2Regressor <- function(n_hidden_features=5L,
                      row_sample=row_sample,
                      lambda1=lambda1,
                      lambda2=lambda2,
-                     seed=seed)
+                     seed=seed,
+                     backend=backend)
 }

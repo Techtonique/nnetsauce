@@ -14,6 +14,7 @@
 #' @param col_sample
 #' @param seed
 #' @param lags
+#' @param backend
 #'
 #' @return
 #' @export
@@ -56,7 +57,8 @@ MTS <- function(obj,
                 type_clust="kmeans",
                 col_sample=1,
                 seed=123L,
-                lags=1L)
+                lags=1L, 
+                backend="cpu")
 {
   ns$MTS(obj,
          n_hidden_features=n_hidden_features,
@@ -71,5 +73,6 @@ MTS <- function(obj,
          type_clust=type_clust,
          col_sample=col_sample,
          seed=seed,
-         lags=lags)
+         lags=lags,
+         backend=backend)
 }

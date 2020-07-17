@@ -23,6 +23,7 @@
 #' @param seed
 #' @param verbose
 #' @param method
+#' @param backend
 #'
 #' @return
 #' @export
@@ -59,7 +60,8 @@ AdaBoostClassifier <- function(obj,
                               row_sample=1,
                               seed=123L,
                               verbose=1,
-                              method="SAMME")
+                              method="SAMME", 
+                              backend="cpu")
 {
   ns$AdaBoostClassifier(obj,
                         n_estimators=n_estimators,
@@ -80,7 +82,8 @@ AdaBoostClassifier <- function(obj,
                         row_sample=row_sample,
                         seed=seed,
                         verbose=verbose,
-                        method=method)
+                        method=method,
+                        backend=backend)
 }
 
 # 2 - Regressors ---------------------------------------------------------

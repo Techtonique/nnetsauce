@@ -20,6 +20,7 @@
 #' @param n_jobs
 #' @param seed
 #' @param verbose
+#' @param backend
 #'
 #' @return
 #' @export
@@ -53,7 +54,8 @@ RandomBagClassifier <- function(obj,
                                 row_sample=1,
                                 n_jobs=NULL,
                                 seed=123L,
-                                verbose=1L)
+                                verbose=1L, 
+                                backend="cpu")
 {
   ns$RandomBagClassifier(obj=obj,
                          n_estimators=n_estimators,
@@ -71,7 +73,8 @@ RandomBagClassifier <- function(obj,
                          row_sample=row_sample,
                          n_jobs=n_jobs,
                          seed=seed,
-                         verbose=verbose)
+                         verbose=verbose,
+                         backend=backend)
 }
 
 # 2 - Regressors ---------------------------------------------------------

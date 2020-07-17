@@ -20,6 +20,7 @@
 #' @param seed
 #' @param s
 #' @param sigma
+#' @param backend
 #'
 #' @return
 #' @export
@@ -49,7 +50,8 @@ BayesianRVFLRegressor <- function(n_hidden_features=5L,
                                   row_sample=1,
                                   s=0.1,
                                   sigma=0.05,
-                                  seed=123L
+                                  seed=123L, 
+                                  backend="cpu"
                                   )
 {
   ns$BayesianRVFLRegressor(n_hidden_features=n_hidden_features,
@@ -66,7 +68,8 @@ BayesianRVFLRegressor <- function(n_hidden_features=5L,
                            row_sample=row_sample,
                            seed=seed,
                            s=s,
-                           sigma=sigma)
+                           sigma=sigma,
+                           backend=backend)
 }
 
 
@@ -88,6 +91,7 @@ BayesianRVFLRegressor <- function(n_hidden_features=5L,
 #' @param s1
 #' @param s2
 #' @param sigma
+#' @param backend
 #'
 #' @return
 #' @export
@@ -118,7 +122,8 @@ BayesianRVFL2Regressor <- function(n_hidden_features=5L,
                                    s1=0.1,
                                    s2=0.1,
                                    sigma=0.05,
-                                   seed=123L
+                                   seed=123L, 
+                                   backend="cpu"
                                    )
 {
  ns$BayesianRVFL2Regressor(n_hidden_features=n_hidden_features,
@@ -136,5 +141,6 @@ BayesianRVFL2Regressor <- function(n_hidden_features=5L,
                            seed=seed,
                            s1=s1,
                            s2=s2,
-                           sigma=sigma)
+                           sigma=sigma,
+                           backend=backend)
 }
