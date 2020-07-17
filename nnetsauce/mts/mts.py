@@ -59,6 +59,8 @@ class MTS(Base):
            smoothing parameter (testing set)           
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
+       backend: str
+           "cpu" or "gpu" or "tpu"                           
     """
 
     # construct the object -----
@@ -82,6 +84,7 @@ class MTS(Base):
         alpha1=None,
         alpha2=None,
         seed=123,
+        backend="cpu"
     ):
 
         assert np.int(lags) == lags, "parameter 'lags' should be an integer"
@@ -100,6 +103,7 @@ class MTS(Base):
             type_scaling=type_scaling,
             col_sample=col_sample,
             seed=seed,
+            backend=backend
         )
 
         self.obj = obj

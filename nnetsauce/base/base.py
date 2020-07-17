@@ -528,6 +528,7 @@ class Base(BaseEstimator):
             # y is not subsampled
             # regression
             return (centered_y, self.scaler.transform(Z))
+            
         # classification
         # y is subsampled
         if self.row_sample < 1:

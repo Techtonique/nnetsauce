@@ -70,6 +70,9 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
            reproducibility seed for nodes_sim=='uniform'
        method: str
            type of Adaboost method, 'SAMME' (discrete) or 'SAMME.R' (real)
+       backend: str
+           "cpu" or "gpu" or "tpu"                
+    
     """
 
     # construct the object -----
@@ -97,6 +100,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         seed=123,
         verbose=1,
         method="SAMME",
+        backend="cpu"
     ):
 
         super().__init__(
@@ -117,6 +121,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,
+            backend=backend
         )
 
         self.type_fit = "classification"

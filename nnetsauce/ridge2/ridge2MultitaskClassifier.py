@@ -53,6 +53,9 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
            regularization parameter on hidden layer
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
+       backend: str
+           "cpu" or "gpu" or "tpu"                
+
 
        References
        ----------
@@ -78,6 +81,7 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
         lambda1=0.1,
         lambda2=0.1,
         seed=123,
+        backend="cpu"
     ):
 
         super().__init__(
@@ -96,6 +100,7 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
             lambda1=lambda1,
             lambda2=lambda2,
             seed=seed,
+            backend=backend
         )
 
         self.type_fit = "regression"

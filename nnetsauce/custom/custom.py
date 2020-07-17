@@ -52,6 +52,9 @@ class Custom(Base):
            percentage of rows chosen for training, by stratified bootstrapping    
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
+       backend: str
+           "cpu" or "gpu" or "tpu"                
+
     """
 
     # construct the object -----
@@ -73,6 +76,7 @@ class Custom(Base):
         col_sample=1,
         row_sample=1,
         seed=123,
+        backend="cpu"
     ):
 
         super().__init__(
@@ -90,6 +94,7 @@ class Custom(Base):
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,
+            backend=backend
         )
 
         self.obj = obj

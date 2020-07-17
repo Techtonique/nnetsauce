@@ -61,6 +61,8 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
            percentage of rows chosen for training, by stratified bootstrapping    
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
+       backend: str
+           "cpu" or "gpu" or "tpu"                           
     """
 
     # construct the object -----
@@ -85,6 +87,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         n_jobs=None,
         seed=123,
         verbose=1,
+        backend="cpu"
     ):
 
         super().__init__(
@@ -104,6 +107,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,
+            backend=backend
         )
 
         self.type_fit = "classification"

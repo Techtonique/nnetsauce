@@ -57,7 +57,10 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
        Sigma: array-like
            covariance of the distribution of fitted parameters
        GCV: float
-       return_std: boolean
+           return_std: boolean
+       backend: str
+           "cpu" or "gpu" or "tpu"                
+
     """
 
     # construct the object -----
@@ -84,6 +87,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
         Sigma=None,
         GCV=None,
         return_std=True,
+        backend="cpu"
     ):
 
         super().__init__(
@@ -101,6 +105,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,
+            backend=backend
         )
         self.s = s
         self.sigma = sigma

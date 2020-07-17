@@ -53,6 +53,9 @@ class BaseRegressor(Base, RegressorMixin):
            percentage of rows chosen for training, by stratified bootstrapping    
        seed: int 
            reproducibility seed for nodes_sim=='uniform', clustering and dropout
+       backend: str
+           "cpu" or "gpu" or "tpu"                
+    
     """
 
     # construct the object -----
@@ -73,6 +76,7 @@ class BaseRegressor(Base, RegressorMixin):
         col_sample=1,
         row_sample=1,
         seed=123,
+        backend="cpu"
     ):
 
         super().__init__(
@@ -90,6 +94,7 @@ class BaseRegressor(Base, RegressorMixin):
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,
+            backend=backend
         )
 
     def fit(self, X, y, **kwargs):
