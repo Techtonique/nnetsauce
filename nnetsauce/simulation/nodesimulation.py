@@ -9,7 +9,7 @@ from ..utils import memoize
 from rpy2.robjects import numpy2ri
 from rpy2.robjects.packages import importr
 
-randtoolbox = importr("randtoolbox")
+randtoolbox = importr("randtoolbox", lib_loc="./randtoolbox")
 
 
 # From: https://github.com/PhaethonPrime/hammersley/blob/master/hammersley/sequences.py
