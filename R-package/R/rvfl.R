@@ -51,9 +51,10 @@ BayesianRVFLRegressor <- function(n_hidden_features=5L,
                                   s=0.1,
                                   sigma=0.05,
                                   seed=123L, 
-                                  backend="cpu"
+                                  backend=c("cpu", "gpu", "tpu")
                                   )
 {
+  backend <- match.arg(backend)    
   ns$BayesianRVFLRegressor(n_hidden_features=n_hidden_features,
                            activation_name=activation_name,
                            a=a,

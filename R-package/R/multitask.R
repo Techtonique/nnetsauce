@@ -69,9 +69,9 @@ MultitaskClassifier <- function(obj,
                                 col_sample=1,
                                 row_sample=1,
                                 seed=123L, 
-                                backend="cpu")
+                                backend=c("cpu", "gpu", "tpu"))
 {
-
+  backend <- match.arg(backend)      
   ns$MultitaskClassifier(obj=obj,
                          n_hidden_features=n_hidden_features,
                          activation_name=activation_name,

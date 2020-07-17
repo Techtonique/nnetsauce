@@ -58,8 +58,9 @@ MTS <- function(obj,
                 col_sample=1,
                 seed=123L,
                 lags=1L, 
-                backend="cpu")
+                backend=c("cpu", "gpu", "tpu"))
 {
+  backend <- match.arg(backend)    
   ns$MTS(obj,
          n_hidden_features=n_hidden_features,
          activation_name=activation_name,

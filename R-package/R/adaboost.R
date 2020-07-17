@@ -61,8 +61,9 @@ AdaBoostClassifier <- function(obj,
                               seed=123L,
                               verbose=1,
                               method="SAMME", 
-                              backend="cpu")
+                              backend=c("cpu", "gpu", "tpu"))
 {
+  backend <- match.arg(backend)    
   ns$AdaBoostClassifier(obj,
                         n_estimators=n_estimators,
                         learning_rate=learning_rate,

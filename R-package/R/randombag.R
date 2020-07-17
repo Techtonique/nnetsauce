@@ -55,8 +55,9 @@ RandomBagClassifier <- function(obj,
                                 n_jobs=NULL,
                                 seed=123L,
                                 verbose=1L, 
-                                backend="cpu")
+                                backend=c("cpu", "gpu", "tpu"))
 {
+  backend <- match.arg(backend)      
   ns$RandomBagClassifier(obj=obj,
                          n_estimators=n_estimators,
                          n_hidden_features=n_hidden_features,

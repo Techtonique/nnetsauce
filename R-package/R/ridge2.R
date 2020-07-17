@@ -218,8 +218,9 @@ Ridge2Regressor <- function(n_hidden_features=5L,
                             lambda1=0.1,
                             lambda2=0.1,
                             seed=123L, 
-                            backend="cpu")
+                            backend=c("cpu", "gpu", "tpu"))
 {
+  backend <- match.arg(backend)    
   ns$Ridge2Regressor(n_hidden_features=n_hidden_features,
                      activation_name=activation_name,
                      a=a,
