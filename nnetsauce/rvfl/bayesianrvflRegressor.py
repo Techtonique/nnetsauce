@@ -138,7 +138,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
             sigma=self.sigma,
             fit_intercept=False,
             return_cov=self.return_std,
-            backend=self.backend
+            backend=self.backend,
         )
 
         self.beta = fit_obj["beta_hat"]
@@ -172,7 +172,8 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
             new_X = mo.rbind(
                 x=X.reshape(1, n_features),
                 y=np.ones(n_features).reshape(1, n_features),
-                backend=self.backend)
+                backend=self.backend,
+            )
 
         self.return_std = return_std
 
@@ -182,12 +183,17 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
 
                 return (
                     self.y_mean
-                    + mo.safe_sparse_dot(a=self.cook_test_set(new_X, **kwargs), b=self.beta, 
-                                         backend=self.backend)
+                    + mo.safe_sparse_dot(
+                        a=self.cook_test_set(new_X, **kwargs),
+                        b=self.beta,
+                        backend=self.backend,
+                    )
                 )[0]
 
             return self.y_mean + mo.safe_sparse_dot(
-                a=self.cook_test_set(X, **kwargs), b=self.beta, backend=self.backend
+                a=self.cook_test_set(X, **kwargs),
+                b=self.beta,
+                backend=self.backend,
             )
 
         else:  # confidence interval required for preds?
@@ -203,7 +209,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
                     return_cov=True,
                     beta_hat_=self.beta,
                     Sigma_hat_=self.Sigma,
-                    backend=self.backend
+                    backend=self.backend,
                 )
 
                 return (
@@ -219,8 +225,8 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
                 X_star=Z,
                 return_cov=True,
                 beta_hat_=self.beta,
-                Sigma_hat_=self.Sigma, 
-                backend=self.backend
+                Sigma_hat_=self.Sigma,
+                backend=self.backend,
             )
 
             return (self.y_mean + pred_obj["preds"], pred_obj["preds_std"])

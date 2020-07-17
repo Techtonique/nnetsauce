@@ -8,6 +8,7 @@ import nnetsauce as ns
 
 np.random.seed(123)
 
+
 class TestRidge2Regressor(ut.TestCase):
     def test_Ridge2Regressor(self):
 

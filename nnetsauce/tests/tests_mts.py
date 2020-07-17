@@ -8,6 +8,7 @@ import nnetsauce as ns
 
 np.random.seed(123)
 
+
 class TestMTS(ut.TestCase):
     def test_MTS(self):
 
@@ -292,7 +293,9 @@ class TestMTS(ut.TestCase):
 
         self.assertTrue(
             np.allclose([np.round(x) for x in scores], [239.0, 0.0, 85.0])
-            & np.allclose([np.round(x,3) for x in scores2], [15.464, 0.284, 9.22])
+            & np.allclose(
+                [np.round(x, 3) for x in scores2], [15.464, 0.284, 9.22]
+            )
         )
 
 

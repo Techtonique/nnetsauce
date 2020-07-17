@@ -144,22 +144,33 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
         X_ = scaled_Z[:, 0:n_features]
         Phi_X_ = scaled_Z[:, n_features:p_Z]
 
-        B = mo.crossprod(x=X_, backend=self.backend) + self.lambda1 * np.diag(np.repeat(1, X_.shape[1]))
-        C = mo.crossprod(x=Phi_X_, y=X_, backend=self.backend)
-        D = mo.crossprod(x=Phi_X_, backend=self.backend) + self.lambda2 * np.diag(
-            np.repeat(1, Phi_X_.shape[1])
+        B = mo.crossprod(x=X_, backend=self.backend) + self.lambda1 * np.diag(
+            np.repeat(1, X_.shape[1])
         )
+        C = mo.crossprod(x=Phi_X_, y=X_, backend=self.backend)
+        D = mo.crossprod(
+            x=Phi_X_, backend=self.backend
+        ) + self.lambda2 * np.diag(np.repeat(1, Phi_X_.shape[1]))
         B_inv = pinv(B) if self.backend == "cpu" else jpinv(B)
         W = mo.safe_sparse_dot(a=C, b=B_inv, backend=self.backend)
         S_mat = D - mo.tcrossprod(x=W, y=C, backend=self.backend)
         S_inv = pinv(S_mat) if self.backend == "cpu" else jpinv(S_mat)
         Y2 = mo.safe_sparse_dot(a=S_inv, b=W, backend=self.backend)
         inv = mo.rbind(
-            mo.cbind(x=B_inv + mo.crossprod(x=W, y=Y2, backend=self.backend), y=-np.transpose(Y2), backend=self.backend),
-            mo.cbind(x=-Y2, y=S_inv, backend=self.backend), backend=self.backend)
+            mo.cbind(
+                x=B_inv + mo.crossprod(x=W, y=Y2, backend=self.backend),
+                y=-np.transpose(Y2),
+                backend=self.backend,
+            ),
+            mo.cbind(x=-Y2, y=S_inv, backend=self.backend),
+            backend=self.backend,
+        )
 
-        self.beta = mo.safe_sparse_dot(a=inv, b=mo.crossprod(x=scaled_Z, y=Y, 
-          backend=self.backend), backend=self.backend)
+        self.beta = mo.safe_sparse_dot(
+            a=inv,
+            b=mo.crossprod(x=scaled_Z, y=Y, backend=self.backend),
+            backend=self.backend,
+        )
 
         return self
 
@@ -202,10 +213,11 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
         if len(X.shape) == 1:
 
             n_features = X.shape[0]
-            new_X = mo.rbind(x=
-                X.reshape(1, n_features), y=
-                np.ones(n_features).reshape(1, n_features),
-             backend=self.backend)
+            new_X = mo.rbind(
+                x=X.reshape(1, n_features),
+                y=np.ones(n_features).reshape(1, n_features),
+                backend=self.backend,
+            )
 
             Z = self.cook_test_set(new_X, **kwargs)
 

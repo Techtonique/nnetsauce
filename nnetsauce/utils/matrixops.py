@@ -34,7 +34,7 @@ def cluster_covariates(X, n_clusters, seed, type_clust="kmeans", **kwargs):
 
         return kmeans, kmeans.predict(X)
 
-    if type_clust == "gmm":
+    elif type_clust == "gmm":
 
         gmm = GaussianMixture(
             n_components=n_clusters, random_state=seed, **kwargs
@@ -107,7 +107,7 @@ def one_hot_encode2(y, n_classes):
 
 
 # row bind
-def rbind(x, y, backend="cpu"):    
+def rbind(x, y, backend="cpu"):
     # if len(x.shape) == 1 or len(y.shape) == 1:
     if backend in ("gpu", "tpu"):
         return jnp.row_stack((x, y))
@@ -131,14 +131,14 @@ def safe_sparse_dot(a, b, backend="cpu", dense_output=False):
     dot_product : array or sparse matrix
         sparse if ``a`` and ``b`` are sparse and ``dense_output=False``.
     """
-    
-    if (backend in ("gpu", "tpu")):   
+
+    if backend in ("gpu", "tpu"):
         # modif when jax.scipy.sparse available
         a = device_put(a)
-        b = device_put(b)        
+        b = device_put(b)
         return jnp.dot(a, b).block_until_ready()
-    
-#    if backend == "cpu":
+
+    #    if backend == "cpu":
     if a.ndim > 2 or b.ndim > 2:
         if sparse.issparse(a):
             # sparse is always 2D. Implies b is 3D+
@@ -165,10 +165,8 @@ def safe_sparse_dot(a, b, backend="cpu", dense_output=False):
         and hasattr(ret, "toarray")
     ):
         return ret.toarray()
-    
+
     return ret
-    
-    
 
 
 # scale... covariates
@@ -213,12 +211,12 @@ def squared_norm(x):
 # computes x%*%t(y)
 def tcrossprod(x, y=None, backend="cpu"):
     # assert on dimensions
-    if backend in ("gpu", "tpu"):        
+    if backend in ("gpu", "tpu"):
         x = device_put(x)
         if y is None:
             return jnp.dot(x, x.T).block_until_ready()
         y = device_put(y)
-        return jnp.dot(x, y.T).block_until_ready()        
+        return jnp.dot(x, y.T).block_until_ready()
     if y is None:
         return np.dot(x, x.transpose())
     return np.dot(x, y.transpose())

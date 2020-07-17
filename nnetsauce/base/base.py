@@ -80,7 +80,7 @@ class Base(BaseEstimator):
         col_sample=1,
         row_sample=1,
         seed=123,
-        backend="cpu"
+        backend="cpu",
     ):
 
         # input checks -----
@@ -114,7 +114,10 @@ class Base(BaseEstimator):
             col_sample <= 1
         ), "'col_sample' must be comprised between 0 and 1 (both included)"
 
-        assert backend in ("cpu", "gpu", "tpu"
+        assert backend in (
+            "cpu",
+            "gpu",
+            "tpu",
         ), "must have 'backend' in ('cpu', 'gpu', 'tpu')"
 
         # activation function -----
@@ -239,7 +242,7 @@ class Base(BaseEstimator):
         if self.bias is False:  # no bias term in the hidden layer
 
             if W is None:
-                
+
                 try:
                     h_sim = {
                         "sobol": ns.generate_sobol_randtoolbox(
@@ -282,8 +285,11 @@ class Base(BaseEstimator):
                 ), "check dimensions of covariates X and matrix W"
 
                 return mo.dropout(
-                    x=self.activation_func(mo.safe_sparse_dot(a=scaled_X, b=self.W, 
-                                                              backend=self.backend)),
+                    x=self.activation_func(
+                        mo.safe_sparse_dot(
+                            a=scaled_X, b=self.W, backend=self.backend
+                        )
+                    ),
                     drop_prob=self.dropout,
                     seed=self.seed,
                 )
@@ -295,8 +301,9 @@ class Base(BaseEstimator):
 
             # self.W = W
             return mo.dropout(
-                x=self.activation_func(mo.safe_sparse_dot(a=scaled_X, b=W, 
-                                                          backend=self.backend)),
+                x=self.activation_func(
+                    mo.safe_sparse_dot(a=scaled_X, b=W, backend=self.backend)
+                ),
                 drop_prob=self.dropout,
                 seed=self.seed,
             )
@@ -305,7 +312,7 @@ class Base(BaseEstimator):
         if W is None:
 
             n_features_1 = n_features + 1
-            
+
             try:
                 h_sim = {
                     "sobol": ns.generate_sobol_randtoolbox(
@@ -340,15 +347,20 @@ class Base(BaseEstimator):
                         n_dims=n_features_1, n_points=self.n_hidden_features
                     ),
                 }
-                
 
             self.W = h_sim[self.nodes_sim]
 
             return mo.dropout(
                 x=self.activation_func(
-                    mo.safe_sparse_dot(a=mo.cbind(np.ones(scaled_X.shape[0]), scaled_X, 
-                                                  backend=self.backend), b=self.W, 
-                                       backend=self.backend)
+                    mo.safe_sparse_dot(
+                        a=mo.cbind(
+                            np.ones(scaled_X.shape[0]),
+                            scaled_X,
+                            backend=self.backend,
+                        ),
+                        b=self.W,
+                        backend=self.backend,
+                    )
                 ),
                 drop_prob=self.dropout,
                 seed=self.seed,
@@ -358,9 +370,15 @@ class Base(BaseEstimator):
         # self.W = W
         return mo.dropout(
             x=self.activation_func(
-                mo.safe_sparse_dot(a=mo.cbind(np.ones(scaled_X.shape[0]), scaled_X, 
-                                              backend=self.backend), b=W, 
-                                   backend=self.backend)
+                mo.safe_sparse_dot(
+                    a=mo.cbind(
+                        np.ones(scaled_X.shape[0]),
+                        scaled_X,
+                        backend=self.backend,
+                    ),
+                    b=W,
+                    backend=self.backend,
+                )
             ),
             drop_prob=self.dropout,
             seed=self.seed,
@@ -438,7 +456,7 @@ class Base(BaseEstimator):
                     else self.create_layer(scaled_X, W=W)
                 )
                 Z = (
-                    mo.cbind(input_X, Phi_X)
+                    mo.cbind(input_X, Phi_X, backend=self.backend)
                     if self.direct_link == True
                     else Phi_X
                 )
@@ -452,7 +470,9 @@ class Base(BaseEstimator):
                 )
         else:  # data with clustering: self.n_clusters is not None ----- # keep
             augmented_X = mo.cbind(
-                input_X, self.encode_clusters(input_X, **kwargs)
+                input_X,
+                self.encode_clusters(input_X, **kwargs),
+                backend=self.backend,
             )
             if self.n_hidden_features > 0:  # with hidden layer
                 self.nn_scaler, scaled_X = mo.scale_covariates(
@@ -464,7 +484,7 @@ class Base(BaseEstimator):
                     else self.create_layer(scaled_X, W=W)
                 )
                 Z = (
-                    mo.cbind(augmented_X, Phi_X)
+                    mo.cbind(augmented_X, Phi_X, backend=self.backend)
                     if self.direct_link == True
                     else Phi_X
                 )
@@ -561,7 +581,9 @@ class Base(BaseEstimator):
                 )
                 Phi_X = self.create_layer(scaled_X, self.W)
                 if self.direct_link == True:
-                    return self.scaler.transform(mo.cbind(scaled_X, Phi_X))
+                    return self.scaler.transform(
+                        mo.cbind(scaled_X, Phi_X, backend=self.backend)
+                    )
                 # when self.direct_link == False
                 return self.scaler.transform(Phi_X)
             # if no hidden layer # self.n_hidden_features == 0
@@ -572,18 +594,22 @@ class Base(BaseEstimator):
             predicted_clusters = self.encode_clusters(
                 X=X, predict=True, **kwargs
             )
-            augmented_X = mo.cbind(X, predicted_clusters)
+            augmented_X = mo.cbind(X, predicted_clusters, backend=self.backend)
         else:
             predicted_clusters = self.encode_clusters(
                 X=X[:, self.index_col], predict=True, **kwargs
             )
-            augmented_X = mo.cbind(X[:, self.index_col], predicted_clusters)
+            augmented_X = mo.cbind(
+                X[:, self.index_col], predicted_clusters, backend=self.backend
+            )
 
         if self.n_hidden_features > 0:  # if hidden layer
             scaled_X = self.nn_scaler.transform(augmented_X)
             Phi_X = self.create_layer(scaled_X, self.W)
             if self.direct_link == True:
-                return self.scaler.transform(mo.cbind(augmented_X, Phi_X))
+                return self.scaler.transform(
+                    mo.cbind(augmented_X, Phi_X, backend=self.backend)
+                )
             return self.scaler.transform(Phi_X)
 
         # if no hidden layer

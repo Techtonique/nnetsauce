@@ -275,10 +275,7 @@ class TestBase(ut.TestCase):
         fit_obj.fit(X, y)
 
         self.assertTrue(
-            np.allclose(
-                    fit_obj.score(X, y, scoring="r2"),
-                0.9294339466604191,
-            )
+            np.allclose(fit_obj.score(X, y, scoring="r2"), 0.9294339466604191)
             & np.allclose(fit_obj.score(X, y), 1596.2615409365528)
         )
 

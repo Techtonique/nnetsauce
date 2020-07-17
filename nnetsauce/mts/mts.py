@@ -190,7 +190,9 @@ class MTS(Base):
             xreg_input = ts.create_train_inputs(xreg[::-1], self.lags)
 
             dummy_y, scaled_Z = self.cook_training_set(
-                y=rep_1_n, X=mo.cbind(self.X, xreg_input[1]), **kwargs
+                y=rep_1_n,
+                X=mo.cbind(self.X, xreg_input[1], backend=self.backend),
+                **kwargs
             )
 
         else:  # xreg is None
