@@ -11,9 +11,11 @@ from ..utils import memoize
 from rpy2.robjects import numpy2ri
 from rpy2.robjects.packages import importr
 
-path = os.path.dirname(__file__)
-print(path)
-randtoolbox = importr("randtoolbox", lib_loc=path+"/randtoolbox")
+
+try:
+    randtoolbox = importr("randtoolbox")
+except:
+    pass
 
 
 # From: https://github.com/PhaethonPrime/hammersley/blob/master/hammersley/sequences.py
@@ -222,12 +224,15 @@ def generate_halton_cpp(n_dims=2, n_points=10):
 # randtoolbox exports -----
 
 # sobol numbers' generation (cpp)
-@memoize
-def generate_sobol_randtoolbox(n_dims=2, n_points=10):
-    return np.asarray(randtoolbox.sobol(n=n_points, dim=n_dims)).T
+try:
+    @memoize
+    def generate_sobol_randtoolbox(n_dims=2, n_points=10):
+        return np.asarray(randtoolbox.sobol(n=n_points, dim=n_dims)).T
 
 
-# halton numbers' generation (cpp)
-@memoize
-def generate_halton_randtoolbox(n_dims=2, n_points=10):
-    return np.asarray(randtoolbox.halton(n=n_points, dim=n_dims)).T
+    # halton numbers' generation (cpp)
+    @memoize
+    def generate_halton_randtoolbox(n_dims=2, n_points=10):
+        return np.asarray(randtoolbox.halton(n=n_points, dim=n_dims)).T
+except:
+    pass
