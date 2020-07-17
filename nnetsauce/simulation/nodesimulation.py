@@ -15,7 +15,12 @@ from rpy2.robjects.packages import importr
 try:
     randtoolbox = importr("randtoolbox")
 except:
-    pass
+    try:
+        rutils = importr('utils')
+        rutils.install_packages("randtoolbox")
+        randtoolbox = importr("randtoolbox")
+    except:            
+        pass
 
 
 # From: https://github.com/PhaethonPrime/hammersley/blob/master/hammersley/sequences.py
