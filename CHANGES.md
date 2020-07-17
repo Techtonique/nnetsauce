@@ -1,3 +1,14 @@
+# version 0.5.0
+
+- contains a refactorized code for the [`Base`](https://github.com/thierrymoudiki/nnetsauce/nnetsauce/base/base.py) class, 
+and for many other utilities.
+- makes use of [randtoolbox](https://cran.r-project.org/web/packages/randtoolbox/index.html) 
+for a faster, more scalable generation of quasi-random numbers.
+- contains __a (work in progress) implementation of most algorithms on GPUs__,
+ using [JAX](https://github.com/google/jax). Most of the nnetsauce's changes 
+ related to GPUs are currently made on potentially time consuming operations 
+ such as matrices multiplications and matrices inversions.
+
 # version 0.4.0
 
 - (Work in progress) documentation in `/docs`
