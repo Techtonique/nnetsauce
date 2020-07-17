@@ -18,6 +18,7 @@
 #' @param col_sample
 #' @param row_sample
 #' @param seed
+#' @param backend
 #'
 #' @return
 #' @export
@@ -47,7 +48,8 @@ CustomClassifier <- function(obj,
                              type_clust="kmeans",
                              col_sample=1,
                              row_sample=1,
-                             seed=123L)
+                             seed=123L, 
+                             backend="cpu")
 {
   ns$CustomClassifier(obj,
                       n_hidden_features=n_hidden_features,
@@ -62,7 +64,8 @@ CustomClassifier <- function(obj,
                       type_clust=type_clust,
                       col_sample=col_sample,
                       row_sample=row_sample,
-                      seed=seed)
+                      seed=seed,
+                      backend=backend)
 }
 
 
@@ -85,6 +88,7 @@ CustomClassifier <- function(obj,
 #' @param col_sample
 #' @param row_sample
 #' @param seed
+#' @param backend
 #'
 #' @return
 #' @export
@@ -114,8 +118,10 @@ CustomRegressor <- function(obj,
                              type_clust="kmeans",
                              col_sample=1,
                              row_sample=1,
-                             seed=123L)
+                             seed=123L, 
+                             backend=c("cpu", "gpu", "tpu"))
 {
+  backend <- match.arg(backend)    
   ns$CustomRegressor(obj,
                       n_hidden_features=n_hidden_features,
                       activation_name=activation_name,
@@ -129,5 +135,6 @@ CustomRegressor <- function(obj,
                       type_clust=type_clust,
                       col_sample=col_sample,
                       row_sample=row_sample,
-                      seed=seed)
+                      seed=seed,
+                      backend=backend)
 }

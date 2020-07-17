@@ -1,7 +1,6 @@
-
 # Authors: Thierry Moudiki
 #
-# License: BSD 3
+# License: BSD 3 Clear
 
 import numpy as np
 from scipy.optimize import minimize
@@ -59,6 +58,9 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
            regularization parameter on hidden layer
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
+       backend: str
+           "cpu" or "gpu" or "tpu"                
+
 
        References
        ----------
@@ -89,6 +91,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
         lambda1=0.1,
         lambda2=0.1,
         seed=123,
+        backend="cpu"
     ):
 
         super().__init__(
@@ -108,6 +111,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
             lambda1=lambda1,
             lambda2=lambda2,
             seed=seed,
+            backend=backend
         )
 
         self.type_fit = "classification"
@@ -151,7 +155,12 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
             # X -> (n, p)
             # (K, n) %*% (n, p) -> (K, p)
             if hessian is False:
-                grad = -np.dot((Y - probs).T, X) / n
+                grad = (
+                    -mo.safe_sparse_dot(
+                        a=(Y - probs).T, b=X, backend=self.backend
+                    )
+                    / n
+                )
                 grad += self.lambda1 * B[0:init_p, :].sum(axis=0)[:, None]
                 grad += self.lambda2 * B[init_p:p, :].sum(axis=0)[:, None]
 
@@ -166,8 +175,10 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
                     for k2 in range(k1, K):
                         y_index = range(k2 * p, (k2 + 1) * p)
                         H_sub = (
-                            -np.dot(
-                                X.T, (probs[:, k1] * probs[:, k2])[:, None] * X
+                            -mo.safe_sparse_dot(
+                                a=X.T,
+                                b=(probs[:, k1] * probs[:, k2])[:, None] * X,
+                                backend=self.backend,
                             )
                             / n
                         )  # do not store
@@ -189,12 +200,12 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
             B = x.reshape(Y.shape[1], p).T
 
             # (n, K)
-            XB = mo.safe_sparse_dot(X, B)
+            XB = mo.safe_sparse_dot(X, B, backend=self.backend)
 
             res = -(np.sum(Y * XB, axis=1) - logsumexp(XB)).mean()
 
-            res += 0.5 * self.lambda1 * mo.squared_norm(B[0:init_p, :])
-            res += 0.5 * self.lambda2 * mo.squared_norm(B[init_p:p, :])
+            res += 0.5 * self.lambda1 * mo.squared_norm(B[0:init_p, :], backend=self.backend)
+            res += 0.5 * self.lambda2 * mo.squared_norm(B[init_p:p, :], backend=self.backend)
 
             return res
 
@@ -207,7 +218,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
                 Y=Y,
                 X=X,
                 B=B,
-                XB=mo.safe_sparse_dot(X, B),
+                XB=mo.safe_sparse_dot(X, B, backend=self.backend),
                 hessian=False,
                 **kwargs
             )
@@ -221,7 +232,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
                 Y=Y,
                 X=X,
                 B=B,
-                XB=mo.safe_sparse_dot(X, B),
+                XB=mo.safe_sparse_dot(X, B, backend=self.backend),
                 hessian=True,
                 **kwargs
             )
@@ -333,12 +344,12 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
             Z = self.cook_test_set(X, **kwargs)
 
         ZB = mo.safe_sparse_dot(
-            Z,
-            self.beta.reshape(
+            a=Z,
+            b=self.beta.reshape(
                 self.n_classes,
-                X.shape[1] + self.n_hidden_features + self.n_clusters,
-            ).T,
-        )
+                X.shape[1] + self.n_hidden_features + self.n_clusters).T,        
+            backend=self.backend)
+        
         exp_ZB = np.exp(ZB)
 
         return exp_ZB / exp_ZB.sum(axis=1)[:, None]

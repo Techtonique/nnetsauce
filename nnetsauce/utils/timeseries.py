@@ -8,23 +8,22 @@ import numpy as np
 
 
 # create lags for one series
-def create_lags(x, k, n=None):    
-        
+def create_lags(x, k, n=None):
+
     k_ = k + 1
-    
+
     n_k = len(x) - k_
-    
-    x_ = x[::-1]    
+
+    x_ = x[::-1]
 
     z = [x_[i : (n_k + i + 1)] for i in range(k_)]
-    
+
     if n is None:
-    
-        return np.column_stack(z)        
-    
+
+        return np.column_stack(z)
+
     temp = np.column_stack(z)
     return np.repeat(temp, n).reshape(temp.shape[0], -1)
-        
 
 
 # create inputs for training from MTS (envisage other regressors in X)

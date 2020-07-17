@@ -53,6 +53,9 @@ class Ridge2(Base):
            regularization parameter on hidden layer
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
+       backend: str
+           "cpu" or "gpu" or "tpu"                
+
     """
 
     # construct the object -----
@@ -75,6 +78,7 @@ class Ridge2(Base):
         lambda1=0.1,
         lambda2=0.1,
         seed=123,
+        backend="cpu"
     ):
 
         super().__init__(
@@ -92,6 +96,7 @@ class Ridge2(Base):
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,
+            backend=backend
         )
 
         self.lambda1 = lambda1

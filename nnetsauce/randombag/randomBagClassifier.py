@@ -1,4 +1,3 @@
-
 # Authors: Thierry Moudiki
 #
 # License: BSD 3
@@ -62,6 +61,8 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
            percentage of rows chosen for training, by stratified bootstrapping    
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
+       backend: str
+           "cpu" or "gpu" or "tpu"                           
     """
 
     # construct the object -----
@@ -86,6 +87,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         n_jobs=None,
         seed=123,
         verbose=1,
+        backend="cpu"
     ):
 
         super().__init__(
@@ -105,6 +107,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,
+            backend=backend
         )
 
         self.type_fit = "classification"
@@ -213,7 +216,9 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
                     seed=self.seed + m * 1000,
                 )
                 base_learner.fit(X, y, **kwargs)
-                self.voter.update({m: pickle.loads(pickle.dumps(base_learner, -1))})
+                self.voter.update(
+                    {m: pickle.loads(pickle.dumps(base_learner, -1))}
+                )
             except:
                 pass
 

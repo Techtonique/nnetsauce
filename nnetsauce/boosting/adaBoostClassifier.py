@@ -1,4 +1,3 @@
-
 # Authors: Thierry Moudiki
 #
 # License: BSD 3
@@ -71,6 +70,9 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
            reproducibility seed for nodes_sim=='uniform'
        method: str
            type of Adaboost method, 'SAMME' (discrete) or 'SAMME.R' (real)
+       backend: str
+           "cpu" or "gpu" or "tpu"                
+    
     """
 
     # construct the object -----
@@ -98,6 +100,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         seed=123,
         verbose=1,
         method="SAMME",
+        backend="cpu"
     ):
 
         super().__init__(
@@ -118,6 +121,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,
+            backend=backend
         )
 
         self.type_fit = "classification"
@@ -128,7 +132,6 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         self.method = method
         self.reg_lambda = reg_lambda
         self.reg_alpha = reg_alpha
-
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit Boosting model to training data (X, y).
@@ -196,7 +199,6 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
         if self.verbose == 1:
             pbar = Progbar(self.n_estimators)
-            
 
         if self.method == "SAMME":
 
@@ -208,8 +210,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             for m in range(self.n_estimators):
 
                 preds = base_learner.fit(
-                    X, y, sample_weight=np.ravel(w_m), 
-                    **kwargs
+                    X, y, sample_weight=np.ravel(w_m, order='C'), **kwargs
                 ).predict(X)
 
                 self.base_learners.update(
@@ -224,7 +225,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                 )  # sum(w_m) == 1
 
                 if self.reg_lambda > 0:
-                    
+
                     err_m += self.reg_lambda * (
                         (1 - self.reg_alpha) * 0.5 * sum([x ** 2 for x in w_m])
                         + self.reg_alpha * sum([abs(x) for x in w_m])
@@ -239,9 +240,9 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                 self.alpha.append(alpha_m)
 
                 w_m_temp = [exp(alpha_m * cond[i]) for i in x_range_n]
-                
+
                 sum_w_m = sum(w_m_temp)
-                
+
                 w_m = np.asarray([w_m_temp[i] / sum_w_m for i in x_range_n])
 
                 base_learner.set_params(seed=self.seed + (m + 1) * 1000)
@@ -255,7 +256,6 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             self.n_estimators = len(self.base_learners)
 
             return self
-        
 
         if self.method == "SAMME.R":
 
@@ -263,7 +263,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
             if sample_weight is None:
 
-                w_m = np.repeat(1.0 / n, n)   # (N, 1)
+                w_m = np.repeat(1.0 / n, n)  # (N, 1)
 
             else:
 
@@ -272,7 +272,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             for m in range(self.n_estimators):
 
                 probs = base_learner.fit(
-                    X, y, sample_weight=np.ravel(w_m), **kwargs
+                    X, y, sample_weight=np.ravel(w_m, order='C'), **kwargs
                 ).predict_proba(X)
 
                 np.clip(
@@ -291,7 +291,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                 )
 
                 w_m /= np.sum(w_m)
-                
+
                 base_learner.set_params(seed=self.seed + (m + 1) * 1000)
 
                 if self.verbose == 1:
@@ -303,7 +303,6 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             self.n_estimators = len(self.base_learners)
 
             return self
-        
 
     def predict(self, X, **kwargs):
         """Predict test data X.
@@ -323,7 +322,6 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         """
 
         return self.predict_proba(X, **kwargs).argmax(axis=1)
-
 
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
@@ -402,7 +400,6 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         sum_ensemble = expit_ensemble_learner.sum(axis=1)
 
         return expit_ensemble_learner / sum_ensemble[:, None]
-    
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 

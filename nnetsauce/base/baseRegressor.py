@@ -53,6 +53,9 @@ class BaseRegressor(Base, RegressorMixin):
            percentage of rows chosen for training, by stratified bootstrapping    
        seed: int 
            reproducibility seed for nodes_sim=='uniform', clustering and dropout
+       backend: str
+           "cpu" or "gpu" or "tpu"                
+    
     """
 
     # construct the object -----
@@ -73,6 +76,7 @@ class BaseRegressor(Base, RegressorMixin):
         col_sample=1,
         row_sample=1,
         seed=123,
+        backend="cpu"
     ):
 
         super().__init__(
@@ -90,6 +94,7 @@ class BaseRegressor(Base, RegressorMixin):
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,
+            backend=backend
         )
 
     def fit(self, X, y, **kwargs):
@@ -113,7 +118,7 @@ class BaseRegressor(Base, RegressorMixin):
 
         centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
-        fit_obj = lmf.beta_Sigma_hat(X=scaled_Z, y=centered_y)
+        fit_obj = lmf.beta_Sigma_hat(X=scaled_Z, y=centered_y, backend=self.backend)
 
         self.beta = fit_obj["beta_hat"]
 
@@ -147,10 +152,16 @@ class BaseRegressor(Base, RegressorMixin):
 
             return (
                 self.y_mean
-                + np.dot(self.cook_test_set(new_X, **kwargs), self.beta)
+                + mo.safe_sparse_dot(
+                    a=self.cook_test_set(new_X, **kwargs),
+                    b=self.beta,
+                    backend=self.backend,
+                )
             )[0]
 
-        return self.y_mean + np.dot(self.cook_test_set(X, **kwargs), self.beta)
+        return self.y_mean + mo.safe_sparse_dot(
+            a=self.cook_test_set(X, **kwargs), b=self.beta, backend=self.backend
+        )
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 

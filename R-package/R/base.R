@@ -19,6 +19,7 @@
 #' @param col_sample
 #' @param row_sample
 #' @param seed
+#' @param backend
 #'
 #' @return
 #' @export
@@ -46,8 +47,10 @@ BaseRegressor <- function(n_hidden_features=5L,
                           type_clust="kmeans",
                           col_sample=1,
                           row_sample=1,
-                          seed=123L)
+                          seed=123L, 
+                          backend=c("cpu", "gpu", "tpu"))
 {
+ backend <- match.arg(backend)     
  ns$BaseRegressor(n_hidden_features=n_hidden_features,
                   activation_name=activation_name,
                   a=a,
@@ -60,5 +63,6 @@ BaseRegressor <- function(n_hidden_features=5L,
                   type_clust=type_clust,
                   col_sample=col_sample,
                   row_sample=row_sample,
-                  seed=seed)
+                  seed=seed,
+                  backend=backend)
 }

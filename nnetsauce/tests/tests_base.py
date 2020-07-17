@@ -6,6 +6,8 @@ import nnetsauce as ns
 
 # Basic tests
 
+np.random.seed(123)
+
 
 class TestBase(ut.TestCase):
     def test_base(self):
@@ -259,7 +261,7 @@ class TestBase(ut.TestCase):
     def test_score(self):
 
         X, y = datasets.make_regression(
-            n_samples=100, n_features=3, random_state=123
+            n_samples=25, n_features=3, random_state=123
         )
 
         fit_obj = ns.BaseRegressor(
@@ -273,11 +275,8 @@ class TestBase(ut.TestCase):
         fit_obj.fit(X, y)
 
         self.assertTrue(
-            np.allclose(
-                fit_obj.score(X, y, scoring="neg_mean_squared_error"),
-                2244396.8658475084,
-            )
-            & np.allclose(fit_obj.score(X, y), 2244396.8658475084)
+            np.allclose(fit_obj.score(X, y, scoring="r2"), 0.9294339466604191)
+            & np.allclose(fit_obj.score(X, y), 1596.2615409365528)
         )
 
 

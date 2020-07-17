@@ -1,4 +1,3 @@
-
 # Authors: Thierry Moudiki
 #
 # License: BSD 3
@@ -55,6 +54,9 @@ class CustomClassifier(Custom, ClassifierMixin):
            percentage of rows chosen for training, by stratified bootstrapping    
        seed: int 
            reproducibility seed for nodes_sim=='uniform'
+       backend: str
+           "cpu" or "gpu" or "tpu"                
+    
     """
 
     # construct the object -----
@@ -76,6 +78,7 @@ class CustomClassifier(Custom, ClassifierMixin):
         col_sample=1,
         row_sample=1,
         seed=123,
+        backend="cpu"
     ):
 
         super().__init__(
@@ -94,10 +97,10 @@ class CustomClassifier(Custom, ClassifierMixin):
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,
+            backend=backend
         )
 
         self.type_fit = "classification"
-
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit custom model to training data (X, y).
@@ -127,7 +130,7 @@ class CustomClassifier(Custom, ClassifierMixin):
             self.obj.fit(
                 scaled_Z,
                 output_y,
-                sample_weight=np.ravel(sample_weight)[self.index_row],
+                sample_weight=np.ravel(sample_weight, order='C')[self.index_row],
                 **kwargs
             )
 
@@ -137,7 +140,6 @@ class CustomClassifier(Custom, ClassifierMixin):
         self.obj.fit(scaled_Z, output_y, **kwargs)
 
         return self
-    
 
     def predict(self, X, **kwargs):
         """Predict test data X.
@@ -169,7 +171,6 @@ class CustomClassifier(Custom, ClassifierMixin):
             )[0]
 
         return self.obj.predict(self.cook_test_set(X, **kwargs), **kwargs)
-    
 
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
@@ -203,7 +204,6 @@ class CustomClassifier(Custom, ClassifierMixin):
             )[0]
 
         return self.obj.predict_proba(self.cook_test_set(X, **kwargs), **kwargs)
-
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 

@@ -18,6 +18,7 @@
 #' @param col_sample
 #' @param row_sample
 #' @param seed
+#' @param backend
 #'
 #' @return
 #' @export
@@ -67,9 +68,10 @@ MultitaskClassifier <- function(obj,
                                 type_clust="kmeans", # type_scaling
                                 col_sample=1,
                                 row_sample=1,
-                                seed=123L)
+                                seed=123L, 
+                                backend=c("cpu", "gpu", "tpu"))
 {
-
+  backend <- match.arg(backend)      
   ns$MultitaskClassifier(obj=obj,
                          n_hidden_features=n_hidden_features,
                          activation_name=activation_name,
@@ -83,5 +85,6 @@ MultitaskClassifier <- function(obj,
                          type_clust=type_clust, # type_scaling
                          col_sample=col_sample,
                          row_sample=row_sample,
-                         seed=seed)
+                         seed=seed,
+                         backend=backend)
 }

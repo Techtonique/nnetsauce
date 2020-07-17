@@ -1,4 +1,3 @@
-
 # Authors: Thierry Moudiki
 #
 # License: BSD 3
@@ -57,6 +56,8 @@ class CustomRegressor(Custom, RegressorMixin):
            reproducibility seed for nodes_sim=='uniform'
        type_fit: str
            'regression'
+       backend: str
+           "cpu" or "gpu" or "tpu"                           
     """
 
     # construct the object -----
@@ -78,6 +79,7 @@ class CustomRegressor(Custom, RegressorMixin):
         col_sample=1,
         row_sample=1,
         seed=123,
+        backend="cpu"
     ):
 
         super().__init__(
@@ -96,10 +98,10 @@ class CustomRegressor(Custom, RegressorMixin):
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,
+            backend=backend
         )
 
         self.type_fit = "regression"
-
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit custom model to training data (X, y).
@@ -122,14 +124,14 @@ class CustomRegressor(Custom, RegressorMixin):
         """
 
         centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
-        
+
         # if sample_weights, else: (must use self.row_index)
         if sample_weight is not None:
 
             self.obj.fit(
                 scaled_Z,
                 centered_y,
-                sample_weight=np.ravel(sample_weight)[self.index_row],
+                sample_weight=np.ravel(sample_weight, order='C')[self.index_row],
                 **kwargs
             )
 
@@ -138,7 +140,6 @@ class CustomRegressor(Custom, RegressorMixin):
         self.obj.fit(scaled_Z, centered_y, **kwargs)
 
         return self
-    
 
     def predict(self, X, **kwargs):
         """Predict test data X.
@@ -175,7 +176,6 @@ class CustomRegressor(Custom, RegressorMixin):
         return self.y_mean + self.obj.predict(
             self.cook_test_set(X, **kwargs), **kwargs
         )
-
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 

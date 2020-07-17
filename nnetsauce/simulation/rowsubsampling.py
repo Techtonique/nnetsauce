@@ -9,14 +9,14 @@ from ..utils import misc as mx
 
 # stratified subsampling
 def subsample(y, row_sample=0.8, seed=123):
-    
-    assert (row_sample < 1) & (row_sample >= 0),\
-    "'row_sample' must be < 1 and >= 0"
-    n_obs = len(y)    
-    n_obs_out = np.ceil(n_obs * row_sample)
-    
 
-    # preproc -----    
+    assert (row_sample < 1) & (
+        row_sample >= 0
+    ), "'row_sample' must be < 1 and >= 0"
+    n_obs = len(y)
+    n_obs_out = np.ceil(n_obs * row_sample)
+
+    # preproc -----
     if mx.is_factor(y):
 
         classes, n_elem_classes = np.unique(y, return_counts=True)
@@ -33,10 +33,15 @@ def subsample(y, row_sample=0.8, seed=123):
 
         n_breaks_1 = len(breaks) - 1
         classes = range(n_breaks_1)
-        n_classes = n_breaks_1        
-        y_as_classes=np.asarray([int(i) if ((y > breaks[i]) & (y <= breaks[i + 1])) else None for i in classes])
+        n_classes = n_breaks_1
+        y_as_classes = np.asarray(
+            [
+                int(i) if ((y > breaks[i]) & (y <= breaks[i + 1])) else None
+                for i in classes
+            ]
+        )
 
-    # main loop ----    
+    # main loop ----
     index = []
 
     np.random.seed(seed)
@@ -47,7 +52,7 @@ def subsample(y, row_sample=0.8, seed=123):
         index_class_i = np.where(y_as_classes == classes[i])[0]
 
         # at least 2 elements in class  #i
-        # or only one element in class        
+        # or only one element in class
         index.append(
             np.random.choice(
                 index_class_i,
@@ -55,14 +60,13 @@ def subsample(y, row_sample=0.8, seed=123):
                 replace=True,
             ).tolist()
         ) if len(index_class_i) > 1 else index.append(index_class_i[0])
-        
-        
+
     try:
-        
+
         return np.asarray(mx.flatten(index))
-    
+
     except:
-        
+
         return np.asarray(index)
 
 

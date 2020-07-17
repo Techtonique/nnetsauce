@@ -1,4 +1,3 @@
-
 # Authors: Thierry Moudiki
 #
 # License: BSD 3
@@ -60,7 +59,10 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
        Sigma: array-like
            covariance of the distribution of fitted parameters
        GCV: float
-       return_std: boolean
+           return_std: boolean
+       backend: str
+           "cpu" or "gpu" or "tpu"                
+
 
        References
        ----------
@@ -94,6 +96,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         Sigma=None,
         GCV=None,
         return_std=True,
+        backend="cpu"
     ):
 
         super().__init__(
@@ -111,6 +114,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,
+            backend=backend
         )
 
         self.s1 = s1
@@ -156,7 +160,9 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
             block22 = (self.s2 ** 2) * np.eye(q)
 
             Sigma_prior = mo.rbind(
-                mo.cbind(block11, block12), mo.cbind(block21, block22)
+                x=mo.cbind(x=block11, y=block12, backend=self.backend),
+                y=mo.cbind(x=block21, y=block22, backend=self.backend),
+                backend=self.backend,
             )
 
         else:
@@ -170,6 +176,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
             sigma=self.sigma,
             fit_intercept=False,
             return_cov=self.return_std,
+            backend=self.backend,
         )
 
         self.beta = fit_obj["beta_hat"]
@@ -201,8 +208,9 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         if len(X.shape) == 1:  # one observation in the test set only
             n_features = X.shape[0]
             new_X = mo.rbind(
-                X.reshape(1, n_features),
-                np.ones(n_features).reshape(1, n_features),
+                x=X.reshape(1, n_features),
+                y=np.ones(n_features).reshape(1, n_features),
+                backend=self.backend,
             )
 
         self.return_std = return_std
@@ -213,11 +221,16 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
 
                 return (
                     self.y_mean
-                    + np.dot(self.cook_test_set(new_X, **kwargs), self.beta)
+                    + mo.safe_sparse_dot(
+                        self.cook_test_set(new_X, **kwargs),
+                        self.beta,
+                        backend=self.backend,
+                    )
                 )[0]
 
-            return self.y_mean + np.dot(
-                self.cook_test_set(X, **kwargs), self.beta
+            return self.y_mean + mo.safe_sparse_dot(
+                self.cook_test_set(X, **kwargs), self.beta, 
+                backend=self.backend
             )
 
         else:  # confidence interval required for preds?
@@ -231,6 +244,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
                     return_cov=self.return_std,
                     beta_hat_=self.beta,
                     Sigma_hat_=self.Sigma,
+                    backend=self.backend,
                 )
 
                 return (
@@ -245,6 +259,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
                 return_cov=self.return_std,
                 beta_hat_=self.beta,
                 Sigma_hat_=self.Sigma,
+                backend=self.backend,
             )
 
             return (self.y_mean + pred_obj["preds"], pred_obj["preds_std"])

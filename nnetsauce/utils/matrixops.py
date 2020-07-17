@@ -1,6 +1,8 @@
+import jax.numpy as jnp
 import numpy as np
 
 from .memoize import memoize
+from jax import device_put
 from scipy import sparse
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.cluster import KMeans
@@ -8,8 +10,10 @@ from sklearn.mixture import GaussianMixture
 
 
 # column bind
-def cbind(x, y):
+def cbind(x, y, backend="cpu"):
     # if len(x.shape) == 1 or len(y.shape) == 1:
+    if backend in ("gpu", "tpu"):
+        return jnp.column_stack((x, y))
     return np.column_stack((x, y))
 
 
@@ -30,7 +34,7 @@ def cluster_covariates(X, n_clusters, seed, type_clust="kmeans", **kwargs):
 
         return kmeans, kmeans.predict(X)
 
-    if type_clust == "gmm":
+    elif type_clust == "gmm":
 
         gmm = GaussianMixture(
             n_components=n_clusters, random_state=seed, **kwargs
@@ -41,12 +45,17 @@ def cluster_covariates(X, n_clusters, seed, type_clust="kmeans", **kwargs):
 
 
 # computes t(x)%*%y
-def crossprod(x, y=None):
+def crossprod(x, y=None, backend="cpu"):
     # assert on dimensions
+    if backend in ("gpu", "tpu"):
+        x = device_put(x)
+        if y is None:
+            return jnp.dot(x.T, x).block_until_ready()
+        y = device_put(y)
+        return jnp.dot(x.T, y).block_until_ready()
     if y is None:
         return np.dot(x.transpose(), x)
-    else:
-        return np.dot(x.transpose(), y)
+    return np.dot(x.transpose(), y)
 
 
 # dropout
@@ -88,7 +97,7 @@ def one_hot_encode(x_clusters, n_clusters):
 def one_hot_encode2(y, n_classes):
 
     n_obs = len(y)
-    
+
     res = np.zeros((n_obs, n_classes))
 
     for i in range(n_obs):
@@ -98,13 +107,15 @@ def one_hot_encode2(y, n_classes):
 
 
 # row bind
-def rbind(x, y):
+def rbind(x, y, backend="cpu"):
     # if len(x.shape) == 1 or len(y.shape) == 1:
+    if backend in ("gpu", "tpu"):
+        return jnp.row_stack((x, y))
     return np.row_stack((x, y))
 
 
 # adapted from sklearn.utils.exmath
-def safe_sparse_dot(a, b, dense_output=False, backend="cpu"):
+def safe_sparse_dot(a, b, backend="cpu", dense_output=False):
     """Dot product that handle the sparse matrix case correctly
 
     Parameters
@@ -120,7 +131,14 @@ def safe_sparse_dot(a, b, dense_output=False, backend="cpu"):
     dot_product : array or sparse matrix
         sparse if ``a`` and ``b`` are sparse and ``dense_output=False``.
     """
-    
+
+    if backend in ("gpu", "tpu"):
+        # modif when jax.scipy.sparse available
+        a = device_put(a)
+        b = device_put(b)
+        return jnp.dot(a, b).block_until_ready()
+
+    #    if backend == "cpu":
     if a.ndim > 2 or b.ndim > 2:
         if sparse.issparse(a):
             # sparse is always 2D. Implies b is 3D+
@@ -140,9 +158,14 @@ def safe_sparse_dot(a, b, dense_output=False, backend="cpu"):
     else:
         ret = a @ b
 
-    if (sparse.issparse(a) and sparse.issparse(b)
-            and dense_output and hasattr(ret, "toarray")):
+    if (
+        sparse.issparse(a)
+        and sparse.issparse(b)
+        and dense_output
+        and hasattr(ret, "toarray")
+    ):
         return ret.toarray()
+
     return ret
 
 
@@ -166,7 +189,7 @@ def scale_covariates(X, choice="std", training=True, scaler=None):
 
 
 # from sklearn.utils.exmath
-def squared_norm(x):
+def squared_norm(x, backend="cpu"):
     """Squared Euclidean or Frobenius norm of x.
 
     Faster than norm(x) ** 2.
@@ -181,39 +204,29 @@ def squared_norm(x):
         The Euclidean norm when x is a vector, the Frobenius norm when x
         is a matrix (2-d array).
     """
+    if backend in ("gpu", "tpu"):
+        x = np.ravel(x, order="K")
+        x = device_put(x)        
+        return jnp.dot(x, x).block_until_ready()
+
     x = np.ravel(x, order="K")
     return np.dot(x, x)
 
 
 # computes x%*%t(y)
-def tcrossprod(x, y=None):
+def tcrossprod(x, y=None, backend="cpu"):
     # assert on dimensions
+    if backend in ("gpu", "tpu"):
+        x = device_put(x)
+        if y is None:
+            return jnp.dot(x, x.T).block_until_ready()
+        y = device_put(y)
+        return jnp.dot(x, y.T).block_until_ready()
     if y is None:
         return np.dot(x, x.transpose())
-    else:
-        return np.dot(x, y.transpose())
+    return np.dot(x, y.transpose())
 
 
 # convert vector to numpy array
 def to_np_array(X):
     return np.array(X.copy(), ndmin=2)
-
-
-# scale matrix
-# def scale_matrix(X, x_means=None, x_vars=None):
-#
-#    if ((x_means is None) & (x_vars is None)):
-#        x_means = X.mean(axis = 0)
-#        x_vars = X.var(axis = 0)
-#        return ((X - x_means)/np.sqrt(x_vars),
-#                x_means,
-#                x_vars)
-#
-#    if ((x_means is not None) & (x_vars is None)):
-#        return X - x_means
-#
-#    if ((x_means is None) & (x_vars is not None)):
-#        return X/np.sqrt(x_vars)
-#
-#    if ((x_means is not None) & (x_vars is not None)):
-#        return (X - x_means)/np.sqrt(x_vars)

@@ -6,7 +6,7 @@ def relu(x):
 
 
 def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
+    return np.exp(-np.logaddexp(0, -x))
 
 
 def prelu(x, a=None):

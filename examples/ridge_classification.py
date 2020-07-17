@@ -10,6 +10,7 @@ import nnetsauce as ns
 import numpy as np
 from sklearn.datasets import load_digits, load_breast_cancer, load_wine, load_iris
 from sklearn.model_selection import train_test_split
+from time import time
 
 
 # dataset no. 1 ----------

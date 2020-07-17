@@ -1,7 +1,6 @@
-
 # Authors: Thierry Moudiki
 #
-# License: BSD 3
+# License: BSD 3 Clear
 
 import numpy as np
 from functools import partial
@@ -59,6 +58,8 @@ class Base(BaseEstimator):
            percentage of rows chosen for training, by stratified bootstrapping    
        seed: int 
            reproducibility seed for nodes_sim=='uniform', clustering and dropout
+       backend: str
+           "cpu" or "gpu" or "tpu"                
     """
 
     # construct the object -----
@@ -79,6 +80,7 @@ class Base(BaseEstimator):
         col_sample=1,
         row_sample=1,
         seed=123,
+        backend="cpu",
     ):
 
         # input checks -----
@@ -112,6 +114,12 @@ class Base(BaseEstimator):
             col_sample <= 1
         ), "'col_sample' must be comprised between 0 and 1 (both included)"
 
+        assert backend in (
+            "cpu",
+            "gpu",
+            "tpu",
+        ), "must have 'backend' in ('cpu', 'gpu', 'tpu')"
+
         # activation function -----
 
         activation_options = {
@@ -129,6 +137,7 @@ class Base(BaseEstimator):
         self.nodes_sim = nodes_sim
         self.bias = bias
         self.seed = seed
+        self.backend = backend
         self.dropout = dropout
         self.direct_link = direct_link
         self.cluster_encode = cluster_encode
@@ -173,6 +182,8 @@ class Base(BaseEstimator):
         Clusters' matrix, one-hot encoded: {array-like}        
         """
 
+        np.random.seed(self.seed)
+
         if X is None:
             X = self.X
 
@@ -183,37 +194,19 @@ class Base(BaseEstimator):
                 X, choice=self.type_scaling[2]
             )
 
-            if self.type_clust == "kmeans":
+            self.clustering_obj, X_clustered = mo.cluster_covariates(
+                scaled_X,
+                self.n_clusters,
+                self.seed,
+                type_clust=self.type_clust,
+                **kwargs
+            )
 
-                self.clustering_obj, X_kmeans = mo.cluster_covariates(
-                    scaled_X,
-                    self.n_clusters,
-                    self.seed,
-                    type_clust="kmeans",
-                    **kwargs
-                )
+            if self.cluster_encode == True:
 
-                if self.cluster_encode == True:
+                return mo.one_hot_encode(X_clustered, self.n_clusters)
 
-                    return mo.one_hot_encode(X_kmeans, self.n_clusters)
-
-                return X_kmeans
-
-            if self.type_clust == "gmm":
-
-                self.clustering_obj, X_gmm = mo.cluster_covariates(
-                    scaled_X,
-                    self.n_clusters,
-                    self.seed,
-                    type_clust="gmm",
-                    **kwargs
-                )
-
-                if self.cluster_encode == True:
-
-                    return mo.one_hot_encode(X_gmm, self.n_clusters)
-
-                return X_gmm
+            return X_clustered
 
         # if predict == True, encode test set
         X_clustered = self.clustering_obj.predict(
@@ -225,7 +218,6 @@ class Base(BaseEstimator):
             return mo.one_hot_encode(X_clustered, self.n_clusters)
 
         return X_clustered
-
 
     def create_layer(self, scaled_X, W=None):
         """ Create hidden layer. 
@@ -243,52 +235,61 @@ class Base(BaseEstimator):
         -------
         Hidden layer matrix: {array-like}        
 
-        """        
+        """
 
         n_features = scaled_X.shape[1]
 
         if self.bias is False:  # no bias term in the hidden layer
 
             if W is None:
-                
-                if self.nodes_sim == "sobol":
-                    try:  # try cpp version
-                        self.W = ns.generate_sobol_cpp(
-                            n_dims=n_features, n_points=self.n_hidden_features
-                        )
-                    except:  # python version
-                        self.W = ns.generate_sobol2(
-                            n_dims=n_features, n_points=self.n_hidden_features
-                        )
 
-                if self.nodes_sim == "hammersley":
-                    self.W = ns.generate_hammersley(
-                        n_dims=n_features, n_points=self.n_hidden_features
-                    )
-
-                if self.nodes_sim == "uniform":
-                    self.W = ns.generate_uniform(
-                        n_dims=n_features,
-                        n_points=self.n_hidden_features,
-                        seed=self.seed,
-                    )
-
-                if self.nodes_sim == "halton":
-                    try:  # try cpp version
-                        self.W = ns.generate_halton_cpp(
+                try:
+                    h_sim = {
+                        "sobol": ns.generate_sobol_randtoolbox(
                             n_dims=n_features, n_points=self.n_hidden_features
-                        )
-                    except:  # python version
-                        self.W = ns.generate_halton(
+                        ),
+                        "hammersley": ns.generate_hammersley(
                             n_dims=n_features, n_points=self.n_hidden_features
-                        )
+                        ),
+                        "uniform": ns.generate_uniform(
+                            n_dims=n_features,
+                            n_points=self.n_hidden_features,
+                            seed=self.seed,
+                        ),
+                        "halton": ns.generate_halton_randtoolbox(
+                            n_dims=n_features, n_points=self.n_hidden_features
+                        ),
+                    }
+                except:
+                    h_sim = {
+                        "sobol": ns.generate_sobol2(
+                            n_dims=n_features, n_points=self.n_hidden_features
+                        ),
+                        "hammersley": ns.generate_hammersley(
+                            n_dims=n_features, n_points=self.n_hidden_features
+                        ),
+                        "uniform": ns.generate_uniform(
+                            n_dims=n_features,
+                            n_points=self.n_hidden_features,
+                            seed=self.seed,
+                        ),
+                        "halton": ns.generate_halton(
+                            n_dims=n_features, n_points=self.n_hidden_features
+                        ),
+                    }
+
+                self.W = h_sim[self.nodes_sim]
 
                 assert (
                     scaled_X.shape[1] == self.W.shape[0]
                 ), "check dimensions of covariates X and matrix W"
 
                 return mo.dropout(
-                    x=self.activation_func(np.dot(scaled_X, self.W)),
+                    x=self.activation_func(
+                        mo.safe_sparse_dot(
+                            a=scaled_X, b=self.W, backend=self.backend
+                        )
+                    ),
                     drop_prob=self.dropout,
                     seed=self.seed,
                 )
@@ -300,7 +301,9 @@ class Base(BaseEstimator):
 
             # self.W = W
             return mo.dropout(
-                x=self.activation_func(np.dot(scaled_X, W)),
+                x=self.activation_func(
+                    mo.safe_sparse_dot(a=scaled_X, b=W, backend=self.backend)
+                ),
                 drop_prob=self.dropout,
                 seed=self.seed,
             )
@@ -309,43 +312,54 @@ class Base(BaseEstimator):
         if W is None:
 
             n_features_1 = n_features + 1
-            
-            if self.nodes_sim == "sobol":
-                try:  # try cpp version
-                    self.W = ns.generate_sobol_cpp(
-                        n_dims=n_features_1, n_points=self.n_hidden_features
-                    )
-                except:  # python version
-                    self.W = ns.generate_sobol2(
-                        n_dims=n_features_1, n_points=self.n_hidden_features
-                    )
 
-            if self.nodes_sim == "hammersley":
-                self.W = ns.generate_hammersley(
-                    n_dims=n_features_1, n_points=self.n_hidden_features
-                )
-
-            if self.nodes_sim == "uniform":
-                self.W = ns.generate_uniform(
-                    n_dims=n_features_1,
-                    n_points=self.n_hidden_features,
-                    seed=self.seed,
-                )
-
-            if self.nodes_sim == "halton":
-                try:  # try cpp version
-                    self.W = ns.generate_halton_cpp(
+            try:
+                h_sim = {
+                    "sobol": ns.generate_sobol_randtoolbox(
                         n_dims=n_features_1, n_points=self.n_hidden_features
-                    )
-                except:  # python version
-                    self.W = ns.generate_halton(
+                    ),
+                    "hammersley": ns.generate_hammersley(
                         n_dims=n_features_1, n_points=self.n_hidden_features
-                    )
+                    ),
+                    "uniform": ns.generate_uniform(
+                        n_dims=n_features_1,
+                        n_points=self.n_hidden_features,
+                        seed=self.seed,
+                    ),
+                    "halton": ns.generate_halton_randtoolbox(
+                        n_dims=n_features_1, n_points=self.n_hidden_features
+                    ),
+                }
+            except:
+                h_sim = {
+                    "sobol": ns.generate_sobol2(
+                        n_dims=n_features_1, n_points=self.n_hidden_features
+                    ),
+                    "hammersley": ns.generate_hammersley(
+                        n_dims=n_features_1, n_points=self.n_hidden_features
+                    ),
+                    "uniform": ns.generate_uniform(
+                        n_dims=n_features_1,
+                        n_points=self.n_hidden_features,
+                        seed=self.seed,
+                    ),
+                    "halton": ns.generate_halton(
+                        n_dims=n_features_1, n_points=self.n_hidden_features
+                    ),
+                }
+
+            self.W = h_sim[self.nodes_sim]
 
             return mo.dropout(
                 x=self.activation_func(
-                    np.dot(
-                        mo.cbind(np.ones(scaled_X.shape[0]), scaled_X), self.W
+                    mo.safe_sparse_dot(
+                        a=mo.cbind(
+                            np.ones(scaled_X.shape[0]),
+                            scaled_X,
+                            backend=self.backend,
+                        ),
+                        b=self.W,
+                        backend=self.backend,
                     )
                 ),
                 drop_prob=self.dropout,
@@ -356,12 +370,19 @@ class Base(BaseEstimator):
         # self.W = W
         return mo.dropout(
             x=self.activation_func(
-                np.dot(mo.cbind(np.ones(scaled_X.shape[0]), scaled_X), W)
+                mo.safe_sparse_dot(
+                    a=mo.cbind(
+                        np.ones(scaled_X.shape[0]),
+                        scaled_X,
+                        backend=self.backend,
+                    ),
+                    b=W,
+                    backend=self.backend,
+                )
             ),
             drop_prob=self.dropout,
             seed=self.seed,
         )
-
 
     def cook_training_set(self, y=None, X=None, W=None, **kwargs):
         """ Create new hidden features for training set, with hidden layer, center the response. 
@@ -382,30 +403,19 @@ class Base(BaseEstimator):
         -------
         (centered response, direct link + hidden layer matrix): {tuple}
 
-        """        
+        """
 
         # either X and y are stored or not
         # assert ((y is None) & (X is None)) | ((y is not None) & (X is not None))
         if self.n_hidden_features > 0:  # has a hidden layer
-
-            assert len(self.type_scaling) >= 2, ""
-                
-        # center y
-        if mx.is_factor(y) == False:  # regression
-
-            if y is None:
-                self.y_mean, centered_y = mo.center_response(self.y)
-            else:  # keep
-                self.y_mean, centered_y = mo.center_response(y)
+            assert (
+                len(self.type_scaling) >= 2
+            ), "must have len(self.type_scaling) >= 2 when self.n_hidden_features > 0"
 
         if X is None:
-
             if self.col_sample == 1:
-
                 input_X = self.X
-
             else:
-
                 n_features = self.X.shape[1]
                 new_n_features = int(np.ceil(n_features * self.col_sample))
                 assert (
@@ -417,15 +427,10 @@ class Base(BaseEstimator):
                 )
                 self.index_col = index_col
                 input_X = self.X[:, self.index_col]
-
-        else:  # X is not None
-
+        else:  # X is not None # keep X vs self.X
             if self.col_sample == 1:
-
                 input_X = X
-
             else:
-
                 n_features = X.shape[1]
                 new_n_features = int(np.ceil(n_features * self.col_sample))
                 assert (
@@ -441,99 +446,103 @@ class Base(BaseEstimator):
         if (
             self.n_clusters <= 0
         ):  # data without any clustering: self.n_clusters is None -----
-
             if self.n_hidden_features > 0:  # with hidden layer
-
                 self.nn_scaler, scaled_X = mo.scale_covariates(
                     input_X, choice=self.type_scaling[1]
                 )
-
-                if W is None:
-                    Phi_X = self.create_layer(scaled_X)
-                else:
-                    Phi_X = self.create_layer(scaled_X, W=W)
-
-                if self.direct_link == True:
-                    Z = mo.cbind(input_X, Phi_X)
-                else:
-                    Z = Phi_X
-
+                Phi_X = (
+                    self.create_layer(scaled_X)
+                    if W is None
+                    else self.create_layer(scaled_X, W=W)
+                )
+                Z = (
+                    mo.cbind(input_X, Phi_X, backend=self.backend)
+                    if self.direct_link == True
+                    else Phi_X
+                )
                 self.scaler, scaled_Z = mo.scale_covariates(
                     Z, choice=self.type_scaling[0]
                 )
-
             else:  # no hidden layer
-
                 Z = input_X
-
                 self.scaler, scaled_Z = mo.scale_covariates(
                     Z, choice=self.type_scaling[0]
                 )
-
-        else:  # data with clustering: self.n_clusters is not None -----
-
+        else:  # data with clustering: self.n_clusters is not None ----- # keep
             augmented_X = mo.cbind(
-                input_X, self.encode_clusters(input_X, **kwargs)
+                input_X,
+                self.encode_clusters(input_X, **kwargs),
+                backend=self.backend,
             )
-
             if self.n_hidden_features > 0:  # with hidden layer
-
                 self.nn_scaler, scaled_X = mo.scale_covariates(
                     augmented_X, choice=self.type_scaling[1]
                 )
-
-                if W is None:
-                    Phi_X = self.create_layer(scaled_X)
-                else:
-                    Phi_X = self.create_layer(scaled_X, W=W)
-
-                if self.direct_link == True:
-                    Z = mo.cbind(augmented_X, Phi_X)
-                else:
-                    Z = Phi_X
-
+                Phi_X = (
+                    self.create_layer(scaled_X)
+                    if W is None
+                    else self.create_layer(scaled_X, W=W)
+                )
+                Z = (
+                    mo.cbind(augmented_X, Phi_X, backend=self.backend)
+                    if self.direct_link == True
+                    else Phi_X
+                )
                 self.scaler, scaled_Z = mo.scale_covariates(
                     Z, choice=self.type_scaling[0]
                 )
-
             else:  # no hidden layer
-
                 Z = augmented_X
-
                 self.scaler, scaled_Z = mo.scale_covariates(
                     Z, choice=self.type_scaling[0]
                 )
 
         # Returning model inputs -----
-
-        # y is subsampled
-        if self.row_sample < 1:
-
-            n, p = Z.shape
-
-            if y is None:
-
-                self.index_row = rs.subsample(
-                    y=self.y, row_sample=self.row_sample, seed=self.seed
+        if mx.is_factor(y) == False:  # regression
+            # center y
+            self.y_mean, centered_y = (
+                mo.center_response(self.y)
+                if y is None
+                else mo.center_response(y)
+            )
+            # y is subsampled
+            if self.row_sample < 1:
+                n, p = Z.shape
+                self.index_row = (
+                    rs.subsample(
+                        y=self.y, row_sample=self.row_sample, seed=self.seed
+                    )
+                    if y is None
+                    else rs.subsample(
+                        y=y, row_sample=self.row_sample, seed=self.seed
+                    )
                 )
-
-            else:
-
-                self.index_row = rs.subsample(
-                    y=y, row_sample=self.row_sample, seed=self.seed
-                )
-
-            n_row_sample = len(self.index_row)
-
-            if mx.is_factor(y) == False:  # regression
-
+                n_row_sample = len(self.index_row)
+                # regression
                 return (
                     centered_y[self.index_row].reshape(n_row_sample),
                     self.scaler.transform(
                         Z[self.index_row, :].reshape(n_row_sample, p)
                     ),
                 )
-
+            # y is not subsampled
+            # regression
+            return (centered_y, self.scaler.transform(Z))
+            
+        # classification
+        # y is subsampled
+        if self.row_sample < 1:
+            n, p = Z.shape
+            self.index_row = (
+                rs.subsample(
+                    y=self.y, row_sample=self.row_sample, seed=self.seed
+                )
+                if y is None
+                else rs.subsample(
+                    y=y, row_sample=self.row_sample, seed=self.seed
+                )
+            )
+            n_row_sample = len(self.index_row)
             # classification
             return (
                 y[self.index_row].reshape(n_row_sample),
@@ -541,15 +550,9 @@ class Base(BaseEstimator):
                     Z[self.index_row, :].reshape(n_row_sample, p)
                 ),
             )
-
         # y is not subsampled
-        if mx.is_factor(y) == False:  # regression
-
-            return (centered_y, self.scaler.transform(Z))
-
         # classification
         return (y, self.scaler.transform(Z))
-
 
     def cook_test_set(self, X, **kwargs):
         """ Transform data from test set, with hidden layer. 
@@ -565,57 +568,49 @@ class Base(BaseEstimator):
         Returns
         -------
         Transformed test set : {array-like}        
-        """        
+        """
 
         if (
             self.n_clusters == 0
         ):  # data without clustering: self.n_clusters is None -----
-
-            if self.n_hidden_features > 0:  # if hidden layer
-
-                if self.col_sample == 1:
-
-                    scaled_X = self.nn_scaler.transform(X)
-
-                else:
-
-                    scaled_X = self.nn_scaler.transform(X[:, self.index_col])
-
+            if self.n_hidden_features > 0:
+                # if hidden layer
+                scaled_X = (
+                    self.nn_scaler.transform(X)
+                    if (self.col_sample == 1)
+                    else self.nn_scaler.transform(X[:, self.index_col])
+                )
                 Phi_X = self.create_layer(scaled_X, self.W)
-
                 if self.direct_link == True:
-
-                    return self.scaler.transform(mo.cbind(scaled_X, Phi_X))
-
+                    return self.scaler.transform(
+                        mo.cbind(scaled_X, Phi_X, backend=self.backend)
+                    )
                 # when self.direct_link == False
                 return self.scaler.transform(Phi_X)
-
             # if no hidden layer # self.n_hidden_features == 0
             return self.scaler.transform(X)
 
         # data with clustering: self.n_clusters > 0 -----
         if self.col_sample == 1:
-
             predicted_clusters = self.encode_clusters(
                 X=X, predict=True, **kwargs
             )
-            augmented_X = mo.cbind(X, predicted_clusters)
-
+            augmented_X = mo.cbind(X, predicted_clusters, backend=self.backend)
         else:
-
             predicted_clusters = self.encode_clusters(
                 X=X[:, self.index_col], predict=True, **kwargs
             )
-            augmented_X = mo.cbind(X[:, self.index_col], predicted_clusters)
+            augmented_X = mo.cbind(
+                X[:, self.index_col], predicted_clusters, backend=self.backend
+            )
 
         if self.n_hidden_features > 0:  # if hidden layer
-
             scaled_X = self.nn_scaler.transform(augmented_X)
             Phi_X = self.create_layer(scaled_X, self.W)
-
             if self.direct_link == True:
-                return self.scaler.transform(mo.cbind(augmented_X, Phi_X))
-
+                return self.scaler.transform(
+                    mo.cbind(augmented_X, Phi_X, backend=self.backend)
+                )
             return self.scaler.transform(Phi_X)
 
         # if no hidden layer
