@@ -11,7 +11,7 @@ from ..utils import memoize
 from rpy2.robjects import numpy2ri
 from rpy2.robjects.packages import importr
 
-path = os.path.abspath(__file__)
+path = os.path.dirname(__file__)
 print(path)
 randtoolbox = importr("randtoolbox", lib_loc=path+"/randtoolbox")
 
