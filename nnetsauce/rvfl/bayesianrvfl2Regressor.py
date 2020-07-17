@@ -224,7 +224,8 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
                 )[0]
 
             return self.y_mean + mo.safe_sparse_dot(
-                self.cook_test_set(X, **kwargs), self.beta, backend=self.backend
+                self.cook_test_set(X, **kwargs), self.beta, 
+                backend=self.backend
             )
 
         else:  # confidence interval required for preds?

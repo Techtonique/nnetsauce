@@ -189,7 +189,7 @@ def scale_covariates(X, choice="std", training=True, scaler=None):
 
 
 # from sklearn.utils.exmath
-def squared_norm(x):
+def squared_norm(x, backend="cpu"):
     """Squared Euclidean or Frobenius norm of x.
 
     Faster than norm(x) ** 2.
@@ -204,6 +204,11 @@ def squared_norm(x):
         The Euclidean norm when x is a vector, the Frobenius norm when x
         is a matrix (2-d array).
     """
+    if backend in ("gpu", "tpu"):
+        x = np.ravel(x, order="K")
+        x = device_put(x)        
+        return jnp.dot(x, x).block_until_ready()
+
     x = np.ravel(x, order="K")
     return np.dot(x, x)
 

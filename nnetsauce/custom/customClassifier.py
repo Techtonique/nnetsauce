@@ -125,7 +125,7 @@ class CustomClassifier(Custom, ClassifierMixin):
             self.obj.fit(
                 scaled_Z,
                 output_y,
-                sample_weight=np.ravel(sample_weight)[self.index_row],
+                sample_weight=np.ravel(sample_weight, order='C')[self.index_row],
                 **kwargs
             )
 
