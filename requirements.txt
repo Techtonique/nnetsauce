@@ -12,8 +12,6 @@ GitPython==0.3.6
 idna==2.10
 imagesize==1.2.0
 importlib-metadata==1.7.0
-jax==0.1.72
-jaxlib==0.1.51
 Jinja2==2.11.2
 joblib==0.16.0
 MarkupSafe==1.1.1

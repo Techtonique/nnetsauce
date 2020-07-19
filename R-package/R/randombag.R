@@ -57,7 +57,12 @@ RandomBagClassifier <- function(obj,
                                 verbose=1L, 
                                 backend=c("cpu", "gpu", "tpu"))
 {
-  backend <- match.arg(backend)      
+  backend <- match.arg(backend)   
+  if ((as.character(Sys.info()[1])=="Windows") && (backend %in% c("gpu", "tpu")))
+  {
+      warning("No GPU/TPU computing on Windows yet, backend set to 'cpu'")
+      backend <- "cpu"  
+  }   
   ns$RandomBagClassifier(obj=obj,
                          n_estimators=n_estimators,
                          n_hidden_features=n_hidden_features,

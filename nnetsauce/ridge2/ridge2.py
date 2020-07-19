@@ -2,7 +2,8 @@
 
 # Authors: Thierry Moudiki
 #
-# License: BSD 3
+# License: BSD 3 Clear
+
 
 from ..base import Base
 

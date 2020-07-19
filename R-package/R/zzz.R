@@ -9,7 +9,8 @@ ns <- NULL
 
 install_miniconda_ <- function(silent = TRUE)
 {
-  try(reticulate::install_miniconda(), silent = TRUE)
+  try(reticulate::install_miniconda(), 
+      silent = TRUE) # loop in requirements.txt instead
 }
 
 

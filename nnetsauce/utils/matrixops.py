@@ -1,18 +1,20 @@
-import jax.numpy as jnp
 import numpy as np
-
+import platform
 from .memoize import memoize
 from jax import device_put
 from scipy import sparse
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
+if platform.system() in ('Linux', 'Darwin'):
+    import jax.numpy as jnp
 
 
 # column bind
 def cbind(x, y, backend="cpu"):
     # if len(x.shape) == 1 or len(y.shape) == 1:
-    if backend in ("gpu", "tpu"):
+    sys_platform = platform.system()
+    if backend in ("gpu", "tpu") and (sys_platform in ('Linux', 'Darwin')):
         return jnp.column_stack((x, y))
     return np.column_stack((x, y))
 
@@ -28,14 +30,12 @@ def center_response(y):
 def cluster_covariates(X, n_clusters, seed, type_clust="kmeans", **kwargs):
 
     if type_clust == "kmeans":
-
         kmeans = KMeans(n_clusters=n_clusters, random_state=seed, **kwargs)
         kmeans.fit(X)
 
         return kmeans, kmeans.predict(X)
 
     elif type_clust == "gmm":
-
         gmm = GaussianMixture(
             n_components=n_clusters, random_state=seed, **kwargs
         )
@@ -47,7 +47,8 @@ def cluster_covariates(X, n_clusters, seed, type_clust="kmeans", **kwargs):
 # computes t(x)%*%y
 def crossprod(x, y=None, backend="cpu"):
     # assert on dimensions
-    if backend in ("gpu", "tpu"):
+    sys_platform = platform.system()
+    if backend in ("gpu", "tpu") and (sys_platform in ('Linux', 'Darwin')):
         x = device_put(x)
         if y is None:
             return jnp.dot(x.T, x).block_until_ready()
@@ -97,7 +98,6 @@ def one_hot_encode(x_clusters, n_clusters):
 def one_hot_encode2(y, n_classes):
 
     n_obs = len(y)
-
     res = np.zeros((n_obs, n_classes))
 
     for i in range(n_obs):
@@ -109,7 +109,8 @@ def one_hot_encode2(y, n_classes):
 # row bind
 def rbind(x, y, backend="cpu"):
     # if len(x.shape) == 1 or len(y.shape) == 1:
-    if backend in ("gpu", "tpu"):
+    sys_platform = platform.system()
+    if backend in ("gpu", "tpu") and (sys_platform in ('Linux', 'Darwin')):
         return jnp.row_stack((x, y))
     return np.row_stack((x, y))
 
@@ -131,12 +132,11 @@ def safe_sparse_dot(a, b, backend="cpu", dense_output=False):
     dot_product : array or sparse matrix
         sparse if ``a`` and ``b`` are sparse and ``dense_output=False``.
     """
+    sys_platform = platform.system()
 
-    if backend in ("gpu", "tpu"):
+    if backend in ("gpu", "tpu") and (sys_platform in ('Linux', 'Darwin')):
         # modif when jax.scipy.sparse available
-        a = device_put(a)
-        b = device_put(b)
-        return jnp.dot(a, b).block_until_ready()
+        return jnp.dot(device_put(a), device_put(b)).block_until_ready()
 
     #    if backend == "cpu":
     if a.ndim > 2 or b.ndim > 2:
@@ -204,7 +204,8 @@ def squared_norm(x, backend="cpu"):
         The Euclidean norm when x is a vector, the Frobenius norm when x
         is a matrix (2-d array).
     """
-    if backend in ("gpu", "tpu"):
+    sys_platform = platform.system()
+    if backend in ("gpu", "tpu") and (sys_platform in ('Linux', 'Darwin')):
         x = np.ravel(x, order="K")
         x = device_put(x)        
         return jnp.dot(x, x).block_until_ready()
@@ -216,7 +217,8 @@ def squared_norm(x, backend="cpu"):
 # computes x%*%t(y)
 def tcrossprod(x, y=None, backend="cpu"):
     # assert on dimensions
-    if backend in ("gpu", "tpu"):
+    sys_platform = platform.system()
+    if backend in ("gpu", "tpu") and (sys_platform in ('Linux', 'Darwin')):
         x = device_put(x)
         if y is None:
             return jnp.dot(x, x.T).block_until_ready()

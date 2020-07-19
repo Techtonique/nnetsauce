@@ -3,8 +3,10 @@
 # License: BSD 3 Clear
 
 import numpy as np
-from scipy.optimize import minimize
+import platform
+import sys
 import sklearn.metrics as skm2
+from scipy.optimize import minimize
 from .ridge2 import Ridge2
 from ..utils import matrixops as mo
 from ..utils import misc as mx
@@ -111,8 +113,9 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
             lambda1=lambda1,
             lambda2=lambda2,
             seed=seed,
-            backend=backend
+            backend=backend 
         )
+
 
         self.type_fit = "classification"
 

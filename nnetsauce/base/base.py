@@ -2,9 +2,9 @@
 #
 # License: BSD 3 Clear
 
-import jax.nn as jnn
-import jax.numpy as jnp
 import numpy as np
+import platform
+import warnings
 from functools import partial
 from sklearn.base import BaseEstimator
 from sklearn.cluster import KMeans
@@ -16,6 +16,9 @@ from ..utils import matrixops as mo
 from ..utils import misc as mx
 from ..simulation import nodesimulation as ns
 from ..simulation import rowsubsampling as rs
+if platform.system() in ('Linux', 'Darwin'):
+    import jax.nn as jnn
+    import jax.numpy as jnp
 
 
 class Base(BaseEstimator):
@@ -87,6 +90,12 @@ class Base(BaseEstimator):
 
         # input checks -----
 
+        sys_platform = platform.system()
+
+        if (sys_platform == "Windows") and (backend in ("gpu", "tpu")):
+            warnings.warn("GPU not implemented on Windows yet, 'backend' now set to 'cpu'")
+            backend = "cpu"
+
         assert activation_name in (
             "relu",
             "tanh",
@@ -151,14 +160,23 @@ class Base(BaseEstimator):
         self.beta = None
 
 
-        # activation function -----        
-        activation_options = {
-            "relu": ac.relu if (self.backend == "cpu") else jnn.relu,
-            "tanh": np.tanh if (self.backend == "cpu") else jnp.tanh,
-            "sigmoid": ac.sigmoid if (self.backend == "cpu") else jnn.sigmoid,
-            "prelu": partial(ac.prelu, a=a),
-            "elu": partial(ac.elu, a=a) if (self.backend == "cpu") else partial(jnn.elu, a=a)
-        }
+        # activation function -----    
+        if sys_platform in ('Linux', 'Darwin'):    
+            activation_options = {
+                "relu": ac.relu if (self.backend == "cpu") else jnn.relu,
+                "tanh": np.tanh if (self.backend == "cpu") else jnp.tanh,
+                "sigmoid": ac.sigmoid if (self.backend == "cpu") else jnn.sigmoid,
+                "prelu": partial(ac.prelu, a=a),
+                "elu": partial(ac.elu, a=a) if (self.backend == "cpu") else partial(jnn.elu, a=a)
+            }
+        else: # on Windows currently, no JAX
+            activation_options = {
+                "relu": ac.relu if (self.backend == "cpu") else NotImplementedError,
+                "tanh": np.tanh if (self.backend == "cpu") else NotImplementedError,
+                "sigmoid": ac.sigmoid if (self.backend == "cpu") else NotImplementedError,
+                "prelu": partial(ac.prelu, a=a),
+                "elu": partial(ac.elu, a=a) if (self.backend == "cpu") else NotImplementedError
+            }            
         self.activation_func = activation_options[activation_name]
 
 

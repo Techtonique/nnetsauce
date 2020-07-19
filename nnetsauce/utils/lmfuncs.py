@@ -1,7 +1,9 @@
 import numpy as np
+import platform
 from numpy import linalg as la
-import jax.numpy as jnp
-from jax.numpy import linalg as jla
+if platform.system() in ('Linux', 'Darwin'):
+    import jax.numpy as jnp
+    from jax.numpy import linalg as jla
 
 # import .matrixops as mo
 from . import matrixops as mo
@@ -28,7 +30,8 @@ def beta_hat(x, y, lam=None, backend="cpu"):
 # computes (t(x)%*%x + lam*I)^{-1}
 def inv_penalized_cov(x, lam=None, backend="cpu"):
     # assert on dimensions
-    if backend in ("gpu", "tpu"):
+    sys_platform = platform.system()
+    if backend in ("gpu", "tpu") and (sys_platform in ('Linux', 'Darwin')):
         if lam is None:
             return jla.inv(mo.crossprod(x=x, backend=backend))
         return jla.inv(
