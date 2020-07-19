@@ -129,7 +129,7 @@ BayesianRVFL2Regressor <- function(n_hidden_features=5L,
                                    s2=0.1,
                                    sigma=0.05,
                                    seed=123L, 
-                                   backend="cpu"
+                                   backend=c("cpu", "gpu", "tpu")
                                    )
 {
   backend <- match.arg(backend) 
