@@ -93,7 +93,7 @@ class Base(BaseEstimator):
         sys_platform = platform.system()
 
         if (sys_platform == "Windows") and (backend in ("gpu", "tpu")):
-            warnings.warn("GPU not implemented on Windows yet, 'backend' now set to 'cpu'")
+            warnings.warn("GPU/TPU not implemented on Windows yet, 'backend' now set to 'cpu'")
             backend = "cpu"
 
         assert activation_name in (
