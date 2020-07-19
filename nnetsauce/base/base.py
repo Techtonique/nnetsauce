@@ -2,6 +2,8 @@
 #
 # License: BSD 3 Clear
 
+import jax.nn as jnn
+import jax.numpy as jnp
 import numpy as np
 from functools import partial
 from sklearn.base import BaseEstimator
@@ -120,20 +122,9 @@ class Base(BaseEstimator):
             "tpu",
         ), "must have 'backend' in ('cpu', 'gpu', 'tpu')"
 
-        # activation function -----
-
-        activation_options = {
-            "relu": ac.relu,
-            "tanh": np.tanh,
-            "sigmoid": ac.sigmoid,
-            "prelu": partial(ac.prelu, a=a),
-            "elu": partial(ac.elu, a=a),
-        }
-
         self.n_hidden_features = n_hidden_features
         self.activation_name = activation_name
-        self.a = a
-        self.activation_func = activation_options[activation_name]
+        self.a = a        
         self.nodes_sim = nodes_sim
         self.bias = bias
         self.seed = seed
@@ -158,6 +149,18 @@ class Base(BaseEstimator):
         self.y = None
         self.y_mean = None
         self.beta = None
+
+
+        # activation function -----        
+        activation_options = {
+            "relu": ac.relu if (self.backend == "cpu") else jnn.relu,
+            "tanh": np.tanh if (self.backend == "cpu") else jnp.tanh,
+            "sigmoid": ac.sigmoid if (self.backend == "cpu") else jnn.sigmoid,
+            "prelu": partial(ac.prelu, a=a),
+            "elu": partial(ac.elu, a=a) if (self.backend == "cpu") else partial(jnn.elu, a=a)
+        }
+        self.activation_func = activation_options[activation_name]
+
 
     # "preprocessing" methods to be inherited -----
 
