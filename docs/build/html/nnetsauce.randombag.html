@@ -184,7 +184,7 @@
 <p>RandomBag model</p>
 <dl class="class">
 <dt id="nnetsauce.randombag.bag.RandomBag">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.randombag.bag.</code><code class="sig-name descname">RandomBag</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_estimators=10</em>, <em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.randombag.bag.RandomBag" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.randombag.bag.</code><code class="sig-name descname">RandomBag</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_estimators=10</em>, <em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.randombag.bag.RandomBag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="nnetsauce.base.html#nnetsauce.base.base.Base" title="nnetsauce.base.base.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">nnetsauce.base.base.Base</span></code></a></p>
 <p>RandomBag model class derived from class Base</p>
 <dl class="simple">
@@ -232,6 +232,8 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 </dd>
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
 </dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -240,7 +242,7 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 <span id="nnetsauce-randombag-randombagclassifier-module"></span><h2>nnetsauce.randombag.randomBagClassifier module<a class="headerlink" href="#module-nnetsauce.randombag.randomBagClassifier" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="nnetsauce.randombag.randomBagClassifier.RandomBagClassifier">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.randombag.randomBagClassifier.</code><code class="sig-name descname">RandomBagClassifier</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_estimators=10</em>, <em class="sig-param">n_hidden_features=1</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=False</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">n_jobs=None</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">verbose=1</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.randombag.randomBagClassifier.RandomBagClassifier" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.randombag.randomBagClassifier.</code><code class="sig-name descname">RandomBagClassifier</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_estimators=10</em>, <em class="sig-param">n_hidden_features=1</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=False</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">n_jobs=None</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">verbose=1</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.randombag.randomBagClassifier.RandomBagClassifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#nnetsauce.randombag.bag.RandomBag" title="nnetsauce.randombag.bag.RandomBag"><code class="xref py py-class docutils literal notranslate"><span class="pre">nnetsauce.randombag.bag.RandomBag</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.ClassifierMixin</span></code></p>
 <p>Randomized ‘Bagging’ Classification model</p>
 <dl class="simple">
@@ -287,6 +289,8 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 <dt>row_sample: float</dt><dd><p>percentage of rows chosen for training, by stratified bootstrapping</p>
 </dd>
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
+</dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
 </dd>
 </dl>
 <dl class="method">
@@ -357,7 +361,7 @@ of samples and n_features is the number of features</p>
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-nnetsauce.randombag" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="nnetsauce.randombag.RandomBagClassifier">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.randombag.</code><code class="sig-name descname">RandomBagClassifier</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_estimators=10</em>, <em class="sig-param">n_hidden_features=1</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=False</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">n_jobs=None</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">verbose=1</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.randombag.RandomBagClassifier" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.randombag.</code><code class="sig-name descname">RandomBagClassifier</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_estimators=10</em>, <em class="sig-param">n_hidden_features=1</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=False</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">n_jobs=None</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">verbose=1</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.randombag.RandomBagClassifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#nnetsauce.randombag.bag.RandomBag" title="nnetsauce.randombag.bag.RandomBag"><code class="xref py py-class docutils literal notranslate"><span class="pre">nnetsauce.randombag.bag.RandomBag</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.ClassifierMixin</span></code></p>
 <p>Randomized ‘Bagging’ Classification model</p>
 <dl class="simple">
@@ -404,6 +408,8 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 <dt>row_sample: float</dt><dd><p>percentage of rows chosen for training, by stratified bootstrapping</p>
 </dd>
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
+</dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
 </dd>
 </dl>
 <dl class="method">

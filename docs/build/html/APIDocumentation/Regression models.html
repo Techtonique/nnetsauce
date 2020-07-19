@@ -190,7 +190,7 @@
 <span id="baseregressor"></span><h2>BaseRegressor<a class="headerlink" href="#module-nnetsauce.base.baseRegressor" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="nnetsauce.base.baseRegressor.BaseRegressor">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.base.baseRegressor.</code><code class="sig-name descname">BaseRegressor</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.base.baseRegressor.BaseRegressor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.base.baseRegressor.</code><code class="sig-name descname">BaseRegressor</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.base.baseRegressor.BaseRegressor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Random Vector Functional Link Network regression without shrinkage</p>
 <dl class="simple">
 <dt>n_hidden_features: int</dt><dd><p>number of nodes in the hidden layer</p>
@@ -229,6 +229,8 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 <dt>row_sample: float</dt><dd><p>percentage of rows chosen for training, by stratified bootstrapping</p>
 </dd>
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’, clustering and dropout</p>
+</dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
 </dd>
 </dl>
 <dl class="method">
@@ -283,7 +285,7 @@ of samples and n_features is the number of features</p>
 <span id="bayesianrvflregressor"></span><h2>BayesianrvflRegressor<a class="headerlink" href="#module-nnetsauce.rvfl.bayesianrvflRegressor" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="nnetsauce.rvfl.bayesianrvflRegressor.BayesianRVFLRegressor">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.rvfl.bayesianrvflRegressor.</code><code class="sig-name descname">BayesianRVFLRegressor</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">s=0.1</em>, <em class="sig-param">sigma=0.05</em>, <em class="sig-param">beta=None</em>, <em class="sig-param">Sigma=None</em>, <em class="sig-param">GCV=None</em>, <em class="sig-param">return_std=True</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.rvfl.bayesianrvflRegressor.BayesianRVFLRegressor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.rvfl.bayesianrvflRegressor.</code><code class="sig-name descname">BayesianRVFLRegressor</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">s=0.1</em>, <em class="sig-param">sigma=0.05</em>, <em class="sig-param">beta=None</em>, <em class="sig-param">Sigma=None</em>, <em class="sig-param">GCV=None</em>, <em class="sig-param">return_std=True</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.rvfl.bayesianrvflRegressor.BayesianRVFLRegressor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bayesian Random Vector Functional Link Network regression with one prior</p>
 <dl class="simple">
 <dt>n_hidden_features: int</dt><dd><p>number of nodes in the hidden layer</p>
@@ -326,9 +328,11 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 </dd>
 <dt>Sigma: array-like</dt><dd><p>covariance of the distribution of fitted parameters</p>
 </dd>
+<dt>GCV: float</dt><dd><p>return_std: boolean</p>
+</dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
+</dd>
 </dl>
-<p>GCV: float
-return_std: boolean</p>
 <dl class="method">
 <dt id="nnetsauce.rvfl.bayesianrvflRegressor.BayesianRVFLRegressor.fit">
 <code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.rvfl.bayesianrvflRegressor.BayesianRVFLRegressor.fit" title="Permalink to this definition">¶</a></dt>
@@ -386,7 +390,7 @@ of samples and n_features is the number of features</p>
 <span id="bayesianrvfl2regressor"></span><h2>Bayesianrvfl2Regressor<a class="headerlink" href="#module-nnetsauce.rvfl.bayesianrvfl2Regressor" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="nnetsauce.rvfl.bayesianrvfl2Regressor.BayesianRVFL2Regressor">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.rvfl.bayesianrvfl2Regressor.</code><code class="sig-name descname">BayesianRVFL2Regressor</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=0</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">s1=0.1</em>, <em class="sig-param">s2=0.1</em>, <em class="sig-param">sigma=0.05</em>, <em class="sig-param">beta=None</em>, <em class="sig-param">Sigma=None</em>, <em class="sig-param">GCV=None</em>, <em class="sig-param">return_std=True</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.rvfl.bayesianrvfl2Regressor.BayesianRVFL2Regressor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.rvfl.bayesianrvfl2Regressor.</code><code class="sig-name descname">BayesianRVFL2Regressor</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=0</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">s1=0.1</em>, <em class="sig-param">s2=0.1</em>, <em class="sig-param">sigma=0.05</em>, <em class="sig-param">beta=None</em>, <em class="sig-param">Sigma=None</em>, <em class="sig-param">GCV=None</em>, <em class="sig-param">return_std=True</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.rvfl.bayesianrvfl2Regressor.BayesianRVFL2Regressor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bayesian Random Vector Functional Link Network regression with two priors</p>
 <dl class="simple">
 <dt>n_hidden_features: int</dt><dd><p>number of nodes in the hidden layer</p>
@@ -431,9 +435,11 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 </dd>
 <dt>Sigma: array-like</dt><dd><p>covariance of the distribution of fitted parameters</p>
 </dd>
+<dt>GCV: float</dt><dd><p>return_std: boolean</p>
+</dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
+</dd>
 </dl>
-<p>GCV: float
-return_std: boolean</p>
 <dl class="footnote brackets">
 <dt class="label" id="id13"><span class="brackets">1</span></dt>
 <dd><p>Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: <a class="reference external" href="https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters">https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters</a></p>
@@ -496,7 +502,7 @@ of samples and n_features is the number of features</p>
 <span id="customregressor"></span><h2>CustomRegressor<a class="headerlink" href="#module-nnetsauce.custom.customRegressor" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="nnetsauce.custom.customRegressor.CustomRegressor">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.custom.customRegressor.</code><code class="sig-name descname">CustomRegressor</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.custom.customRegressor.CustomRegressor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.custom.customRegressor.</code><code class="sig-name descname">CustomRegressor</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.custom.customRegressor.CustomRegressor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Custom Regression model</p>
 <dl class="simple">
 <dt>obj: object</dt><dd><p>any object containing a method fit (obj.fit()) and a method predict 
@@ -543,10 +549,12 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 </dd>
 <dt>type_fit: str</dt><dd><p>‘regression’</p>
 </dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
+</dd>
 </dl>
 <dl class="method">
 <dt id="nnetsauce.custom.customRegressor.CustomRegressor.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.custom.customRegressor.CustomRegressor.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">sample_weight=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.custom.customRegressor.CustomRegressor.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit custom model to training data (X, y).</p>
 <dl class="simple">
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
@@ -598,7 +606,7 @@ of samples and n_features is the number of features</p>
 <span id="ridge2regressor"></span><h2>Ridge2Regressor<a class="headerlink" href="#module-nnetsauce.ridge2.ridge2Regressor" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="nnetsauce.ridge2.ridge2Regressor.Ridge2Regressor">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.ridge2.ridge2Regressor.</code><code class="sig-name descname">Ridge2Regressor</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">lambda1=0.1</em>, <em class="sig-param">lambda2=0.1</em>, <em class="sig-param">seed=123</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.ridge2.ridge2Regressor.Ridge2Regressor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.ridge2.ridge2Regressor.</code><code class="sig-name descname">Ridge2Regressor</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">lambda1=0.1</em>, <em class="sig-param">lambda2=0.1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.ridge2.ridge2Regressor.Ridge2Regressor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ridge regression with 2 regularization parameters derived from class Ridge</p>
 <dl class="simple">
 <dt>n_hidden_features: int</dt><dd><p>number of nodes in the hidden layer</p>
@@ -640,6 +648,8 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 <dt>lambda2: float</dt><dd><p>regularization parameter on hidden layer</p>
 </dd>
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
+</dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
 </dd>
 </dl>
 <dl class="footnote brackets">

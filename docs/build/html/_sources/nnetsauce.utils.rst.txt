@@ -12,10 +12,10 @@ nnetsauce.utils.activations module
    :undoc-members:
    :show-inheritance:
 
-nnetsauce.utils.isfactor module
--------------------------------
+nnetsauce.utils.check\_factor module
+------------------------------------
 
-.. automodule:: nnetsauce.utils.isfactor
+.. automodule:: nnetsauce.utils.check_factor
    :members:
    :undoc-members:
    :show-inheritance:
@@ -76,18 +76,18 @@ nnetsauce.utils.psdcheck module
    :undoc-members:
    :show-inheritance:
 
-nnetsauce.utils.setup\_isfactor module
---------------------------------------
-
-.. automodule:: nnetsauce.utils.setup_isfactor
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 nnetsauce.utils.timeseries module
 ---------------------------------
 
 .. automodule:: nnetsauce.utils.timeseries
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nnetsauce.utils.where module
+----------------------------
+
+.. automodule:: nnetsauce.utils.where
    :members:
    :undoc-members:
    :show-inheritance:

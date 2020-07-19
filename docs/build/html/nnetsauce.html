@@ -254,7 +254,7 @@
 <li class="toctree-l1"><a class="reference internal" href="nnetsauce.utils.html">nnetsauce.utils package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="nnetsauce.utils.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nnetsauce.utils.html#module-nnetsauce.utils.activations">nnetsauce.utils.activations module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="nnetsauce.utils.html#nnetsauce-utils-isfactor-module">nnetsauce.utils.isfactor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nnetsauce.utils.html#nnetsauce-utils-check-factor-module">nnetsauce.utils.check_factor module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nnetsauce.utils.html#module-nnetsauce.utils.lmfuncs">nnetsauce.utils.lmfuncs module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nnetsauce.utils.html#module-nnetsauce.utils.matrixops">nnetsauce.utils.matrixops module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nnetsauce.utils.html#module-nnetsauce.utils.memoize">nnetsauce.utils.memoize module</a></li>
@@ -262,8 +262,8 @@
 <li class="toctree-l2"><a class="reference internal" href="nnetsauce.utils.html#module-nnetsauce.utils.model_selection">nnetsauce.utils.model_selection module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nnetsauce.utils.html#module-nnetsauce.utils.progress_bar">nnetsauce.utils.progress_bar module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nnetsauce.utils.html#module-nnetsauce.utils.psdcheck">nnetsauce.utils.psdcheck module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="nnetsauce.utils.html#nnetsauce-utils-setup-isfactor-module">nnetsauce.utils.setup_isfactor module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nnetsauce.utils.html#module-nnetsauce.utils.timeseries">nnetsauce.utils.timeseries module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nnetsauce.utils.html#module-nnetsauce.utils.where">nnetsauce.utils.where module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nnetsauce.utils.html#module-nnetsauce.utils">Module contents</a></li>
 </ul>
 </li>
@@ -274,7 +274,7 @@
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-nnetsauce" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="nnetsauce.AdaBoostClassifier">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">AdaBoostClassifier</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_estimators=10</em>, <em class="sig-param">learning_rate=0.1</em>, <em class="sig-param">n_hidden_features=1</em>, <em class="sig-param">reg_lambda=0</em>, <em class="sig-param">reg_alpha=0.5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=False</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">verbose=1</em>, <em class="sig-param">method='SAMME'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.AdaBoostClassifier" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">AdaBoostClassifier</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_estimators=10</em>, <em class="sig-param">learning_rate=0.1</em>, <em class="sig-param">n_hidden_features=1</em>, <em class="sig-param">reg_lambda=0</em>, <em class="sig-param">reg_alpha=0.5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=False</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">verbose=1</em>, <em class="sig-param">method='SAMME'</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.AdaBoostClassifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="nnetsauce.boosting.html#nnetsauce.boosting.bst.Boosting" title="nnetsauce.boosting.bst.Boosting"><code class="xref py py-class docutils literal notranslate"><span class="pre">nnetsauce.boosting.bst.Boosting</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.ClassifierMixin</span></code></p>
 <p>AdaBoost Classification (SAMME) model class derived from class Boosting</p>
 <dl class="simple">
@@ -329,6 +329,8 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
 </dd>
 <dt>method: str</dt><dd><p>type of Adaboost method, ‘SAMME’ (discrete) or ‘SAMME.R’ (real)</p>
+</dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
 </dd>
 </dl>
 <dl class="method">
@@ -396,7 +398,7 @@ of samples and n_features is the number of features</p>
 
 <dl class="class">
 <dt id="nnetsauce.Base">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">Base</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.Base" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">Base</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.Base" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
 <p>Base model from which all the other classes inherit. Contains mainly data preprocessing methods.</p>
 <dl class="simple">
@@ -436,6 +438,8 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 <dt>row_sample: float</dt><dd><p>percentage of rows chosen for training, by stratified bootstrapping</p>
 </dd>
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’, clustering and dropout</p>
+</dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
 </dd>
 </dl>
 <dl class="method">
@@ -502,7 +506,7 @@ clustering method</p>
 
 <dl class="class">
 <dt id="nnetsauce.BaseRegressor">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">BaseRegressor</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.BaseRegressor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">BaseRegressor</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.BaseRegressor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="nnetsauce.base.html#nnetsauce.base.base.Base" title="nnetsauce.base.base.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">nnetsauce.base.base.Base</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.RegressorMixin</span></code></p>
 <p>Random Vector Functional Link Network regression without shrinkage</p>
 <dl class="simple">
@@ -542,6 +546,8 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 <dt>row_sample: float</dt><dd><p>percentage of rows chosen for training, by stratified bootstrapping</p>
 </dd>
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’, clustering and dropout</p>
+</dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
 </dd>
 </dl>
 <dl class="method">
@@ -593,7 +599,7 @@ of samples and n_features is the number of features</p>
 
 <dl class="class">
 <dt id="nnetsauce.BayesianRVFLRegressor">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">BayesianRVFLRegressor</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">s=0.1</em>, <em class="sig-param">sigma=0.05</em>, <em class="sig-param">beta=None</em>, <em class="sig-param">Sigma=None</em>, <em class="sig-param">GCV=None</em>, <em class="sig-param">return_std=True</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.BayesianRVFLRegressor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">BayesianRVFLRegressor</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">s=0.1</em>, <em class="sig-param">sigma=0.05</em>, <em class="sig-param">beta=None</em>, <em class="sig-param">Sigma=None</em>, <em class="sig-param">GCV=None</em>, <em class="sig-param">return_std=True</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.BayesianRVFLRegressor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="nnetsauce.base.html#nnetsauce.base.base.Base" title="nnetsauce.base.base.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">nnetsauce.base.base.Base</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.RegressorMixin</span></code></p>
 <p>Bayesian Random Vector Functional Link Network regression with one prior</p>
 <dl class="simple">
@@ -637,9 +643,11 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 </dd>
 <dt>Sigma: array-like</dt><dd><p>covariance of the distribution of fitted parameters</p>
 </dd>
+<dt>GCV: float</dt><dd><p>return_std: boolean</p>
+</dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
+</dd>
 </dl>
-<p>GCV: float
-return_std: boolean</p>
 <dl class="method">
 <dt id="nnetsauce.BayesianRVFLRegressor.fit">
 <code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.BayesianRVFLRegressor.fit" title="Permalink to this definition">¶</a></dt>
@@ -694,7 +702,7 @@ of samples and n_features is the number of features</p>
 
 <dl class="class">
 <dt id="nnetsauce.BayesianRVFL2Regressor">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">BayesianRVFL2Regressor</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=0</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">s1=0.1</em>, <em class="sig-param">s2=0.1</em>, <em class="sig-param">sigma=0.05</em>, <em class="sig-param">beta=None</em>, <em class="sig-param">Sigma=None</em>, <em class="sig-param">GCV=None</em>, <em class="sig-param">return_std=True</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.BayesianRVFL2Regressor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">BayesianRVFL2Regressor</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=0</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">s1=0.1</em>, <em class="sig-param">s2=0.1</em>, <em class="sig-param">sigma=0.05</em>, <em class="sig-param">beta=None</em>, <em class="sig-param">Sigma=None</em>, <em class="sig-param">GCV=None</em>, <em class="sig-param">return_std=True</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.BayesianRVFL2Regressor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="nnetsauce.base.html#nnetsauce.base.base.Base" title="nnetsauce.base.base.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">nnetsauce.base.base.Base</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.RegressorMixin</span></code></p>
 <p>Bayesian Random Vector Functional Link Network regression with two priors</p>
 <dl class="simple">
@@ -740,9 +748,11 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 </dd>
 <dt>Sigma: array-like</dt><dd><p>covariance of the distribution of fitted parameters</p>
 </dd>
+<dt>GCV: float</dt><dd><p>return_std: boolean</p>
+</dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
+</dd>
 </dl>
-<p>GCV: float
-return_std: boolean</p>
 <dl class="footnote brackets">
 <dt class="label" id="id25"><span class="brackets">1</span></dt>
 <dd><p>Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: <a class="reference external" href="https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters">https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters</a></p>
@@ -802,7 +812,7 @@ of samples and n_features is the number of features</p>
 
 <dl class="class">
 <dt id="nnetsauce.CustomClassifier">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">CustomClassifier</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.CustomClassifier" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">CustomClassifier</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.CustomClassifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="nnetsauce.custom.html#nnetsauce.custom.custom.Custom" title="nnetsauce.custom.custom.Custom"><code class="xref py py-class docutils literal notranslate"><span class="pre">nnetsauce.custom.custom.Custom</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.ClassifierMixin</span></code></p>
 <p>Custom Classification model</p>
 <dl class="simple">
@@ -847,6 +857,8 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 <dt>row_sample: float</dt><dd><p>percentage of rows chosen for training, by stratified bootstrapping</p>
 </dd>
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
+</dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
 </dd>
 </dl>
 <dl class="method">
@@ -914,7 +926,7 @@ of samples and n_features is the number of features</p>
 
 <dl class="class">
 <dt id="nnetsauce.CustomRegressor">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">CustomRegressor</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.CustomRegressor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">CustomRegressor</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.CustomRegressor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="nnetsauce.custom.html#nnetsauce.custom.custom.Custom" title="nnetsauce.custom.custom.Custom"><code class="xref py py-class docutils literal notranslate"><span class="pre">nnetsauce.custom.custom.Custom</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.RegressorMixin</span></code></p>
 <p>Custom Regression model</p>
 <dl class="simple">
@@ -962,10 +974,12 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 </dd>
 <dt>type_fit: str</dt><dd><p>‘regression’</p>
 </dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
+</dd>
 </dl>
 <dl class="method">
 <dt id="nnetsauce.CustomRegressor.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.CustomRegressor.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">sample_weight=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.CustomRegressor.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit custom model to training data (X, y).</p>
 <dl class="simple">
 <dt>X: {array-like}, shape = [n_samples, n_features]</dt><dd><p>Training vectors, where n_samples is the number 
@@ -1014,7 +1028,7 @@ of samples and n_features is the number of features</p>
 
 <dl class="class">
 <dt id="nnetsauce.MultitaskClassifier">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">MultitaskClassifier</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.MultitaskClassifier" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">MultitaskClassifier</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.MultitaskClassifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="nnetsauce.base.html#nnetsauce.base.base.Base" title="nnetsauce.base.base.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">nnetsauce.base.base.Base</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.ClassifierMixin</span></code></p>
 <p>Multitask Classification model based on regression models, with shared covariates</p>
 <dl class="simple">
@@ -1059,6 +1073,8 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 <dt>row_sample: float</dt><dd><p>percentage of rows chosen for training, by stratified bootstrapping</p>
 </dd>
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
+</dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
 </dd>
 </dl>
 <dl class="footnote brackets">
@@ -1131,7 +1147,7 @@ of samples and n_features is the number of features</p>
 
 <dl class="class">
 <dt id="nnetsauce.RandomBagClassifier">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">RandomBagClassifier</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_estimators=10</em>, <em class="sig-param">n_hidden_features=1</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=False</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">n_jobs=None</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">verbose=1</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.RandomBagClassifier" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">RandomBagClassifier</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_estimators=10</em>, <em class="sig-param">n_hidden_features=1</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=False</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">n_jobs=None</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">verbose=1</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.RandomBagClassifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="nnetsauce.randombag.html#nnetsauce.randombag.bag.RandomBag" title="nnetsauce.randombag.bag.RandomBag"><code class="xref py py-class docutils literal notranslate"><span class="pre">nnetsauce.randombag.bag.RandomBag</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.ClassifierMixin</span></code></p>
 <p>Randomized ‘Bagging’ Classification model</p>
 <dl class="simple">
@@ -1178,6 +1194,8 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 <dt>row_sample: float</dt><dd><p>percentage of rows chosen for training, by stratified bootstrapping</p>
 </dd>
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
+</dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
 </dd>
 </dl>
 <dl class="method">
@@ -1245,7 +1263,7 @@ of samples and n_features is the number of features</p>
 
 <dl class="class">
 <dt id="nnetsauce.Ridge2Regressor">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">Ridge2Regressor</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">lambda1=0.1</em>, <em class="sig-param">lambda2=0.1</em>, <em class="sig-param">seed=123</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.Ridge2Regressor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">Ridge2Regressor</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">lambda1=0.1</em>, <em class="sig-param">lambda2=0.1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.Ridge2Regressor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="nnetsauce.ridge2.html#nnetsauce.ridge2.ridge2.Ridge2" title="nnetsauce.ridge2.ridge2.Ridge2"><code class="xref py py-class docutils literal notranslate"><span class="pre">nnetsauce.ridge2.ridge2.Ridge2</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.RegressorMixin</span></code></p>
 <p>Ridge regression with 2 regularization parameters derived from class Ridge</p>
 <dl class="simple">
@@ -1288,6 +1306,8 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 <dt>lambda2: float</dt><dd><p>regularization parameter on hidden layer</p>
 </dd>
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
+</dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
 </dd>
 </dl>
 <dl class="footnote brackets">
@@ -1346,7 +1366,7 @@ of samples and n_features is the number of features</p>
 
 <dl class="class">
 <dt id="nnetsauce.Ridge2Classifier">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">Ridge2Classifier</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">lambda1=0.1</em>, <em class="sig-param">lambda2=0.1</em>, <em class="sig-param">seed=123</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.Ridge2Classifier" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">Ridge2Classifier</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">row_sample=1</em>, <em class="sig-param">lambda1=0.1</em>, <em class="sig-param">lambda2=0.1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.Ridge2Classifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="nnetsauce.ridge2.html#nnetsauce.ridge2.ridge2.Ridge2" title="nnetsauce.ridge2.ridge2.Ridge2"><code class="xref py py-class docutils literal notranslate"><span class="pre">nnetsauce.ridge2.ridge2.Ridge2</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.ClassifierMixin</span></code></p>
 <p>Multinomial logit classification with 2 regularization parameters</p>
 <dl class="simple">
@@ -1392,6 +1412,8 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 <dt>lambda2: float</dt><dd><p>regularization parameter on hidden layer</p>
 </dd>
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
+</dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
 </dd>
 </dl>
 <dl class="footnote brackets">
@@ -1486,7 +1508,7 @@ of samples and n_features is the number of features</p>
 
 <dl class="class">
 <dt id="nnetsauce.Ridge2MultitaskClassifier">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">Ridge2MultitaskClassifier</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">lambda1=0.1</em>, <em class="sig-param">lambda2=0.1</em>, <em class="sig-param">seed=123</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.Ridge2MultitaskClassifier" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">Ridge2MultitaskClassifier</code><span class="sig-paren">(</span><em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">lambda1=0.1</em>, <em class="sig-param">lambda2=0.1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.Ridge2MultitaskClassifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="nnetsauce.ridge2.html#nnetsauce.ridge2.ridge2.Ridge2" title="nnetsauce.ridge2.ridge2.Ridge2"><code class="xref py py-class docutils literal notranslate"><span class="pre">nnetsauce.ridge2.ridge2.Ridge2</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.ClassifierMixin</span></code></p>
 <p>Multitask Ridge classification with 2 regularization parameters</p>
 <dl class="simple">
@@ -1525,6 +1547,8 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 <dt>lambda2: float</dt><dd><p>regularization parameter on hidden layer</p>
 </dd>
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
+</dd>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
 </dd>
 </dl>
 <dl class="footnote brackets">
@@ -1586,7 +1610,7 @@ of samples and n_features is the number of features.</p>
 
 <dl class="class">
 <dt id="nnetsauce.MTS">
-<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">MTS</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">lags=1</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.MTS" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">nnetsauce.</code><code class="sig-name descname">MTS</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">n_hidden_features=5</em>, <em class="sig-param">activation_name='relu'</em>, <em class="sig-param">a=0.01</em>, <em class="sig-param">nodes_sim='sobol'</em>, <em class="sig-param">bias=True</em>, <em class="sig-param">dropout=0</em>, <em class="sig-param">direct_link=True</em>, <em class="sig-param">n_clusters=2</em>, <em class="sig-param">cluster_encode=True</em>, <em class="sig-param">type_clust='kmeans'</em>, <em class="sig-param">type_scaling=('std'</em>, <em class="sig-param">'std'</em>, <em class="sig-param">'std')</em>, <em class="sig-param">col_sample=1</em>, <em class="sig-param">lags=1</em>, <em class="sig-param">alpha1=None</em>, <em class="sig-param">alpha2=None</em>, <em class="sig-param">seed=123</em>, <em class="sig-param">backend='cpu'</em><span class="sig-paren">)</span><a class="headerlink" href="#nnetsauce.MTS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="nnetsauce.base.html#nnetsauce.base.base.Base" title="nnetsauce.base.base.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">nnetsauce.base.base.Base</span></code></a></p>
 <p>Univariate and multivariate time series (MTS) forecasting with Quasi-Randomized networks</p>
 <dl class="simple">
@@ -1624,9 +1648,15 @@ Currently available: standardization (‘std’) or MinMax scaling (‘minmax’
 </dd>
 <dt>col_sample: float</dt><dd><p>percentage of covariates randomly chosen for training</p>
 </dd>
+<dt>lags: int</dt><dd><p>number of lags used for each time series</p>
+</dd>
+<dt>alpha1: float</dt><dd><p>smoothing weight (training set)</p>
+</dd>
+<dt>alpha2: float</dt><dd><p>smoothing parameter (testing set)</p>
+</dd>
 <dt>seed: int </dt><dd><p>reproducibility seed for nodes_sim==’uniform’</p>
 </dd>
-<dt>lags: int</dt><dd><p>number of lags used for each time series</p>
+<dt>backend: str</dt><dd><p>“cpu” or “gpu” or “tpu”</p>
 </dd>
 </dl>
 <dl class="method">
