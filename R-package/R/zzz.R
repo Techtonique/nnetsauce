@@ -5,10 +5,10 @@ six <- NULL
 sklearn <- NULL
 tqdm <- NULL
 ns <- NULL
-rp <- NULL
+rpy2 <- NULL
 if (as.character(Sys.info()[1]) %in% c("Linux", "Darwin")){
- rjax <- NULL
- rjaxlib <- NULL
+ jax <- NULL
+ jaxlib <- NULL
 }
 
 
@@ -74,10 +74,11 @@ install_packages <- function(pip = TRUE) {
 
   # use superassignment to update global reference to packages
   if (as.character(Sys.info()[1]) %in% c("Linux", "Darwin")){
-  rjax <<- reticulate::import("jax", delay_load = TRUE)
-  rjaxlib <<- reticulate::import("jaxlib", delay_load = TRUE)
+    jax <<- reticulate::import("jax", delay_load = TRUE)
+    jaxlib <<- reticulate::import("jaxlib", delay_load = TRUE)
   }
   numpy <<- reticulate::import("numpy", delay_load = TRUE)
+  rpy2 <<- reticulate::import("rpy2", delay_load = TRUE)
   scipy <<- reticulate::import("scipy", delay_load = TRUE)
   six <<- reticulate::import("six", delay_load = TRUE)
   sklearn <<- reticulate::import("sklearn", delay_load = TRUE)
