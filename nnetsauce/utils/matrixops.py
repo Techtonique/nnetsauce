@@ -59,6 +59,11 @@ def crossprod(x, y=None, backend="cpu"):
     return np.dot(x.transpose(), y)
 
 
+# Obtain this for JAX
+# Obtain this for JAX
+# Obtain this for JAX
+# Obtain this for JAX
+# Obtain this for JAX
 # dropout
 def dropout(x, drop_prob=0, seed=123):
 
@@ -168,7 +173,11 @@ def safe_sparse_dot(a, b, backend="cpu", dense_output=False):
 
     return ret
 
-
+# Obtain this for JAX
+# Obtain this for JAX
+# Obtain this for JAX
+# Obtain this for JAX
+# Obtain this for JAX
 # scale... covariates
 def scale_covariates(X, choice="std", training=True, scaler=None):
 
