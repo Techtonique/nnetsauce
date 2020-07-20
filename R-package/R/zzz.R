@@ -39,8 +39,9 @@ install_packages <- function(pip = TRUE) {
     reticulate::py_install("tqdm", pip = pip)
 
   if (has_nnetsauce == FALSE)
-    reticulate::py_install("git+https://github.com/thierrymoudiki/nnetsauce.git", 
-      pip = pip)
+    #reticulate::py_install("git+https://github.com/thierrymoudiki/nnetsauce.git", 
+    #  pip = pip)
+    reticulate::py_install("nnetsauce", pip = pip)
 }
 
 
