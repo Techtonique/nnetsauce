@@ -1,5 +1,5 @@
 
-import sys
+import platform
 from setuptools import setup, find_packages
 from os import path
 
@@ -14,11 +14,11 @@ with open(path.join(here, 'requirements.txt'), encoding='utf-8') as f:
 
 install_requires = [x.strip() for x in all_reqs if 'git+' not in x]
 
-install_jax_requires = ["jax>=0.1.72", "jaxlib>=0.1.51"] if sys.platform in ('linux', 'darwin') else []
+install_jax_requires = ["jax>=0.1.72", "jaxlib>=0.1.51"] if platform.system() in ('Linux', 'Darwin') else []
 
 setup(
     name="nnetsauce",
-    version="0.5.1",
+    version="0.5.2",
     url="https://github.com/thierrymoudiki/nnetsauce",
     packages=find_packages(),
     author="Thierry Moudiki",
