@@ -13,7 +13,6 @@ install_miniconda_ <- function(silent = TRUE)
       silent = TRUE) # loop in requirements.txt instead
 }
 
-
 install_packages <- function(pip = TRUE) {
 
   if (as.character(Sys.info()[1]) %in% c("Linux", "Darwin")){
@@ -22,6 +21,7 @@ install_packages <- function(pip = TRUE) {
   }  
   has_nnetsauce <- reticulate::py_module_available("nnetsauce")
   has_numpy <- reticulate::py_module_available("numpy")
+  has_rpy2 <- reticulate::py_module_available("rpy2")
   has_scipy <- reticulate::py_module_available("scipy")
   has_sklearn <- reticulate::py_module_available("sklearn")
   has_six <- reticulate::py_module_available("six")
@@ -35,11 +35,14 @@ install_packages <- function(pip = TRUE) {
 
     if (has_jaxlib == FALSE)
       reticulate::py_install("jaxlib", pip = pip)  
-      
+
   }
 
   if (has_numpy == FALSE)
     reticulate::py_install("numpy", pip = pip)
+
+  if (has_rpy2 == FALSE)
+    reticulate::py_install("rpy2", pip = pip)
 
   if (has_scipy == FALSE)
     reticulate::py_install("scipy", pip = pip)
