@@ -16,12 +16,27 @@ install_miniconda_ <- function(silent = TRUE)
 
 install_packages <- function(pip = TRUE) {
 
+  if (as.character(Sys.info()[1]) %in% c("Linux", "Darwin")){
+    has_jax <- reticulate::py_module_available("jax")
+    has_jaxlib <- reticulate::py_module_available("jaxlib")
+  }  
+  has_nnetsauce <- reticulate::py_module_available("nnetsauce")
   has_numpy <- reticulate::py_module_available("numpy")
   has_scipy <- reticulate::py_module_available("scipy")
   has_sklearn <- reticulate::py_module_available("sklearn")
   has_six <- reticulate::py_module_available("six")
   has_tqdm <- reticulate::py_module_available("tqdm")
   has_nnetsauce <- reticulate::py_module_available("nnetsauce")
+
+  if (as.character(Sys.info()[1]) %in% c("Linux", "Darwin")){
+
+    if (has_jax == FALSE)
+      reticulate::py_install("jax", pip = pip)
+
+    if (has_jaxlib == FALSE)
+      reticulate::py_install("jaxlib", pip = pip)  
+      
+  }
 
   if (has_numpy == FALSE)
     reticulate::py_install("numpy", pip = pip)
@@ -39,9 +54,7 @@ install_packages <- function(pip = TRUE) {
     reticulate::py_install("tqdm", pip = pip)
 
   if (has_nnetsauce == FALSE)
-    reticulate::py_install("nnetsauce", pip = pip)
-    #reticulate::py_install("git+https://github.com/thierrymoudiki/nnetsauce.git", 
-    #  pip = pip)    
+    reticulate::py_install("nnetsauce", pip = pip)    
 }
 
 
