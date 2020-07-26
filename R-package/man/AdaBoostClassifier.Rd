@@ -24,11 +24,12 @@ AdaBoostClassifier(
   row_sample = 1,
   seed = 123L,
   verbose = 1,
-  method = "SAMME"
+  method = "SAMME",
+  backend = c("cpu", "gpu", "tpu")
 )
 }
 \arguments{
-\item{method}{}
+\item{backend}{}
 }
 \value{
 

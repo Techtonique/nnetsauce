@@ -48,15 +48,11 @@ CustomClassifier <- function(obj,
                              type_clust="kmeans",
                              col_sample=1,
                              row_sample=1,
-                             seed=123L, 
+                             seed=123L,
                              backend=c("cpu", "gpu", "tpu"))
 {
-  backend <- match.arg(backend)    
-  if ((as.character(Sys.info()[1])=="Windows") && (backend %in% c("gpu", "tpu")))
-  {
-      warning("No GPU/TPU computing on Windows yet, backend set to 'cpu'")
-      backend <- "cpu"  
-  }
+  backend <- match.arg(backend)
+
   ns$CustomClassifier(obj,
                       n_hidden_features=n_hidden_features,
                       activation_name=activation_name,
@@ -124,15 +120,11 @@ CustomRegressor <- function(obj,
                              type_clust="kmeans",
                              col_sample=1,
                              row_sample=1,
-                             seed=123L, 
+                             seed=123L,
                              backend=c("cpu", "gpu", "tpu"))
 {
-  backend <- match.arg(backend) 
-  if ((as.character(Sys.info()[1])=="Windows") && (backend %in% c("gpu", "tpu")))
-  {
-      warning("No GPU/TPU computing on Windows yet, backend set to 'cpu'")
-      backend <- "cpu"  
-  }   
+  backend <- match.arg(backend)
+
   ns$CustomRegressor(obj,
                       n_hidden_features=n_hidden_features,
                       activation_name=activation_name,

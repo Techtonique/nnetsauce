@@ -20,11 +20,12 @@ BayesianRVFL2Regressor(
   s1 = 0.1,
   s2 = 0.1,
   sigma = 0.05,
-  seed = 123L
+  seed = 123L,
+  backend = c("cpu", "gpu", "tpu")
 )
 }
 \arguments{
-\item{sigma}{}
+\item{backend}{}
 }
 \value{
 

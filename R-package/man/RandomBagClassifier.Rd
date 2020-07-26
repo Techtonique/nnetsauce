@@ -21,11 +21,12 @@ RandomBagClassifier(
   row_sample = 1,
   n_jobs = NULL,
   seed = 123L,
-  verbose = 1L
+  verbose = 1L,
+  backend = c("cpu", "gpu", "tpu")
 )
 }
 \arguments{
-\item{verbose}{}
+\item{backend}{}
 }
 \value{
 

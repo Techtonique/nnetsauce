@@ -18,11 +18,12 @@ MTS(
   type_clust = "kmeans",
   col_sample = 1,
   seed = 123L,
-  lags = 1L
+  lags = 1L,
+  backend = c("cpu", "gpu", "tpu")
 )
 }
 \arguments{
-\item{lags}{}
+\item{backend}{}
 }
 \value{
 

@@ -60,15 +60,11 @@ AdaBoostClassifier <- function(obj,
                               row_sample=1,
                               seed=123L,
                               verbose=1,
-                              method="SAMME", 
+                              method="SAMME",
                               backend=c("cpu", "gpu", "tpu"))
 {
-  backend <- match.arg(backend)  
-  if ((as.character(Sys.info()[1])=="Windows") && (backend %in% c("gpu", "tpu")))
-  {
-      warning("No GPU/TPU computing on Windows yet, backend set to 'cpu'")
-      backend <- "cpu"  
-  }
+  backend <- match.arg(backend)
+
   ns$AdaBoostClassifier(obj,
                         n_estimators=n_estimators,
                         learning_rate=learning_rate,

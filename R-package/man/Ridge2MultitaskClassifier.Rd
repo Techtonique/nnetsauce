@@ -16,11 +16,12 @@ Ridge2MultitaskClassifier(
   type_clust = "kmeans",
   lambda1 = 0.1,
   lambda2 = 0.1,
-  seed = 123L
+  seed = 123L,
+  backend = c("cpu", "gpu", "tpu")
 )
 }
 \arguments{
-\item{seed}{}
+\item{backend}{}
 }
 \value{
 

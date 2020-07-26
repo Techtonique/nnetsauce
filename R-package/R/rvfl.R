@@ -50,16 +50,12 @@ BayesianRVFLRegressor <- function(n_hidden_features=5L,
                                   row_sample=1,
                                   s=0.1,
                                   sigma=0.05,
-                                  seed=123L, 
+                                  seed=123L,
                                   backend=c("cpu", "gpu", "tpu")
                                   )
 {
-  backend <- match.arg(backend)    
-  if ((as.character(Sys.info()[1])=="Windows") && (backend %in% c("gpu", "tpu")))
-  {
-      warning("No GPU/TPU computing on Windows yet, backend set to 'cpu'")
-      backend <- "cpu"  
-  }
+  backend <- match.arg(backend)
+
   ns$BayesianRVFLRegressor(n_hidden_features=n_hidden_features,
                            activation_name=activation_name,
                            a=a,
@@ -128,16 +124,12 @@ BayesianRVFL2Regressor <- function(n_hidden_features=5L,
                                    s1=0.1,
                                    s2=0.1,
                                    sigma=0.05,
-                                   seed=123L, 
+                                   seed=123L,
                                    backend=c("cpu", "gpu", "tpu")
                                    )
 {
-  backend <- match.arg(backend) 
-  if ((as.character(Sys.info()[1])=="Windows") && (backend %in% c("gpu", "tpu")))
-  {
-      warning("No GPU/TPU computing on Windows yet, backend set to 'cpu'")
-      backend <- "cpu"  
-  }
+  backend <- match.arg(backend)
+
  ns$BayesianRVFL2Regressor(n_hidden_features=n_hidden_features,
                            activation_name=activation_name,
                            a=a,

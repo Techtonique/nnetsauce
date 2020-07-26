@@ -18,11 +18,12 @@ MultitaskClassifier(
   type_clust = "kmeans",
   col_sample = 1,
   row_sample = 1,
-  seed = 123L
+  seed = 123L,
+  backend = c("cpu", "gpu", "tpu")
 )
 }
 \arguments{
-\item{seed}{}
+\item{backend}{}
 }
 \value{
 
