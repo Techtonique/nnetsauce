@@ -15,7 +15,7 @@ from ..utils import memoize
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 from ..simulation import nodesimulation as ns
-from ..simulation import rowsubsampling as rs
+from ..sampling import SubSampler
 if platform.system() in ('Linux', 'Darwin'):
     import jax.nn as jnn
     import jax.numpy as jnp
@@ -145,6 +145,7 @@ class Base(BaseEstimator):
         self.type_scaling = type_scaling
         self.col_sample = col_sample
         self.row_sample = row_sample
+        self.subsampler = None
         self.index_col = None
         self.index_row = True
         self.n_clusters = n_clusters
@@ -431,7 +432,7 @@ class Base(BaseEstimator):
         if self.n_hidden_features > 0:  # has a hidden layer
             assert (
                 len(self.type_scaling) >= 2
-            ), "must have len(self.type_scaling) >= 2 when self.n_hidden_features > 0"
+            ), "must have len(self.type_scaling) >= 2 when self.n_hidden_features > 0"        
 
         if X is None:
             if self.col_sample == 1:
@@ -526,18 +527,15 @@ class Base(BaseEstimator):
                 if y is None
                 else mo.center_response(y)
             )
-            # y is subsampled
+            # y is subsampled            
             if self.row_sample < 1:
+
                 n, p = Z.shape
-                self.index_row = (
-                    rs.subsample(
-                        y=self.y, row_sample=self.row_sample, seed=self.seed
-                    )
-                    if y is None
-                    else rs.subsample(
-                        y=y, row_sample=self.row_sample, seed=self.seed
-                    )
-                )
+
+                self.subsampler = SubSampler(y=self.y, row_sample=self.row_sample, seed=self.seed) if y is None else SubSampler(y=y, row_sample=self.row_sample, seed=self.seed)
+
+                self.index_row = self.subsampler.subsample()
+                    
                 n_row_sample = len(self.index_row)
                 # regression
                 return (
@@ -553,16 +551,13 @@ class Base(BaseEstimator):
         # classification
         # y is subsampled
         if self.row_sample < 1:
+
             n, p = Z.shape
-            self.index_row = (
-                rs.subsample(
-                    y=self.y, row_sample=self.row_sample, seed=self.seed
-                )
-                if y is None
-                else rs.subsample(
-                    y=y, row_sample=self.row_sample, seed=self.seed
-                )
-            )
+
+            self.subsampler = SubSampler(y=self.y, row_sample=self.row_sample, seed=self.seed) if y is None else SubSampler(y=y, row_sample=self.row_sample, seed=self.seed)
+
+            self.index_row = self.subsampler.subsample()
+                
             n_row_sample = len(self.index_row)
             # classification
             return (
