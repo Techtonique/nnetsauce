@@ -65,13 +65,13 @@ else:
     from .boosting.adaBoostClassifier import AdaBoostClassifier
     from .custom.customClassifier import CustomClassifier
     from .custom.customRegressor import CustomRegressor
+    from .glm import GLMRegressor, GLMClassifier
     from .multitask.multitaskClassifier import MultitaskClassifier
     from .mts import MTS
     from .randombag.randomBagClassifier import RandomBagClassifier
     from .ridge2.ridge2Classifier import Ridge2Classifier
     from .ridge2.ridge2Regressor import Ridge2Regressor
     from .ridge2.ridge2MultitaskClassifier import Ridge2MultitaskClassifier
-
     # from .rnn.rnnRegressor import RNNRegressor
     # from .rnn.rnnClassifier import RNNClassifier
     from .rvfl.bayesianrvflRegressor import BayesianRVFLRegressor
@@ -86,6 +86,8 @@ else:
         "BayesianRVFL2Regressor",
         "CustomClassifier",
         "CustomRegressor",
+        "GLMRegressor", 
+        "GLMClassifier",
         "MultitaskClassifier",
         "RandomBagClassifier",
         "Ridge2Regressor",
