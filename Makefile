@@ -48,7 +48,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint: ## check style with flake8
-	flake8 mlsauce tests
+	flake8 nnetsauce tests
 
 test: ## run tests quickly with the default Python
 	python setup.py test
@@ -57,15 +57,15 @@ test-all: ## run tests on every Python version with tox
 	tox
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source mlsauce setup.py test
+	coverage run --source nnetsauce setup.py test
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/source/mlsauce.rst
+	rm -f docs/source/nnetsauce.rst
 	rm -f docs/source/modules.rst
-	sphinx-apidoc -f -o docs/source mlsauce
+	sphinx-apidoc -f -o docs/source nnetsauce
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/build/html/index.html

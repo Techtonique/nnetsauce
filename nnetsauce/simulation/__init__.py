@@ -1,5 +1,3 @@
-from .rowsubsampling import subsample
-
 
 try:
 
@@ -18,8 +16,7 @@ try:
         "generate_uniform",
         "generate_hammersley",
         "generate_halton",
-        "generate_halton_randtoolbox",
-        "subsample",
+        "generate_halton_randtoolbox"
     ]
 
 except:
@@ -35,6 +32,5 @@ except:
         "generate_sobol2",
         "generate_uniform",
         "generate_hammersley",
-        "generate_halton",
-        "subsample",
+        "generate_halton"
     ]

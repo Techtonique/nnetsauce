@@ -1,0 +1,18 @@
+site_name: The nnetsauce
+theme:
+  name: cyborg
+  nav_style: dark
+
+docs_dir: sources
+repo_url: https://github.com/Techtonique/nnetsauce
+edit_uri: ""
+site_description: 'Documentation for the nnetsauce.'
+
+nav:
+    - Home: index.md
+    - Documentation:
+      - AdaBoostingClassifier: documentation/adaboostclassifier.md
+      - BaseRegressor: documentation/baseregressor.md
+      - CustomClassifier: documentation/customclassifier.md
+      
+        
