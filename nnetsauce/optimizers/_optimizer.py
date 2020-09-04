@@ -51,7 +51,7 @@ class Optimizer(BaseEstimator):
     def __init__(
         self,        
         type_optim="sgd",
-        num_iters=200,         
+        num_iters=100,         
         learning_rate=0.01, 
         batch_prop=1.0,         
         learning_method="momentum", 

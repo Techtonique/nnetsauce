@@ -288,10 +288,7 @@ class GLMRegressor(GLM, RegressorMixin):
         n_Z = scaled_Z.shape[0]
         
         # initialization                    
-        np.random.seed(seed=self.seed)
-        idx = np.random.choice(range(n_Z), size=3, replace=False)
-        beta_ = np.linalg.lstsq(scaled_Z[idx,:], centered_y[idx], 
-                                       rcond=None)[0]    
+        beta_ = np.linalg.lstsq(scaled_Z, centered_y, rcond=None)[0]     
 
         self.optimizer.learning_rate = learning_rate
         self.optimizer.decay = decay
@@ -311,6 +308,7 @@ class GLMRegressor(GLM, RegressorMixin):
                            X = scaled_Z, 
                            y = centered_y, 
                            type_loss=self.family, 
+                           tolerance=tolerance,
                            **kwargs)         
 
         self.beta = self.optimizer.results[0]

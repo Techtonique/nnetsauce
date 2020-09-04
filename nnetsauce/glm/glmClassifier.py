@@ -115,11 +115,11 @@ class GLMClassifier(GLM, ClassifierMixin):
      
         
         
-    def logit_loss(self, y, row_index, XB):
+    def logit_loss(self, Y, row_index, XB):
         
         self.n_classes = len(np.unique(y))
         #Y = mo.one_hot_encode2(y, self.n_classes)
-        Y = self.optimizer.one_hot_encode(y, self.n_classes)
+        #Y = self.optimizer.one_hot_encode(y, self.n_classes)
 
         #max_double = 709.0 # only if softmax
         #XB[XB > max_double] = max_double
@@ -132,11 +132,12 @@ class GLMClassifier(GLM, ClassifierMixin):
     
     
     
-    def expit_erf_loss(self, y, row_index, XB):
+    def expit_erf_loss(self, Y, row_index, XB):
         
-        self.n_classes = len(np.unique(y))
+        #self.n_classes = len(np.unique(y))
         # Y = mo.one_hot_encode2(y, self.n_classes)
-        Y = self.optimizer.one_hot_encode(y, self.n_classes)
+        #Y = self.optimizer.one_hot_encode(y, self.n_classes)
+        self.n_classes = Y.shape[1]
         
         if row_index is None:
             return -np.mean(np.sum(Y * XB, axis=1) - logsumexp(XB))
@@ -145,7 +146,8 @@ class GLMClassifier(GLM, ClassifierMixin):
         
     
     
-    def loss_func(self, beta, group_index, X, y, 
+    def loss_func(self, beta, group_index, 
+                  X, Y, y,
                   row_index=None, type_loss="logit", 
                   **kwargs):
 
@@ -160,7 +162,7 @@ class GLMClassifier(GLM, ClassifierMixin):
                                                            self.n_classes), 
                                                  order="F"))  
 
-            return res[type_loss](y, row_index, XB) + self.compute_penalty(group_index=group_index, 
+            return res[type_loss](Y, row_index, XB) + self.compute_penalty(group_index=group_index, 
                   beta=beta)
             
         XB = self.compute_XB(X, beta=np.reshape(beta, (X.shape[1], 
@@ -168,7 +170,7 @@ class GLMClassifier(GLM, ClassifierMixin):
                                                 order="F"), 
                              row_index=row_index)                
         
-        return res[type_loss](y, row_index, XB) + self.compute_penalty(group_index=group_index, 
+        return res[type_loss](Y, row_index, XB) + self.compute_penalty(group_index=group_index, 
                   beta=beta)
         
                                                 
@@ -203,7 +205,7 @@ class GLMClassifier(GLM, ClassifierMixin):
         
         self.n_iter = 0
         
-        n = X.shape[0]
+        n, p = X.shape
         
         self.group_index = n*X.shape[1]
 
@@ -215,10 +217,7 @@ class GLMClassifier(GLM, ClassifierMixin):
         Y = self.optimizer.one_hot_encode(output_y, self.n_classes)
         
         # initialization                    
-        np.random.seed(seed=self.seed)
-        idx = np.random.choice(range(n), size=3, replace=False)
-        beta_ = np.linalg.lstsq(scaled_Z[idx,:], Y[idx,:], 
-                                       rcond=None)[0]
+        beta_ = np.linalg.lstsq(scaled_Z, Y, rcond=None)[0]  
         
         self.optimizer.learning_rate = learning_rate
         self.optimizer.decay = decay
@@ -235,8 +234,10 @@ class GLMClassifier(GLM, ClassifierMixin):
                            x0 = beta_.flatten(order="F"),
                            group_index = self.group_index, 
                            X = scaled_Z, 
+                           Y = Y,
                            y = y, 
                            type_loss=self.family, 
+                           tolerance=tolerance,
                            **kwargs)         
 
         self.beta = self.optimizer.results[0]        

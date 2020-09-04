@@ -88,8 +88,8 @@ def generate_index(double[:] response, double batch_prop=1.0,
 
 
 cdef int check_is_min(f, double[:] x):
-    print("hessian eigen values > 0")
-    print(numerical_hessian(f, x)[1])
+    # print("hessian eigen values > 0")
+    # print(numerical_hessian(f, x)[1])
     return (numerical_hessian(f, x)[1])*1
 
 cdef list flatten(x): 
@@ -383,7 +383,7 @@ def one_hot_encode(long int[:] y,
 def scd(loss_func, double[:] response, double[:] x, int num_iters=200, 
         double batch_prop=1.0, double learning_rate=0.01, double mass=0.9, 
         double decay=0.1, method="momentum", randomization="strat", 
-        double ftol=2.220446049250313e-09, double gtol=1e-5, verbose=1, 
+        double tolerance=1e-3, verbose=1, 
         **kwargs):
     """Stochastic gradient descent with momentum and adaptive learning rates."""
     
@@ -394,7 +394,8 @@ def scd(loss_func, double[:] response, double[:] x, int num_iters=200,
     cdef double[:] velocity = np.zeros(p)
     cdef double grad_x, decay_rate, learning_rate_, h0
     cdef list losses = []
-    
+
+    print(f"\n x0: {np.asarray(x)}")
     
     if verbose == 1:
         iterator = tqdm(range(num_iters))          
@@ -421,24 +422,38 @@ def scd(loss_func, double[:] response, double[:] x, int num_iters=200,
                 return res                                                                                     
             
             diff = -np.asarray(x)
+
+            if verbose == 2:
+                print(f"\n x prev: {np.asarray(x)}")
             
             for j in range(p):                          
                 h0 = 6.055454452393343e-06*x[j]        
                 grad_x = (f_j(h0, x, j) - f_j(-h0, x, j))/(2*h0)        
-                velocity[j] = mass * velocity[j] - learning_rate * grad_x               
+                velocity[j] = mass * velocity[j] - learning_rate * grad_x  
                 x[j] = x[j] + velocity[j]        
             
             diff += np.asarray(x)  
+
+            if verbose == 2:
+                print(f"\n x new: {np.asarray(x)}")
             
             losses.append(f(x))
+
+            if (len(losses) > 3) and (np.abs(np.diff(losses[-2:])[0]) < tolerance):
+                break
             
             if verbose == 2:
+
+                print("\n")
                 print(f"iter {i+1} - decrease -----")
-                print(np.linalg.norm(diff, 1)) 
-                print("loss")
-                print(losses[-1])                   
-                print("\n")            
-    
+
+                try: 
+                    print(np.linalg.norm(diff, 1)) 
+                except:
+                    pass   
+
+                print(f"iter {i+1} - loss -----")
+                print(np.flip(losses)[0])     
     
     if method in ("exp", "poly"):
         
@@ -460,6 +475,9 @@ def scd(loss_func, double[:] response, double[:] x, int num_iters=200,
             decay_rate = (1 + decay*i) if method is "poly" else exp(decay*i)
             
             diff = -np.asarray(x)
+
+            if verbose == 2:
+                print(f"\n x prev: {np.asarray(x)}")
             
             losses.append(f(x))
             
@@ -468,14 +486,26 @@ def scd(loss_func, double[:] response, double[:] x, int num_iters=200,
                 grad_x = (f_j(h0, x, j) - f_j(-h0, x, j))/(2*h0)        
                 x[j] = x[j] - grad_x*learning_rate/decay_rate
                 
-            diff += np.asarray(x)  
-            
+            diff += np.asarray(x) 
+
             if verbose == 2:
-                print(f"iter {i+1} - decrease -----")
-                print(np.linalg.norm(diff, 1))   
-                print("loss")
-                print(losses[-1])                         
+                print(f"\n x new: {np.asarray(x)}") 
+            
+            if (len(losses) > 3) and (np.abs(np.diff(losses[-2:])[0]) < tolerance):
+                break
+
+            if verbose == 2:
+
                 print("\n")
+                print(f"iter {i+1} - decrease -----")
+
+                try:
+                    print(np.linalg.norm(diff, 1))   
+                except:
+                    pass 
+
+                print(f"iter {i+1} - loss -----")
+                print(np.flip(losses)[0])
 
                     
     return np.asarray(x), num_iters, losses
@@ -486,7 +516,7 @@ def scd(loss_func, double[:] response, double[:] x, int num_iters=200,
 def sgd(loss_func, double[:] response, double[:] x, int num_iters=200, 
         double batch_prop=1.0, double learning_rate=0.01, double mass=0.9, 
         double decay=0.1, method="momentum", randomization="strat", 
-        double ftol=2.220446049250313e-09, double gtol=1e-5, verbose=1, 
+        double tolerance=1e-3, verbose=1, 
         **kwargs):
     """Stochastic gradient descent with momentum and adaptive learning rates."""
     
@@ -499,14 +529,14 @@ def sgd(loss_func, double[:] response, double[:] x, int num_iters=200,
     cdef double decay_rate, learning_rate_
     cdef list losses = []
     
-    
+    print(f"\n x0: {np.asarray(x)}")
+
     if verbose == 1:
         iterator = tqdm(range(num_iters))          
     else:
         iterator = range(num_iters)
             
     f = lambda x: loss_func(x, **kwargs)                            
-
     
     if method is "momentum":                
     
@@ -523,23 +553,37 @@ def sgd(loss_func, double[:] response, double[:] x, int num_iters=200,
             grad_i = calc_grad(objective, x)    
             
             diff = -np.asarray(x)
-            
+
+            if verbose == 2:
+                print(f"\n x prev: {np.asarray(x)}")
+
             for j in range(p):                
-                velocity[j] = mass * velocity[j] - learning_rate * grad_i[j]                
+                velocity[j] = mass * velocity[j] - learning_rate * grad_i[j]                        
                 x[j] = x[j] + velocity[j]
             
             diff += np.asarray(x)
             
-            losses.append(f(x))
-            
             if verbose == 2:
-                print(f"iter {i+1} - decrease -----")
-                print(np.linalg.norm(diff, 1))                            
-                print("loss")
-                print(losses[-1])             
-                print("\n")
-                
+                print(f"\n x new: {np.asarray(x)}")
+
+            losses.append(f(x))
+
+            if (len(losses) > 3) and (np.abs(np.diff(losses[-2:])[0]) < tolerance):
+                break
             
+            if verbose == 2:       
+
+                print("\n")
+                print(f"iter {i+1} - decrease -----")
+
+                try:
+                    print(np.linalg.norm(diff, 1))                            
+                except:
+                    pass  
+
+                print(f"iter {i+1} - loss -----")
+                print(np.flip(losses)[0])
+
     
     if method in ("exp", "poly"):
         
@@ -558,20 +602,35 @@ def sgd(loss_func, double[:] response, double[:] x, int num_iters=200,
             decay_rate = (1 + decay*i) if method is "poly" else exp(decay*i)
             
             diff = -np.asarray(x)
+
+            if verbose == 2:
+                print(f"\n x prev: {np.asarray(x)}")
             
-            for j in range(p):                
+            for j in range(p):   
+
                 x[j] = x[j] - grad_i[j]*learning_rate/decay_rate
-                
+
+            if verbose == 2:
+                print(f"\n x new: {np.asarray(x)}")
+
             diff += np.asarray(x)  
             
             losses.append(f(x))
-            
-            if verbose == 2:
-                print(f"iter {i+1} - decrease -----")
-                print(np.linalg.norm(diff, 1))   
-                print("loss")
-                print(losses[-1])             
-                print("\n")
 
+            if (len(losses) > 3) and (np.abs(np.diff(losses[-2:])[0]) < tolerance):
+                break
+        
+            if verbose == 2:
+
+                print("\n")
+                print(f"iter {i+1} - decrease -----")
+                
+                try:
+                    print(np.linalg.norm(diff, 1))   
+                except:
+                    pass
+                
+                print(f"iter {i+1} - loss -----")
+                print(np.flip(losses)[0])
     
     return np.asarray(x), num_iters, losses

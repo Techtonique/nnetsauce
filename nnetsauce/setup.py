@@ -30,6 +30,7 @@ def configuration(parent_package="", top_path=None):
     config.add_subpackage("glm")    
     config.add_subpackage("mts")
     config.add_subpackage("multitask")
+    config.add_subpackage("optimizers")
     config.add_subpackage("randombag")
     config.add_subpackage("ridge2")
     config.add_subpackage("rvfl")        
