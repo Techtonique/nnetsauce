@@ -395,8 +395,6 @@ def scd(loss_func, double[:] response, double[:] x, int num_iters=200,
     cdef double grad_x, decay_rate, learning_rate_, h0
     cdef list losses = []
 
-    print(f"\n x0: {np.asarray(x)}")
-    
     if verbose == 1:
         iterator = tqdm(range(num_iters))          
     else:
@@ -529,8 +527,6 @@ def sgd(loss_func, double[:] response, double[:] x, int num_iters=200,
     cdef double decay_rate, learning_rate_
     cdef list losses = []
     
-    print(f"\n x0: {np.asarray(x)}")
-
     if verbose == 1:
         iterator = tqdm(range(num_iters))          
     else:
