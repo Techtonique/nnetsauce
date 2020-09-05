@@ -27,8 +27,8 @@ builtins.__NNETSAUCE_SETUP__ = True
 
 
 DISTNAME = 'nnetsauce'
-DESCRIPTION = '#'
-LONG_DESCRIPTION = '#'
+DESCRIPTION = 'Randomized and Quasi-Randomized (neural) networks'
+LONG_DESCRIPTION = 'A package for Statistical/Machine Learning using Randomized and Quasi-Randomized (neural) networks'
 MAINTAINER = 'T. Moudiki'
 MAINTAINER_EMAIL = 'thierry.moudiki@gmail.com'
 LICENSE = 'BSD3 Clause Clear'
@@ -37,7 +37,7 @@ LICENSE = 'BSD3 Clause Clear'
 # does not need the compiled code
 import nnetsauce
 
-__version__ = '0.5.2'
+__version__ = '0.6.0'
 
 VERSION = __version__
 
