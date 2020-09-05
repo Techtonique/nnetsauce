@@ -5,7 +5,7 @@ nnetsauce
 
 <hr>
 
-Miscellaneous Statistical/Machine learning stuff.  
+Randomized and Quasi-Randomized (neural) networks.  
 
 ![PyPI](https://img.shields.io/pypi/v/nnetsauce) [![PyPI - License](https://img.shields.io/pypi/l/nnetsauce)](https://github.com/thierrymoudiki/nnetsauce/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce)
 [![Documentation Status](https://readthedocs.org/projects/nnetsauce/badge/?version=latest)](https://nnetsauce.readthedocs.io/en/latest/?badge=latest)
@@ -56,13 +56,11 @@ __General rule for using the package in R__:  object accesses with `.`'s are rep
 
 ## Package description
 
-Miscellaneous Statistical/Machine learning stuff. See next section. 
+A package for Statistical/Machine Learning using Randomized and Quasi-Randomized (neural) networks. See next section. 
 
 ## Quick start
 
-- [AdaOpt: probabilistic classifier based on a mix of multivariable optimization and a nearest neighbors algorithm](https://thierrymoudiki.github.io/blog/#AdaOpt)
-- [LSBoost: Gradient Boosted randomized networks using Least Squares](https://thierrymoudiki.github.io/blog/#LSBoost)
-
+[https://thierrymoudiki.github.io/blog/#QuasiRandomizedNN](https://thierrymoudiki.github.io/blog/#QuasiRandomizedNN)
 
 ## Contributing
 
@@ -124,14 +122,13 @@ coverage html
 - Numpy
 - Scipy
 - scikit-learn
-- querier
 
 ## Citation
 
 ```
 @misc{moudiki2019nnetsauce,
 author={Moudiki, Thierry},
-title={\code{nnetsauce}, {M}iscellaneous {S}tatistical/{M}achine {L}earning stuff},
+title={\code{nnetsauce}, {A} package for {S}tatistical/{M}achine {L}earning using {R}andomized and {Q}uasi-{R}andomized (neural) networks.,
 howpublished={\url{https://github.com/thierrymoudiki/nnetsauce}},
 note={BSD 3-Clause Clear License. Version 0.x.x.},
 year={2019--2020}
@@ -141,9 +138,3 @@ year={2019--2020}
 ## License
 
 [BSD 3-Clause](LICENSE) © Thierry Moudiki, 2019. 
-
-
-## Credits
-
-This package was created with [Cookiecutter](https://github.com/cookiecutter/cookiecutter)  and the [project template](https://github.com/audreyr/cookiecutter-pypackage).
-
