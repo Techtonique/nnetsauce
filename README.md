@@ -20,6 +20,7 @@ Randomized and Quasi-Randomized (neural) networks.
  [Dependencies](#dependencies) |
  [Citing `nnetsauce`](#Citation) |
  [API Documentation](#api-documentation) |
+ [References](#References) |
  [License](#License) 
 
 
@@ -134,6 +135,15 @@ note={BSD 3-Clause Clear License. Version 0.x.x.},
 year={2019--2020}
 }
 ```
+
+## References
+
+- Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
+
+- Moudiki, T. (2019). Multinomial logistic regression using quasi-randomized networks. Available at: https://www.researchgate.net/publication/334706878_Multinomial_logistic_regression_using_quasi-randomized_networks
+
+- Moudiki  T,  Planchet  F,  Cousin  A  (2018).   “Multiple  Time  Series  Forecasting Using  Quasi-Randomized  Functional  Link  Neural  Networks. ”Risks, 6(1), 22. Available at: https://www.mdpi.com/2227-9091/6/1/22
+
 
 ## License
 
