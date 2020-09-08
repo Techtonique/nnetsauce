@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <title>{% if page.title %}{{ page.title }} - {% endif %}{{ config.site_name }}</title>
+
+    <script type=text/javascript src="https://use.typekit.net/lem3gmz.js"></script> 
+
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+    
+  </head>
+  <body>
+    {{ page.content }}
+  </body>
+</html>

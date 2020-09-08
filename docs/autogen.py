@@ -5,24 +5,13 @@ import shutil
 import keras_autodoc
 
 PAGES = {    
-    'documentation/baseregressor.md': [
-        'nnetsauce.BaseRegressor',
-        'nnetsauce.BaseRegressor.fit',
-        'nnetsauce.BaseRegressor.predict',
-    ],
-    'documentation/adaboostclassifier.md': [
+    'documentation/classifiers.md': [
         'nnetsauce.AdaBoostClassifier',
-        'nnetsauce.AdaBoostClassifier.fit',
-        'nnetsauce.AdaBoostClassifier.predict_proba',
-        'nnetsauce.AdaBoostClassifier.predict',
-        'nnetsauce.AdaBoostClassifier.score',
-    ],
-    'documentation/customclassifier.md': [
         'nnetsauce.CustomClassifier',
-        'nnetsauce.CustomClassifier.fit',
-        'nnetsauce.CustomClassifier.predict_proba',
-        'nnetsauce.CustomClassifier.predict',
-        'nnetsauce.CustomClassifier.score',
+    ],
+    'documentation/regressors.md': [
+        'nnetsauce.BaseRegressor',
+        'nnetsauce.CustomRegressor',
     ]
 }
 
