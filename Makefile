@@ -65,13 +65,11 @@ coverage: ## check code coverage quickly with the default Python
 docs: ## generate mkdocs
 	 rm -rf docs/sources
 	 make install	 
-	 python3 docs/autogen.py
-	 pwd	 
-	 cd docs&&mkdocs serve
-	 cd ..
+	 python3 docs/autogen.py	 
 
 servedocs: docs ## compile the docs watching for changes
-	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
+	cd docs&&mkdocs serve
+	cd ..
 
 release: dist ## package and upload a release
 	twine upload dist/*
