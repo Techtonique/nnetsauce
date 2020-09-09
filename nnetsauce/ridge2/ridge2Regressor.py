@@ -18,7 +18,7 @@ if platform.system() in ('Linux', 'Darwin'):
 
 class Ridge2Regressor(Ridge2, RegressorMixin):
     """Ridge regression with 2 regularization parameters derived from class Ridge
-    
+
     Attributes: 
     
         n_hidden_features: int
@@ -75,13 +75,15 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
             reproducibility seed for nodes_sim=='uniform'
             
         backend: str
-            "cpu" or "gpu" or "tpu"                
+            'cpu' or 'gpu' or 'tpu'                
 
     References: 
 
-        - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters    
-       
+        - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: 
+        https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters    
+    
     """
+
 
     # construct the object -----
 

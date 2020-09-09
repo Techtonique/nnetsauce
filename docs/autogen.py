@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import pathlib
 import shutil
-
 import keras_autodoc
 
 PAGES = {    
@@ -9,12 +8,20 @@ PAGES = {
         'nnetsauce.AdaBoostClassifier',
         'nnetsauce.CustomClassifier',
         'nnetsauce.GLMClassifier',
+        'nnetsauce.MultitaskClassifier',
+        'nnetsauce.RandomBagClassifier',
+        'nnetsauce.Ridge2Classifier',
+        'nnetsauce.Ridge2MultitaskClassifier',
+        'nnetsauce.RandomBagClassifier',
     ],
     'documentation/regressors.md': [
-        'nnetsauce.BaseRegressor',
+       'nnetsauce.BaseRegressor'    ,
+        'nnetsauce.BayesianRVFLRegressor',
+        'nnetsauce.BayesianRVFL2Regressor',
         'nnetsauce.CustomRegressor',
         'nnetsauce.GLMRegressor',
-    ],
+        'nnetsauce.Ridge2Regressor',
+    ],    
     'documentation/time_series.md': [
         'nnetsauce.MTS',
     ]

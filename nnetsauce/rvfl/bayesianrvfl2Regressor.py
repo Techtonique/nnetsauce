@@ -36,7 +36,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
             of the training
 
         direct_link: boolean
-            indicates if the original features are included (True) in model's fitting or not (False)
+            indicates if the original features are included (True) in model''s fitting or not (False)
 
         n_clusters: int
             number of clusters for 'kmeans' or 'gmm' clustering (could be 0: no clustering)
@@ -72,7 +72,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
             std. dev. of residuals in Bayesian Ridge Regression
 
         beta: array-like
-            regression's fitted parameters 
+            regression''s fitted parameters 
 
         Sigma: array-like
             covariance of the distribution of fitted parameters
@@ -85,7 +85,9 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
 
     References:       
 
-        - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
+        - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: 
+          https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
+               
        
     """
 
