@@ -12,37 +12,46 @@ from . import _optimizerc as optimizerc
 class Optimizer(BaseEstimator):
     """Optimizer class
     
-        Parameters
-       ----------
-       type_optim: str
-           type of optimizer, (currently) either 'sgd' (stochastic minibatch gradient descent)
-           or 'scd' (stochastic minibatch coordinate descent)
-       num_iters: int
-           number of iterations of the optimizer
-       learning_rate: float
-           step size
-       batch_prop: float
-           proportion of the initial data used at each optimization step
-       learning_method: str
-           "poly" - learning rate decreasing as a polynomial function 
-           of # of iterations (default)
-           "exp" - learning rate decreasing as an exponential function 
-           of # of iterations
-           "momentum" - gradient descent using momentum
-       randomization: str
-           type of randomization applied at each step
-           "strat" - stratified subsampling (default)
-           "shuffle" - random subsampling
-       mass: float
-           mass on velocity, for `method` == "momentum"
-       decay: float
-           coefficient of decrease of the learning rate for 
-           `method` == "poly" and `method` == "exp"
-       verbose: int 
-           controls verbosity of gradient descent
-           0 - nothing is printed
-           1 - a progress bar is printed
-           2 - succesive loss function values are printed
+    Attributes: 
+    
+        type_optim: str
+            type of optimizer, (currently) either 'sgd' (stochastic minibatch gradient descent)
+            or 'scd' (stochastic minibatch coordinate descent)
+
+        num_iters: int
+            number of iterations of the optimizer
+
+        learning_rate: float
+            step size
+
+        batch_prop: float
+            proportion of the initial data used at each optimization step
+
+        learning_method: str
+            "poly" - learning rate decreasing as a polynomial function 
+            of # of iterations (default)
+            "exp" - learning rate decreasing as an exponential function 
+            of # of iterations
+            "momentum" - gradient descent using momentum
+
+        randomization: str
+            type of randomization applied at each step
+            "strat" - stratified subsampling (default)
+            "shuffle" - random subsampling
+
+        mass: float
+            mass on velocity, for `method` == "momentum"
+
+        decay: float
+            coefficient of decrease of the learning rate for 
+            `method` == "poly" and `method` == "exp"
+            
+        verbose: int 
+            controls verbosity of gradient descent
+            0 - nothing is printed
+            1 - a progress bar is printed
+            2 - succesive loss function values are printed
+
     """
     
     
@@ -74,23 +83,23 @@ class Optimizer(BaseEstimator):
     def fit(self, loss_func, response, x0, **kwargs):
         """Fit GLM model to training data (X, y).
         
-        Parameters
-        ----------
+        Args:
+                        
+            loss_func: loss function
+            
+            response: array-like, shape = [n_samples]
+            target variable (used for subsampling) 
+            
+            x0: array-like, shape = [n_features]
+                initial value provided to the optimizer
         
-        loss_func: loss function
-        
-        response: array-like, shape = [n_samples]
-           target variable (used for subsampling) 
-        
-        x0: array-like, shape = [n_features]
-            initial value provided to the optimizer
-    
-        **kwargs: additional parameters to be passed to 
-                  loss function
+            **kwargs: additional parameters to be passed to 
+                    loss function
                
-        Returns
-        -------
-        self: object
+        Returns: 
+
+            self: object
+            
         """
         
         

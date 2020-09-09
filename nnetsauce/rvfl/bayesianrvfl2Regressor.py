@@ -14,60 +14,78 @@ from sklearn.base import RegressorMixin
 class BayesianRVFL2Regressor(Base, RegressorMixin):
     """Bayesian Random Vector Functional Link Network regression with two priors
     
-       Parameters
-       ----------
-       n_hidden_features: int
-           number of nodes in the hidden layer
-       activation_name: str
-           activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
-       a: float
-           hyperparameter for 'prelu' or 'elu' activation function
-       nodes_sim: str
-           type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 'uniform'
-       bias: boolean
-           indicates if the hidden layer contains a bias term (True) or not (False)
-       dropout: float
-           regularization parameter; (random) percentage of nodes dropped out 
-           of the training
-       direct_link: boolean
-           indicates if the original features are included (True) in model's fitting or not (False)
-       n_clusters: int
-           number of clusters for 'kmeans' or 'gmm' clustering (could be 0: no clustering)
-       cluster_encode: bool
-           defines how the variable containing clusters is treated (default is one-hot)
-           if `False`, then labels are used, without one-hot encoding
-       type_clust: str
-           type of clustering method: currently k-means ('kmeans') or Gaussian Mixture Model ('gmm')
-       type_scaling: a tuple of 3 strings
-           scaling methods for inputs, hidden layer, and clustering respectively
-           (and when relevant). 
-           Currently available: standardization ('std') or MinMax scaling ('minmax')
-       col_sample: float
-           percentage of features randomly chosen for training  
-       row_sample: float
-           percentage of rows chosen for training, by stratified bootstrapping    
-       seed: int 
-           reproducibility seed for nodes_sim=='uniform'
-       s1: float
-           std. dev. of init. regression parameters in Bayesian Ridge Regression
-       s2: float
-           std. dev. of augmented regression parameters in Bayesian Ridge Regression  
-       sigma: float
-           std. dev. of residuals in Bayesian Ridge Regression
-       beta: array-like
-           regression's fitted parameters 
-       Sigma: array-like
-           covariance of the distribution of fitted parameters
-       GCV: float
-           return_std: boolean
-       backend: str
-           "cpu" or "gpu" or "tpu"                
+    Attributes: 
+    
+        n_hidden_features: int
+            number of nodes in the hidden layer
 
+        activation_name: str
+            activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
 
-       References
-       ----------
+        a: float
+            hyperparameter for 'prelu' or 'elu' activation function
 
-       .. [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
+        nodes_sim: str
+            type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 'uniform'
+
+        bias: boolean
+            indicates if the hidden layer contains a bias term (True) or not (False)
+
+        dropout: float
+            regularization parameter; (random) percentage of nodes dropped out 
+            of the training
+
+        direct_link: boolean
+            indicates if the original features are included (True) in model's fitting or not (False)
+
+        n_clusters: int
+            number of clusters for 'kmeans' or 'gmm' clustering (could be 0: no clustering)
+
+        cluster_encode: bool
+            defines how the variable containing clusters is treated (default is one-hot)
+            if `False`, then labels are used, without one-hot encoding
+
+        type_clust: str
+            type of clustering method: currently k-means ('kmeans') or Gaussian Mixture Model ('gmm')
+
+        type_scaling: a tuple of 3 strings
+            scaling methods for inputs, hidden layer, and clustering respectively
+            (and when relevant). 
+            Currently available: standardization ('std') or MinMax scaling ('minmax')
+
+        col_sample: float
+            percentage of features randomly chosen for training  
+
+        row_sample: float
+            percentage of rows chosen for training, by stratified bootstrapping    
+
+        seed: int 
+            reproducibility seed for nodes_sim=='uniform'
+
+        s1: float
+            std. dev. of init. regression parameters in Bayesian Ridge Regression
+
+        s2: float
+            std. dev. of augmented regression parameters in Bayesian Ridge Regression  
+
+        sigma: float
+            std. dev. of residuals in Bayesian Ridge Regression
+
+        beta: array-like
+            regression's fitted parameters 
+
+        Sigma: array-like
+            covariance of the distribution of fitted parameters
+
+        GCV: float
+            return_std: boolean
+            
+        backend: str
+            "cpu" or "gpu" or "tpu"                
+
+    References:       
+
+        - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
        
     """
 
@@ -128,21 +146,22 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
     def fit(self, X, y, **kwargs):
         """Fit BayesianRVFL2Regressor to training data (X, y)
         
-        Parameters
-        ----------
-        X: {array-like}, shape = [n_samples, n_features]
-            Training vectors, where n_samples is the number 
-            of samples and n_features is the number of features
+        Args:        
         
-        y: array-like, shape = [n_samples]
-               Target values
-    
-        **kwargs: additional parameters to be passed to 
-                  self.cook_training_set
+            X: {array-like}, shape = [n_samples, n_features]
+                Training vectors, where n_samples is the number 
+                of samples and n_features is the number of features
+            
+            y: array-like, shape = [n_samples]
+                Target values
+        
+            **kwargs: additional parameters to be passed to 
+                    self.cook_training_set
                
-        Returns
-        -------
-        self: object
+        Returns: 
+
+            self: object
+
         """
 
         centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
@@ -191,18 +210,21 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
     def predict(self, X, return_std=False, **kwargs):
         """Predict test data X.
         
-        Parameters
-        ----------
-        X: {array-like}, shape = [n_samples, n_features]
-            Training vectors, where n_samples is the number 
-            of samples and n_features is the number of features.
-        return_std: {boolean}, standard dev. is returned or not
-        **kwargs: additional parameters to be passed to 
-                  self.cook_test_set
+        Args:
+        
+            X: {array-like}, shape = [n_samples, n_features]
+                Training vectors, where n_samples is the number 
+                of samples and n_features is the number of features.
+
+            return_std: {boolean}, standard dev. is returned or not
+            
+            **kwargs: additional parameters to be passed to 
+                    self.cook_test_set
                
-        Returns
-        -------
-        model predictions: {array-like}
+        Returns: 
+        
+            model predictions: {array-like}
+
         """
 
         if len(X.shape) == 1:  # one observation in the test set only
@@ -267,25 +289,26 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 
 
-        Parameters
-        ----------
-        X: {array-like}, shape = [n_samples, n_features]
-            Training vectors, where n_samples is the number 
-            of samples and n_features is the number of features
-
-        y: array-like, shape = [n_samples]
-            Target values
-
-        scoring: str
-            must be in ('explained_variance', 'neg_mean_absolute_error', \
-                        'neg_mean_squared_error', 'neg_mean_squared_log_error', \
-                        'neg_median_absolute_error', 'r2')
+        Args:
         
-        **kwargs: additional parameters to be passed to scoring functions
-               
-        Returns
-        -------
-        model scores: {array-like}
+            X: {array-like}, shape = [n_samples, n_features]
+                Training vectors, where n_samples is the number 
+                of samples and n_features is the number of features
+
+            y: array-like, shape = [n_samples]
+                Target values
+
+            scoring: str
+                must be in ('explained_variance', 'neg_mean_absolute_error', \
+                            'neg_mean_squared_error', 'neg_mean_squared_log_error', \
+                            'neg_median_absolute_error', 'r2')
+            
+            **kwargs: additional parameters to be passed to scoring functions
+                
+        Returns: 
+        
+            model scores: {array-like}
+            
         """
 
         preds = self.predict(X)

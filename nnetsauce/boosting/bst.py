@@ -10,54 +10,71 @@ from ..base import Base
 class Boosting(Base):
     """Boosting model class derived from class Base
     
-       Parameters
-       ----------
-       obj: object
-           any object containing a method fit (obj.fit()) and a method predict 
-           (obj.predict())
-       n_estimators: int
-           number of boosting iterations
-       learning_rate: float
-           learning rate
-       n_hidden_features: int
-           number of nodes in the hidden layer
-       activation_name: str
-           activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
-       a: float
-           hyperparameter for 'prelu' or 'elu' activation function
-       nodes_sim: str
-           type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
-           'uniform'
-       bias: boolean
-           indicates if the hidden layer contains a bias term (True) or not 
-           (False)
-       dropout: float
-           regularization parameter; (random) percentage of nodes dropped out 
-           of the training
-       direct_link: boolean
-           indicates if the original predictors are included (True) in model's 
-           fitting or not (False)
-       n_clusters: int
-           number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
-               no clustering)
-       cluster_encode: bool
-           defines how the variable containing clusters is treated (default is one-hot)
-           if `False`, then labels are used, without one-hot encoding
-       type_clust: str
-           type of clustering method: currently k-means ('kmeans') or Gaussian 
-           Mixture Model ('gmm')
-       type_scaling: a tuple of 3 strings
-           scaling methods for inputs, hidden layer, and clustering respectively
-           (and when relevant). 
-           Currently available: standardization ('std') or MinMax scaling ('minmax')
-       col_sample: float
-           percentage of covariates randomly chosen for training 
-       row_sample: float
-           percentage of rows chosen for training, by stratified bootstrapping    
-       seed: int 
-           reproducibility seed for nodes_sim=='uniform'
-       backend: str
-           "cpu" or "gpu" or "tpu"                
+    Attributes:
+    
+        obj: object
+            any object containing a method fit (obj.fit()) and a method predict 
+            (obj.predict())
+
+        n_estimators: int
+            number of boosting iterations
+
+        learning_rate: float
+            learning rate
+
+        n_hidden_features: int
+            number of nodes in the hidden layer
+
+        activation_name: str
+            activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
+
+        a: float
+            hyperparameter for 'prelu' or 'elu' activation function
+
+        nodes_sim: str
+            type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+            'uniform'
+
+        bias: boolean
+            indicates if the hidden layer contains a bias term (True) or not 
+            (False)
+
+        dropout: float
+            regularization parameter; (random) percentage of nodes dropped out 
+            of the training
+
+        direct_link: boolean
+            indicates if the original predictors are included (True) in model's 
+            fitting or not (False)
+
+        n_clusters: int
+            number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
+                no clustering)
+
+        cluster_encode: bool
+            defines how the variable containing clusters is treated (default is one-hot)
+            if `False`, then labels are used, without one-hot encoding
+            
+        type_clust: str
+            type of clustering method: currently k-means ('kmeans') or Gaussian 
+            Mixture Model ('gmm')
+            
+        type_scaling: a tuple of 3 strings
+            scaling methods for inputs, hidden layer, and clustering respectively
+            (and when relevant). 
+            Currently available: standardization ('std') or MinMax scaling ('minmax')
+
+        col_sample: float
+            percentage of covariates randomly chosen for training 
+
+        row_sample: float
+            percentage of rows chosen for training, by stratified bootstrapping    
+
+        seed: int 
+            reproducibility seed for nodes_sim=='uniform'
+            
+        backend: str
+            "cpu" or "gpu" or "tpu"                
 
     """
 

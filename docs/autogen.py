@@ -8,10 +8,15 @@ PAGES = {
     'documentation/classifiers.md': [
         'nnetsauce.AdaBoostClassifier',
         'nnetsauce.CustomClassifier',
+        'nnetsauce.GLMClassifier',
     ],
     'documentation/regressors.md': [
         'nnetsauce.BaseRegressor',
         'nnetsauce.CustomRegressor',
+        'nnetsauce.GLMRegressor',
+    ],
+    'documentation/time_series.md': [
+        'nnetsauce.MTS',
     ]
 }
 

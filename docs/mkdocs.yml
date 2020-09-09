@@ -14,9 +14,11 @@ nav:
     - Quickstart examples:
       - Classification: examples/classification.md
       - Regression: examples/regression.md
+      - Time series: examples/time_series_examples.md
     - Documentation:
       - Classifiers: documentation/classifiers.md
       - Regressors: documentation/regressors.md
+      - Time series: documentation/time_series.md
     - Contributing Guide: CONTRIBUTING.md  
     - License: LICENSE.md
       

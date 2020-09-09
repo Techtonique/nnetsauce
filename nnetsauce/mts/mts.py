@@ -15,52 +15,70 @@ from functools import partial
 class MTS(Base):
     """Univariate and multivariate time series (MTS) forecasting with Quasi-Randomized networks
     
-       Parameters
-       ----------
-       obj: object
-           any object containing a method fit (obj.fit()) and a method predict 
-           (obj.predict())
-       n_hidden_features: int
-           number of nodes in the hidden layer
-       activation_name: str
-           activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
-       a: float
-           hyperparameter for 'prelu' or 'elu' activation function
-       nodes_sim: str
-           type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
-           'uniform'
-       bias: boolean
-           indicates if the hidden layer contains a bias term (True) or not 
-           (False)
-       dropout: float
-           regularization parameter; (random) percentage of nodes dropped out 
-           of the training
-       direct_link: boolean
-           indicates if the original predictors are included (True) in model's fitting or not (False)
-       n_clusters: int
-           number of clusters for 'kmeans' or 'gmm' clustering (could be 0: no clustering)
-       cluster_encode: bool
-           defines how the variable containing clusters is treated (default is one-hot)
-           if `False`, then labels are used, without one-hot encoding
-       type_clust: str
-           type of clustering method: currently k-means ('kmeans') or Gaussian 
-           Mixture Model ('gmm')
-       type_scaling: a tuple of 3 strings
-           scaling methods for inputs, hidden layer, and clustering respectively
-           (and when relevant). 
-           Currently available: standardization ('std') or MinMax scaling ('minmax')
-       col_sample: float
-           percentage of covariates randomly chosen for training    
-       lags: int
-           number of lags used for each time series 
-       alpha1: float
-           smoothing weight (training set)
-       alpha2: float
-           smoothing parameter (testing set)           
-       seed: int 
-           reproducibility seed for nodes_sim=='uniform'
-       backend: str
-           "cpu" or "gpu" or "tpu"                           
+    Attributes: 
+
+        obj: object
+            any object containing a method fit (obj.fit()) and a method predict 
+            (obj.predict())
+
+        n_hidden_features: int
+            number of nodes in the hidden layer
+
+        activation_name: str
+            activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
+
+        a: float
+            hyperparameter for 'prelu' or 'elu' activation function
+
+        nodes_sim: str
+            type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+            'uniform'
+
+        bias: boolean
+            indicates if the hidden layer contains a bias term (True) or not 
+            (False)
+
+        dropout: float
+            regularization parameter; (random) percentage of nodes dropped out 
+            of the training
+
+        direct_link: boolean
+            indicates if the original predictors are included (True) in model's fitting or not (False)
+
+        n_clusters: int
+            number of clusters for 'kmeans' or 'gmm' clustering (could be 0: no clustering)
+
+        cluster_encode: bool
+            defines how the variable containing clusters is treated (default is one-hot)
+            if `False`, then labels are used, without one-hot encoding
+
+        type_clust: str
+            type of clustering method: currently k-means ('kmeans') or Gaussian 
+            Mixture Model ('gmm')
+
+        type_scaling: a tuple of 3 strings
+            scaling methods for inputs, hidden layer, and clustering respectively
+            (and when relevant). 
+            Currently available: standardization ('std') or MinMax scaling ('minmax')
+
+        col_sample: float
+            percentage of covariates randomly chosen for training    
+
+        lags: int
+            number of lags used for each time series 
+
+        alpha1: float
+            smoothing weight (training set)
+
+        alpha2: float
+            smoothing parameter (testing set) 
+
+        seed: int 
+            reproducibility seed for nodes_sim=='uniform'
+
+        backend: str
+            "cpu" or "gpu" or "tpu"                           
+
     """
 
     # construct the object -----
@@ -123,21 +141,23 @@ class MTS(Base):
     def fit(self, X, xreg=None, **kwargs):
         """Fit MTS model to training data X, with optional regressors xreg
         
-        Parameters
-        ----------
-        X: {array-like}, shape = [n_samples, n_features]
-            Training time series, where n_samples is the number 
-            of samples and n_features is the number of features;
-            X must be in increasing order (most recent observations last)
-        xreg: {array-like}, shape = [n_samples, n_features_xreg]
-              Additional regressors to be passed to obj
-              xreg must be in increasing order (most recent observations last)
-        **kwargs: additional parameters to be passed to 
-                  self.cook_training_set
+        Args:
+        
+            X: {array-like}, shape = [n_samples, n_features]
+                Training time series, where n_samples is the number 
+                of samples and n_features is the number of features;
+                X must be in increasing order (most recent observations last)
+
+            xreg: {array-like}, shape = [n_samples, n_features_xreg]
+                Additional regressors to be passed to obj
+                xreg must be in increasing order (most recent observations last)
+
+            **kwargs: additional parameters to be passed to 
+                    self.cook_training_set
                
-        Returns
-        -------
-        self: object
+        Returns: 
+        
+            self: object
         """
 
         try:
@@ -221,25 +241,25 @@ class MTS(Base):
     def predict(self, h=5, level=95, new_xreg=None, **kwargs):
         """Forecast all the time series, h steps ahead
         
-        Parameters
-        ----------
-        h: {integer}
-            Forecasting horizon
+        Args:
         
-        level: {integer}
-            Level of confidence (if obj has option 'return_std' and the 
-            posterior is gaussian)
+            h: {integer}
+                Forecasting horizon
             
-        new_xreg: {array-like}, shape = [n_samples = h, n_new_xreg]
-            New values of additional (deterministic) regressors on horizon = h
-            new_xreg must be in increasing order (most recent observations last)
-        
-        **kwargs: additional parameters to be passed to 
-                  self.cook_test_set
+            level: {integer}
+                Level of confidence (if obj has option 'return_std' and the 
+                posterior is gaussian)
+                
+            new_xreg: {array-like}, shape = [n_samples = h, n_new_xreg]
+                New values of additional (deterministic) regressors on horizon = h
+                new_xreg must be in increasing order (most recent observations last)
+            
+            **kwargs: additional parameters to be passed to 
+                    self.cook_test_set
                
-        Returns
-        -------
-        model predictions for horizon = h: {array-like}
+        Returns: 
+        
+            model predictions for horizon = h: {array-like}
         """
 
         self.return_std = False

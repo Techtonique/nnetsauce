@@ -13,51 +13,68 @@ from ..optimizers import Optimizer
 class GLM(Base):
     """Generalized 'linear' models for quasi-randomized networks (nonlinear models!)
     
-       Parameters
-       ----------
-       n_hidden_features: int
-           number of nodes in the hidden layer
-       lambda1: float
-           regularization parameter for GLM coefficients on original features
-       alpha1: float
-           controls compromize between l1 and l2 norm of GLM coefficients on original features
-       lambda2: float
-           regularization parameter for GLM coefficients on nonlinear features
-       alpha2: float
-           controls compromize between l1 and l2 norm of GLM coefficients on nonlinear features
-       activation_name: str
-           activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
-       a: float
-           hyperparameter for 'prelu' or 'elu' activation function
-       nodes_sim: str
-           type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
-           'uniform'
-       bias: boolean
-           indicates if the hidden layer contains a bias term (True) or not 
-           (False)
-       dropout: float
-           regularization parameter; (random) percentage of nodes dropped out 
-           of the training
-       direct_link: boolean
-           indicates if the original predictors are included (True) in model's 
-           fitting or not (False)
-       n_clusters: int
-           number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
-               no clustering)
-       cluster_encode: bool
-           defines how the variable containing clusters is treated (default is one-hot)
-           if `False`, then labels are used, without one-hot encoding
-       type_clust: str
-           type of clustering method: currently k-means ('kmeans') or Gaussian 
-           Mixture Model ('gmm')
-       type_scaling: a tuple of 3 strings
-           scaling methods for inputs, hidden layer, and clustering respectively
-           (and when relevant). 
-           Currently available: standardization ('std') or MinMax scaling ('minmax')
-       optimizer: object 
-           optimizer, from class nnetsauce.utils.Optimizer
-       seed: int 
-           reproducibility seed for nodes_sim=='uniform' and clustering       
+    Attributes:
+       
+        n_hidden_features: int
+            number of nodes in the hidden layer
+
+        lambda1: float
+            regularization parameter for GLM coefficients on original features
+
+        alpha1: float
+            controls compromize between l1 and l2 norm of GLM coefficients on original features
+
+        lambda2: float
+            regularization parameter for GLM coefficients on nonlinear features
+
+        alpha2: float
+            controls compromize between l1 and l2 norm of GLM coefficients on nonlinear features
+
+        activation_name: str
+            activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
+
+        a: float
+            hyperparameter for 'prelu' or 'elu' activation function
+
+        nodes_sim: str
+            type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+            'uniform'
+
+        bias: boolean
+            indicates if the hidden layer contains a bias term (True) or not 
+            (False)
+
+        dropout: float
+            regularization parameter; (random) percentage of nodes dropped out 
+            of the training
+
+        direct_link: boolean
+            indicates if the original predictors are included (True) in model's 
+            fitting or not (False)
+
+        n_clusters: int
+            number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
+                no clustering)
+
+        cluster_encode: bool
+            defines how the variable containing clusters is treated (default is one-hot)
+            if `False`, then labels are used, without one-hot encoding
+
+        type_clust: str
+            type of clustering method: currently k-means ('kmeans') or Gaussian 
+            Mixture Model ('gmm')
+
+        type_scaling: a tuple of 3 strings
+            scaling methods for inputs, hidden layer, and clustering respectively
+            (and when relevant). 
+            Currently available: standardization ('std') or MinMax scaling ('minmax')
+
+        optimizer: object 
+            optimizer, from class nnetsauce.utils.Optimizer
+
+        seed: int 
+            reproducibility seed for nodes_sim=='uniform' and clustering       
+
     """
 
     # construct the object -----

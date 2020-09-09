@@ -4,14 +4,17 @@ from . import _rowsubsamplingc as rowsubsamplingc
 class SubSampler():
     """Subsampling class.
         
-     Parameters
-     ----------
-     y: array-like, shape = [n_samples]
-        Target values.
-     row_sample: double
-        subsampling fraction
-     seed: int
-        reproductibility seed   
+     Attributes: 
+     
+        y: array-like, shape = [n_samples]
+            Target values.
+
+        row_sample: double
+            subsampling fraction
+
+        seed: int
+            reproductibility seed   
+
     """
 
     def __init__(self, y, row_sample=0.8, seed=123):

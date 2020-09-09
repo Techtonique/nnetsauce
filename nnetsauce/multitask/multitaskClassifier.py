@@ -15,55 +15,69 @@ from sklearn.base import ClassifierMixin
 class MultitaskClassifier(Base, ClassifierMixin):
     """Multitask Classification model based on regression models, with shared covariates
     
-       Parameters
-       ----------
-       obj: object
-           any object (must be a regression model) containing a method fit (obj.fit()) 
-           and a method predict (obj.predict())
-       n_hidden_features: int
-           number of nodes in the hidden layer
-       activation_name: str
-           activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
-       a: float
-           hyperparameter for 'prelu' or 'elu' activation function
-       nodes_sim: str
-           type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
-           'uniform'
-       bias: boolean
-           indicates if the hidden layer contains a bias term (True) or not 
-           (False)
-       dropout: float
-           regularization parameter; (random) percentage of nodes dropped out 
-           of the training
-       direct_link: boolean
-           indicates if the original predictors are included (True) in model's 
-           fitting or not (False)
-       n_clusters: int
-           number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
-               no clustering)
-       cluster_encode: bool
-           defines how the variable containing clusters is treated (default is one-hot)
-           if `False`, then labels are used, without one-hot encoding
-       type_clust: str
-           type of clustering method: currently k-means ('kmeans') or Gaussian 
-           Mixture Model ('gmm')
-       type_scaling: a tuple of 3 strings
-           scaling methods for inputs, hidden layer, and clustering respectively
-           (and when relevant). 
-           Currently available: standardization ('std') or MinMax scaling ('minmax')
-       col_sample: float
-           percentage of covariates randomly chosen for training   
-       row_sample: float
-           percentage of rows chosen for training, by stratified bootstrapping    
-       seed: int 
-           reproducibility seed for nodes_sim=='uniform'
-       backend: str
-           "cpu" or "gpu" or "tpu"                           
+    Attributes: 
+    
+        obj: object
+            any object (must be a regression model) containing a method fit (obj.fit()) 
+            and a method predict (obj.predict())
 
-       References
-       ----------
+        n_hidden_features: int
+            number of nodes in the hidden layer
 
-       .. [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters    
+        activation_name: str
+            activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
+
+        a: float
+            hyperparameter for 'prelu' or 'elu' activation function
+
+        nodes_sim: str
+            type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+            'uniform'
+
+        bias: boolean
+            indicates if the hidden layer contains a bias term (True) or not 
+            (False)
+
+        dropout: float
+            regularization parameter; (random) percentage of nodes dropped out 
+            of the training
+
+        direct_link: boolean
+            indicates if the original predictors are included (True) in model's 
+            fitting or not (False)
+
+        n_clusters: int
+            number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
+                no clustering)
+
+        cluster_encode: bool
+            defines how the variable containing clusters is treated (default is one-hot)
+            if `False`, then labels are used, without one-hot encoding
+
+        type_clust: str
+            type of clustering method: currently k-means ('kmeans') or Gaussian 
+            Mixture Model ('gmm')
+
+        type_scaling: a tuple of 3 strings
+            scaling methods for inputs, hidden layer, and clustering respectively
+            (and when relevant). 
+            Currently available: standardization ('std') or MinMax scaling ('minmax')
+
+        col_sample: float
+            percentage of covariates randomly chosen for training   
+
+        row_sample: float
+            percentage of rows chosen for training, by stratified bootstrapping    
+
+        seed: int 
+            reproducibility seed for nodes_sim=='uniform'
+
+        backend: str
+            "cpu" or "gpu" or "tpu"                           
+
+    References:       
+
+        [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters    
        
     """
 
@@ -114,21 +128,22 @@ class MultitaskClassifier(Base, ClassifierMixin):
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit MultitaskClassifier to training data (X, y).
         
-        Parameters
-        ----------
-        X: {array-like}, shape = [n_samples, n_features]
-            Training vectors, where n_samples is the number 
-            of samples and n_features is the number of features.
+        Args:
         
-        y: array-like, shape = [n_samples]
-               Target values.
-    
-        **kwargs: additional parameters to be passed to 
-                  self.cook_training_set or self.obj.fit
+            X: {array-like}, shape = [n_samples, n_features]
+                Training vectors, where n_samples is the number 
+                of samples and n_features is the number of features.
+            
+            y: array-like, shape = [n_samples]
+                Target values.
+        
+            **kwargs: additional parameters to be passed to 
+                    self.cook_training_set or self.obj.fit
                
-        Returns
-        -------
-        self: object
+        Returns:
+        
+            self: object
+
         """
 
         assert mx.is_factor(y), "y must contain only integers"
@@ -152,18 +167,19 @@ class MultitaskClassifier(Base, ClassifierMixin):
     def predict(self, X, **kwargs):
         """Predict test data X.
         
-        Parameters
-        ----------
-        X: {array-like}, shape = [n_samples, n_features]
-            Training vectors, where n_samples is the number 
-            of samples and n_features is the number of features.
+        Args:
         
-        **kwargs: additional parameters to be passed to 
-                  self.cook_test_set
+            X: {array-like}, shape = [n_samples, n_features]
+                Training vectors, where n_samples is the number 
+                of samples and n_features is the number of features.
+            
+            **kwargs: additional parameters to be passed to 
+                    self.cook_test_set
                
-        Returns
-        -------
-        model predictions: {array-like}
+        Returns:
+        
+            model predictions: {array-like}
+
         """
 
         return np.argmax(self.predict_proba(X, **kwargs), axis=1)
@@ -171,18 +187,19 @@ class MultitaskClassifier(Base, ClassifierMixin):
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
         
-        Parameters
-        ----------
-        X: {array-like}, shape = [n_samples, n_features]
-            Training vectors, where n_samples is the number 
-            of samples and n_features is the number of features.
+        Args:
         
-        **kwargs: additional parameters to be passed to 
-                  self.cook_test_set
+            X: {array-like}, shape = [n_samples, n_features]
+                Training vectors, where n_samples is the number 
+                of samples and n_features is the number of features.
+            
+            **kwargs: additional parameters to be passed to 
+                    self.cook_test_set
                
-        Returns
-        -------
-        probability estimates for test data: {array-like}        
+        Returns:
+        
+            probability estimates for test data: {array-like}   
+                 
         """
 
         shape_X = X.shape
@@ -221,25 +238,26 @@ class MultitaskClassifier(Base, ClassifierMixin):
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 
 
-        Parameters
-        ----------
-        X: {array-like}, shape = [n_samples, n_features]
-            Training vectors, where n_samples is the number 
-            of samples and n_features is the number of features
-
-        y: array-like, shape = [n_samples]
-            Target values
-
-        scoring: str
-            must be in ('explained_variance', 'neg_mean_absolute_error', \
-                        'neg_mean_squared_error', 'neg_mean_squared_log_error', \
-                        'neg_median_absolute_error', 'r2')
+        Args:
         
-        **kwargs: additional parameters to be passed to scoring functions
+            X: {array-like}, shape = [n_samples, n_features]
+                Training vectors, where n_samples is the number 
+                of samples and n_features is the number of features
+
+            y: array-like, shape = [n_samples]
+                Target values
+
+            scoring: str
+                must be in ('explained_variance', 'neg_mean_absolute_error', \
+                            'neg_mean_squared_error', 'neg_mean_squared_log_error', \
+                            'neg_median_absolute_error', 'r2')
+            
+            **kwargs: additional parameters to be passed to scoring functions
                
-        Returns
-        -------
-        model scores: {array-like}
+        Returns: 
+        
+            model scores: {array-like}
+
         """
 
         preds = self.predict(X)
