@@ -1,6 +1,8 @@
-# Documentation for regressors
+# Regressors
 
 _In alphabetical order_
+
+All models possess methods `fit`, `predict`, and `score`. Methods `predict` and `score` are only documented for the first model; the __same principles apply subsequently__. For scoring metrics, refer to [scoring metrics](scoring_metrics.md). 
 
 <span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L14)</span>
 
@@ -85,6 +87,98 @@ Attributes:
 
     backend: str
         "cpu" or "gpu" or "tpu"                
+
+
+----
+
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L114)</span>
+
+### fit
+
+
+```python
+BaseRegressor.fit(X, y, **kwargs)
+```
+
+
+Fit BaseRegressor to training data (X, y)
+
+Args:
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features
+    
+    y: array-like, shape = [n_samples]
+        Target values
+
+    **kwargs: additional parameters to be passed to self.cook_training_set
+       
+Returns:
+
+    self: object
+
+
+----
+
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L143)</span>
+
+### predict
+
+
+```python
+BaseRegressor.predict(X, **kwargs)
+```
+
+
+Predict test data X.
+
+Args
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features
+
+    **kwargs: additional parameters to be passed to self.cook_test_set
+       
+Returns:
+
+    model predictions: {array-like}
+
+
+----
+
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L180)</span>
+
+### score
+
+
+```python
+BaseRegressor.score(X, y, scoring=None, **kwargs)
+```
+
+
+Score the model on test set features X and response y. 
+
+Args:
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features
+
+    y: array-like, shape = [n_samples]
+        Target values
+
+    scoring: str
+        must be in ('explained_variance', 'neg_mean_absolute_error', 
+                    'neg_mean_squared_error', 'neg_mean_squared_log_error', 
+                    'neg_median_absolute_error', 'r2')
+    
+    **kwargs: additional parameters to be passed to scoring functions
+       
+Returns: 
+
+model scores: {array-like}
 
 
 ----
@@ -188,6 +282,37 @@ Attributes:
 
     backend: str
         "cpu" or "gpu" or "tpu"                
+
+
+----
+
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/rvfl/bayesianrvflRegressor.py#L136)</span>
+
+### fit
+
+
+```python
+BayesianRVFLRegressor.fit(X, y, **kwargs)
+```
+
+
+Fit BayesianRVFLRegressor to training data (X, y).
+
+Args:
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features.
+    
+    y: array-like, shape = [n_samples]
+        Target values.
+
+    **kwargs: additional parameters to be passed to 
+            self.cook_training_set
+       
+Returns: 
+
+    self: object
 
 
 ----
@@ -306,6 +431,37 @@ References:
 
 ----
 
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/rvfl/bayesianrvfl2Regressor.py#L148)</span>
+
+### fit
+
+
+```python
+BayesianRVFL2Regressor.fit(X, y, **kwargs)
+```
+
+
+Fit BayesianRVFL2Regressor to training data (X, y)
+
+Args:        
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features
+    
+    y: array-like, shape = [n_samples]
+        Target values
+
+    **kwargs: additional parameters to be passed to 
+            self.cook_training_set
+       
+Returns: 
+
+    self: object
+
+
+----
+
 <span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/custom/customRegressor.py#L12)</span>
 
 ### CustomRegressor
@@ -399,6 +555,37 @@ Attributes:
 
     backend: str
         "cpu" or "gpu" or "tpu"                           
+
+
+----
+
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/custom/customRegressor.py#L125)</span>
+
+### fit
+
+
+```python
+CustomRegressor.fit(X, y, sample_weight=None, **kwargs)
+```
+
+
+Fit custom model to training data (X, y).
+
+Args:
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features.
+
+    y: array-like, shape = [n_samples]
+        Target values.
+
+    **kwargs: additional parameters to be passed to 
+        self.cook_training_set or self.obj.fit
+    
+Returns: 
+
+    self: object
 
 
 ----
@@ -499,6 +686,39 @@ Attributes:
 
 ----
 
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmRegressor.py#L272)</span>
+
+### fit
+
+
+```python
+GLMRegressor.fit(
+    X, y, learning_rate=0.01, decay=0.1, batch_prop=1, tolerance=1e-05, optimizer=None, verbose=0, **kwargs
+)
+```
+
+
+Fit GLM model to training data (X, y).
+
+Args:
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features.
+    
+    y: array-like, shape = [n_samples]
+        Target values.
+
+    **kwargs: additional parameters to be passed to 
+            self.cook_training_set or self.obj.fit
+       
+Returns:
+
+    self: object
+
+
+----
+
 <span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2Regressor.py#L19)</span>
 
 ### Ridge2Regressor
@@ -590,6 +810,37 @@ References:
 
     - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: 
     https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters    
+
+
+----
+
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2Regressor.py#L131)</span>
+
+### fit
+
+
+```python
+Ridge2Regressor.fit(X, y, **kwargs)
+```
+
+
+Fit Ridge model to training data (X, y).           
+
+Args:
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features.
+    
+    y: array-like, shape = [n_samples]
+        Target values.
+
+    **kwargs: additional parameters to be passed to 
+            self.cook_training_set or self.obj.fit
+       
+Returns: 
+
+    self: object
 
 
 ----

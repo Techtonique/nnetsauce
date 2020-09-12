@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 
 define BROWSER_PYSCRIPT
-import os, webbrowser, sys
+import os, webbrowser, sys, mkdocs
 
 from urllib.request import pathname2url
 

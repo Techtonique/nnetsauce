@@ -435,9 +435,11 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                 Target values
 
             scoring: str
-                must be in ('explained_variance', 'neg_mean_absolute_error', \
-                            'neg_mean_squared_error', 'neg_mean_squared_log_error', \
-                            'neg_median_absolute_error', 'r2')
+                must be in ('accuracy', 'average_precision', 
+                           'brier_score_loss', 'f1', 'f1_micro', 
+                           'f1_macro', 'f1_weighted',  'f1_samples', 
+                           'neg_log_loss', 'precision', 'recall', 
+                           'roc_auc')
             
             **kwargs: additional parameters to be passed to scoring functions
                

@@ -1,6 +1,8 @@
-# Documentation for time series models 
+# Time series models 
 
 _In alphabetical order_
+
+All models possess methods: `fit`, `predict`.
 
 <span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L15)</span>
 
@@ -96,6 +98,74 @@ Attributes:
         
     backend: str.
         "cpu" or "gpu" or "tpu".                           
+
+
+----
+
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L140)</span>
+
+### fit
+
+
+```python
+MTS.fit(X, xreg=None, **kwargs)
+```
+
+
+Fit MTS model to training data X, with optional regressors xreg
+
+Args:
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training time series, where n_samples is the number 
+        of samples and n_features is the number of features;
+        X must be in increasing order (most recent observations last)
+
+    xreg: {array-like}, shape = [n_samples, n_features_xreg]
+        Additional regressors to be passed to obj
+        xreg must be in increasing order (most recent observations last)
+
+    **kwargs: additional parameters to be passed to 
+            self.cook_training_set
+       
+Returns: 
+
+    self: object
+
+
+----
+
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L240)</span>
+
+### predict
+
+
+```python
+MTS.predict(h=5, level=95, new_xreg=None, **kwargs)
+```
+
+
+Forecast all the time series, h steps ahead
+
+Args:
+
+    h: {integer}
+        Forecasting horizon
+    
+    level: {integer}
+        Level of confidence (if obj has option 'return_std' and the 
+        posterior is gaussian)
+        
+    new_xreg: {array-like}, shape = [n_samples = h, n_new_xreg]
+        New values of additional (deterministic) regressors on horizon = h
+        new_xreg must be in increasing order (most recent observations last)
+    
+    **kwargs: additional parameters to be passed to 
+            self.cook_test_set
+       
+Returns: 
+
+    model predictions for horizon = h: {array-like}
 
 
 ----

@@ -1,6 +1,8 @@
-# Documentation for classifiers 
+# Classifiers 
 
 _In alphabetical order_
+
+All models possess methods `fit`, `predict`, `predict_proba`, and `score`. For scoring metrics, refer to [scoring metrics](scoring_metrics.md).
 
 <span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L18)</span>
 
@@ -115,6 +117,130 @@ Attributes:
 
 ----
 
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L156)</span>
+
+### fit
+
+
+```python
+AdaBoostClassifier.fit(X, y, sample_weight=None, **kwargs)
+```
+
+
+Fit Boosting model to training data (X, y).
+
+Args:
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features.
+    
+    y: array-like, shape = [n_samples]
+        Target values.
+
+    **kwargs: additional parameters to be passed to 
+            self.cook_training_set or self.obj.fit
+       
+Returns:
+
+     self: object
+
+
+----
+
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L327)</span>
+
+### predict
+
+
+```python
+AdaBoostClassifier.predict(X, **kwargs)
+```
+
+
+Predict test data X.
+
+Args:
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features.
+
+    **kwargs: additional parameters to be passed to 
+          self.cook_test_set
+       
+Returns:
+
+    model predictions: {array-like}        
+
+
+----
+
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L346)</span>
+
+### predict_proba
+
+
+```python
+AdaBoostClassifier.predict_proba(X, **kwargs)
+```
+
+
+Predict probabilities for test data X.
+
+Args:
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features.
+
+    **kwargs: additional parameters to be passed to 
+          self.cook_test_set
+       
+Returns: 
+
+    probability estimates for test data: {array-like}    
+
+
+----
+
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L425)</span>
+
+### score
+
+
+```python
+AdaBoostClassifier.score(X, y, scoring=None, **kwargs)
+```
+
+
+Score the model on test set features X and response y. 
+
+Args:
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features
+
+    y: array-like, shape = [n_samples]
+        Target values
+
+    scoring: str
+        must be in ('accuracy', 'average_precision', 
+                   'brier_score_loss', 'f1', 'f1_micro', 
+                   'f1_macro', 'f1_weighted',  'f1_samples', 
+                   'neg_log_loss', 'precision', 'recall', 
+                   'roc_auc')
+    
+    **kwargs: additional parameters to be passed to scoring functions
+       
+Returns: 
+
+    model scores: {array-like}
+
+
+----
+
 <span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/custom/customClassifier.py#L12)</span>
 
 ### CustomClassifier
@@ -203,6 +329,37 @@ Attributes:
 
     backend: str
         "cpu" or "gpu" or "tpu"                
+
+
+----
+
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/custom/customClassifier.py#L120)</span>
+
+### fit
+
+
+```python
+CustomClassifier.fit(X, y, sample_weight=None, **kwargs)
+```
+
+
+Fit custom model to training data (X, y).
+
+Args: 
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features.
+    
+    y: array-like, shape = [n_samples]
+        Target values.
+
+    **kwargs: additional parameters to be passed to 
+                self.cook_training_set or self.obj.fit
+    
+Returns:
+
+    self: object
 
 
 ----
@@ -299,6 +456,39 @@ Attributes:
 
     seed: int 
         reproducibility seed for nodes_sim=='uniform'
+
+
+----
+
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmClassifier.py#L195)</span>
+
+### fit
+
+
+```python
+GLMClassifier.fit(
+    X, y, learning_rate=0.01, decay=0.1, batch_prop=1, tolerance=1e-05, optimizer=None, verbose=1, **kwargs
+)
+```
+
+
+Fit GLM model to training data (X, y).
+
+Args: 
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features.
+    
+    y: array-like, shape = [n_samples]
+        Target values.
+
+    **kwargs: additional parameters to be passed to 
+            self.cook_training_set or self.obj.fit
+       
+Returns: 
+
+    self: object
 
 
 ----
@@ -401,6 +591,37 @@ References:
 
 ----
 
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/multitask/multitaskClassifier.py#L129)</span>
+
+### fit
+
+
+```python
+MultitaskClassifier.fit(X, y, sample_weight=None, **kwargs)
+```
+
+
+Fit MultitaskClassifier to training data (X, y).
+
+Args:
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features.
+    
+    y: array-like, shape = [n_samples]
+        Target values.
+
+    **kwargs: additional parameters to be passed to 
+            self.cook_training_set or self.obj.fit
+       
+Returns:
+
+    self: object
+
+
+----
+
 <span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/randomBagClassifier.py#L17)</span>
 
 ### RandomBagClassifier
@@ -495,6 +716,38 @@ Attributes:
 
     backend: str
         "cpu" or "gpu" or "tpu"                           
+
+
+----
+
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/randomBagClassifier.py#L135)</span>
+
+### fit
+
+
+```python
+RandomBagClassifier.fit(X, y, **kwargs)
+```
+
+
+Fit Random 'Forest' model to training data (X, y).
+
+Args:
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features.
+    
+    y: array-like, shape = [n_samples]
+        Target values.
+
+    **kwargs: additional parameters to be passed to 
+            self.cook_training_set or self.obj.fit
+        
+Returns: 
+
+    self: object
+    
 
 
 ----
@@ -603,6 +856,40 @@ References:
 
 ----
 
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2Classifier.py#L264)</span>
+
+### fit
+
+
+```python
+Ridge2Classifier.fit(X, y, solver="L-BFGS-B", **kwargs)
+```
+
+
+Fit Ridge model to training data (X, y).
+   
+for beta: regression coeffs (beta11, ..., beta1p, ..., betaK1, ..., betaKp)
+for K classes and p covariates.
+
+Args:
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features.
+    
+    y: array-like, shape = [n_samples]
+        Target values.
+
+    **kwargs: additional parameters to be passed to 
+            self.cook_training_set or self.obj.fit
+       
+Returns: 
+
+    self: object
+
+
+----
+
 <span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2MultitaskClassifier.py#L19)</span>
 
 ### Ridge2MultitaskClassifier
@@ -686,6 +973,37 @@ References:
 
     - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: 
     https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
+
+
+----
+
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2MultitaskClassifier.py#L122)</span>
+
+### fit
+
+
+```python
+Ridge2MultitaskClassifier.fit(X, y, **kwargs)
+```
+
+
+Fit Ridge model to training data (X, y).           
+
+Args:
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features.
+    
+    y: array-like, shape = [n_samples]
+        Target values.
+
+    **kwargs: additional parameters to be passed to 
+            self.cook_training_set or self.obj.fit
+       
+Returns: 
+
+    self: object
 
 
 ----
@@ -784,6 +1102,38 @@ Attributes:
 
     backend: str
         "cpu" or "gpu" or "tpu"                           
+
+
+----
+
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/randomBagClassifier.py#L135)</span>
+
+### fit
+
+
+```python
+RandomBagClassifier.fit(X, y, **kwargs)
+```
+
+
+Fit Random 'Forest' model to training data (X, y).
+
+Args:
+
+    X: {array-like}, shape = [n_samples, n_features]
+        Training vectors, where n_samples is the number 
+        of samples and n_features is the number of features.
+    
+    y: array-like, shape = [n_samples]
+        Target values.
+
+    **kwargs: additional parameters to be passed to 
+            self.cook_training_set or self.obj.fit
+        
+Returns: 
+
+    self: object
+    
 
 
 ----
