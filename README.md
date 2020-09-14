@@ -116,7 +116,7 @@ coverage html
 
 ## API Documentation
 
-- TBD
+- [https://techtonique.github.io/nnetsauce/](https://techtonique.github.io/nnetsauce/)
 
 ## Dependencies 
 
