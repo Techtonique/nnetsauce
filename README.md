@@ -8,11 +8,11 @@ nnetsauce
 Randomized and Quasi-Randomized (neural) networks.  
 
 ![PyPI](https://img.shields.io/pypi/v/nnetsauce) [![PyPI - License](https://img.shields.io/pypi/l/nnetsauce)](https://github.com/thierrymoudiki/nnetsauce/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce)
-[![Documentation Status](https://readthedocs.org/projects/nnetsauce/badge/?version=latest)](https://nnetsauce.readthedocs.io/en/latest/?badge=latest)
+[![Documentation](https://img.shields.io/badge/documentation-is_here-green)](https://techtonique.github.io/nnetsauce/)
 
 
 ## Contents 
- [Installation for Python and R](#installation-for-Python-and-R) |
+ [Installing for Python and R](#installing-for-Python-and-R) |
  [Package description](#package-description) |
  [Quick start](#quick-start) |
  [Contributing](#Contributing) |
@@ -24,7 +24,7 @@ Randomized and Quasi-Randomized (neural) networks.
  [License](#License) 
 
 
-## Installation (for Python and R)
+## Installing (for Python and R)
 
 ### Python 
 
