@@ -13,11 +13,13 @@ _nnetsauce_ does Statistical/Machine Learning (ML) using advanced combinations o
    - b is an optional bias parameter.
    - g is an activation function such as the hyperbolic tangent or the sigmoid function, that renders the combination of explanatory variables – through W – nonlinear.
 
-__nnetsauce__’s source code is [available on GitHub](https://github.com/thierrymoudiki/nnetsauce). You can read posts about nnetsauce [in this blog](https://thierrymoudiki.github.io/blog/#QuasiRandomizedNN), and for current references, feel free consult the section: [References](REFERENCES.md).
+__nnetsauce__’s source code is [available on GitHub](https://github.com/Techtonique/nnetsauce). 
+
+You can read posts about nnetsauce [in this blog](https://thierrymoudiki.github.io/blog/#QuasiRandomizedNN), and for current references, feel free consult the section: [References](REFERENCES.md).
 
 Looking for a specific function? You can also use the __search__ function available in the navigation bar.
 
-## Installation
+## Installing
 
 ### Python 
 
@@ -50,9 +52,9 @@ Examples of use:
 
 - For [classification](examples/classification.md)
 
-- For [regression](examples/regressors.md)
+- For [regression](examples/regression.md)
 
-- For [time series](examples/time_series.md)
+- For [time series](examples/time_series_examples.md)
 
 - R examples can be found in these notebooks: 
    - [thierrymoudiki_060320_RandomBagClassifier.Rmd](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/demo/thierrymoudiki_060320_RandomBagClassifier.Rmd)

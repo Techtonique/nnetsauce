@@ -96,7 +96,7 @@ def check_openmp_support():
 
                 It seems that nnetsauce cannot be built with OpenMP.
 
-                - Make sure you have followed the installation instructions:
+                - Make sure you have followed the installing instructions:
 
                     https://github.com/thierrymoudiki/nnetsauce 
 

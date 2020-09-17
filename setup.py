@@ -206,12 +206,12 @@ def check_package_status(package, min_version):
     req_str = "nnetsauce requires {} >= {}.\n".format(
         package, min_version)
 
-    instructions = ("Installation instructions are available on the "
+    instructions = ("Installing instructions are available on the "
                     "nnetsauce GitHub repo: ")
 
     if package_status['up_to_date'] is False:
         if package_status['version']:
-            raise ImportError("Your installation of {} "
+            raise ImportError("Your installing of {} "
                               "{} is out-of-date.\n{}{}"
                               .format(package, package_status['version'],
                                       req_str, instructions))

@@ -1,4 +1,4 @@
-site_name: nnetsauce
+site_name: Techtonique/nnetsauce
 theme:
   name: darkly # sandstone # slate # lux # darkly
   nav_style: dark
@@ -23,5 +23,6 @@ nav:
     - Contributing: CONTRIBUTING.md  
     - License: LICENSE.md
     - References: REFERENCES.md
+    - Techtonique: ../
       
         

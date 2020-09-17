@@ -101,3 +101,4 @@ ENV/
 # IDE settings
 .vscode/
 .Rproj.user
+site/

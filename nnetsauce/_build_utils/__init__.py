@@ -21,7 +21,7 @@ DEFAULT_ROOT = "nnetsauce"
 # The following places need to be in sync with regard to Cython version:
 # - .circleci config file
 # - nnetsauce/_build_utils/__init__.py
-# - advanced installation guide
+# - advanced installing guide
 CYTHON_MIN_VERSION = "0.29.13"
 
 
