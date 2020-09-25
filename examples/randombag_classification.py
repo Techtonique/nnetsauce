@@ -16,6 +16,9 @@ t = breast_cancer.target
 np.random.seed(123)
 X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
+print("\n")
+print(f"breast cancer dataset -----")
+print("\n")
 # decision tree
 clf = DecisionTreeClassifier(max_depth=2, random_state=123)
 fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=2,
@@ -50,13 +53,16 @@ t = wine.target
 np.random.seed(123)
 Z_train, Z_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
+print("\n")
+print(f"wine dataset -----")
+print("\n")
 clf = DecisionTreeClassifier(max_depth=2, random_state=123)
 fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=5,
                                 direct_link=True,
                                 n_estimators=100, 
                                 col_sample=0.5, row_sample=0.5,
                                 dropout=0.1, n_clusters=3, 
-                                type_clust="gmm", verbose=1)
+                                type_clust="gmm", verbose=0)
 
 start = time()
 fit_obj.fit(Z_train, y_train)
@@ -76,6 +82,9 @@ t = iris.target
 np.random.seed(123)
 Z_train, Z_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
+print("\n")
+print(f"iris dataset -----")
+print("\n")
 clf = LogisticRegression(solver='liblinear', multi_class = 'ovr', 
                          random_state=123)
 fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=5,
@@ -99,13 +108,16 @@ X, y = make_classification(n_samples=2500, n_features=20,
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, 
                                                     random_state=351452)
 
+print("\n")
+print(f"make_classification dataset -----")
+print("\n")
 clf = DecisionTreeClassifier(max_depth=1, random_state=123)
 fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=5,
                                 direct_link=True,
                                 n_estimators=100, 
                                 col_sample=0.5, row_sample=0.5,
                                 dropout=0.1, n_clusters=3, 
-                                type_clust="gmm", verbose=1)
+                                type_clust="gmm", verbose=0)
 
 start = time()
 fit_obj.fit(X_train, y_train)

@@ -127,8 +127,7 @@ cdef double calculate_tolerance(nparray_double[:] x):
 
 # 1 main fitting loop -----       
 
-def rbagloop(object base_learner, double[:,:] X, long int[:] y,
-int n_estimators, int verbose, int seed):
+def rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators, int verbose, int seed):
 
     cdef int m 
     cdef dict voter 
@@ -136,31 +135,49 @@ int n_estimators, int verbose, int seed):
     voter = dict.fromkeys(range(n_estimators))
 
     if verbose == 1:
+
         pbar = Progbar(n_estimators)
 
-    for m in range(n_estimators):
+        for m in range(n_estimators):
 
-        try:
+            try:
 
-            base_learner.fit(X, y)
+                base_learner.fit(X, y)
 
-            voter.update(
-                {m: pickle.loads(pickle.dumps(base_learner, -1))}
-            )
+                voter.update(
+                    {m: pickle.loads(pickle.dumps(base_learner, -1))}
+                )
 
-            base_learner.set_params(seed=seed + (m + 1) * 1000)
+                base_learner.set_params(seed=seed + (m + 1) * 1000)
 
-            if verbose == 1:
                 pbar.update(m)
 
-        except:
+            except:
 
-            if verbose == 1:
                 pbar.update(m)
 
-            continue
-
-    if verbose == 1:
-        pbar.update(n_estimators)
+                continue
     
-    return voter
+            pbar.update(n_estimators)
+    
+        return voter
+
+    else: # verbose != 1:
+
+        for m in range(n_estimators):
+
+            try:
+
+                base_learner.fit(X, y)
+
+                voter.update(
+                    {m: pickle.loads(pickle.dumps(base_learner, -1))}
+                )
+
+                base_learner.set_params(seed=seed + (m + 1) * 1000)
+
+            except:
+
+                continue
+        
+        return voter
