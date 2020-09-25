@@ -12,7 +12,7 @@ from sklearn.base import ClassifierMixin
 import pickle
 from joblib import Parallel, delayed
 from tqdm import tqdm
-
+from . import _randombagc as randombagc
 
 class RandomBagClassifier(RandomBag, ClassifierMixin):
     """Randomized 'Bagging' Classification model 
@@ -183,30 +183,8 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
         if self.n_jobs is None:
 
-            for idx, m in enumerate(range(self.n_estimators)):
-
-                try:
-
-                    base_learner.fit(X, y, **kwargs)
-
-                    self.voter.update(
-                        {m: pickle.loads(pickle.dumps(base_learner, -1))}
-                    )
-
-                    base_learner.set_params(seed=self.seed + (m + 1) * 1000)
-
-                    if self.verbose == 1:
-                        pbar.update(m)
-
-                except:
-
-                    if self.verbose == 1:
-                        pbar.update(m)
-
-                    continue
-
-            if self.verbose == 1:
-                pbar.update(self.n_estimators)
+            self.voter = randombagc.rbagloop(base_learner, X, y, \
+                self.n_estimators, self.verbose, self.seed)
 
             self.n_estimators = len(self.voter)
 
@@ -231,7 +209,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
                     type_scaling=self.type_scaling,
                     col_sample=self.col_sample,
                     row_sample=self.row_sample,
-                    seed=self.seed + m * 1000,
+                    seed=self.seed + (m + 1) * 1000,
                 )
                 base_learner.fit(X, y, **kwargs)
                 self.voter.update(
