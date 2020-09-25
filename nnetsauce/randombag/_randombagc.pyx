@@ -24,7 +24,6 @@ from sklearn.preprocessing import StandardScaler
 from multiprocessing import Pool
 from tqdm import tqdm
 from ..utils import Progbar
-from ..utils import subsample
 
 
 # 0 - utils -----
@@ -130,19 +129,19 @@ cdef double calculate_tolerance(nparray_double[:] x):
 def rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators, int verbose, int seed):
 
     cdef int m 
-    cdef dict voter 
+    cdef dict voter
 
-    voter = dict.fromkeys(range(n_estimators))
+    voter = {}    
 
     if verbose == 1:
 
         pbar = Progbar(n_estimators)
 
-        for m in range(n_estimators):
-
+        for m in range(n_estimators):   
+            
             try:
-
-                base_learner.fit(X, y)
+                    
+                base_learner.fit(np.asarray(X), np.asarray(y))
 
                 voter.update(
                     {m: pickle.loads(pickle.dumps(base_learner, -1))}
@@ -158,26 +157,27 @@ def rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators
 
                 continue
     
-            pbar.update(n_estimators)
+        pbar.update(n_estimators)
     
         return voter
 
-    else: # verbose != 1:
-
-        for m in range(n_estimators):
-
-            try:
-
-                base_learner.fit(X, y)
-
-                voter.update(
-                    {m: pickle.loads(pickle.dumps(base_learner, -1))}
-                )
-
-                base_learner.set_params(seed=seed + (m + 1) * 1000)
-
-            except:
-
-                continue
+    # verbose != 1:
+    for m in range(n_estimators):   
         
-        return voter
+        try:
+                
+            base_learner.fit(np.asarray(X), np.asarray(y))
+
+            voter.update(
+                {m: pickle.loads(pickle.dumps(base_learner, -1))}
+            )
+
+            base_learner.set_params(seed=seed + (m + 1) * 1000)            
+
+        except:            
+
+            continue
+
+    return voter
+
+

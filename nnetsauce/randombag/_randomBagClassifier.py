@@ -130,7 +130,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         self.type_fit = "classification"
         self.verbose = verbose
         self.n_jobs = n_jobs
-        self.voter = dict.fromkeys(range(n_estimators))
+        self.voter = {}
 
     def fit(self, X, y, **kwargs):
         """Fit Random 'Forest' model to training data (X, y).
@@ -175,23 +175,20 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             row_sample=self.row_sample,
             seed=self.seed,
         )
-
-        if self.verbose == 1:
-            pbar = Progbar(self.n_estimators)
-
+        
         # 1 - Sequential training -----
 
         if self.n_jobs is None:
 
-            self.voter = randombagc.rbagloop(base_learner, X, y, \
-                self.n_estimators, self.verbose, self.seed)
+            #rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators, int verbose, int seed):
+            self.voter = randombagc.rbagloop(base_learner, X, y, self.n_estimators, self.verbose, self.seed)
 
             self.n_estimators = len(self.voter)
 
             return self
 
         # 2 - Parallel training -----
-
+        
         # if self.n_jobs is not None:
         def fit_estimators(m):
             try:
@@ -283,10 +280,16 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
                 for idx, elt in voter.items():
 
-                    ensemble_proba += elt.predict_proba(X)
+                    try: 
 
-                    if verbose == 1:
-                        pbar.update(idx)
+                        ensemble_proba += elt.predict_proba(X)
+
+                        if verbose == 1:
+                            pbar.update(idx)
+
+                    except:
+
+                        continue
 
                 if verbose == 1:
                     pbar.update(n_iter)

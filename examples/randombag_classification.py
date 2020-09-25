@@ -17,7 +17,7 @@ np.random.seed(123)
 X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
 print("\n")
-print(f"breast cancer dataset -----")
+print(f"1 - breast cancer dataset -----")
 print("\n")
 # decision tree
 clf = DecisionTreeClassifier(max_depth=2, random_state=123)
@@ -25,19 +25,14 @@ fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=2,
                                 direct_link=True,
                                 n_estimators=100, 
                                 col_sample=0.9, row_sample=0.9,
-                                dropout=0.3, n_clusters=0, verbose=0)
+                                dropout=0.3, n_clusters=0, verbose=1)
 
 start = time()
 fit_obj.fit(X_train, y_train)
 print(time() - start)
-#0.8955960273742676
 
 print(fit_obj.score(X_test, y_test))
 print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
-
-start = time()
-[fit_obj.fit(X_train, y_train) for _ in range(10)]
-print(time() - start)
 
 start = time()
 preds = fit_obj.predict(X_test)
@@ -54,7 +49,7 @@ np.random.seed(123)
 Z_train, Z_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
 print("\n")
-print(f"wine dataset -----")
+print(f"2 - wine dataset -----")
 print("\n")
 clf = DecisionTreeClassifier(max_depth=2, random_state=123)
 fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=5,
@@ -62,11 +57,12 @@ fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=5,
                                 n_estimators=100, 
                                 col_sample=0.5, row_sample=0.5,
                                 dropout=0.1, n_clusters=3, 
-                                type_clust="gmm", verbose=0)
+                                type_clust="gmm", verbose=1)                                
 
 start = time()
 fit_obj.fit(Z_train, y_train)
 print(time() - start)
+
 # 1.8651049137115479
 print(fit_obj.score(Z_test, y_test))
 
@@ -83,7 +79,7 @@ np.random.seed(123)
 Z_train, Z_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
 print("\n")
-print(f"iris dataset -----")
+print(f"3 - iris dataset -----")
 print("\n")
 clf = LogisticRegression(solver='liblinear', multi_class = 'ovr', 
                          random_state=123)
@@ -91,12 +87,12 @@ fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=5,
                                 direct_link=False,
                                 n_estimators=100, 
                                 col_sample=0.5, row_sample=0.5,
-                                dropout=0.1, n_clusters=0, verbose=0,
-                                n_jobs=1)
+                                dropout=0.1, n_clusters=0, verbose=1)
 
 start = time()
 fit_obj.fit(Z_train, y_train)
 print(time() - start)
+
 # 0.4114112854003906
 print(fit_obj.score(Z_test, y_test))
 
@@ -109,7 +105,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
                                                     random_state=351452)
 
 print("\n")
-print(f"make_classification dataset -----")
+print(f"4 - make_classification dataset -----")
 print("\n")
 clf = DecisionTreeClassifier(max_depth=1, random_state=123)
 fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=5,
@@ -117,7 +113,7 @@ fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=5,
                                 n_estimators=100, 
                                 col_sample=0.5, row_sample=0.5,
                                 dropout=0.1, n_clusters=3, 
-                                type_clust="gmm", verbose=0)
+                                type_clust="gmm", verbose=1)
 
 start = time()
 fit_obj.fit(X_train, y_train)
