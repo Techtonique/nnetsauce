@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 # Dev branch marker is: 'X.Y.dev' or 'X.Y.devN' where N is an integer.
 # 'X.Y.dev0' is the canonical version of 'X.Y.dev'
 #
-__version__ = "0.5.2"
+__version__ = "0.7.3"
 
 
 # On OSX, we can get a runtime error due to multiple OpenMP libraries loaded
@@ -70,7 +70,7 @@ else:
     from .mts.mts import MTS
     from .multitask.multitaskClassifier import MultitaskClassifier
     from .optimizers._optimizer import Optimizer
-    from .randombag.randomBagClassifier import RandomBagClassifier
+    from .randombag._randomBagClassifier import RandomBagClassifier
     from .ridge2.ridge2Classifier import Ridge2Classifier
     from .ridge2.ridge2Regressor import Ridge2Regressor
     from .ridge2.ridge2MultitaskClassifier import Ridge2MultitaskClassifier
