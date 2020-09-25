@@ -183,7 +183,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
         if self.n_jobs is None:
 
-            for idx, m in enumerate(range(self.n_estimators)):
+            for m in range(self.n_estimators):
 
                 try:
 
