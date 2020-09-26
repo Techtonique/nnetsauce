@@ -156,7 +156,6 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         assert mx.is_factor(y), "y must contain only integers"
 
         # training
-        n, p = X.shape
         self.n_classes = len(np.unique(y))
 
         base_learner = CustomClassifier(
@@ -188,32 +187,19 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             return self
 
         # 2 - Parallel training -----
-        
+        # buggy
         # if self.n_jobs is not None:
         def fit_estimators(m):
-            try:
-                base_learner = CustomClassifier(
-                    self.obj,
-                    n_hidden_features=self.n_hidden_features,
-                    activation_name=self.activation_name,
-                    a=self.a,
-                    nodes_sim=self.nodes_sim,
-                    bias=self.bias,
-                    dropout=self.dropout,
-                    direct_link=self.direct_link,
-                    n_clusters=self.n_clusters,
-                    type_clust=self.type_clust,
-                    type_scaling=self.type_scaling,
-                    col_sample=self.col_sample,
-                    row_sample=self.row_sample,
-                    seed=self.seed + (m + 1) * 1000,
-                )
-                base_learner.fit(X, y, **kwargs)
-                self.voter.update(
-                    {m: pickle.loads(pickle.dumps(base_learner, -1))}
-                )
-            except:
-                pass
+            #try:            
+            base_learner.fit(X, y, **kwargs)
+            self.voter.update(
+                {m: pickle.loads(pickle.dumps(base_learner, -1))}
+            )
+            base_learner.set_params(
+                seed=self.seed + (m + 1) * 1000,
+            )
+            #except:
+            #    pass
 
         if self.verbose == 1:
 

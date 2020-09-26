@@ -146,13 +146,13 @@ class CustomClassifier(Custom, ClassifierMixin):
                 scaled_Z,
                 output_y,
                 sample_weight=np.ravel(sample_weight, order='C')[self.index_row],
-                **kwargs
+                #**kwargs
             )
 
             return self
 
         # if sample_weight is None:
-        self.obj.fit(scaled_Z, output_y, **kwargs)
+        self.obj.fit(scaled_Z, output_y)
 
         return self
 

@@ -1,3 +1,12 @@
+# version 0.7.0
+
+- RandomBag classifier cythonized
+
+# version 0.6.0
+
+- Documentation with MkDocs
+- Cython-ready
+
 # version 0.5.0
 
 - contains a refactorized code for the [`Base`](https://github.com/thierrymoudiki/nnetsauce/nnetsauce/base/base.py) class, 

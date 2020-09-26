@@ -19,6 +19,7 @@ X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 print("\n")
 print(f"1 - breast cancer dataset -----")
 print("\n")
+
 # decision tree
 clf = DecisionTreeClassifier(max_depth=2, random_state=123)
 fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=2,
