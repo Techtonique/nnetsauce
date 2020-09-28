@@ -67,6 +67,7 @@ else:
     from .custom.customRegressor import CustomRegressor
     from .glm.glmClassifier import GLMClassifier
     from .glm.glmRegressor import GLMRegressor
+    from .hyperbolictan import HypTan
     from .mts.mts import MTS
     from .multitask.multitaskClassifier import MultitaskClassifier
     from .optimizers._optimizer import Optimizer
@@ -89,15 +90,16 @@ else:
         "CustomRegressor",
         "GLMRegressor", 
         "GLMClassifier",
+        "MTS",
         "MultitaskClassifier",
         "Optimizer",
         "RandomBagClassifier",
         "Ridge2Regressor",
         "Ridge2Classifier",
         "Ridge2MultitaskClassifier",
+        "HypTan"
         #    "RNNRegressor",
-        #    "RNNClassifier",
-        "MTS",
+        #    "RNNClassifier",        
     ]
 
 def setup_module(module):
