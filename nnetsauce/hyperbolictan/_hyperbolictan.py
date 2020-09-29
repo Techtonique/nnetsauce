@@ -1,5 +1,6 @@
 from . import _hyperbolictanc as hyperbolictanc
 
+
 class HypTan():    
 
     def __init__(self, x):

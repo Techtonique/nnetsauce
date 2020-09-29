@@ -79,6 +79,7 @@ else:
     # from .rnn.rnnClassifier import RNNClassifier
     from .rvfl.bayesianrvflRegressor import BayesianRVFLRegressor
     from .rvfl.bayesianrvfl2Regressor import BayesianRVFL2Regressor
+    from .simulator import Simulator
 
     __all__ = [
         "AdaBoostClassifier",
@@ -90,14 +91,15 @@ else:
         "CustomRegressor",
         "GLMRegressor", 
         "GLMClassifier",
+        "HypTan",
         "MTS",
         "MultitaskClassifier",
         "Optimizer",
         "RandomBagClassifier",
         "Ridge2Regressor",
         "Ridge2Classifier",
-        "Ridge2MultitaskClassifier",
-        "HypTan"
+        "Ridge2MultitaskClassifier",    
+        "Simulator",
         #    "RNNRegressor",
         #    "RNNClassifier",        
     ]
