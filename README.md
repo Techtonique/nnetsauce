@@ -38,7 +38,7 @@ pip install nnetsauce
 - __2nd method__: from Github, for the development version
 
 ```bash
-pip install git+https://github.com/thierrymoudiki/nnetsauce.git
+pip install git+https://github.com/Techtonique/nnetsauce.git
 ```
 
 ### R 
