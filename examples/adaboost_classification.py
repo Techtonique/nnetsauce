@@ -16,28 +16,28 @@ t = breast_cancer.target
 np.random.seed(123)
 X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
-# # SAMME
-# clf = LogisticRegression(solver='liblinear', multi_class = 'ovr', 
-#                          random_state=123)
-# fit_obj = ns.AdaBoostClassifier(clf, 
-#                                 n_hidden_features=np.int(56.13806152), 
-#                                 direct_link=True,
-#                                 n_estimators=1000, learning_rate=0.09393372,
-#                                 col_sample=0.52887573, row_sample=0.87781372,
-#                                 dropout=0.10216064, n_clusters=2,
-#                                 type_clust="gmm",
-#                                 verbose=1, seed = 123, 
-#                                 method="SAMME") 
+# SAMME
+clf = LogisticRegression(solver='liblinear', multi_class = 'ovr', 
+                         random_state=123)
+fit_obj = ns.AdaBoostClassifier(clf, 
+                                n_hidden_features=np.int(56.13806152), 
+                                direct_link=True,
+                                n_estimators=1000, learning_rate=0.09393372,
+                                col_sample=0.52887573, row_sample=0.87781372,
+                                dropout=0.10216064, n_clusters=2,
+                                type_clust="gmm",
+                                verbose=1, seed = 123, 
+                                method="SAMME") 
 
-# start = time() 
-# fit_obj.fit(X_train, y_train) 
-# print(time() - start)
+start = time() 
+fit_obj.fit(X_train, y_train) 
+print(time() - start)
 
-# print(fit_obj.score(X_test, y_test))
-# preds = fit_obj.predict(X_test)                        
+print(fit_obj.score(X_test, y_test))
+preds = fit_obj.predict(X_test)                        
 
-# print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
-# print(metrics.classification_report(preds, y_test))
+print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
+print(metrics.classification_report(preds, y_test))
 
 # SAMME.R
 # clf = LogisticRegression(solver='liblinear', multi_class = 'ovr', 
