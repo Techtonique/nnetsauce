@@ -367,8 +367,8 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
             ensemble_learner = np.zeros((X.shape[0], self.n_classes))
 
-            if self.verbose == 1:
-                pbar = Progbar(n_iter)
+            #if self.verbose == 1:
+            #    pbar = Progbar(n_iter)
 
             for (idx, base_learner) in self.base_learners.items():
 
@@ -378,11 +378,11 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                     preds, self.n_classes
                 )
 
-                if self.verbose == 1:
-                    pbar.update(idx)
+                #if self.verbose == 1:
+                #    pbar.update(idx)
 
-            if self.verbose == 1:
-                pbar.update(n_iter)
+            #if self.verbose == 1:
+            #    pbar.update(n_iter)
 
             expit_ensemble_learner = expit(ensemble_learner)
 
@@ -393,8 +393,8 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         # if self.method == "SAMME.R":
         ensemble_learner = 0
 
-        if self.verbose == 1:
-            pbar = Progbar(n_iter)
+        #if self.verbose == 1:
+        #    pbar = Progbar(n_iter)
 
         for idx, base_learner in self.base_learners.items():
 
@@ -408,13 +408,13 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                 log_preds_proba - log_preds_proba.mean(axis=1)[:, None]
             )
 
-            if self.verbose == 1:
-                pbar.update(idx)
+            #if self.verbose == 1:
+            #    pbar.update(idx)
 
         ensemble_learner *= self.n_classes - 1
 
-        if self.verbose == 1:
-            pbar.update(n_iter)
+        #if self.verbose == 1:
+        #    pbar.update(n_iter)
 
         expit_ensemble_learner = expit(ensemble_learner)
 

@@ -161,7 +161,22 @@ def safe_sparse_dot(a, b, backend="cpu", dense_output=False):
         else:
             ret = np.dot(a, b)
     else:
-        ret = a @ b
+        try:
+            # print("a.shape")
+            # print(a.shape)
+            # print("\n")
+            # print("b.shape")
+            # print(b.shape)
+            # print("\n")
+            ret = a @ b
+        except: 
+            # print("a.shape")
+            # print(a.shape)
+            # print("\n")
+            # print("b.shape")
+            # print(b.shape)
+            # print("\n")
+            ret = np.dot(a, b)   
 
     if (
         sparse.issparse(a)

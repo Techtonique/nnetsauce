@@ -22,12 +22,12 @@ fit_obj = ns.MultitaskClassifier(regr, n_hidden_features=5,
 
 start = time()
 fit_obj.fit(X_train, y_train)
-print(time() - start)
+print(f"Elapsed {time() - start}") 
 
 print(fit_obj.score(X_test, y_test))
 print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
 
 start = time()
 preds = fit_obj.predict(X_test)
-print(time() - start)
+print(f"Elapsed {time() - start}") 
 print(metrics.classification_report(preds, y_test))
