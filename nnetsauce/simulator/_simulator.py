@@ -1,18 +1,22 @@
 
 from . import _simulatorc as simulatorc
-
+from ..utils import memoize
 
 class Simulator():    
 
-    def __init__(self, n_points, n_dims, skip=1):
+    def __init__(self, n_points, n_dims, type_sim="sobol"):
+
         self.n = n_points            
         self.m = n_dims                
-        self.skip = skip 
+        self.type_sim = type_sim 
 
-    def draw(self, type_sim="sobol"):
+    @memoize
+    def draw(self):
         h_sim = {
-            "sobol": simulatorc.py_i4_sobol_generate
-        }
-        return h_sim[type_sim](self.m, self.n, self.skip)
-
+            "sobol": simulatorc.py_i4_sobol_generate,
+            "halton": simulatorc.py_halton_sequence,
+            "hammersley": simulatorc.py_hammersley_sequence
+        }    
+        return h_sim[self.type_sim](m=self.m, n=self.n)    
+        
 

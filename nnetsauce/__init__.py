@@ -66,8 +66,7 @@ else:
     from .custom.customClassifier import CustomClassifier
     from .custom.customRegressor import CustomRegressor
     from .glm.glmClassifier import GLMClassifier
-    from .glm.glmRegressor import GLMRegressor
-    from .hyperbolictan import HypTan
+    from .glm.glmRegressor import GLMRegressor    
     from .mts.mts import MTS
     from .multitask.multitaskClassifier import MultitaskClassifier
     from .optimizers._optimizer import Optimizer
@@ -91,7 +90,6 @@ else:
         "CustomRegressor",
         "GLMRegressor", 
         "GLMClassifier",
-        "HypTan",
         "MTS",
         "MultitaskClassifier",
         "Optimizer",

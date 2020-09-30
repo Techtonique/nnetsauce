@@ -27,7 +27,6 @@ def configuration(parent_package="", top_path=None):
     config.add_subpackage("base")
     config.add_subpackage("boosting")
     config.add_subpackage("custom")
-    config.add_subpackage("hyperbolictan")
     config.add_subpackage("glm")    
     config.add_subpackage("mts")
     config.add_subpackage("multitask")

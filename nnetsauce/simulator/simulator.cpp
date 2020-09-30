@@ -13947,20 +13947,6 @@ float *i4_sobol_generate ( int m, int n, int skip )
 }
 
 
-void i4_sobol_generate_in_C(float r[], int m, int n, int skip)
-{
-  int j;
-  int seed;
-  
-  seed = skip;
-
-  for (j = 0; j < n; j++ )
-  {
-    i4_sobol ( m, &seed, r+m*j );
-  }
-}
-
-
 //****************************************************************************80
 
 int i4_uniform ( int a, int b, int *seed )
@@ -28900,7 +28886,7 @@ int halton_inverse ( double r[], int m )
 }
 //****************************************************************************80
 
-double *halton_sequence ( int i1, int i2, int m )
+double *halton_sequence (int i1, int i2, int m)
 
 //****************************************************************************80
 //
@@ -29007,6 +28993,8 @@ double *halton_sequence ( int i1, int i2, int m )
 
   return r;
 }
+
+
 //****************************************************************************80
 
 int i4vec_sum ( int n, int a[] )
@@ -29894,5 +29882,161 @@ void r8mat_print_some ( int m, int n, double a[], int ilo, int jlo, int ihi,
 # undef INCX
 }
 //****************************************************************************80
+
+
+/***** main *****/
+
+void i4_sobol_generate_in_cpp(float r[], int m, int n, int skip)
+{
+  int j;
+  int seed;
+  
+  seed = skip;
+
+  for (j = 0; j < n; j++ )
+  {
+    i4_sobol ( m, &seed, r+m*j );
+  }
+}
+
+
+void halton_sequence_in_cpp(double r[], int i1, int i2, int m)
+{
+  int d;
+  int i;
+  int i3;
+  int j;
+  int k;
+  int n;
+  double *prime_inv;
+  int *t;
+
+  prime_inv = new double[m];
+  //r = new double[m*(abs(i1-i2)+1)];
+  t = new int[m];
+
+  if ( i1 <= i2 )
+  {
+    i3 = +1;
+  }
+  else
+  {
+    i3 = -1;
+  }
+
+  n = abs ( i2 - i1 ) + 1;
+
+  for ( j = 0; j < n; j++ )
+  {
+    for ( i = 0; i < m; i++ )
+    {
+      r[i+j*m] = 0.0;
+    }
+  }
+
+  i = i1;
+
+  for ( k = 0; k < n; k++ )
+  {
+    for ( j = 0; j < m; j++ )
+    {
+      t[j] = i;
+    }
+//
+//  Carry out the computation.
+//
+    for ( j = 0; j < m; j++ )
+    {
+      prime_inv[j] = 1.0 / ( double ) ( prime ( j + 1 ) );
+    }
+
+    while ( 0 < i4vec_sum ( m, t ) )
+    {
+      for ( j = 0; j < m; j++ )
+      {
+        d = ( t[j] % prime ( j + 1 ) );
+        r[j+k*m] = r[j+k*m] + ( double ) ( d ) * prime_inv[j];
+        prime_inv[j] = prime_inv[j] / ( double ) ( prime ( j + 1 ) );
+        t[j] = ( t[j] / prime ( j + 1 ) );
+      }
+    }
+    i = i + i3;
+  }
+
+  delete [] prime_inv;
+  delete [] t;
+}
+
+
+void hammersley_sequence_in_cpp(double r[], int i1, int i2, int m, int n)
+{
+  int d;
+  int i;
+  int i3;
+  int j;
+  int k;
+  int l;
+  double *prime_inv;
+  int *t;
+
+  if ( i1 <= i2 )
+  {
+    i3 = +1;
+  }
+  else
+  {
+    i3 = -1;
+  }
+
+  prime_inv = new double[m];
+  prime_inv[0] = 1.0;
+
+  l = abs ( i2 - i1 ) + 1;
+
+  for ( k = 0; k < l; k++ )
+  {
+    for ( j = 0; j < m; j++ )
+    {
+      r[j+k*m] = 0.0;
+    }
+  }
+
+  i = i1;
+
+  t = new int[m];
+  for ( k = 0; k < l; k++ )
+  {
+    t[0] = 0;
+    for ( j = 1; j < m; j++ )
+    {
+      t[j] = i;
+    }
+//
+//  Carry out the computation.
+//
+    for ( j = 1; j < m; j++ )
+    {
+      prime_inv[j] = 1.0 / ( double ) ( prime ( j ) );
+    }
+
+    r[0+k*m] = ( double ) ( i % ( n + 1 ) ) / ( double ) ( n );
+
+    while ( 0 < i4vec_sum ( m, t ) )
+    {
+      for ( j = 1; j < m; j++ )
+      {
+        d = ( t[j] % prime ( j ) );
+        r[j+k*m] = r[j+k*m] + ( double ) ( d ) * prime_inv[j];
+        prime_inv[j] = prime_inv[j] / ( double ) ( prime ( j ) );
+        t[j] = ( t[j] / prime ( j ) );
+      }
+    }
+    i = i + i3;
+  }
+
+  delete [] prime_inv;
+  delete [] t;
+
+}
 
 
