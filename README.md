@@ -95,7 +95,7 @@ pip install coverage
 - Run tests and print coverage:
 
 ```bash
-git clone https://github.com/thierrymoudiki/nnetsauce.git
+git clone https://github.com/Techtonique/nnetsauce.git
 cd nnetsauce
 nose2 --with-coverage
 ```
