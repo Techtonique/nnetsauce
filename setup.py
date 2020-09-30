@@ -59,6 +59,7 @@ else:
     SCIPY_MIN_VERSION = '0.19.0'
     NUMPY_MIN_VERSION = '1.13.0'
 
+CYTHON_MIN_VERSION = '0.29.21'
 JOBLIB_MIN_VERSION = '0.14.0'
 SKLEARN_MIN_VERSION = '0.18.0'
 THREADPOOLCTL_MIN_VERSION = '2.0.0'
@@ -235,6 +236,7 @@ def check_package_status(package, min_version):
 def setup_package():
 
     install_all_requires = [
+                        'cython>={}'.format(CYTHON_MIN_VERSION),
                         'numpy>={}'.format(NUMPY_MIN_VERSION),
                         'scipy>={}'.format(SCIPY_MIN_VERSION),
                         'joblib>={}'.format(JOBLIB_MIN_VERSION),
