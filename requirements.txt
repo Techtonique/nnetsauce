@@ -59,7 +59,6 @@ regex==2020.7.14
 requests==2.24.0
 requests-toolbelt==0.9.1
 rfc3986==1.4.0
-rpy2==3.3.5
 scikit-learn==0.23.1
 scipy==1.5.1
 six==1.15.0
@@ -76,7 +75,7 @@ sphinxcontrib-serializinghtml==1.1.4
 threadpoolctl==2.1.0
 toml==0.10.1
 tornado==6.0.4
-tqdm==4.47.0
+tqdm==4.48.1
 twine==3.2.0
 typed-ast==1.4.1
 tzlocal==2.1
@@ -84,4 +83,3 @@ urllib3==1.25.9
 wcwidth==0.2.5
 webencodings==0.5.1
 zipp==3.1.0
-.

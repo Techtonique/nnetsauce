@@ -46,10 +46,7 @@ def rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators
             try:
                     
                 base_learner.fit(np.asarray(X), np.asarray(y))
-
-                #voter.update(
-                #    {m: pickle.loads(pickle.dumps(base_learner, -1))}
-                #)
+                
                 voter[m] = pickle.loads(pickle.dumps(base_learner, -1))                
 
                 base_learner.set_params(seed=seed + (m + 1) * 1000)
@@ -73,9 +70,6 @@ def rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators
                 
             base_learner.fit(np.asarray(X), np.asarray(y))
 
-            # voter.update(
-            #    {m: pickle.loads(pickle.dumps(base_learner, -1))}
-            # )
             voter[m] = pickle.loads(pickle.dumps(base_learner, -1))                
 
             base_learner.set_params(seed=seed + (m + 1) * 1000)            

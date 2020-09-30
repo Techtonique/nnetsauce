@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 # Dev branch marker is: 'X.Y.dev' or 'X.Y.devN' where N is an integer.
 # 'X.Y.dev0' is the canonical version of 'X.Y.dev'
 #
-__version__ = "0.7.3"
+__version__ = "__version__ = '0.8.0'"
 
 
 # On OSX, we can get a runtime error due to multiple OpenMP libraries loaded
@@ -66,7 +66,7 @@ else:
     from .custom.customClassifier import CustomClassifier
     from .custom.customRegressor import CustomRegressor
     from .glm.glmClassifier import GLMClassifier
-    from .glm.glmRegressor import GLMRegressor
+    from .glm.glmRegressor import GLMRegressor    
     from .mts.mts import MTS
     from .multitask.multitaskClassifier import MultitaskClassifier
     from .optimizers._optimizer import Optimizer
@@ -78,6 +78,7 @@ else:
     # from .rnn.rnnClassifier import RNNClassifier
     from .rvfl.bayesianrvflRegressor import BayesianRVFLRegressor
     from .rvfl.bayesianrvfl2Regressor import BayesianRVFL2Regressor
+    from .simulator import Simulator
 
     __all__ = [
         "AdaBoostClassifier",
@@ -89,15 +90,16 @@ else:
         "CustomRegressor",
         "GLMRegressor", 
         "GLMClassifier",
+        "MTS",
         "MultitaskClassifier",
         "Optimizer",
         "RandomBagClassifier",
         "Ridge2Regressor",
         "Ridge2Classifier",
-        "Ridge2MultitaskClassifier",
+        "Ridge2MultitaskClassifier",    
+        "Simulator",
         #    "RNNRegressor",
-        #    "RNNClassifier",
-        "MTS",
+        #    "RNNClassifier",        
     ]
 
 def setup_module(module):

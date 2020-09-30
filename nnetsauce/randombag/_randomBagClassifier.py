@@ -270,15 +270,15 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
                         ensemble_proba += elt.predict_proba(X)
 
-                        if verbose == 1:
-                            pbar.update(idx)
+                        #if verbose == 1:
+                        #    pbar.update(idx)
 
                     except:
 
                         continue
 
-                if verbose == 1:
-                    pbar.update(n_iter)
+                #if verbose == 1:
+                #    pbar.update(n_iter)
 
                 return ensemble_proba / n_iter
 
@@ -287,11 +287,11 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
                 ensemble_proba += weights[idx] * elt.predict_proba(X)
 
-                if verbose == 1:
-                    pbar.update(idx)
+                #if verbose == 1:
+                #    pbar.update(idx)
 
-            if verbose == 1:
-                pbar.update(n_iter)
+            #if verbose == 1:
+            #    pbar.update(n_iter)
 
             return ensemble_proba
 
@@ -299,8 +299,8 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
         if self.n_jobs is None:
 
-            if self.verbose == 1:
-                pbar = Progbar(self.n_estimators)
+            #if self.verbose == 1:
+            #    pbar = Progbar(self.n_estimators)
 
             if weights is None:
 

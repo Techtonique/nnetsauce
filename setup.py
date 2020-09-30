@@ -3,6 +3,8 @@
 # Copyright (C) 2020 T. Moudiki <thierry.moudiki@gmail.com>
 # License: 3-clause BSD
 
+# bumpversion --current-version 0.7.3 minor setup.py nnetsauce/__init__.py 
+
 import sys
 import os
 import platform
@@ -37,7 +39,7 @@ LICENSE = 'BSD3 Clause Clear'
 # does not need the compiled code
 import nnetsauce
 
-__version__ = '0.7.3'
+__version__ = "version='0.8.0'"
 
 VERSION = __version__
 

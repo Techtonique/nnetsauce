@@ -22,7 +22,7 @@ fit_obj = ns.Ridge2MultitaskClassifier(n_hidden_features=np.int(9.83730469e+01),
 
 start = time()
 fit_obj.fit(X_train, y_train)
-print(time() - start)
+print(f"Elapsed {time() - start}") 
 
 print(fit_obj.score(X_test, y_test))
 print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
@@ -30,7 +30,7 @@ print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
 
 start = time()
 preds = fit_obj.predict(X_test)
-print(time() - start)
+print(f"Elapsed {time() - start}") 
 print(metrics.classification_report(preds, y_test))
 
 
@@ -48,7 +48,7 @@ fit_obj = ns.Ridge2MultitaskClassifier(n_hidden_features=15,
 
 start = time()
 fit_obj.fit(Z_train, y_train)
-print(time() - start)
+print(f"Elapsed {time() - start}") 
 
 print(fit_obj.score(Z_test, y_test))
 
@@ -70,7 +70,7 @@ fit_obj = ns.Ridge2MultitaskClassifier(n_hidden_features=10,
 
 start = time()
 fit_obj.fit(Z_train, y_train)
-print(time() - start)
+print(f"Elapsed {time() - start}") 
 
 print(fit_obj.score(Z_test, y_test))
 
@@ -89,7 +89,7 @@ fit_obj = ns.Ridge2MultitaskClassifier(n_hidden_features=5,
 
 start = time()
 fit_obj.fit(X_train, y_train)
-print(time() - start)
+print(f"Elapsed {time() - start}") 
 
 print(fit_obj.score(X_test, y_test))
 
@@ -111,10 +111,10 @@ fit_obj = ns.Ridge2MultitaskClassifier(n_hidden_features=25,
 
 start = time()
 fit_obj.fit(X_train, y_train)
-print(time() - start)
+print(f"Elapsed {time() - start}") 
 print(fit_obj.score(X_test, y_test))
 
 start = time()
 preds = fit_obj.predict(X_test)
-print(time() - start)
+print(f"Elapsed {time() - start}") 
 print(metrics.classification_report(preds, y_test))

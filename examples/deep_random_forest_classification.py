@@ -3,6 +3,8 @@ import nnetsauce as ns
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_digits
+from time import time
+
 
 
 digits = load_digits()
@@ -14,6 +16,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
 
 # layer 1 (base layer) ----
 layer1_regr = RandomForestClassifier(n_estimators=10, random_state=123)
+
+start = time() 
+
 layer1_regr.fit(X_train, y_train)
 
 # Accuracy in layer 1
@@ -40,3 +45,5 @@ layer3_regr.fit(X_train, y_train)
 
 # Accuracy in layer 3
 print(layer3_regr.score(X_test, y_test))
+
+print(f"Elapsed {time() - start}")  

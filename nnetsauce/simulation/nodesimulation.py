@@ -1,26 +1,12 @@
 import numpy as np
 import ctypes
 import os
-import rpy2.robjects as robjects
 
 from six import moves
 from .sobol_lib2 import *  # longer sobol sequence !
 from .sobol import *
 from .halton import *
 from ..utils import memoize
-from rpy2.robjects import numpy2ri
-from rpy2.robjects.packages import importr
-
-
-try:
-    randtoolbox = importr("randtoolbox")
-except:
-    try:
-        rutils = importr('utils')
-        rutils.install_packages("randtoolbox")
-        randtoolbox = importr("randtoolbox")
-    except:            
-        pass
 
 
 # From: https://github.com/PhaethonPrime/hammersley/blob/master/hammersley/sequences.py
@@ -224,20 +210,3 @@ def generate_halton_cpp(n_dims=2, n_points=10):
         return np.transpose(np.array(list(xx)).reshape(n_points, n_dims))
     except:
         raise ValueError("_halton.so is not imported.")
-
-
-# randtoolbox exports -----
-
-# sobol numbers' generation (cpp)
-try:
-    @memoize
-    def generate_sobol_randtoolbox(n_dims=2, n_points=10):
-        return np.asarray(randtoolbox.sobol(n=n_points, dim=n_dims)).T
-
-
-    # halton numbers' generation (cpp)
-    @memoize
-    def generate_halton_randtoolbox(n_dims=2, n_points=10):
-        return np.asarray(randtoolbox.halton(n=n_points, dim=n_dims)).T
-except:
-    pass

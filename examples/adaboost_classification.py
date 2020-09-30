@@ -32,7 +32,7 @@ fit_obj = ns.AdaBoostClassifier(clf,
 start = time() 
 fit_obj.fit(X_train, y_train) 
 print(time() - start)
-# 29.34
+
 print(fit_obj.score(X_test, y_test))
 preds = fit_obj.predict(X_test)                        
 
@@ -53,9 +53,12 @@ fit_obj = ns.AdaBoostClassifier(clf,
                                 method="SAMME.R")  
 start = time() 
 fit_obj.fit(X_train, y_train) 
-print(time() - start) 
-# 6.906151294708252
+print(f"Elapsed {time() - start}") 
+
+start = time() 
 print(fit_obj.score(X_test, y_test))
+print(f"Elapsed {time() - start}") 
+
 preds = fit_obj.predict(X_test)                        
 
 print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
@@ -85,9 +88,10 @@ fit_obj = ns.AdaBoostClassifier(clf,
                                 method="SAMME")  
 start = time() 
 fit_obj.fit(Z_train, y_train) 
-print(time() - start)  
-# 22.685115098953247
+print(f"Elapsed {time() - start}") 
+start = time() 
 print(fit_obj.score(Z_test, y_test))
+print(f"Elapsed {time() - start}")  
 preds = fit_obj.predict(Z_test)     
 print(metrics.classification_report(preds, y_test))     
 
@@ -114,9 +118,10 @@ fit_obj = ns.AdaBoostClassifier(clf,
                                 method="SAMME.R")  
 start = time() 
 fit_obj.fit(Z_train, y_train)
-print(time() - start)    
-# 1.413327932357788
+print(f"Elapsed {time() - start}")   
+start = time() 
 print(fit_obj.score(Z_test, y_test))
+print(f"Elapsed {time() - start}")    
 preds = fit_obj.predict(Z_test)     
 print(metrics.classification_report(preds, y_test))     
                     

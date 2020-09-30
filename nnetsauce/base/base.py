@@ -16,6 +16,7 @@ from ..utils import matrixops as mo
 from ..utils import misc as mx
 from ..simulation import nodesimulation as ns
 from ..sampling import SubSampler
+from ..simulator import Simulator
 if platform.system() in ('Linux', 'Darwin'):
     import jax.nn as jnn
     import jax.numpy as jnp
@@ -283,24 +284,13 @@ class Base(BaseEstimator):
 
             if W is None:
 
-                try:
-                    h_sim = {
-                        "sobol": ns.generate_sobol_randtoolbox(
-                            n_dims=n_features, n_points=self.n_hidden_features
-                        ),
-                        "hammersley": ns.generate_hammersley(
-                            n_dims=n_features, n_points=self.n_hidden_features
-                        ),
-                        "uniform": ns.generate_uniform(
-                            n_dims=n_features,
-                            n_points=self.n_hidden_features,
-                            seed=self.seed,
-                        ),
-                        "halton": ns.generate_halton_randtoolbox(
-                            n_dims=n_features, n_points=self.n_hidden_features
-                        ),
-                    }
+                try: # use Simulator here
+                
+                    self.W = Simulator(n_points=self.n_hidden_features, n_dims=n_features, 
+                    type_sim=self.nodes_sim, seed=self.seed).draw()
+
                 except:
+
                     h_sim = {
                         "sobol": ns.generate_sobol2(
                             n_dims=n_features, n_points=self.n_hidden_features
@@ -318,7 +308,7 @@ class Base(BaseEstimator):
                         ),
                     }
 
-                self.W = h_sim[self.nodes_sim]
+                    self.W = h_sim[self.nodes_sim]
 
                 assert (
                     scaled_X.shape[1] == self.W.shape[0]
@@ -354,23 +344,12 @@ class Base(BaseEstimator):
             n_features_1 = n_features + 1
 
             try:
-                h_sim = {
-                    "sobol": ns.generate_sobol_randtoolbox(
-                        n_dims=n_features_1, n_points=self.n_hidden_features
-                    ),
-                    "hammersley": ns.generate_hammersley(
-                        n_dims=n_features_1, n_points=self.n_hidden_features
-                    ),
-                    "uniform": ns.generate_uniform(
-                        n_dims=n_features_1,
-                        n_points=self.n_hidden_features,
-                        seed=self.seed,
-                    ),
-                    "halton": ns.generate_halton_randtoolbox(
-                        n_dims=n_features_1, n_points=self.n_hidden_features
-                    ),
-                }
+
+                self.W = Simulator(n_points=self.n_hidden_features, n_dims=n_features_1, 
+                    type_sim=self.nodes_sim, seed=self.seed).draw()                
+
             except:
+                
                 h_sim = {
                     "sobol": ns.generate_sobol2(
                         n_dims=n_features_1, n_points=self.n_hidden_features
@@ -388,7 +367,7 @@ class Base(BaseEstimator):
                     ),
                 }
 
-            self.W = h_sim[self.nodes_sim]
+                self.W = h_sim[self.nodes_sim]
 
             return mo.dropout(
                 x=self.activation_func(
