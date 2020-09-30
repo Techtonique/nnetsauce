@@ -38,14 +38,14 @@ install_packages <- function(pip=TRUE) {
     reticulate::py_install("tqdm", pip = pip)
     reticulate::py_install("sklearn", pip = pip)
 
-   #  foo <- try(reticulate::py_install("nnetsauce", pip = pip,
-   #                                   pip_ignore_installed = TRUE),
-   #            silent=TRUE)
-   # if (class(foo) == "try-error")
-   # {
-     reticulate::py_install("git+https://github.com/Techtonique/nnetsauce.git@cpp-extension",
+   foo <- try(reticulate::py_install("nnetsauce", pip = pip,
+                                      pip_ignore_installed = TRUE),
+               silent=TRUE)
+    if (class(foo) == "try-error")
+    {
+     reticulate::py_install("git+https://github.com/Techtonique/nnetsauce.git",
                             pip = pip, pip_ignore_installed = TRUE)
-   #}
+   }
 
 }
 
