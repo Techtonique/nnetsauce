@@ -23,5 +23,5 @@ def py_i4_sobol_generate(int m, int n, int skip):
 
     i4_sobol_generate_in_C(&arr_memview[0], m, n, skip)
 
-    return arr.reshape(n, m).T
+    return np.transpose(np.reshape(arr, (n, m)))
 

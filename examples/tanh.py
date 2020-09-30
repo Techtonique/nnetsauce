@@ -32,8 +32,8 @@ print("tanh(-0.5)")
 print(fit_obj5.calculate())
 print("\n")
 
-n_dims = 6
-n_points = 8
+n_dims = 4
+n_points = 9
 
 start = time()
 print(ns.Simulator(n_points=n_points, n_dims=n_dims, skip=1).draw())
@@ -46,16 +46,21 @@ print(ns.simulation.generate_sobol_randtoolbox(n_dims=n_dims, n_points=n_points)
 print(f"timing generate_sobol_randtoolbox {time() - start}")
 
 
-n_dims = 100
-n_points = 100
+print("\n")
+n_dims = 1000
+n_points = 10000
 n_repeats = 100
 
 
 start = time()
-[ns.Simulator(n_points=n_points, n_dims=n_dims, skip=1).draw() for _ in tqdm(range(n_repeats))]
-print(time() - start)
+#[ns.Simulator(n_points=n_points, n_dims=n_dims, skip=1).draw() for _ in tqdm(range(n_repeats))]
+ns.Simulator(n_points=n_points, n_dims=n_dims, skip=1).draw()
+#print(time() - start)
+print(f"timing ns.Simulator (large matrix) {time() - start}")
 
 
 start = time()
-[ns.simulation.generate_sobol_randtoolbox(n_dims=n_dims, n_points=n_points) for _ in tqdm(range(n_repeats))]
-print(time() - start)
+#[ns.simulation.generate_sobol_randtoolbox(n_dims=n_dims, n_points=n_points) for _ in tqdm(range(n_repeats))]
+ns.simulation.generate_sobol_randtoolbox(n_dims=n_dims, n_points=n_points)
+#print(time() - start)
+print(f"timing generate_sobol_randtoolbox (large matrix) {time() - start}")

@@ -283,7 +283,7 @@ class Base(BaseEstimator):
 
             if W is None:
 
-                try:
+                try: # use Simulator here
                     h_sim = {
                         "sobol": ns.generate_sobol_randtoolbox(
                             n_dims=n_features, n_points=self.n_hidden_features

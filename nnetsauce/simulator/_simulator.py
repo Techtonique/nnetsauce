@@ -9,7 +9,10 @@ class Simulator():
         self.m = n_dims                
         self.skip = skip 
 
-    def draw(self):
-        return simulatorc.py_i4_sobol_generate(self.m, self.n, self.skip)
+    def draw(self, type_sim="sobol"):
+        h_sim = {
+            "sobol": simulatorc.py_i4_sobol_generate
+        }
+        return h_sim[type_sim](self.m, self.n, self.skip)
 
 
