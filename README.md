@@ -56,7 +56,7 @@ make install
 
 ```r
 library(devtools)
-devtools::install_github("thierrymoudiki/nnetsauce/R-package")
+devtools::install_github("Techtonique/nnetsauce/R-package")
 library(nnetsauce)
 ```
 

@@ -622,7 +622,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/randomBagClassifier.py#L17)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/_randomBagClassifier.py#L17)</span>
 
 ### RandomBagClassifier
 
@@ -720,7 +720,7 @@ Attributes:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/randomBagClassifier.py#L135)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/_randomBagClassifier.py#L135)</span>
 
 ### fit
 
@@ -1008,7 +1008,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/randomBagClassifier.py#L17)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/_randomBagClassifier.py#L17)</span>
 
 ### RandomBagClassifier
 
@@ -1106,7 +1106,7 @@ Attributes:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/randomBagClassifier.py#L135)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/_randomBagClassifier.py#L135)</span>
 
 ### fit
 

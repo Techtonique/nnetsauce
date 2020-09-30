@@ -19,7 +19,7 @@ You can read posts about nnetsauce [in this blog](https://thierrymoudiki.github.
 
 Looking for a specific function? You can also use the __search__ function available in the navigation bar.
 
-## Installing
+## Installing (for Python and R)
 
 ### Python 
 
@@ -36,7 +36,7 @@ pip install nnetsauce
 pip install git+https://github.com/Techtonique/nnetsauce.git
 ```
 
-or
+or 
 
 ```bash
 git clone https://github.com/Techtonique/nnetsauce.git
@@ -44,15 +44,19 @@ cd nnetsauce
 make install
 ```
 
+
 ### R 
 
 - __1st method__: From Github, in R console:
 
 ```r
 library(devtools)
-devtools::install_github("thierrymoudiki/nnetsauce/R-package")
+devtools::install_github("Techtonique/nnetsauce/R-package")
 library(nnetsauce)
 ```
+
+__General rule for using the package in R__:  object accesses with `.`'s are replaced by `$`'s. See also [Quick start](#quick-start).
+
 
 ## Quickstart 
 
