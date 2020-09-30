@@ -40,7 +40,7 @@ LICENSE = 'BSD3 Clause Clear'
 # does not need the compiled code
 import nnetsauce
 
-__version__ = "0.8.1"
+__version__ = "0.8.2"
 
 VERSION = __version__
 
@@ -247,7 +247,7 @@ def setup_package():
                             'jaxlib>={}'.format(JAXLIB_MIN_VERSION)
                             ] if platform.system() in ('Linux', 'Darwin') else []                        
 
-    install_requires = [item for sublist in [install_jax_requires, install_all_requires, OTHER_REQUIREMENTS] for item in sublist]
+    install_requires = [item for sublist in [install_all_requires, install_jax_requires, OTHER_REQUIREMENTS] for item in sublist]
 
     metadata = dict(name=DISTNAME,
                     maintainer=MAINTAINER,
