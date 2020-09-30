@@ -41,6 +41,15 @@ pip install nnetsauce
 pip install git+https://github.com/Techtonique/nnetsauce.git
 ```
 
+or 
+
+```bash
+git clone https://github.com/Techtonique/nnetsauce.git
+cd nnetsauce
+make install
+```
+
+
 ### R 
 
 - __1st method__: From Github, in R console:

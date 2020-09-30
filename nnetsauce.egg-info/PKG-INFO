@@ -1,4 +1,4 @@
-Metadata-Version: 1.2
+Metadata-Version: 2.1
 Name: nnetsauce
 Version: 0.8.2
 Summary: Randomized and Quasi-Randomized (neural) networks
@@ -18,3 +18,4 @@ Classifier: Programming Language :: Python :: 3.6
 Classifier: Programming Language :: Python :: 3.7
 Classifier: Programming Language :: Python :: 3.8
 Requires-Python: >=3.5
+Provides-Extra: alldeps
