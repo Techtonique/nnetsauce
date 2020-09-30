@@ -9,7 +9,6 @@ nnetsauce/setup.py
 nnetsauce.egg-info/PKG-INFO
 nnetsauce.egg-info/SOURCES.txt
 nnetsauce.egg-info/dependency_links.txt
-nnetsauce.egg-info/not-zip-safe
 nnetsauce.egg-info/requires.txt
 nnetsauce.egg-info/top_level.txt
 nnetsauce/__check_build/__init__.py

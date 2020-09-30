@@ -18,6 +18,7 @@ try:
 except ImportError:
     # Python 2 compat: just to be able to declare that Python >=3.5 is needed.
     import __builtin__ as builtins
+from os import path    
 
 # This is a bit (!) hackish: we are setting a global variable so that the
 # main nnetsauce __init__ can detect if it is being loaded by the setup
@@ -39,9 +40,17 @@ LICENSE = 'BSD3 Clause Clear'
 # does not need the compiled code
 import nnetsauce
 
-__version__ = "0.8.0"
+__version__ = "0.8.1"
 
 VERSION = __version__
+
+# get the dependencies and installs
+here = path.abspath(path.dirname(__file__))
+with open(path.join(here, 'requirements.txt'), encoding='utf-8') as f:
+    all_reqs = f.read().split('\n')
+
+OTHER_REQUIREMENTS = [x.strip() for x in all_reqs if 'git+' not in x]
+
 
 if platform.python_implementation() == 'PyPy':
     SCIPY_MIN_VERSION = '1.1.0'
@@ -236,11 +245,9 @@ def setup_package():
     install_jax_requires = [
                             'jax>={}'.format(JAX_MIN_VERSION), 
                             'jaxlib>={}'.format(JAXLIB_MIN_VERSION)
-                            ] if platform.system() in ('Linux', 'Darwin') else []
+                            ] if platform.system() in ('Linux', 'Darwin') else []                        
 
-    other_requirements = ["tqdm==4.48.1"]                        
-
-    install_requires = [item for sublist in [install_jax_requires, install_all_requires, other_requirements] for item in sublist]
+    install_requires = [item for sublist in [install_jax_requires, install_all_requires, OTHER_REQUIREMENTS] for item in sublist]
 
     metadata = dict(name=DISTNAME,
                     maintainer=MAINTAINER,
