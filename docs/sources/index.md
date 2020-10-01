@@ -2,7 +2,7 @@
 
 # nnetsauce
 
-![PyPI](https://img.shields.io/pypi/v/nnetsauce) [![PyPI - License](https://img.shields.io/pypi/l/nnetsauce)](https://github.com/thierrymoudiki/nnetsauce/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce)
+![PyPI](https://img.shields.io/pypi/v/nnetsauce) [![PyPI - License](https://img.shields.io/pypi/l/nnetsauce)](https://github.com/thierrymoudiki/nnetsauce/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce) [![Last Commit](https://img.shields.io/github/last-commit/Techtonique/nnetsauce)](https://github.com/Techtonique/nnetsauce)
 
 Welcome to __nnetsauce__'s website.
 
@@ -18,7 +18,6 @@ __nnetsauce__’s source code is [available on GitHub](https://github.com/Techto
 You can read posts about nnetsauce [in this blog](https://thierrymoudiki.github.io/blog/#QuasiRandomizedNN), and for current references, feel free consult the section: [References](REFERENCES.md).
 
 Looking for a specific function? You can also use the __search__ function available in the navigation bar.
-
 
 ## Installing (for Python and R)
 

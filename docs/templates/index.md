@@ -2,7 +2,7 @@
 
 # nnetsauce
 
-![PyPI](https://img.shields.io/pypi/v/nnetsauce) [![PyPI - License](https://img.shields.io/pypi/l/nnetsauce)](https://github.com/thierrymoudiki/nnetsauce/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce)
+![PyPI](https://img.shields.io/pypi/v/nnetsauce) [![PyPI - License](https://img.shields.io/pypi/l/nnetsauce)](https://github.com/thierrymoudiki/nnetsauce/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce) [![Last Commit](https://img.shields.io/github/last-commit/Techtonique/nnetsauce)](https://github.com/Techtonique/nnetsauce)
 
 Welcome to __nnetsauce__'s website.
 
@@ -19,7 +19,7 @@ You can read posts about nnetsauce [in this blog](https://thierrymoudiki.github.
 
 Looking for a specific function? You can also use the __search__ function available in the navigation bar.
 
-## Installing
+## Installing (for Python and R)
 
 ### Python 
 
@@ -33,8 +33,17 @@ pip install nnetsauce
 - __2nd method__: from Github, for the development version
 
 ```bash
-pip install git+https://github.com/thierrymoudiki/nnetsauce.git
+pip install git+https://github.com/Techtonique/nnetsauce.git
 ```
+
+or 
+
+```bash
+git clone https://github.com/Techtonique/nnetsauce.git
+cd nnetsauce
+make install
+```
+
 
 ### R 
 
@@ -42,9 +51,12 @@ pip install git+https://github.com/thierrymoudiki/nnetsauce.git
 
 ```r
 library(devtools)
-devtools::install_github("thierrymoudiki/nnetsauce/R-package")
+devtools::install_github("Techtonique/nnetsauce/R-package")
 library(nnetsauce)
 ```
+
+__General rule for using the package in R__:  object accesses with `.`'s are replaced by `$`'s. See also [Quick start](#quick-start).
+
 
 ## Quickstart 
 
