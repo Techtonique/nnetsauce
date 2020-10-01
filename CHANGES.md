@@ -1,3 +1,8 @@
+# version 0.8.0
+
+- Use C++ for simulation
+- Fix R Engine problem
+
 # version 0.7.0
 
 - RandomBag classifier cythonized

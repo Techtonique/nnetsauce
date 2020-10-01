@@ -19,6 +19,7 @@ You can read posts about nnetsauce [in this blog](https://thierrymoudiki.github.
 
 Looking for a specific function? You can also use the __search__ function available in the navigation bar.
 
+
 ## Installing (for Python and R)
 
 ### Python 
