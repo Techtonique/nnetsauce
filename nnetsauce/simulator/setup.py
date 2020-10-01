@@ -11,7 +11,7 @@ def configuration(parent_package="", top_path=None):
     if os.name == "posix":
         libraries.append("m")
 
-    cpp_args = ['-stdlib=libc++', '-mmacosx-version-min=10.7']    
+    #cpp_args = ['-stdlib=libc++', '-mmacosx-version-min=10.7']    
 
     config.add_extension(
         "_simulatorc",
@@ -19,7 +19,7 @@ def configuration(parent_package="", top_path=None):
         include_dirs=numpy.get_include(),
         libraries=libraries,
         language='c++',
-        extra_compile_args = cpp_args,
+        #extra_compile_args = cpp_args,
     )
 
     return config
