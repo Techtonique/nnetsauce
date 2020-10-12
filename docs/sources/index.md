@@ -1,6 +1,6 @@
 
 
-# nnetsauce | <a class="github-button" href="https://github.com/Techtonique/nnetsauce/stargazers" data-color-scheme="no-preference: light; light: light; dark: dark;" data-size="large" aria-label="Star dask/dask on GitHub">Star</a>
+# nnetsauce | <a class="github-button" href="https://github.com/Techtonique/nnetsauce/stargazers" data-color-scheme="no-preference: light; light: light; dark: dark;" data-size="large" aria-label="Star nnetsauce/nnetsauce on GitHub">Star</a>
 
 ![PyPI](https://img.shields.io/pypi/v/nnetsauce) [![PyPI - License](https://img.shields.io/pypi/l/nnetsauce)](https://github.com/thierrymoudiki/nnetsauce/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce) [![Last Commit](https://img.shields.io/github/last-commit/Techtonique/nnetsauce)](https://github.com/Techtonique/nnetsauce)
 
