@@ -8,10 +8,6 @@
             "/Users/t/Documents/Python_Packages/venv/lib/python3.8/site-packages/numpy/core/include/numpy/ufuncobject.h",
             "nnetsauce/simulator/simulator.hpp"
         ],
-        "extra_compile_args": [
-            "-stdlib=libc++",
-            "-mmacosx-version-min=10.7"
-        ],
         "include_dirs": [
             "nnetsauce/simulator",
             "/Users/t/Documents/Python_Packages/venv/lib/python3.8/site-packages/numpy/core/include"

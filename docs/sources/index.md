@@ -1,6 +1,6 @@
 
 
-# nnetsauce
+# nnetsauce | <a class="github-button" href="https://github.com/Techtonique/nnetsauce/stargazers" data-color-scheme="no-preference: light; light: light; dark: dark;" data-size="large" aria-label="Star dask/dask on GitHub">Star</a>
 
 ![PyPI](https://img.shields.io/pypi/v/nnetsauce) [![PyPI - License](https://img.shields.io/pypi/l/nnetsauce)](https://github.com/thierrymoudiki/nnetsauce/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce) [![Last Commit](https://img.shields.io/github/last-commit/Techtonique/nnetsauce)](https://github.com/Techtonique/nnetsauce)
 
@@ -86,3 +86,5 @@ The documentation for each model can be found (work in progress) here:
 ## Contributing
 
 Want to contribute to __nnetsauce__'s development on Github, [read this](CONTRIBUTING.md)!
+
+<script async defer src="https://buttons.github.io/buttons.js"></script>
