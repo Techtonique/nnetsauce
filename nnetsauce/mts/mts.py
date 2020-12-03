@@ -484,12 +484,12 @@ class MTS(Base):
             -1, self.n_series
         )
 
-        return (
-            self.preds,
-            self.preds_std,
-            self.preds - qt * self.preds_std,
-            self.preds + qt * self.preds_std,
-        )
+        return {
+            'mean': self.preds,
+            'std': self.preds_std,
+            'lower': self.preds - qt * self.preds_std,
+            'upper': self.preds + qt * self.preds_std,
+        }
 
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):
         """ Train on training_index, score on testing_index. """
