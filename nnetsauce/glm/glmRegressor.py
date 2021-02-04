@@ -137,114 +137,19 @@ class GLMRegressor(GLM, RegressorMixin):
     
     def laplace_loss(self, y, row_index, XB):
         return 0.5*np.mean(np.abs(y[row_index] - XB))
+ 
 
-    
-    def loglik_zip(beta, group_index, X, y, zero_mass, 
-               lambda1, alpha1, lambda2, alpha2, 
-               intercept=True):
-
-        max_double = 709.0
-        zero = np.finfo(float).eps
-        not_zero_mass = 1 - zero_mass
-        n = len(y)
-    
-        if intercept:
-    
-            XB = np.minimum(np.dot(np.column_stack((np.repeat(1, n), X)), beta), 
-                            max_double) # (!) stack columns outside loglik
-            
-            mu = np.minimum(np.exp(XB), 
-                          max_double) # avoid overflows  # but...
-        
-            exp_mu = np.exp(-mu)
-            not_zero_mass_exp_mu = not_zero_mass*exp_mu
-        
-            f = (y == 0)*(zero_mass + not_zero_mass_exp_mu) \
-            + (y > 0)*(not_zero_mass_exp_mu * np.power(mu, y)/factorial(y))   
-        
-            return -np.mean(np.log(np.maximum(f, zero)))
-        
-        else:
-    
-            XB = np.minimum(np.dot(X, beta), 
-                              max_double) # avoid overflows  # but...
-            
-            mu = np.minimum(np.exp(XB), 
-                          max_double) # avoid overflows # but...
-        
-            exp_mu = np.exp(-mu)
-            not_zero_mass_exp_mu = not_zero_mass*exp_mu
-        
-            f = (y == 0)*(zero_mass + not_zero_mass_exp_mu) \
-            + (y > 0)*(not_zero_mass_exp_mu * np.power(mu, y)/factorial(y))   
-        
-            return -np.mean(np.log(np.maximum(f, zero))) 
-    
-
-    def loglik_poisson(beta, group_index, X, y, 
-                       lambda1, alpha1, lambda2, alpha2, 
-                       intercept=True):
+    def poisson_loss(self, y, row_index, XB):
       
-        max_double = 709.0
-        zero = np.finfo(float).eps
-        n = len(y)
-    
-        if intercept:
-    
-            XB = np.minimum(np.dot(np.column_stack((np.repeat(1, n), X)), beta), 
-                            max_double) # (!) stack columns outside loglik
+        # max_double = 709.0
+        # zero = np.finfo(float).eps        
             
-            mu = np.minimum(np.exp(XB), 
-                          max_double) # avoid overflows # but...
-        
-            f = np.exp(-mu)*np.power(mu, y)/factorial(y)
-        
-            return -np.mean(np.log(np.maximum(f, zero)))
-        
-        else:
+        mu = np.exp(XB)
     
-            XB = np.minimum(np.dot(X, beta), 
-                              max_double) # avoid overflows # but...
-            
-            mu = np.minimum(np.exp(XB), 
-                          max_double) # avoid overflows # but...
-        
-            f = np.exp(-mu)*np.power(mu, y)#/factorial(y)
-        
-            return -np.mean(np.log(np.maximum(f, zero)))
-        
+        y_probs = np.exp(-mu)*np.power(mu, y[row_index])
     
-    def loglik_nbinom(beta, group_index, X, y, 
-                      lambda1, alpha1, lambda2, alpha2, 
-                      intercept=True):
+        return -np.mean(np.log(y_probs))
       
-      max_double = 709.0
-      zero = np.finfo(float).eps
-      n = len(y)
-    
-      if intercept:
-        
-        XB = np.minimum(np.dot(np.column_stack((np.repeat(1, n), X)), beta), 
-                        max_double) # (!) stack columns outside loglik
-    
-        p_hat = 0.5*(1 + erf(1.0/(XB/n + 1.0)))
-    
-        f = factorial(y+n-1)/(factorial(n-1)*factorial(y))*np.power(p_hat, n)*np.power(1-p_hat, y) # nbinom.pmf(y, n, p_hat, loc=0)
-    
-        return -np.mean(np.log(np.maximum(f, zero)))
-    
-      else:
-      
-        XB = np.minimum(np.dot(X, beta), 
-                        max_double) # avoid overflows
-        
-        p_hat = 0.5*(1 + erf(1.0/(XB/n + 1.0)))
-    
-        f = factorial(y+n-1)/(factorial(n-1)*factorial(y))*np.power(p_hat, n)*np.power(1-p_hat, y) # nbinom.pmf(y, n, p_hat, loc=0)
-    
-        return -np.mean(np.log(np.maximum(f, zero)))
-    
-    
     
     def loss_func(self, beta, group_index, X, y, 
                   row_index=None, type_loss="gaussian", 
