@@ -140,17 +140,16 @@ class GLMRegressor(GLM, RegressorMixin):
  
 
     def poisson_loss(self, y, row_index, XB):
-      
-        # max_double = 709.0
-        # zero = np.finfo(float).eps        
-            
+        #  max_double = 709.0
+        # zero = np.finfo(float).eps                    
         mu = np.exp(XB)
-    
-        y_probs = np.exp(-mu)*np.power(mu, y[row_index])
+        y_probs = np.exp(-mu)*np.power(mu, y[row_index]) # P(Y = y)
     
         return -np.mean(np.log(y_probs))
-      
-    
+
+    #https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.poisson.html  
+    #https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.nbinom.html
+
     def loss_func(self, beta, group_index, X, y, 
                   row_index=None, type_loss="gaussian", 
                   **kwargs):
