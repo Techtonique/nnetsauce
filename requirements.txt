@@ -23,7 +23,7 @@ imagesize==1.2.0
 importlib-metadata==1.7.0
 jax==0.2.9
 jaxlib==0.1.61
-Jinja2==2.11.2
+Jinja2==2.11.3
 joblib==1.0.1
 keras-autodoc==0.5.1
 keyring==21.4.0
