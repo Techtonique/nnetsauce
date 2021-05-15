@@ -1,3 +1,8 @@
+# version 0.9.0
+
+- Add Poisson and Laplace regressions to GLMRegressor
+- Remove smoothing weights from MTS
+
 # version 0.8.0
 
 - Use C++ for simulation

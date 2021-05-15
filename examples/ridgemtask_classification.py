@@ -99,22 +99,22 @@ print(metrics.classification_report(preds, y_test))
 
 # dataset no. 5 ----------
 
-digits = load_digits()
-X = digits.data
-y = digits.target
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
-                                                    random_state=123)
+# digits = load_digits()
+# X = digits.data
+# y = digits.target
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
+#                                                     random_state=123)
 
-fit_obj = ns.Ridge2MultitaskClassifier(n_hidden_features=25,
-                                  dropout=0.1, n_clusters=3, 
-                                  type_clust="gmm")
+# fit_obj = ns.Ridge2MultitaskClassifier(n_hidden_features=25,
+#                                   dropout=0.1, n_clusters=3, 
+#                                   type_clust="gmm")
 
-start = time()
-fit_obj.fit(X_train, y_train)
-print(f"Elapsed {time() - start}") 
-print(fit_obj.score(X_test, y_test))
+# start = time()
+# fit_obj.fit(X_train, y_train)
+# print(f"Elapsed {time() - start}") 
+# print(fit_obj.score(X_test, y_test))
 
-start = time()
-preds = fit_obj.predict(X_test)
-print(f"Elapsed {time() - start}") 
-print(metrics.classification_report(preds, y_test))
+# start = time()
+# preds = fit_obj.predict(X_test)
+# print(f"Elapsed {time() - start}") 
+# print(metrics.classification_report(preds, y_test))
