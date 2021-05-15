@@ -1,10 +1,10 @@
 import numpy as np
-from sklearn import datasets, linear_model, gaussian_process
 import unittest as ut
 import nnetsauce as ns
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_breast_cancer, load_wine
 from sklearn.linear_model import ElasticNet, LinearRegression
+from sklearn import linear_model, gaussian_process
 
 
 class TestMultitask(ut.TestCase):

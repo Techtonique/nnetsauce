@@ -1,10 +1,10 @@
 import numpy as np
-from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 import unittest as ut
 import nnetsauce as ns
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_breast_cancer, load_wine
+from sklearn.linear_model import LogisticRegression
 
 
 class TestRandomBag(ut.TestCase):
