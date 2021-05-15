@@ -638,6 +638,9 @@ Attributes:
     alpha2: float
         controls compromize between l1 and l2 norm of GLM coefficients on nonlinear features
 
+    family: str
+        "gaussian", "laplace" or "poisson" (for now)    
+
     activation_name: str
         activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
 
@@ -686,7 +689,7 @@ Attributes:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmRegressor.py#L272)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmRegressor.py#L173)</span>
 
 ### fit
 

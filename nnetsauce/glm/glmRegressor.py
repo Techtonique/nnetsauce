@@ -36,6 +36,9 @@ class GLMRegressor(GLM, RegressorMixin):
             alpha2: float
                 controls compromize between l1 and l2 norm of GLM coefficients on nonlinear features
 
+            family: str
+                "gaussian", "laplace" or "poisson" (for now)    
+
             activation_name: str
                 activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
 
@@ -140,22 +143,16 @@ class GLMRegressor(GLM, RegressorMixin):
  
 
     def poisson_loss(self, y, row_index, XB):
-        #  max_double = 709.0
-        # zero = np.finfo(float).eps                    
-        mu = np.exp(XB)
-        y_probs = np.exp(-mu)*np.power(mu, y[row_index]) # P(Y = y)
-    
-        return -np.mean(np.log(y_probs))
+        return -np.mean(y[row_index]*XB - np.exp(XB))
 
-    #https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.poisson.html  
-    #https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.nbinom.html
 
     def loss_func(self, beta, group_index, X, y, 
                   row_index=None, type_loss="gaussian", 
                   **kwargs):
 
         res = {"gaussian": self.gaussian_loss,
-               "laplace": self.laplace_loss}
+               "laplace": self.laplace_loss, 
+               "poisson": self.poisson_loss}
         
         if row_index is None:            
             
