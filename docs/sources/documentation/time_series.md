@@ -25,8 +25,6 @@ nnetsauce.MTS(
     type_scaling=("std", "std", "std"),
     col_sample=1,
     lags=1,
-    alpha1=None,
-    alpha2=None,
     seed=123,
     backend="cpu",
 )
@@ -87,12 +85,6 @@ Attributes:
     lags: int.
         number of lags used for each time series.
 
-    alpha1: float.
-        smoothing weight (training set).
-
-    alpha2: float.
-        smoothing parameter (testing set).
-
     seed: int.
         reproducibility seed for nodes_sim=='uniform'.
 
@@ -102,7 +94,7 @@ Attributes:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L140)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L130)</span>
 
 ### fit
 
@@ -135,7 +127,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L237)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L214)</span>
 
 ### predict
 
