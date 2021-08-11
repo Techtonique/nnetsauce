@@ -1,3 +1,7 @@
+# version 0.9.2
+
+- loosen the range of Python packages versions
+
 # version 0.9.0
 
 - Add Poisson and Laplace regressions to GLMRegressor
