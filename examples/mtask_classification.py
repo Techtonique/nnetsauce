@@ -12,8 +12,9 @@ from time import time
 breast_cancer = load_breast_cancer()
 Z = breast_cancer.data
 t = breast_cancer.target
-np.random.seed(123)
-X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
+
+X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2, 
+                                                    random_state=123+2*10)
 
 # Linear Regression is used 
 regr = LinearRegression()
@@ -26,6 +27,84 @@ print(f"Elapsed {time() - start}")
 
 print(fit_obj.score(X_test, y_test))
 print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
+
+start = time()
+preds = fit_obj.predict(X_test)
+print(f"Elapsed {time() - start}") 
+print(metrics.classification_report(preds, y_test))
+
+
+# dataset no. 2 ---------- 
+
+dataset = load_digits()
+Z = dataset.data
+t = dataset.target
+#np.random.seed(123)
+X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2, 
+                                                    random_state=123+2*10)
+
+# Linear Regression is used 
+regr = LinearRegression()
+fit_obj = ns.MultitaskClassifier(regr, n_hidden_features=5, 
+                                 n_clusters=2, type_clust="gmm")
+
+start = time()
+fit_obj.fit(X_train, y_train)
+print(f"Elapsed {time() - start}") 
+
+print(fit_obj.score(X_test, y_test))
+
+start = time()
+preds = fit_obj.predict(X_test)
+print(f"Elapsed {time() - start}") 
+print(metrics.classification_report(preds, y_test))
+
+
+# dataset no. 3 ---------- 
+
+dataset = load_iris()
+Z = dataset.data
+t = dataset.target
+#np.random.seed(123)
+X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2, 
+                                                    random_state=123+2*10)
+
+# Linear Regression is used 
+regr = LinearRegression()
+fit_obj = ns.MultitaskClassifier(regr, n_hidden_features=5, 
+                                 n_clusters=2, type_clust="gmm")
+
+start = time()
+fit_obj.fit(X_train, y_train)
+print(f"Elapsed {time() - start}") 
+
+print(fit_obj.score(X_test, y_test))
+
+start = time()
+preds = fit_obj.predict(X_test)
+print(f"Elapsed {time() - start}") 
+print(metrics.classification_report(preds, y_test))
+
+
+# dataset no. 4 ---------- 
+
+dataset = load_wine()
+Z = dataset.data
+t = dataset.target
+#np.random.seed(123)
+X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2, 
+                                                    random_state=123+2*10)
+
+# Linear Regression is used 
+regr = LinearRegression()
+fit_obj = ns.MultitaskClassifier(regr, n_hidden_features=5, 
+                                 n_clusters=2, type_clust="gmm")
+
+start = time()
+fit_obj.fit(X_train, y_train)
+print(f"Elapsed {time() - start}") 
+
+print(fit_obj.score(X_test, y_test))
 
 start = time()
 preds = fit_obj.predict(X_test)
