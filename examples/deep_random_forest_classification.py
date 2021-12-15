@@ -15,6 +15,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
 
 
 # layer 1 (base layer) ----
+print(" \n layer 1 ----- \n")
 layer1_regr = RandomForestClassifier(n_estimators=10, random_state=123)
 
 start = time() 
@@ -26,6 +27,7 @@ print(layer1_regr.score(X_test, y_test))
 
 
 # layer 2 using layer 1 ----
+print(" \n layer 2 ----- \n")
 layer2_regr = ns.CustomClassifier(obj = layer1_regr, n_hidden_features=5, 
                         direct_link=True, bias=True, 
                         nodes_sim='uniform', activation_name='relu', 
@@ -37,6 +39,7 @@ print(layer2_regr.score(X_test, y_test))
 
 
 # layer 3 using layer 2 ----
+print(" \n layer 3 ----- \n")
 layer3_regr = ns.CustomClassifier(obj = layer2_regr, n_hidden_features=10, 
                         direct_link=True, bias=True, dropout=0.7,
                         nodes_sim='uniform', activation_name='relu', 

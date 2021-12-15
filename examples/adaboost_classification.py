@@ -9,6 +9,8 @@ from time import time
 
 # dataset no. 1 ----------
 
+print(" \n breast cancer dataset ----- \n")
+
 # logistic reg
 breast_cancer = load_breast_cancer()
 Z = breast_cancer.data
@@ -20,7 +22,7 @@ X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 clf = LogisticRegression(solver='liblinear', multi_class = 'ovr', 
                          random_state=123)
 fit_obj = ns.AdaBoostClassifier(clf, 
-                                n_hidden_features=np.int(56.13806152), 
+                                n_hidden_features=int(56.13806152), 
                                 direct_link=True,
                                 n_estimators=1000, learning_rate=0.09393372,
                                 col_sample=0.52887573, row_sample=0.87781372,
@@ -43,7 +45,7 @@ print(metrics.classification_report(preds, y_test))
 clf = LogisticRegression(solver='liblinear', multi_class = 'ovr', 
                          random_state=123)
 fit_obj = ns.AdaBoostClassifier(clf, 
-                                n_hidden_features=np.int(11.22338867), 
+                                n_hidden_features=int(11.22338867), 
                                 direct_link=True,
                                 n_estimators=250, learning_rate=0.01126343,
                                 col_sample=0.72684326, row_sample=0.86429443,
@@ -67,6 +69,8 @@ print(metrics.classification_report(preds, y_test))
 
 # dataset no. 2 ----------
 
+print(" \n wine dataset ----- \n")
+
 wine = load_wine()
 Z = wine.data
 t = wine.target
@@ -78,7 +82,7 @@ Z_train, Z_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 clf = LogisticRegression(solver='liblinear', multi_class = 'ovr', 
                          random_state=123)
 fit_obj = ns.AdaBoostClassifier(clf, 
-                                n_hidden_features=np.int(8.21154785e+01), 
+                                n_hidden_features=int(8.21154785e+01), 
                                 direct_link=True,
                                 n_estimators=1000, learning_rate=2.96252441e-02,
                                 col_sample=4.22766113e-01, row_sample=7.87268066e-01,
@@ -98,6 +102,8 @@ print(metrics.classification_report(preds, y_test))
 
 # dataset no. 3 ----------
 
+print(" \n iris dataset ----- \n")
+
 iris = load_iris()
 Z = iris.data
 t = iris.target
@@ -109,7 +115,7 @@ Z_train, Z_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 clf = LogisticRegression(solver='liblinear', multi_class = 'ovr', 
                          random_state=123)
 fit_obj = ns.AdaBoostClassifier(clf, 
-                                n_hidden_features=np.int(19.66918945), 
+                                n_hidden_features=int(19.66918945), 
                                 direct_link=True,
                                 n_estimators=250, learning_rate=0.28534302,
                                 col_sample=0.45474854, row_sample=0.87833252,

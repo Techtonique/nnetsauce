@@ -3,8 +3,6 @@
 # Copyright (C) 2020 T. Moudiki <thierry.moudiki@gmail.com>
 # License: 3-clause BSD
 
-# bumpversion --current-version 0.7.3 minor setup.py nnetsauce/__init__.py 
-
 import sys
 import os
 import platform
