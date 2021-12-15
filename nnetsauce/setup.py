@@ -27,19 +27,19 @@ def configuration(parent_package="", top_path=None):
     config.add_subpackage("base")
     config.add_subpackage("boosting")
     config.add_subpackage("custom")
-    config.add_subpackage("glm")    
+    config.add_subpackage("glm")
     config.add_subpackage("mts")
     config.add_subpackage("multitask")
     config.add_subpackage("optimizers")
     config.add_subpackage("randombag")
     config.add_subpackage("ridge2")
-    config.add_subpackage("rvfl")        
+    config.add_subpackage("rvfl")
     config.add_subpackage("simulation")
     config.add_subpackage("simulator")
 
     # submodules which have their own setup.py
     config.add_subpackage("optimizers")
-    config.add_subpackage("sampling")    
+    config.add_subpackage("sampling")
 
     # add the test directory
     config.add_subpackage("tests")

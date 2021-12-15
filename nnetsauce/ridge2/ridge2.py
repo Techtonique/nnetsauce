@@ -95,7 +95,7 @@ class Ridge2(Base):
         lambda1=0.1,
         lambda2=0.1,
         seed=123,
-        backend="cpu"
+        backend="cpu",
     ):
 
         super().__init__(
@@ -113,7 +113,7 @@ class Ridge2(Base):
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,
-            backend=backend
+            backend=backend,
         )
 
         self.lambda1 = lambda1

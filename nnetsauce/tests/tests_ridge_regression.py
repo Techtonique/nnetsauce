@@ -256,8 +256,11 @@ class TestRidge2Regressor(ut.TestCase):
         self.assertTrue(np.allclose(np.round(rmse6, 3), 0.614, atol=1e-3))
         self.assertTrue(np.allclose(np.round(rmse7, 3), 6.789, atol=1e-3))
         self.assertTrue(
-            np.allclose(np.round(rmse7, 3), np.round(np.sqrt(fit_obj7.score(X_test, y_test)), 3)
-        ))
+            np.allclose(
+                np.round(rmse7, 3),
+                np.round(np.sqrt(fit_obj7.score(X_test, y_test)), 3),
+            )
+        )
         self.assertTrue(
             np.allclose(fit_obj.predict(X_test[0, :]), 335.65187002147786)
         )

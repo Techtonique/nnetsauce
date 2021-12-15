@@ -114,71 +114,71 @@ class GLM(Base):
             type_scaling=type_scaling,
             seed=seed,
         )
-        
+
         self.lambda1 = lambda1
         self.alpha1 = alpha1
         self.lambda2 = lambda2
         self.alpha2 = alpha2
         self.optimizer = optimizer
         self.beta = None
-        
-        
-    def compute_XB(self, X, beta=None, row_index=None):        
-        
-        if beta is not None:            
-            
-            if (row_index is None):
-                
+
+    def compute_XB(self, X, beta=None, row_index=None):
+
+        if beta is not None:
+
+            if row_index is None:
+
                 return np.dot(X, beta)
-            
-            return np.dot(X[row_index,:], beta)
-        
-        # self.beta is not None in this case       
+
+            return np.dot(X[row_index, :], beta)
+
+        # self.beta is not None in this case
         if row_index is None:
-            
+
             return np.dot(X, self.beta)
-        
-        return np.dot(X[row_index,:], self.beta)
 
+        return np.dot(X[row_index, :], self.beta)
 
-    def compute_XB2(self, X, beta=None, row_index=None):   
-
+    def compute_XB2(self, X, beta=None, row_index=None):
         def f00(X):
             return np.dot(X, self.beta)
 
         def f01(X):
-            return np.dot(X[row_index,:], self.beta)
+            return np.dot(X[row_index, :], self.beta)
 
         def f11(X):
-            return np.dot(X[row_index,:], beta)
+            return np.dot(X[row_index, :], beta)
 
         def f10(X):
-            return np.dot(X, beta)             
+            return np.dot(X, beta)
 
-        h_result = {'00': f00,
-                    '01': f01,
-                    '11': f11,
-                    '10': f10} 
+        h_result = {"00": f00, "01": f01, "11": f11, "10": f10}
 
-        result_code = str(0 if beta is None else 1) 
-        result_code += str(0 if row_index is None else 1)                              
-        
+        result_code = str(0 if beta is None else 1)
+        result_code += str(0 if row_index is None else 1)
+
         return h_result[result_code](X)
 
-    
-    
     def penalty(self, beta1, beta2, lambda1, lambda2, alpha1, alpha2):
-        
-        res = lambda1*(0.5*(1 - alpha1)*np.sum(np.square(beta1)) + alpha1*np.sum(np.abs(beta1)))            
-        res += lambda2*(0.5*(1 - alpha2)*np.sum(np.square(beta2)) + alpha2*np.sum(np.abs(beta2)))            
-        
+
+        res = lambda1 * (
+            0.5 * (1 - alpha1) * np.sum(np.square(beta1))
+            + alpha1 * np.sum(np.abs(beta1))
+        )
+        res += lambda2 * (
+            0.5 * (1 - alpha2) * np.sum(np.square(beta2))
+            + alpha2 * np.sum(np.abs(beta2))
+        )
+
         return res
-        
-           
-        
-    def compute_penalty(self, group_index, beta):                                                          
-                
-        return self.penalty(beta1=beta[0:group_index], 
-                            beta2=beta[group_index:len(beta)], 
-                            lambda1=self.lambda1, lambda2=self.lambda2, 
-                            alpha1=self.alpha1, alpha2=self.alpha2)
+
+    def compute_penalty(self, group_index, beta):
+
+        return self.penalty(
+            beta1=beta[0:group_index],
+            beta2=beta[group_index : len(beta)],
+            lambda1=self.lambda1,
+            lambda2=self.lambda2,
+            alpha1=self.alpha1,
+            alpha2=self.alpha2,
+        )

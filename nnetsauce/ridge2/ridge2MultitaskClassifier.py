@@ -12,8 +12,9 @@ from ..utils import misc as mx
 from sklearn.base import ClassifierMixin
 from scipy.special import logsumexp
 from scipy.linalg import pinv
-if platform.system() in ('Linux', 'Darwin'):
-  from jax.numpy.linalg import pinv as jpinv
+
+if platform.system() in ("Linux", "Darwin"):
+    from jax.numpy.linalg import pinv as jpinv
 
 
 class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
@@ -95,7 +96,7 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
         lambda1=0.1,
         lambda2=0.1,
         seed=123,
-        backend="cpu" 
+        backend="cpu",
     ):
 
         super().__init__(
@@ -114,7 +115,7 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
             lambda1=lambda1,
             lambda2=lambda2,
             seed=seed,
-            backend=backend
+            backend=backend,
         )
 
         self.type_fit = "regression"
@@ -142,7 +143,7 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
 
         sys_platform = platform.system()
 
-        assert mx.is_factor(y), "y must contain only integers"        
+        assert mx.is_factor(y), "y must contain only integers"
 
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
@@ -173,18 +174,18 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
             x=Phi_X_, backend=self.backend
         ) + self.lambda2 * np.diag(np.repeat(1, Phi_X_.shape[1]))
 
-        if sys_platform in ('Linux', 'Darwin'):  
-          B_inv = pinv(B) if self.backend == "cpu" else jpinv(B)
+        if sys_platform in ("Linux", "Darwin"):
+            B_inv = pinv(B) if self.backend == "cpu" else jpinv(B)
         else:
-          B_inv = pinv(B)
+            B_inv = pinv(B)
 
         W = mo.safe_sparse_dot(a=C, b=B_inv, backend=self.backend)
         S_mat = D - mo.tcrossprod(x=W, y=C, backend=self.backend)
 
-        if sys_platform in ('Linux', 'Darwin'):
-          S_inv = pinv(S_mat) if self.backend == "cpu" else jpinv(S_mat)
+        if sys_platform in ("Linux", "Darwin"):
+            S_inv = pinv(S_mat) if self.backend == "cpu" else jpinv(S_mat)
         else:
-          S_inv = pinv(S_mat) 
+            S_inv = pinv(S_mat)
 
         Y2 = mo.safe_sparse_dot(a=S_inv, b=W, backend=self.backend)
         inv = mo.rbind(

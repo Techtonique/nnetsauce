@@ -101,7 +101,7 @@ class MultitaskClassifier(Base, ClassifierMixin):
         col_sample=1,
         row_sample=1,
         seed=123,
-        backend="cpu"
+        backend="cpu",
     ):
 
         super().__init__(
@@ -119,7 +119,7 @@ class MultitaskClassifier(Base, ClassifierMixin):
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,
-            backend=backend
+            backend=backend,
         )
 
         self.type_fit = "classification"

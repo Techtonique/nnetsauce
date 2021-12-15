@@ -106,7 +106,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
         Sigma=None,
         GCV=None,
         return_std=True,
-        backend="cpu"
+        backend="cpu",
     ):
 
         super().__init__(
@@ -124,7 +124,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,
-            backend=backend
+            backend=backend,
         )
         self.s = s
         self.sigma = sigma

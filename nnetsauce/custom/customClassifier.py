@@ -93,7 +93,7 @@ class CustomClassifier(Custom, ClassifierMixin):
         col_sample=1,
         row_sample=1,
         seed=123,
-        backend="cpu"
+        backend="cpu",
     ):
 
         super().__init__(
@@ -112,7 +112,7 @@ class CustomClassifier(Custom, ClassifierMixin):
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,
-            backend=backend
+            backend=backend,
         )
 
         self.type_fit = "classification"
@@ -145,8 +145,10 @@ class CustomClassifier(Custom, ClassifierMixin):
             self.obj.fit(
                 scaled_Z,
                 output_y,
-                sample_weight=np.ravel(sample_weight, order='C')[self.index_row],
-                #**kwargs
+                sample_weight=np.ravel(sample_weight, order="C")[
+                    self.index_row
+                ],
+                # **kwargs
             )
 
             return self

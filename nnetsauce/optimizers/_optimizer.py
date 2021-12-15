@@ -1,4 +1,3 @@
-
 # Authors: Thierry Moudiki
 #
 # License: BSD 3 Clear
@@ -53,21 +52,22 @@ class Optimizer(BaseEstimator):
             2 - succesive loss function values are printed
 
     """
-    
-    
+
     # construct the object -----
 
     def __init__(
-        self,        
+        self,
         type_optim="sgd",
-        num_iters=100,         
-        learning_rate=0.01, 
-        batch_prop=1.0,         
-        learning_method="momentum", 
-        randomization="strat", 
-        mass=0.9, decay=0.1, 
-        verbose=1):
-        
+        num_iters=100,
+        learning_rate=0.01,
+        batch_prop=1.0,
+        learning_method="momentum",
+        randomization="strat",
+        mass=0.9,
+        decay=0.1,
+        verbose=1,
+    ):
+
         self.type_optim = type_optim
         self.num_iters = num_iters
         self.learning_rate = learning_rate
@@ -78,8 +78,7 @@ class Optimizer(BaseEstimator):
         self.decay = decay
         self.verbose = verbose
         self.opt = None
-                                                          
-    
+
     def fit(self, loss_func, response, x0, **kwargs):
         """Fit GLM model to training data (X, y).
         
@@ -101,34 +100,40 @@ class Optimizer(BaseEstimator):
             self: object
             
         """
-        
-        
+
         if self.type_optim == "scd":
-                    
-            self.results = optimizerc.scd(loss_func, 
-                            response=response, x=x0, 
-                            num_iters=self.num_iters,
-                            batch_prop=self.batch_prop, 
-                            learning_rate=self.learning_rate, 
-                            learning_method=self.learning_method, 
-                            mass=self.mass, decay=self.decay,                     
-                            randomization=self.randomization,             
-                            verbose=self.verbose, 
-                            **kwargs)            
-            
-            
+
+            self.results = optimizerc.scd(
+                loss_func,
+                response=response,
+                x=x0,
+                num_iters=self.num_iters,
+                batch_prop=self.batch_prop,
+                learning_rate=self.learning_rate,
+                learning_method=self.learning_method,
+                mass=self.mass,
+                decay=self.decay,
+                randomization=self.randomization,
+                verbose=self.verbose,
+                **kwargs
+            )
+
         if self.type_optim == "sgd":
-                                        
-            self.results = optimizerc.sgd(loss_func, 
-                            response=response, x=x0, 
-                            num_iters=self.num_iters,
-                            batch_prop=self.batch_prop, 
-                            learning_rate=self.learning_rate, 
-                            learning_method=self.learning_method, 
-                            mass=self.mass, decay=self.decay,                     
-                            randomization=self.randomization,             
-                            verbose=self.verbose, 
-                            **kwargs)    
+
+            self.results = optimizerc.sgd(
+                loss_func,
+                response=response,
+                x=x0,
+                num_iters=self.num_iters,
+                batch_prop=self.batch_prop,
+                learning_rate=self.learning_rate,
+                learning_method=self.learning_method,
+                mass=self.mass,
+                decay=self.decay,
+                randomization=self.randomization,
+                verbose=self.verbose,
+                **kwargs
+            )
 
         return self
 

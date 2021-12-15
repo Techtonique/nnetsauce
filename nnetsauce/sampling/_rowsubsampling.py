@@ -1,7 +1,7 @@
 from . import _rowsubsamplingc as rowsubsamplingc
 
 
-class SubSampler():
+class SubSampler:
     """Subsampling class.
         
      Attributes: 

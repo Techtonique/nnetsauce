@@ -1,10 +1,9 @@
-
 # Authors: Thierry Moudiki
 #
 # License: BSD 3 Clear
 
 
-import pickle 
+import pickle
 import numpy as np
 import sklearn.metrics as skm2
 from .glm import GLM
@@ -82,12 +81,11 @@ class GLMClassifier(GLM, ClassifierMixin):
             reproducibility seed for nodes_sim=='uniform'
 
     """
-    
-    
+
     # construct the object -----
 
     def __init__(
-        self,        
+        self,
         n_hidden_features=5,
         lambda1=0.01,
         alpha1=0.5,
@@ -103,7 +101,7 @@ class GLMClassifier(GLM, ClassifierMixin):
         n_clusters=2,
         cluster_encode=True,
         type_clust="kmeans",
-        type_scaling=("std", "std", "std"),  
+        type_scaling=("std", "std", "std"),
         optimizer=Optimizer(),
         seed=123,
     ):
@@ -127,76 +125,88 @@ class GLMClassifier(GLM, ClassifierMixin):
             optimizer=optimizer,
             seed=seed,
         )
-        
-        self.family = family
-     
-        
-        
-    def logit_loss(self, Y, row_index, XB):
-        
-        self.n_classes = len(np.unique(y))
-        #Y = mo.one_hot_encode2(y, self.n_classes)
-        #Y = self.optimizer.one_hot_encode(y, self.n_classes)
 
-        #max_double = 709.0 # only if softmax
-        #XB[XB > max_double] = max_double
-        XB[XB > 709.0] = 709.0
-        
-        if row_index is None: 
-            return -np.mean(np.sum(Y * XB, axis=1) - logsumexp(XB))
-        
-        return -np.mean(np.sum(Y[row_index, :] * XB, axis=1) - logsumexp(XB))
-    
-    
-    
-    def expit_erf_loss(self, Y, row_index, XB):
-        
-        #self.n_classes = len(np.unique(y))
+        self.family = family
+
+    def logit_loss(self, Y, row_index, XB):
+
+        self.n_classes = len(np.unique(y))
         # Y = mo.one_hot_encode2(y, self.n_classes)
-        #Y = self.optimizer.one_hot_encode(y, self.n_classes)
-        self.n_classes = Y.shape[1]
-        
+        # Y = self.optimizer.one_hot_encode(y, self.n_classes)
+
+        # max_double = 709.0 # only if softmax
+        # XB[XB > max_double] = max_double
+        XB[XB > 709.0] = 709.0
+
         if row_index is None:
             return -np.mean(np.sum(Y * XB, axis=1) - logsumexp(XB))
-            
+
         return -np.mean(np.sum(Y[row_index, :] * XB, axis=1) - logsumexp(XB))
-        
-    
-    
-    def loss_func(self, beta, group_index, 
-                  X, Y, y,
-                  row_index=None, type_loss="logit", 
-                  **kwargs):
 
-        res = {"logit": self.logit_loss, 
-               "expit": self.expit_erf_loss,
-               "erf": self.expit_erf_loss}
-        
-        if row_index is None:            
-            
+    def expit_erf_loss(self, Y, row_index, XB):
+
+        # self.n_classes = len(np.unique(y))
+        # Y = mo.one_hot_encode2(y, self.n_classes)
+        # Y = self.optimizer.one_hot_encode(y, self.n_classes)
+        self.n_classes = Y.shape[1]
+
+        if row_index is None:
+            return -np.mean(np.sum(Y * XB, axis=1) - logsumexp(XB))
+
+        return -np.mean(np.sum(Y[row_index, :] * XB, axis=1) - logsumexp(XB))
+
+    def loss_func(
+        self,
+        beta,
+        group_index,
+        X,
+        Y,
+        y,
+        row_index=None,
+        type_loss="logit",
+        **kwargs
+    ):
+
+        res = {
+            "logit": self.logit_loss,
+            "expit": self.expit_erf_loss,
+            "erf": self.expit_erf_loss,
+        }
+
+        if row_index is None:
+
             row_index = range(len(y))
-            XB = self.compute_XB(X, beta=np.reshape(beta, (X.shape[1], 
-                                                           self.n_classes), 
-                                                 order="F"))  
+            XB = self.compute_XB(
+                X,
+                beta=np.reshape(beta, (X.shape[1], self.n_classes), order="F"),
+            )
 
-            return res[type_loss](Y, row_index, XB) + self.compute_penalty(group_index=group_index, 
-                  beta=beta)
-            
-        XB = self.compute_XB(X, beta=np.reshape(beta, (X.shape[1], 
-                                                       self.n_classes), 
-                                                order="F"), 
-                             row_index=row_index)                
-        
-        return res[type_loss](Y, row_index, XB) + self.compute_penalty(group_index=group_index, 
-                  beta=beta)
-        
-                                                
-    
-    def fit(self, X, y, 
-            learning_rate=0.01, decay=0.1, # in an object, in constructor
-            batch_prop=1, tolerance=1e-5, # in an object, in constructor
-            optimizer = None, # in an object, in constructor
-            verbose=1, **kwargs):
+            return res[type_loss](Y, row_index, XB) + self.compute_penalty(
+                group_index=group_index, beta=beta
+            )
+
+        XB = self.compute_XB(
+            X,
+            beta=np.reshape(beta, (X.shape[1], self.n_classes), order="F"),
+            row_index=row_index,
+        )
+
+        return res[type_loss](Y, row_index, XB) + self.compute_penalty(
+            group_index=group_index, beta=beta
+        )
+
+    def fit(
+        self,
+        X,
+        y,
+        learning_rate=0.01,
+        decay=0.1,  # in an object, in constructor
+        batch_prop=1,
+        tolerance=1e-5,  # in an object, in constructor
+        optimizer=None,  # in an object, in constructor
+        verbose=1,
+        **kwargs
+    ):
         """Fit GLM model to training data (X, y).
         
         Args: 
@@ -217,53 +227,55 @@ class GLMClassifier(GLM, ClassifierMixin):
 
         """
 
-        assert mx.is_factor(y), "y must contain only integers" # change is_factor and subsampling everywhere
-        
+        assert mx.is_factor(
+            y
+        ), "y must contain only integers"  # change is_factor and subsampling everywhere
+
         self.beta = None
-        
+
         self.n_iter = 0
-        
+
         n, p = X.shape
-        
-        self.group_index = n*X.shape[1]
+
+        self.group_index = n * X.shape[1]
 
         self.n_classes = len(np.unique(y))
-        
+
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
-        #Y = mo.one_hot_encode2(output_y, self.n_classes)
+        # Y = mo.one_hot_encode2(output_y, self.n_classes)
         Y = self.optimizer.one_hot_encode(output_y, self.n_classes)
-        
-        # initialization                    
-        beta_ = np.linalg.lstsq(scaled_Z, Y, rcond=None)[0]  
-        
+
+        # initialization
+        beta_ = np.linalg.lstsq(scaled_Z, Y, rcond=None)[0]
+
         self.optimizer.learning_rate = learning_rate
         self.optimizer.decay = decay
         self.optimizer.batch_prop = batch_prop
         self.optimizer.verbose = verbose
-        
+
         # optimization
         # fit(self, loss_func, response, x0, **kwargs):
-        # loss_func(self, beta, group_index, X, y, 
-        #          row_index=None, type_loss="gaussian", 
+        # loss_func(self, beta, group_index, X, y,
+        #          row_index=None, type_loss="gaussian",
         #          **kwargs)
-        self.optimizer.fit(self.loss_func,  
-                           response = np.asarray(y, dtype=np.float), 
-                           x0 = beta_.flatten(order="F"),
-                           group_index = self.group_index, 
-                           X = scaled_Z, 
-                           Y = Y,
-                           y = y, 
-                           type_loss=self.family, 
-                           tolerance=tolerance,
-                           **kwargs)         
+        self.optimizer.fit(
+            self.loss_func,
+            response=np.asarray(y, dtype=np.float),
+            x0=beta_.flatten(order="F"),
+            group_index=self.group_index,
+            X=scaled_Z,
+            Y=Y,
+            y=y,
+            type_loss=self.family,
+            tolerance=tolerance,
+            **kwargs
+        )
 
-        self.beta = self.optimizer.results[0]        
-        
+        self.beta = self.optimizer.results[0]
+
         return self
-         
-    
-    
+
     def predict(self, X, **kwargs):
         """Predict test data X.
         
@@ -283,8 +295,6 @@ class GLMClassifier(GLM, ClassifierMixin):
         """
 
         return np.argmax(self.predict_proba(X, **kwargs), axis=1)
-
-
 
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
@@ -324,27 +334,25 @@ class GLMClassifier(GLM, ClassifierMixin):
                 X.shape[1] + self.n_hidden_features + self.n_clusters,
             ).T,
         )
-            
+
         if self.family == "logit":
-            
+
             exp_ZB = np.exp(ZB)
-    
-            return exp_ZB / exp_ZB.sum(axis=1)[:, None]    
-        
+
+            return exp_ZB / exp_ZB.sum(axis=1)[:, None]
+
         if self.family == "expit":
-            
+
             exp_ZB = expit(ZB)
-    
-            return exp_ZB / exp_ZB.sum(axis=1)[:, None]    
-        
+
+            return exp_ZB / exp_ZB.sum(axis=1)[:, None]
+
         if self.family == "erf":
-            
-            exp_ZB = 0.5*(1 + erf(ZB))
-    
-            return exp_ZB / exp_ZB.sum(axis=1)[:, None]    
-    
-    
-    
+
+            exp_ZB = 0.5 * (1 + erf(ZB))
+
+            return exp_ZB / exp_ZB.sum(axis=1)[:, None]
+
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 
 

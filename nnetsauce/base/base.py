@@ -17,7 +17,8 @@ from ..utils import misc as mx
 from ..simulation import nodesimulation as ns
 from ..sampling import SubSampler
 from ..simulator import Simulator
-if platform.system() in ('Linux', 'Darwin'):
+
+if platform.system() in ("Linux", "Darwin"):
     import jax.nn as jnn
     import jax.numpy as jnp
 
@@ -111,7 +112,9 @@ class Base(BaseEstimator):
         sys_platform = platform.system()
 
         if (sys_platform == "Windows") and (backend in ("gpu", "tpu")):
-            warnings.warn("No GPU/TPU computing on Windows yet, backend set to 'cpu'")
+            warnings.warn(
+                "No GPU/TPU computing on Windows yet, backend set to 'cpu'"
+            )
             backend = "cpu"
 
         assert activation_name in (
@@ -151,7 +154,7 @@ class Base(BaseEstimator):
 
         self.n_hidden_features = n_hidden_features
         self.activation_name = activation_name
-        self.a = a        
+        self.a = a
         self.nodes_sim = nodes_sim
         self.bias = bias
         self.seed = seed
@@ -178,26 +181,36 @@ class Base(BaseEstimator):
         self.y_mean = None
         self.beta = None
 
-
-        # activation function -----    
-        if sys_platform in ('Linux', 'Darwin'):    
+        # activation function -----
+        if sys_platform in ("Linux", "Darwin"):
             activation_options = {
                 "relu": ac.relu if (self.backend == "cpu") else jnn.relu,
                 "tanh": np.tanh if (self.backend == "cpu") else jnp.tanh,
-                "sigmoid": ac.sigmoid if (self.backend == "cpu") else jnn.sigmoid,
+                "sigmoid": ac.sigmoid
+                if (self.backend == "cpu")
+                else jnn.sigmoid,
                 "prelu": partial(ac.prelu, a=a),
-                "elu": partial(ac.elu, a=a) if (self.backend == "cpu") else partial(jnn.elu, a=a)
+                "elu": partial(ac.elu, a=a)
+                if (self.backend == "cpu")
+                else partial(jnn.elu, a=a),
             }
-        else: # on Windows currently, no JAX
+        else:  # on Windows currently, no JAX
             activation_options = {
-                "relu": ac.relu if (self.backend == "cpu") else NotImplementedError,
-                "tanh": np.tanh if (self.backend == "cpu") else NotImplementedError,
-                "sigmoid": ac.sigmoid if (self.backend == "cpu") else NotImplementedError,
+                "relu": ac.relu
+                if (self.backend == "cpu")
+                else NotImplementedError,
+                "tanh": np.tanh
+                if (self.backend == "cpu")
+                else NotImplementedError,
+                "sigmoid": ac.sigmoid
+                if (self.backend == "cpu")
+                else NotImplementedError,
                 "prelu": partial(ac.prelu, a=a),
-                "elu": partial(ac.elu, a=a) if (self.backend == "cpu") else NotImplementedError
-            }            
+                "elu": partial(ac.elu, a=a)
+                if (self.backend == "cpu")
+                else NotImplementedError,
+            }
         self.activation_func = activation_options[activation_name]
-
 
     # "preprocessing" methods to be inherited -----
 
@@ -284,10 +297,14 @@ class Base(BaseEstimator):
 
             if W is None:
 
-                try: # use Simulator here
-                
-                    self.W = Simulator(n_points=self.n_hidden_features, n_dims=n_features, 
-                    type_sim=self.nodes_sim, seed=self.seed).draw()
+                try:  # use Simulator here
+
+                    self.W = Simulator(
+                        n_points=self.n_hidden_features,
+                        n_dims=n_features,
+                        type_sim=self.nodes_sim,
+                        seed=self.seed,
+                    ).draw()
 
                 except:
 
@@ -345,11 +362,15 @@ class Base(BaseEstimator):
 
             try:
 
-                self.W = Simulator(n_points=self.n_hidden_features, n_dims=n_features_1, 
-                    type_sim=self.nodes_sim, seed=self.seed).draw()                
+                self.W = Simulator(
+                    n_points=self.n_hidden_features,
+                    n_dims=n_features_1,
+                    type_sim=self.nodes_sim,
+                    seed=self.seed,
+                ).draw()
 
             except:
-                
+
                 h_sim = {
                     "sobol": ns.generate_sobol2(
                         n_dims=n_features_1, n_points=self.n_hidden_features
@@ -429,7 +450,7 @@ class Base(BaseEstimator):
         if self.n_hidden_features > 0:  # has a hidden layer
             assert (
                 len(self.type_scaling) >= 2
-            ), "must have len(self.type_scaling) >= 2 when self.n_hidden_features > 0"        
+            ), "must have len(self.type_scaling) >= 2 when self.n_hidden_features > 0"
 
         if X is None:
             if self.col_sample == 1:
@@ -524,15 +545,23 @@ class Base(BaseEstimator):
                 if y is None
                 else mo.center_response(y)
             )
-            # y is subsampled            
+            # y is subsampled
             if self.row_sample < 1:
 
                 n, p = Z.shape
 
-                self.subsampler = SubSampler(y=self.y, row_sample=self.row_sample, seed=self.seed) if y is None else SubSampler(y=y, row_sample=self.row_sample, seed=self.seed)
+                self.subsampler = (
+                    SubSampler(
+                        y=self.y, row_sample=self.row_sample, seed=self.seed
+                    )
+                    if y is None
+                    else SubSampler(
+                        y=y, row_sample=self.row_sample, seed=self.seed
+                    )
+                )
 
                 self.index_row = self.subsampler.subsample()
-                    
+
                 n_row_sample = len(self.index_row)
                 # regression
                 return (
@@ -544,17 +573,21 @@ class Base(BaseEstimator):
             # y is not subsampled
             # regression
             return (centered_y, self.scaler.transform(Z))
-            
+
         # classification
         # y is subsampled
         if self.row_sample < 1:
 
             n, p = Z.shape
 
-            self.subsampler = SubSampler(y=self.y, row_sample=self.row_sample, seed=self.seed) if y is None else SubSampler(y=y, row_sample=self.row_sample, seed=self.seed)
+            self.subsampler = (
+                SubSampler(y=self.y, row_sample=self.row_sample, seed=self.seed)
+                if y is None
+                else SubSampler(y=y, row_sample=self.row_sample, seed=self.seed)
+            )
 
             self.index_row = self.subsampler.subsample()
-                
+
             n_row_sample = len(self.index_row)
             # classification
             return (

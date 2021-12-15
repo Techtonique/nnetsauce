@@ -66,7 +66,7 @@ else:
     from .custom.customClassifier import CustomClassifier
     from .custom.customRegressor import CustomRegressor
     from .glm.glmClassifier import GLMClassifier
-    from .glm.glmRegressor import GLMRegressor    
+    from .glm.glmRegressor import GLMRegressor
     from .mts.mts import MTS
     from .multitask.multitaskClassifier import MultitaskClassifier
     from .optimizers._optimizer import Optimizer
@@ -74,6 +74,7 @@ else:
     from .ridge2.ridge2Classifier import Ridge2Classifier
     from .ridge2.ridge2Regressor import Ridge2Regressor
     from .ridge2.ridge2MultitaskClassifier import Ridge2MultitaskClassifier
+
     # from .rnn.rnnRegressor import RNNRegressor
     # from .rnn.rnnClassifier import RNNClassifier
     from .rvfl.bayesianrvflRegressor import BayesianRVFLRegressor
@@ -88,7 +89,7 @@ else:
         "BayesianRVFL2Regressor",
         "CustomClassifier",
         "CustomRegressor",
-        "GLMRegressor", 
+        "GLMRegressor",
         "GLMClassifier",
         "MTS",
         "MultitaskClassifier",
@@ -96,11 +97,12 @@ else:
         "RandomBagClassifier",
         "Ridge2Regressor",
         "Ridge2Classifier",
-        "Ridge2MultitaskClassifier",    
+        "Ridge2MultitaskClassifier",
         "Simulator",
         #    "RNNRegressor",
-        #    "RNNClassifier",        
+        #    "RNNClassifier",
     ]
+
 
 def setup_module(module):
     """Fixture for the tests to assure globally controllable seeding of RNGs"""
@@ -116,4 +118,3 @@ def setup_module(module):
     print("I: Seeding RNGs with %r" % _random_seed)
     np.random.seed(_random_seed)
     random.seed(_random_seed)
-

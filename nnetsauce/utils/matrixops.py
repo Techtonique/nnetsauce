@@ -6,7 +6,8 @@ from scipy import sparse
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
-if platform.system() in ('Linux', 'Darwin'):
+
+if platform.system() in ("Linux", "Darwin"):
     import jax.numpy as jnp
 
 
@@ -14,7 +15,7 @@ if platform.system() in ('Linux', 'Darwin'):
 def cbind(x, y, backend="cpu"):
     # if len(x.shape) == 1 or len(y.shape) == 1:
     sys_platform = platform.system()
-    if backend in ("gpu", "tpu") and (sys_platform in ('Linux', 'Darwin')):
+    if backend in ("gpu", "tpu") and (sys_platform in ("Linux", "Darwin")):
         return jnp.column_stack((x, y))
     return np.column_stack((x, y))
 
@@ -48,7 +49,7 @@ def cluster_covariates(X, n_clusters, seed, type_clust="kmeans", **kwargs):
 def crossprod(x, y=None, backend="cpu"):
     # assert on dimensions
     sys_platform = platform.system()
-    if backend in ("gpu", "tpu") and (sys_platform in ('Linux', 'Darwin')):
+    if backend in ("gpu", "tpu") and (sys_platform in ("Linux", "Darwin")):
         x = device_put(x)
         if y is None:
             return jnp.dot(x.T, x).block_until_ready()
@@ -115,7 +116,7 @@ def one_hot_encode2(y, n_classes):
 def rbind(x, y, backend="cpu"):
     # if len(x.shape) == 1 or len(y.shape) == 1:
     sys_platform = platform.system()
-    if backend in ("gpu", "tpu") and (sys_platform in ('Linux', 'Darwin')):
+    if backend in ("gpu", "tpu") and (sys_platform in ("Linux", "Darwin")):
         return jnp.row_stack((x, y))
     return np.row_stack((x, y))
 
@@ -139,7 +140,7 @@ def safe_sparse_dot(a, b, backend="cpu", dense_output=False):
     """
     sys_platform = platform.system()
 
-    if backend in ("gpu", "tpu") and (sys_platform in ('Linux', 'Darwin')):
+    if backend in ("gpu", "tpu") and (sys_platform in ("Linux", "Darwin")):
         # modif when jax.scipy.sparse available
         return jnp.dot(device_put(a), device_put(b)).block_until_ready()
 
@@ -169,14 +170,14 @@ def safe_sparse_dot(a, b, backend="cpu", dense_output=False):
             # print(b.shape)
             # print("\n")
             ret = a @ b
-        except: 
+        except:
             # print("a.shape")
             # print(a.shape)
             # print("\n")
             # print("b.shape")
             # print(b.shape)
             # print("\n")
-            ret = np.dot(a, b)   
+            ret = np.dot(a, b)
 
     if (
         sparse.issparse(a)
@@ -187,6 +188,7 @@ def safe_sparse_dot(a, b, backend="cpu", dense_output=False):
         return ret.toarray()
 
     return ret
+
 
 # Obtain this for JAX
 # Obtain this for JAX
@@ -229,9 +231,9 @@ def squared_norm(x, backend="cpu"):
         is a matrix (2-d array).
     """
     sys_platform = platform.system()
-    if backend in ("gpu", "tpu") and (sys_platform in ('Linux', 'Darwin')):
+    if backend in ("gpu", "tpu") and (sys_platform in ("Linux", "Darwin")):
         x = np.ravel(x, order="K")
-        x = device_put(x)        
+        x = device_put(x)
         return jnp.dot(x, x).block_until_ready()
 
     x = np.ravel(x, order="K")
@@ -242,7 +244,7 @@ def squared_norm(x, backend="cpu"):
 def tcrossprod(x, y=None, backend="cpu"):
     # assert on dimensions
     sys_platform = platform.system()
-    if backend in ("gpu", "tpu") and (sys_platform in ('Linux', 'Darwin')):
+    if backend in ("gpu", "tpu") and (sys_platform in ("Linux", "Darwin")):
         x = device_put(x)
         if y is None:
             return jnp.dot(x, x.T).block_until_ready()

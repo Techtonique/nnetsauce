@@ -14,6 +14,7 @@ from joblib import Parallel, delayed
 from tqdm import tqdm
 from . import _randombagc as randombagc
 
+
 class RandomBagClassifier(RandomBag, ClassifierMixin):
     """Randomized 'Bagging' Classification model 
     
@@ -104,7 +105,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         n_jobs=None,
         seed=123,
         verbose=1,
-        backend="cpu"
+        backend="cpu",
     ):
 
         super().__init__(
@@ -124,7 +125,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,
-            backend=backend
+            backend=backend,
         )
 
         self.type_fit = "classification"
@@ -174,13 +175,15 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             row_sample=self.row_sample,
             seed=self.seed,
         )
-        
+
         # 1 - Sequential training -----
 
         if self.n_jobs is None:
 
-            #rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators, int verbose, int seed):
-            self.voter = randombagc.rbagloop(base_learner, X, y, self.n_estimators, self.verbose, self.seed)
+            # rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators, int verbose, int seed):
+            self.voter = randombagc.rbagloop(
+                base_learner, X, y, self.n_estimators, self.verbose, self.seed
+            )
 
             self.n_estimators = len(self.voter)
 
@@ -190,15 +193,11 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         # buggy
         # if self.n_jobs is not None:
         def fit_estimators(m):
-            #try:            
+            # try:
             base_learner.fit(X, y, **kwargs)
-            self.voter.update(
-                {m: pickle.loads(pickle.dumps(base_learner, -1))}
-            )
-            base_learner.set_params(
-                seed=self.seed + (m + 1) * 1000,
-            )
-            #except:
+            self.voter.update({m: pickle.loads(pickle.dumps(base_learner, -1))})
+            base_learner.set_params(seed=self.seed + (m + 1) * 1000,)
+            # except:
             #    pass
 
         if self.verbose == 1:
@@ -266,18 +265,18 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
                 for idx, elt in voter.items():
 
-                    try: 
+                    try:
 
                         ensemble_proba += elt.predict_proba(X)
 
-                        #if verbose == 1:
+                        # if verbose == 1:
                         #    pbar.update(idx)
 
                     except:
 
                         continue
 
-                #if verbose == 1:
+                # if verbose == 1:
                 #    pbar.update(n_iter)
 
                 return ensemble_proba / n_iter
@@ -287,10 +286,10 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
                 ensemble_proba += weights[idx] * elt.predict_proba(X)
 
-                #if verbose == 1:
+                # if verbose == 1:
                 #    pbar.update(idx)
 
-            #if verbose == 1:
+            # if verbose == 1:
             #    pbar.update(n_iter)
 
             return ensemble_proba
@@ -299,7 +298,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
         if self.n_jobs is None:
 
-            #if self.verbose == 1:
+            # if self.verbose == 1:
             #    pbar = Progbar(self.n_estimators)
 
             if weights is None:

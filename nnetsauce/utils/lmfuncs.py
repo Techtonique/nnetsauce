@@ -1,7 +1,8 @@
 import numpy as np
 import platform
 from numpy import linalg as la
-if platform.system() in ('Linux', 'Darwin'):
+
+if platform.system() in ("Linux", "Darwin"):
     import jax.numpy as jnp
     from jax.numpy import linalg as jla
 
@@ -31,7 +32,7 @@ def beta_hat(x, y, lam=None, backend="cpu"):
 def inv_penalized_cov(x, lam=None, backend="cpu"):
     # assert on dimensions
     sys_platform = platform.system()
-    if backend in ("gpu", "tpu") and (sys_platform in ('Linux', 'Darwin')):
+    if backend in ("gpu", "tpu") and (sys_platform in ("Linux", "Darwin")):
         if lam is None:
             return jla.inv(mo.crossprod(x=x, backend=backend))
         return jla.inv(

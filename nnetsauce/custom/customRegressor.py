@@ -98,7 +98,7 @@ class CustomRegressor(Custom, RegressorMixin):
         col_sample=1,
         row_sample=1,
         seed=123,
-        backend="cpu"
+        backend="cpu",
     ):
 
         super().__init__(
@@ -117,7 +117,7 @@ class CustomRegressor(Custom, RegressorMixin):
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,
-            backend=backend
+            backend=backend,
         )
 
         self.type_fit = "regression"
@@ -151,7 +151,9 @@ class CustomRegressor(Custom, RegressorMixin):
             self.obj.fit(
                 scaled_Z,
                 centered_y,
-                sample_weight=np.ravel(sample_weight, order='C')[self.index_row],
+                sample_weight=np.ravel(sample_weight, order="C")[
+                    self.index_row
+                ],
                 **kwargs
             )
 

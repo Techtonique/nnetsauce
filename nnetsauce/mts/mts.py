@@ -93,7 +93,7 @@ class MTS(Base):
         col_sample=1,
         lags=1,
         seed=123,
-        backend="cpu"
+        backend="cpu",
     ):
 
         assert np.int(lags) == lags, "parameter 'lags' should be an integer"
@@ -112,7 +112,7 @@ class MTS(Base):
             type_scaling=type_scaling,
             col_sample=col_sample,
             seed=seed,
-            backend=backend
+            backend=backend,
         )
 
         self.obj = obj
@@ -176,7 +176,7 @@ class MTS(Base):
 
         self.y = mts_input[0]
         # print(f"self.y: \n {self.y} \n ")
-        # print(f"mts_input[1]: \n {mts_input[1]} \n ")        
+        # print(f"mts_input[1]: \n {mts_input[1]} \n ")
         self.X = mts_input[1]
 
         if xreg is not None:
@@ -198,9 +198,7 @@ class MTS(Base):
         else:  # xreg is None
 
             # avoids scaling X p times in the loop
-            dummy_y, scaled_Z = self.cook_training_set(
-                y=rep_1_n, X=self.X
-            )
+            dummy_y, scaled_Z = self.cook_training_set(y=rep_1_n, X=self.X)
 
         # loop on all the time series and adjust self.obj.fit
         for i in range(p):
@@ -243,7 +241,6 @@ class MTS(Base):
         self.preds = None  # do not remove (!)
 
         self.preds = pickle.loads(pickle.dumps(self.y, -1))
-        
 
         n_features = self.n_series * self.lags
 
@@ -297,25 +294,24 @@ class MTS(Base):
                 )
 
                 if self.return_std == False:  # std. dev. is not returned
-                    
+
                     preds = np.array(
-                            [
-                                (self.y_means[j] + predicted_cooked_new_X[0])
-                                for j in range(self.n_series)
-                            ]
-                        )
+                        [
+                            (self.y_means[j] + predicted_cooked_new_X[0])
+                            for j in range(self.n_series)
+                        ]
+                    )
 
                 else:  # std. dev. is returned
 
                     preds = np.array(
-                            [
-                                (self.y_means[j] + predicted_cooked_new_X[0][0])
-                                for j in range(self.n_series)
-                            ]
-                        )
+                        [
+                            (self.y_means[j] + predicted_cooked_new_X[0][0])
+                            for j in range(self.n_series)
+                        ]
+                    )
 
                     self.preds_std[i] = predicted_cooked_new_X[1][0]
-                
 
                 self.preds = mo.rbind(preds, self.preds)
 
@@ -337,24 +333,24 @@ class MTS(Base):
                 )
 
                 if self.return_std == False:  # std. dev. is not returned
-                    
+
                     preds = np.array(
-                            [
-                                (self.y_means[j] + predicted_cooked_new_X[0])
-                                for j in range(self.n_series)
-                            ]
-                        )
+                        [
+                            (self.y_means[j] + predicted_cooked_new_X[0])
+                            for j in range(self.n_series)
+                        ]
+                    )
 
                 else:  # std. dev. is returned
-                    
-                    preds = np.array(
-                            [
-                                (self.y_means[j] + predicted_cooked_new_X[0][0])
-                                for j in range(self.n_series)
-                            ]
-                        )
 
-                    self.preds_std[i] = predicted_cooked_new_X[1][0]                
+                    preds = np.array(
+                        [
+                            (self.y_means[j] + predicted_cooked_new_X[0][0])
+                            for j in range(self.n_series)
+                        ]
+                    )
+
+                    self.preds_std[i] = predicted_cooked_new_X[1][0]
 
                 self.preds = mo.rbind(preds, self.preds)
 
@@ -374,10 +370,10 @@ class MTS(Base):
         )
 
         return {
-            'mean': self.preds,
-            'std': self.preds_std,
-            'lower': self.preds - qt * self.preds_std,
-            'upper': self.preds + qt * self.preds_std,
+            "mean": self.preds,
+            "std": self.preds_std,
+            "lower": self.preds - qt * self.preds_std,
+            "upper": self.preds + qt * self.preds_std,
         }
 
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):

@@ -110,7 +110,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
         lambda1=0.1,
         lambda2=0.1,
         seed=123,
-        backend="cpu"
+        backend="cpu",
     ):
 
         super().__init__(
@@ -130,9 +130,8 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
             lambda1=lambda1,
             lambda2=lambda2,
             seed=seed,
-            backend=backend 
+            backend=backend,
         )
-
 
         self.type_fit = "classification"
 
@@ -224,8 +223,16 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
 
             res = -(np.sum(Y * XB, axis=1) - logsumexp(XB)).mean()
 
-            res += 0.5 * self.lambda1 * mo.squared_norm(B[0:init_p, :], backend=self.backend)
-            res += 0.5 * self.lambda2 * mo.squared_norm(B[init_p:p, :], backend=self.backend)
+            res += (
+                0.5
+                * self.lambda1
+                * mo.squared_norm(B[0:init_p, :], backend=self.backend)
+            )
+            res += (
+                0.5
+                * self.lambda2
+                * mo.squared_norm(B[init_p:p, :], backend=self.backend)
+            )
 
             return res
 
@@ -369,9 +376,11 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
             a=Z,
             b=self.beta.reshape(
                 self.n_classes,
-                X.shape[1] + self.n_hidden_features + self.n_clusters).T,        
-            backend=self.backend)
-        
+                X.shape[1] + self.n_hidden_features + self.n_clusters,
+            ).T,
+            backend=self.backend,
+        )
+
         exp_ZB = np.exp(ZB)
 
         return exp_ZB / exp_ZB.sum(axis=1)[:, None]

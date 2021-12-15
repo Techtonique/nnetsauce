@@ -1,10 +1,9 @@
-
 # Authors: Thierry Moudiki
 #
 # License: BSD 3 Clear
 
 
-import pickle 
+import pickle
 import numpy as np
 import sklearn.metrics as skm2
 from .glm import GLM
@@ -84,12 +83,12 @@ class GLMRegressor(GLM, RegressorMixin):
             seed: int 
                 reproducibility seed for nodes_sim=='uniform'
 
-    """        
-    
+    """
+
     # construct the object -----
 
     def __init__(
-        self,        
+        self,
         n_hidden_features=5,
         lambda1=0.01,
         alpha1=0.5,
@@ -105,7 +104,7 @@ class GLMRegressor(GLM, RegressorMixin):
         n_clusters=2,
         cluster_encode=True,
         type_clust="kmeans",
-        type_scaling=("std", "std", "std"),  
+        type_scaling=("std", "std", "std"),
         optimizer=Optimizer(),
         seed=123,
     ):
@@ -129,52 +128,62 @@ class GLMRegressor(GLM, RegressorMixin):
             optimizer=optimizer,
             seed=seed,
         )
-        
+
         self.family = family
-     
-        
-     
+
     def gaussian_loss(self, y, row_index, XB):
-        return 0.5*np.mean(np.square(y[row_index] - XB))
-        
-    
+        return 0.5 * np.mean(np.square(y[row_index] - XB))
+
     def laplace_loss(self, y, row_index, XB):
-        return 0.5*np.mean(np.abs(y[row_index] - XB))
- 
+        return 0.5 * np.mean(np.abs(y[row_index] - XB))
 
     def poisson_loss(self, y, row_index, XB):
-        return -np.mean(y[row_index]*XB - np.exp(XB))
+        return -np.mean(y[row_index] * XB - np.exp(XB))
 
+    def loss_func(
+        self,
+        beta,
+        group_index,
+        X,
+        y,
+        row_index=None,
+        type_loss="gaussian",
+        **kwargs
+    ):
 
-    def loss_func(self, beta, group_index, X, y, 
-                  row_index=None, type_loss="gaussian", 
-                  **kwargs):
+        res = {
+            "gaussian": self.gaussian_loss,
+            "laplace": self.laplace_loss,
+            "poisson": self.poisson_loss,
+        }
 
-        res = {"gaussian": self.gaussian_loss,
-               "laplace": self.laplace_loss, 
-               "poisson": self.poisson_loss}
-        
-        if row_index is None:            
-            
+        if row_index is None:
+
             row_index = range(len(y))
-            XB = self.compute_XB(X, beta=beta)  
+            XB = self.compute_XB(X, beta=beta)
 
-            return res[type_loss](y, row_index, XB) + self.compute_penalty(group_index=group_index, 
-                  beta=beta)              
-            
-        XB = self.compute_XB(X, beta=beta, 
-                             row_index=row_index)                
-        
-        return res[type_loss](y, row_index, XB) + self.compute_penalty(group_index=group_index, 
-                  beta=beta)                                          
-        
-                                                
-    
-    def fit(self, X, y, 
-            learning_rate=0.01, decay=0.1, # in an object, in constructor
-            batch_prop=1, tolerance=1e-5, # in an object, in constructor
-            optimizer = None, # in an object, in constructor
-            verbose=0, **kwargs):
+            return res[type_loss](y, row_index, XB) + self.compute_penalty(
+                group_index=group_index, beta=beta
+            )
+
+        XB = self.compute_XB(X, beta=beta, row_index=row_index)
+
+        return res[type_loss](y, row_index, XB) + self.compute_penalty(
+            group_index=group_index, beta=beta
+        )
+
+    def fit(
+        self,
+        X,
+        y,
+        learning_rate=0.01,
+        decay=0.1,  # in an object, in constructor
+        batch_prop=1,
+        tolerance=1e-5,  # in an object, in constructor
+        optimizer=None,  # in an object, in constructor
+        verbose=0,
+        **kwargs
+    ):
         """Fit GLM model to training data (X, y).
         
         Args:
@@ -194,47 +203,46 @@ class GLMRegressor(GLM, RegressorMixin):
             self: object
 
         """
-        
+
         self.beta = None
-        
+
         self.n_iter = 0
-        
+
         n, self.group_index = X.shape
-        
+
         centered_y, scaled_Z = self.cook_training_set(y=y, X=X)
-        
+
         n_Z = scaled_Z.shape[0]
-        
-        # initialization                    
-        beta_ = np.linalg.lstsq(scaled_Z, centered_y, rcond=None)[0]     
+
+        # initialization
+        beta_ = np.linalg.lstsq(scaled_Z, centered_y, rcond=None)[0]
 
         self.optimizer.learning_rate = learning_rate
         self.optimizer.decay = decay
         self.optimizer.batch_prop = batch_prop
         self.optimizer.verbose = verbose
-         
-        
+
         # optimization
         # fit(self, loss_func, response, x0, **kwargs):
-        # loss_func(self, beta, group_index, X, y, 
-        #          row_index=None, type_loss="gaussian", 
+        # loss_func(self, beta, group_index, X, y,
+        #          row_index=None, type_loss="gaussian",
         #          **kwargs)
-        self.optimizer.fit(self.loss_func,  
-                           response = centered_y, 
-                           x0 = beta_,
-                           group_index = self.group_index, 
-                           X = scaled_Z, 
-                           y = centered_y, 
-                           type_loss=self.family, 
-                           tolerance=tolerance,
-                           **kwargs)         
+        self.optimizer.fit(
+            self.loss_func,
+            response=centered_y,
+            x0=beta_,
+            group_index=self.group_index,
+            X=scaled_Z,
+            y=centered_y,
+            type_loss=self.family,
+            tolerance=tolerance,
+            **kwargs
+        )
 
         self.beta = self.optimizer.results[0]
-        
+
         return self
-    
-    
-    
+
     def predict(self, X, **kwargs):
         """Predict test data X.
         
@@ -252,7 +260,7 @@ class GLMRegressor(GLM, RegressorMixin):
             model predictions: {array-like}        
 
         """
-        
+
         if len(X.shape) == 1:
 
             n_features = X.shape[0]
@@ -260,15 +268,14 @@ class GLMRegressor(GLM, RegressorMixin):
                 X.reshape(1, n_features),
                 np.ones(n_features).reshape(1, n_features),
             )
-                           
-            return (self.y_mean + np.dot(self.cook_test_set(new_X, **kwargs), 
-                                         self.beta))[0]
-        
-        return self.y_mean + np.dot(self.cook_test_set(X, **kwargs), 
-                                    self.beta)
-    
-    
-    
+
+            return (
+                self.y_mean
+                + np.dot(self.cook_test_set(new_X, **kwargs), self.beta)
+            )[0]
+
+        return self.y_mean + np.dot(self.cook_test_set(X, **kwargs), self.beta)
+
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 
 
