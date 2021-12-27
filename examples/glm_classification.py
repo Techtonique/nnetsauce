@@ -62,55 +62,6 @@ preds = fit_obj.predict(X_test)
 print(time() - start)
 print(metrics.classification_report(preds, y_test))
 
-
-# dataset no. 3 ---------- 
-
-iris = load_iris()
-Z = iris.data
-t = iris.target
-np.random.seed(123575)
-X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
-
-print(f"\n 3 - iris dataset ----------")
-fit_obj = ns.GLMClassifier(n_hidden_features=3, 
-                           n_clusters=2, type_clust="gmm")
-
-start = time()
-fit_obj.fit(X_train, y_train, verbose=2)
-print(time() - start)
-
-plt.plot(fit_obj.optimizer.results[2])
-
-print(fit_obj.score(X_test, y_test))
-
-start = time()
-preds = fit_obj.predict(X_test)
-print(time() - start)
-print(metrics.classification_report(preds, y_test))
-
-
-# dataset no. 4 ----------
-
-X, y = make_classification(n_samples=2500, n_features=20, 
-                                               random_state=783451)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, 
-                                                    random_state=351452)
-
-print(f"\n 4 - make_classification dataset ----------")
-fit_obj = ns.GLMClassifier(n_hidden_features=5,
-                                  dropout=0.1, n_clusters=3, 
-                                  type_clust="gmm")
-
-start = time()
-fit_obj.fit(X_train, y_train, verbose=2)
-print(time() - start)
-
-print(fit_obj.score(X_test, y_test))
-
-preds = fit_obj.predict(X_test)
-print(metrics.classification_report(preds, y_test))
-
-
 # dataset no. 5 ----------
 
 digits = load_digits()
@@ -191,4 +142,52 @@ start = time()
 preds = fit_obj.predict(X_test)
 print(time() - start)
 print(metrics.classification_report(preds, y_test))
+
+
+
+# dataset no. 3 ---------- 
+
+iris = load_iris()
+Z = iris.data
+t = iris.target
+np.random.seed(123575)
+X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
+
+print(f"\n 3 - iris dataset ----------")
+fit_obj = ns.GLMClassifier(n_hidden_features=3, 
+                           n_clusters=0)
+
+start = time()
+fit_obj.fit(X_train, y_train, verbose=2)
+print(time() - start)
+
+plt.plot(fit_obj.optimizer.results[2])
+
+print(fit_obj.score(X_test, y_test))
+
+start = time()
+preds = fit_obj.predict(X_test)
+print(time() - start)
+print(metrics.classification_report(preds, y_test))
+
+# dataset no. 4 ----------
+
+X, y = make_classification(n_samples=2500, n_features=20, 
+                                               random_state=783451)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, 
+                                                    random_state=351452)
+
+print(f"\n 4 - make_classification dataset ----------")
+fit_obj = ns.GLMClassifier(n_hidden_features=5,
+                                  dropout=0.1, n_clusters=0)
+
+start = time()
+fit_obj.fit(X_train, y_train, verbose=2)
+print(time() - start)
+
+print(fit_obj.score(X_test, y_test))
+
+preds = fit_obj.predict(X_test)
+print(metrics.classification_report(preds, y_test))
+
 
