@@ -10,9 +10,9 @@ from . import _optimizerc as optimizerc
 
 class Optimizer(BaseEstimator):
     """Optimizer class
-    
-    Attributes: 
-    
+
+    Attributes:
+
         type_optim: str
             type of optimizer, (currently) either 'sgd' (stochastic minibatch gradient descent)
             or 'scd' (stochastic minibatch coordinate descent)
@@ -27,9 +27,9 @@ class Optimizer(BaseEstimator):
             proportion of the initial data used at each optimization step
 
         learning_method: str
-            "poly" - learning rate decreasing as a polynomial function 
+            "poly" - learning rate decreasing as a polynomial function
             of # of iterations (default)
-            "exp" - learning rate decreasing as an exponential function 
+            "exp" - learning rate decreasing as an exponential function
             of # of iterations
             "momentum" - gradient descent using momentum
 
@@ -42,10 +42,10 @@ class Optimizer(BaseEstimator):
             mass on velocity, for `method` == "momentum"
 
         decay: float
-            coefficient of decrease of the learning rate for 
+            coefficient of decrease of the learning rate for
             `method` == "poly" and `method` == "exp"
-            
-        verbose: int 
+
+        verbose: int
             controls verbosity of gradient descent
             0 - nothing is printed
             1 - a progress bar is printed
@@ -81,24 +81,24 @@ class Optimizer(BaseEstimator):
 
     def fit(self, loss_func, response, x0, **kwargs):
         """Fit GLM model to training data (X, y).
-        
+
         Args:
-                        
+
             loss_func: loss function
-            
+
             response: array-like, shape = [n_samples]
-            target variable (used for subsampling) 
-            
+            target variable (used for subsampling)
+
             x0: array-like, shape = [n_features]
                 initial value provided to the optimizer
-        
-            **kwargs: additional parameters to be passed to 
+
+            **kwargs: additional parameters to be passed to
                     loss function
-               
-        Returns: 
+
+        Returns:
 
             self: object
-            
+
         """
 
         if self.type_optim == "scd":

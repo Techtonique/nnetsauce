@@ -17,71 +17,71 @@ from scipy.special import erf, factorial
 
 class GLMRegressor(GLM, RegressorMixin):
     """Generalized 'linear' models using quasi-randomized networks (regression)
-        
-        Attributes:
-        
-            n_hidden_features: int
-                number of nodes in the hidden layer
 
-            lambda1: float
-                regularization parameter for GLM coefficients on original features
+    Attributes:
 
-            alpha1: float
-                controls compromize between l1 and l2 norm of GLM coefficients on original features
+        n_hidden_features: int
+            number of nodes in the hidden layer
 
-            lambda2: float
-                regularization parameter for GLM coefficients on nonlinear features
+        lambda1: float
+            regularization parameter for GLM coefficients on original features
 
-            alpha2: float
-                controls compromize between l1 and l2 norm of GLM coefficients on nonlinear features
+        alpha1: float
+            controls compromize between l1 and l2 norm of GLM coefficients on original features
 
-            family: str
-                "gaussian", "laplace" or "poisson" (for now)    
+        lambda2: float
+            regularization parameter for GLM coefficients on nonlinear features
 
-            activation_name: str
-                activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
+        alpha2: float
+            controls compromize between l1 and l2 norm of GLM coefficients on nonlinear features
 
-            a: float
-                hyperparameter for 'prelu' or 'elu' activation function
+        family: str
+            "gaussian", "laplace" or "poisson" (for now)
 
-            nodes_sim: str
-                type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
-                'uniform'
+        activation_name: str
+            activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
 
-            bias: boolean
-                indicates if the hidden layer contains a bias term (True) or not 
-                (False)
+        a: float
+            hyperparameter for 'prelu' or 'elu' activation function
 
-            dropout: float
-                regularization parameter; (random) percentage of nodes dropped out 
-                of the training
+        nodes_sim: str
+            type of simulation for the nodes: 'sobol', 'hammersley', 'halton',
+            'uniform'
 
-            direct_link: boolean
-                indicates if the original predictors are included (True) in model's 
-                fitting or not (False)
+        bias: boolean
+            indicates if the hidden layer contains a bias term (True) or not
+            (False)
 
-            n_clusters: int
-                number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
-                    no clustering)
+        dropout: float
+            regularization parameter; (random) percentage of nodes dropped out
+            of the training
 
-            cluster_encode: bool
-                defines how the variable containing clusters is treated (default is one-hot)
-                if `False`, then labels are used, without one-hot encoding
+        direct_link: boolean
+            indicates if the original predictors are included (True) in model's
+            fitting or not (False)
 
-            type_clust: str
-                type of clustering method: currently k-means ('kmeans') or Gaussian 
-                Mixture Model ('gmm')
-                
-            type_scaling: a tuple of 3 strings
-                scaling methods for inputs, hidden layer, and clustering respectively
-                (and when relevant). 
-                Currently available: standardization ('std') or MinMax scaling ('minmax')
+        n_clusters: int
+            number of clusters for 'kmeans' or 'gmm' clustering (could be 0:
+                no clustering)
 
-            optimizer: object 
-                optimizer, from class nnetsauce.utils.Optimizer
+        cluster_encode: bool
+            defines how the variable containing clusters is treated (default is one-hot)
+            if `False`, then labels are used, without one-hot encoding
 
-            seed: int 
-                reproducibility seed for nodes_sim=='uniform'
+        type_clust: str
+            type of clustering method: currently k-means ('kmeans') or Gaussian
+            Mixture Model ('gmm')
+
+        type_scaling: a tuple of 3 strings
+            scaling methods for inputs, hidden layer, and clustering respectively
+            (and when relevant).
+            Currently available: standardization ('std') or MinMax scaling ('minmax')
+
+        optimizer: object
+            optimizer, from class nnetsauce.utils.Optimizer
+
+        seed: int
+            reproducibility seed for nodes_sim=='uniform'
 
     """
 
@@ -185,21 +185,21 @@ class GLMRegressor(GLM, RegressorMixin):
         **kwargs
     ):
         """Fit GLM model to training data (X, y).
-        
+
         Args:
-        
+
             X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number 
+                Training vectors, where n_samples is the number
                 of samples and n_features is the number of features.
-            
+
             y: array-like, shape = [n_samples]
                 Target values.
-        
-            **kwargs: additional parameters to be passed to 
+
+            **kwargs: additional parameters to be passed to
                     self.cook_training_set or self.obj.fit
-               
+
         Returns:
-        
+
             self: object
 
         """
@@ -245,19 +245,19 @@ class GLMRegressor(GLM, RegressorMixin):
 
     def predict(self, X, **kwargs):
         """Predict test data X.
-        
+
         Args:
-        
+
             X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number 
+                Training vectors, where n_samples is the number
                 of samples and n_features is the number of features.
-            
-            **kwargs: additional parameters to be passed to 
+
+            **kwargs: additional parameters to be passed to
                     self.cook_test_set
-               
+
         Returns:
-        
-            model predictions: {array-like}        
+
+            model predictions: {array-like}
 
         """
 

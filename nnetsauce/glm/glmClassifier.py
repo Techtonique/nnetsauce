@@ -17,9 +17,9 @@ from scipy.special import logsumexp, expit, erf
 
 class GLMClassifier(GLM, ClassifierMixin):
     """Generalized 'linear' models using quasi-randomized networks (classification)
-    
+
     Attributes:
-       
+
         n_hidden_features: int
             number of nodes in the hidden layer
 
@@ -42,23 +42,23 @@ class GLMClassifier(GLM, ClassifierMixin):
             hyperparameter for 'prelu' or 'elu' activation function
 
         nodes_sim: str
-            type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+            type of simulation for the nodes: 'sobol', 'hammersley', 'halton',
             'uniform'
 
         bias: boolean
-            indicates if the hidden layer contains a bias term (True) or not 
+            indicates if the hidden layer contains a bias term (True) or not
             (False)
 
         dropout: float
-            regularization parameter; (random) percentage of nodes dropped out 
+            regularization parameter; (random) percentage of nodes dropped out
             of the training
 
         direct_link: boolean
-            indicates if the original predictors are included (True) in model's 
+            indicates if the original predictors are included (True) in model's
             fitting or not (False)
 
         n_clusters: int
-            number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
+            number of clusters for 'kmeans' or 'gmm' clustering (could be 0:
                 no clustering)
 
         cluster_encode: bool
@@ -66,18 +66,18 @@ class GLMClassifier(GLM, ClassifierMixin):
             if `False`, then labels are used, without one-hot encoding
 
         type_clust: str
-            type of clustering method: currently k-means ('kmeans') or Gaussian 
+            type of clustering method: currently k-means ('kmeans') or Gaussian
             Mixture Model ('gmm')
 
         type_scaling: a tuple of 3 strings
             scaling methods for inputs, hidden layer, and clustering respectively
-            (and when relevant). 
+            (and when relevant).
             Currently available: standardization ('std') or MinMax scaling ('minmax')
 
-        optimizer: object 
+        optimizer: object
             optimizer, from class nnetsauce.utils.Optimizer
 
-        seed: int 
+        seed: int
             reproducibility seed for nodes_sim=='uniform'
 
     """
@@ -208,21 +208,21 @@ class GLMClassifier(GLM, ClassifierMixin):
         **kwargs
     ):
         """Fit GLM model to training data (X, y).
-        
-        Args: 
-        
+
+        Args:
+
             X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number 
+                Training vectors, where n_samples is the number
                 of samples and n_features is the number of features.
-            
+
             y: array-like, shape = [n_samples]
                 Target values.
-        
-            **kwargs: additional parameters to be passed to 
+
+            **kwargs: additional parameters to be passed to
                     self.cook_training_set or self.obj.fit
-               
-        Returns: 
-        
+
+        Returns:
+
             self: object
 
         """
@@ -278,18 +278,18 @@ class GLMClassifier(GLM, ClassifierMixin):
 
     def predict(self, X, **kwargs):
         """Predict test data X.
-        
-        Args: 
-        
+
+        Args:
+
             X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number 
+                Training vectors, where n_samples is the number
                 of samples and n_features is the number of features.
-            
-            **kwargs: additional parameters to be passed to 
+
+            **kwargs: additional parameters to be passed to
                     self.cook_test_set
-               
-        Returns: 
-        
+
+        Returns:
+
             model predictions: {array-like}
 
         """
@@ -298,19 +298,19 @@ class GLMClassifier(GLM, ClassifierMixin):
 
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
-        
+
         Args:
-        
+
             X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number 
+                Training vectors, where n_samples is the number
                 of samples and n_features is the number of features.
-            
-            **kwargs: additional parameters to be passed to 
+
+            **kwargs: additional parameters to be passed to
                     self.cook_test_set
-               
-        Returns: 
-        
-            probability estimates for test data: {array-like}        
+
+        Returns:
+
+            probability estimates for test data: {array-like}
 
         """
         if len(X.shape) == 1:

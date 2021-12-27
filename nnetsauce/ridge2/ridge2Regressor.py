@@ -20,8 +20,8 @@ if platform.system() in ("Linux", "Darwin"):
 class Ridge2Regressor(Ridge2, RegressorMixin):
     """Ridge regression with 2 regularization parameters derived from class Ridge
 
-    Attributes: 
-    
+    Attributes:
+
         n_hidden_features: int
             number of nodes in the hidden layer
 
@@ -32,19 +32,19 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
             hyperparameter for 'prelu' or 'elu' activation function
 
         nodes_sim: str
-            type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+            type of simulation for the nodes: 'sobol', 'hammersley', 'halton',
             'uniform'
 
         bias: boolean
-            indicates if the hidden layer contains a bias term (True) or not 
+            indicates if the hidden layer contains a bias term (True) or not
             (False)
 
         dropout: float
-            regularization parameter; (random) percentage of nodes dropped out 
+            regularization parameter; (random) percentage of nodes dropped out
             of the training
 
         n_clusters: int
-            number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
+            number of clusters for 'kmeans' or 'gmm' clustering (could be 0:
                 no clustering)
 
         cluster_encode: bool
@@ -52,19 +52,19 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
             if `False`, then labels are used, without one-hot encoding
 
         type_clust: str
-            type of clustering method: currently k-means ('kmeans') or Gaussian 
+            type of clustering method: currently k-means ('kmeans') or Gaussian
             Mixture Model ('gmm')
 
         type_scaling: a tuple of 3 strings
             scaling methods for inputs, hidden layer, and clustering respectively
-            (and when relevant). 
+            (and when relevant).
             Currently available: standardization ('std') or MinMax scaling ('minmax')
 
         col_sample: float
-            percentage of covariates randomly chosen for training   
+            percentage of covariates randomly chosen for training
 
         row_sample: float
-            percentage of rows chosen for training, by stratified bootstrapping    
+            percentage of rows chosen for training, by stratified bootstrapping
 
         lambda1: float
             regularization parameter on direct link
@@ -72,17 +72,17 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
         lambda2: float
             regularization parameter on hidden layer
 
-        seed: int 
+        seed: int
             reproducibility seed for nodes_sim=='uniform'
-            
+
         backend: str
-            'cpu' or 'gpu' or 'tpu'                
+            'cpu' or 'gpu' or 'tpu'
 
-    References: 
+    References:
 
-        - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: 
-        https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters    
-    
+        - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at:
+        https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
+
     """
 
     # construct the object -----
@@ -129,22 +129,22 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
         self.type_fit = "regression"
 
     def fit(self, X, y, **kwargs):
-        """Fit Ridge model to training data (X, y).           
-        
+        """Fit Ridge model to training data (X, y).
+
         Args:
 
             X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number 
+                Training vectors, where n_samples is the number
                 of samples and n_features is the number of features.
-            
+
             y: array-like, shape = [n_samples]
                 Target values.
-        
-            **kwargs: additional parameters to be passed to 
+
+            **kwargs: additional parameters to be passed to
                     self.cook_training_set or self.obj.fit
-               
-        Returns: 
-        
+
+        Returns:
+
             self: object
 
         """
@@ -209,18 +209,18 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
 
     def predict(self, X, **kwargs):
         """Predict test data X.
-        
+
         Args:
-        
+
             X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number 
+                Training vectors, where n_samples is the number
                 of samples and n_features is the number of features.
-            
-            **kwargs: additional parameters to be passed to 
+
+            **kwargs: additional parameters to be passed to
                     self.cook_test_set
-                
-        Returns: 
-        
+
+        Returns:
+
             model predictions: {array-like}
 
         """

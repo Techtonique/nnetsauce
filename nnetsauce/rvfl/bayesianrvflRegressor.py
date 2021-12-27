@@ -13,9 +13,9 @@ from sklearn.base import RegressorMixin
 
 class BayesianRVFLRegressor(Base, RegressorMixin):
     """Bayesian Random Vector Functional Link Network regression with one prior
-    
-    Attributes: 
-    
+
+    Attributes:
+
         n_hidden_features: int
             number of nodes in the hidden layer
 
@@ -32,7 +32,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
             indicates if the hidden layer contains a bias term (True) or not (False)
 
         dropout: float
-            regularization parameter; (random) percentage of nodes dropped out 
+            regularization parameter; (random) percentage of nodes dropped out
             of the training
 
         direct_link: boolean
@@ -50,16 +50,16 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
 
         type_scaling: a tuple of 3 strings
             scaling methods for inputs, hidden layer, and clustering respectively
-            (and when relevant). 
+            (and when relevant).
             Currently available: standardization ('std') or MinMax scaling ('minmax')
 
         col_sample: float
-            percentage of features randomly chosen for training  
+            percentage of features randomly chosen for training
 
         row_sample: float
-            percentage of rows chosen for training, by stratified bootstrapping    
+            percentage of rows chosen for training, by stratified bootstrapping
 
-        seed: int 
+        seed: int
             reproducibility seed for nodes_sim=='uniform'
 
         s: float
@@ -69,7 +69,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
             std. dev. of residuals in Bayesian Ridge Regression
 
         beta: array-like
-            regression''s fitted parameters 
+            regression''s fitted parameters
 
         Sigma: array-like
             covariance of the distribution of fitted parameters
@@ -78,7 +78,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
             return_std: boolean
 
         backend: str
-            "cpu" or "gpu" or "tpu"                
+            "cpu" or "gpu" or "tpu"
 
     """
 
@@ -135,20 +135,20 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
 
     def fit(self, X, y, **kwargs):
         """Fit BayesianRVFLRegressor to training data (X, y).
-        
+
         Args:
-        
+
             X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number 
+                Training vectors, where n_samples is the number
                 of samples and n_features is the number of features.
-            
+
             y: array-like, shape = [n_samples]
                 Target values.
-        
-            **kwargs: additional parameters to be passed to 
+
+            **kwargs: additional parameters to be passed to
                     self.cook_training_set
-               
-        Returns: 
+
+        Returns:
 
             self: object
 
@@ -177,20 +177,20 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
 
     def predict(self, X, return_std=False, **kwargs):
         """Predict test data X.
-        
+
         Args:
-        
+
             X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number 
+                Training vectors, where n_samples is the number
                 of samples and n_features is the number of features.
 
             return_std: {boolean}, standard dev. is returned or not
 
-            **kwargs: additional parameters to be passed to 
+            **kwargs: additional parameters to be passed to
                     self.cook_test_set
-               
-        Returns: 
-        
+
+        Returns:
+
             model predictions: {array-like}
 
         """

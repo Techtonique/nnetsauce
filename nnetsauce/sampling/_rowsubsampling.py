@@ -3,17 +3,17 @@ from . import _rowsubsamplingc as rowsubsamplingc
 
 class SubSampler:
     """Subsampling class.
-        
-     Attributes: 
-     
-        y: array-like, shape = [n_samples]
-            Target values.
 
-        row_sample: double
-            subsampling fraction
+    Attributes:
 
-        seed: int
-            reproductibility seed   
+       y: array-like, shape = [n_samples]
+           Target values.
+
+       row_sample: double
+           subsampling fraction
+
+       seed: int
+           reproductibility seed
 
     """
 

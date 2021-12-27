@@ -17,11 +17,11 @@ import pickle
 
 class AdaBoostClassifier(Boosting, ClassifierMixin):
     """AdaBoost Classification (SAMME) model class derived from class Boosting
-    
-    Attributes: 
+
+    Attributes:
 
         obj: object
-            any object containing a method fit (obj.fit()) and a method predict 
+            any object containing a method fit (obj.fit()) and a method predict
             (obj.predict())
 
         n_estimators: int
@@ -46,23 +46,23 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             hyperparameter for 'prelu' or 'elu' activation function
 
         nodes_sim: str
-            type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+            type of simulation for the nodes: 'sobol', 'hammersley', 'halton',
             'uniform'
 
         bias: boolean
-            indicates if the hidden layer contains a bias term (True) or not 
+            indicates if the hidden layer contains a bias term (True) or not
             (False)
 
         dropout: float
-            regularization parameter; (random) percentage of nodes dropped out 
+            regularization parameter; (random) percentage of nodes dropped out
             of the training
 
         direct_link: boolean
-            indicates if the original predictors are included (True) in model's 
+            indicates if the original predictors are included (True) in model's
             fitting or not (False)
 
         n_clusters: int
-            number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
+            number of clusters for 'kmeans' or 'gmm' clustering (could be 0:
                 no clustering)
 
         cluster_encode: bool
@@ -70,29 +70,29 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             if `False`, then labels are used, without one-hot encoding
 
         type_clust: str
-            type of clustering method: currently k-means ('kmeans') or Gaussian 
+            type of clustering method: currently k-means ('kmeans') or Gaussian
             Mixture Model ('gmm')
 
         type_scaling: a tuple of 3 strings
             scaling methods for inputs, hidden layer, and clustering respectively
-            (and when relevant). 
+            (and when relevant).
             Currently available: standardization ('std') or MinMax scaling ('minmax')
 
         col_sample: float
-            percentage of covariates randomly chosen for training   
+            percentage of covariates randomly chosen for training
 
         row_sample: float
-            percentage of rows chosen for training, by stratified bootstrapping    
+            percentage of rows chosen for training, by stratified bootstrapping
 
-        seed: int 
+        seed: int
             reproducibility seed for nodes_sim=='uniform'
 
         method: str
             type of Adaboost method, 'SAMME' (discrete) or 'SAMME.R' (real)
-            
+
         backend: str
-            "cpu" or "gpu" or "tpu"                
-    
+            "cpu" or "gpu" or "tpu"
+
     """
 
     # construct the object -----
@@ -155,21 +155,21 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit Boosting model to training data (X, y).
-        
+
         Args:
-        
+
             X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number 
+                Training vectors, where n_samples is the number
                 of samples and n_features is the number of features.
-            
+
             y: array-like, shape = [n_samples]
                 Target values.
-        
-            **kwargs: additional parameters to be passed to 
+
+            **kwargs: additional parameters to be passed to
                     self.cook_training_set or self.obj.fit
-               
+
         Returns:
-        
+
              self: object
         """
 
@@ -326,38 +326,38 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
     def predict(self, X, **kwargs):
         """Predict test data X.
-        
+
         Args:
-        
+
             X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number 
+                Training vectors, where n_samples is the number
                 of samples and n_features is the number of features.
-        
-            **kwargs: additional parameters to be passed to 
+
+            **kwargs: additional parameters to be passed to
                   self.cook_test_set
-               
+
         Returns:
-        
-            model predictions: {array-like}        
+
+            model predictions: {array-like}
         """
 
         return self.predict_proba(X, **kwargs).argmax(axis=1)
 
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
-        
+
         Args:
-        
+
             X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number 
+                Training vectors, where n_samples is the number
                 of samples and n_features is the number of features.
-        
-            **kwargs: additional parameters to be passed to 
+
+            **kwargs: additional parameters to be passed to
                   self.cook_test_set
-               
-        Returns: 
-        
-            probability estimates for test data: {array-like}    
+
+        Returns:
+
+            probability estimates for test data: {array-like}
 
         """
 
@@ -423,28 +423,28 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         return expit_ensemble_learner / sum_ensemble[:, None]
 
     def score(self, X, y, scoring=None, **kwargs):
-        """ Score the model on test set features X and response y. 
+        """Score the model on test set features X and response y.
 
         Args:
-        
+
             X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number 
+                Training vectors, where n_samples is the number
                 of samples and n_features is the number of features
 
             y: array-like, shape = [n_samples]
                 Target values
 
             scoring: str
-                must be in ('accuracy', 'average_precision', 
-                           'brier_score_loss', 'f1', 'f1_micro', 
-                           'f1_macro', 'f1_weighted',  'f1_samples', 
-                           'neg_log_loss', 'precision', 'recall', 
+                must be in ('accuracy', 'average_precision',
+                           'brier_score_loss', 'f1', 'f1_micro',
+                           'f1_macro', 'f1_weighted',  'f1_samples',
+                           'neg_log_loss', 'precision', 'recall',
                            'roc_auc')
-            
+
             **kwargs: additional parameters to be passed to scoring functions
-               
-        Returns: 
-        
+
+        Returns:
+
             model scores: {array-like}
 
         """

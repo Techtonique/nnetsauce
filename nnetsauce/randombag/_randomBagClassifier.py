@@ -16,12 +16,12 @@ from . import _randombagc as randombagc
 
 
 class RandomBagClassifier(RandomBag, ClassifierMixin):
-    """Randomized 'Bagging' Classification model 
-    
-    Attributes: 
-    
+    """Randomized 'Bagging' Classification model
+
+    Attributes:
+
         obj: object
-            any object containing a method fit (obj.fit()) and a method predict 
+            any object containing a method fit (obj.fit()) and a method predict
             (obj.predict())
 
         n_estimators: int
@@ -37,23 +37,23 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             hyperparameter for 'prelu' or 'elu' activation function
 
         nodes_sim: str
-            type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+            type of simulation for the nodes: 'sobol', 'hammersley', 'halton',
             'uniform'
 
         bias: boolean
-            indicates if the hidden layer contains a bias term (True) or not 
+            indicates if the hidden layer contains a bias term (True) or not
             (False)
 
         dropout: float
-            regularization parameter; (random) percentage of nodes dropped out 
+            regularization parameter; (random) percentage of nodes dropped out
             of the training
 
         direct_link: boolean
-            indicates if the original predictors are included (True) in model's 
+            indicates if the original predictors are included (True) in model's
             fitting or not (False)
 
         n_clusters: int
-            number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
+            number of clusters for 'kmeans' or 'gmm' clustering (could be 0:
                 no clustering)
 
         cluster_encode: bool
@@ -61,25 +61,25 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             if `False`, then labels are used, without one-hot encoding
 
         type_clust: str
-            type of clustering method: currently k-means ('kmeans') or Gaussian 
+            type of clustering method: currently k-means ('kmeans') or Gaussian
             Mixture Model ('gmm')
 
         type_scaling: a tuple of 3 strings
             scaling methods for inputs, hidden layer, and clustering respectively
-            (and when relevant). 
+            (and when relevant).
             Currently available: standardization ('std') or MinMax scaling ('minmax')
 
         col_sample: float
-            percentage of covariates randomly chosen for training   
+            percentage of covariates randomly chosen for training
 
         row_sample: float
-            percentage of rows chosen for training, by stratified bootstrapping 
+            percentage of rows chosen for training, by stratified bootstrapping
 
-        seed: int 
+        seed: int
             reproducibility seed for nodes_sim=='uniform'
 
         backend: str
-            "cpu" or "gpu" or "tpu"                           
+            "cpu" or "gpu" or "tpu"
 
     """
 
@@ -135,23 +135,23 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
     def fit(self, X, y, **kwargs):
         """Fit Random 'Forest' model to training data (X, y).
-        
+
         Args:
-        
+
             X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number 
+                Training vectors, where n_samples is the number
                 of samples and n_features is the number of features.
-            
+
             y: array-like, shape = [n_samples]
                 Target values.
-        
-            **kwargs: additional parameters to be passed to 
+
+            **kwargs: additional parameters to be passed to
                     self.cook_training_set or self.obj.fit
-                
-        Returns: 
-        
+
+        Returns:
+
             self: object
-            
+
         """
 
         assert mx.is_factor(y), "y must contain only integers"
@@ -196,7 +196,9 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             # try:
             base_learner.fit(X, y, **kwargs)
             self.voter.update({m: pickle.loads(pickle.dumps(base_learner, -1))})
-            base_learner.set_params(seed=self.seed + (m + 1) * 1000,)
+            base_learner.set_params(
+                seed=self.seed + (m + 1) * 1000,
+            )
             # except:
             #    pass
 
@@ -218,38 +220,38 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
     def predict(self, X, weights=None, **kwargs):
         """Predict test data X.
-        
+
         Args:
-        
+
             X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number 
+                Training vectors, where n_samples is the number
                 of samples and n_features is the number of features.
-            
-            **kwargs: additional parameters to be passed to 
+
+            **kwargs: additional parameters to be passed to
                     self.cook_test_set
-               
-        Returns: 
-        
-            model predictions: {array-like}        
+
+        Returns:
+
+            model predictions: {array-like}
 
         """
         return self.predict_proba(X, weights, **kwargs).argmax(axis=1)
 
     def predict_proba(self, X, weights=None, **kwargs):
         """Predict probabilities for test data X.
-        
+
         Args:
-        
+
             X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number 
+                Training vectors, where n_samples is the number
                 of samples and n_features is the number of features.
-            
-            **kwargs: additional parameters to be passed to 
+
+            **kwargs: additional parameters to be passed to
                     self.cook_test_set
-               
-        Returns: 
-        
-            probability estimates for test data: {array-like}  
+
+        Returns:
+
+            probability estimates for test data: {array-like}
 
         """
 
