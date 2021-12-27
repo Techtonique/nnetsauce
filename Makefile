@@ -81,7 +81,7 @@ dist: clean ## builds source and wheel package
 install: clean ## install the package to the active Python's site-packages
 	python setup.py install
 
-build-site: docs
+build-site: docs ## export mkdocs website to a folder
 	cd docs&&mkdocs build
 	cp -rf docs/site/* ../../Pro_Website/Techtonique.github.io/nnetsauce
 	cd ..
