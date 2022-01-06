@@ -15,8 +15,6 @@ t = breast_cancer.target
 np.random.seed(123)
 X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
-print(Z.shape)
-
 fit_obj = ns.Ridge2MultitaskClassifier(n_hidden_features=int(9.83730469e+01), 
                                    dropout=4.31054687e-01, 
                                    n_clusters=int(1.71484375e+00),
@@ -118,9 +116,8 @@ np.random.seed(123)
 Z_train, Z_test, y_train, y_test = train_test_split(Z, t, test_size=0.2,
                                                     random_state=123)
 
-
 fit_obj = ns.Ridge2MultitaskClassifier(n_hidden_features=10,
-                                  dropout=0.1, n_clusters=2)
+                                       dropout=0.1, n_clusters=2)
 
 start = time()
 fit_obj.fit(Z_train, y_train)
