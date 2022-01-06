@@ -84,6 +84,8 @@ print(metrics.classification_report(preds, y_test))
 
 # dataset no. 5 ----------
 
+print(" \n digits dataset ----- \n")
+
 digits = load_digits()
 X = digits.data
 y = digits.target
@@ -113,7 +115,8 @@ iris = load_iris()
 Z = iris.data
 t = iris.target
 np.random.seed(123)
-Z_train, Z_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
+Z_train, Z_test, y_train, y_test = train_test_split(Z, t, test_size=0.2,
+                                                    random_state=123)
 
 
 fit_obj = ns.Ridge2MultitaskClassifier(n_hidden_features=10,

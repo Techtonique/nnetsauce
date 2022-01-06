@@ -75,15 +75,15 @@ fit_obj = ns.GLMClassifier(n_hidden_features=25,
                                   dropout=0.1, n_clusters=3, 
                                   type_clust="gmm")
 
-start = time()
-fit_obj.fit(X_train, y_train, verbose=2)
-print(time() - start)
-print(fit_obj.score(X_test, y_test))
+# start = time()
+# fit_obj.fit(X_train, y_train, verbose=2)
+# print(time() - start)
+# print(fit_obj.score(X_test, y_test))
 
-start = time()
-preds = fit_obj.predict(X_test)
-print(time() - start)
-print(metrics.classification_report(preds, y_test))
+# start = time()
+# preds = fit_obj.predict(X_test)
+# print(time() - start)
+# print(metrics.classification_report(preds, y_test))
 
 
 print(f"\n method = 'exp' ----------")
@@ -157,18 +157,18 @@ print(f"\n 3 - iris dataset ----------")
 fit_obj = ns.GLMClassifier(n_hidden_features=3, 
                            n_clusters=0)
 
-start = time()
-fit_obj.fit(X_train, y_train, verbose=2)
-print(time() - start)
+# start = time()
+# fit_obj.fit(X_train, y_train, verbose=2)
+# print(time() - start)
 
-plt.plot(fit_obj.optimizer.results[2])
+# plt.plot(fit_obj.optimizer.results[2])
 
-print(fit_obj.score(X_test, y_test))
+# print(fit_obj.score(X_test, y_test))
 
-start = time()
-preds = fit_obj.predict(X_test)
-print(time() - start)
-print(metrics.classification_report(preds, y_test))
+# start = time()
+# preds = fit_obj.predict(X_test)
+# print(time() - start)
+# print(metrics.classification_report(preds, y_test))
 
 # dataset no. 4 ----------
 
