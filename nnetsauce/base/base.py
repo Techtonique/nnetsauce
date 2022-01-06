@@ -390,9 +390,6 @@ class Base(BaseEstimator):
 
                 self.W = h_sim[self.nodes_sim]
 
-            print(f"self.W.shape: {self.W.shape}")
-            print(f"scaled_X.shape: {scaled_X.shape}")
-
             return mo.dropout(
                 x=self.activation_func(
                     mo.safe_sparse_dot(
