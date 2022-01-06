@@ -12,7 +12,6 @@ class Simulator:
         self.type_sim = type_sim
         self.seed = seed
 
-    @memoize
     def draw(self):
         h_sim = {
             "sobol": simulatorc.py_i4_sobol_generate,

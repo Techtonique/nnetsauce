@@ -1,3 +1,7 @@
+# version 0.9.4
+
+- Remove memoize from Simulator
+
 # version 0.9.2
 
 - loosen the range of Python packages versions
