@@ -14,7 +14,7 @@ from ..utils import activations as ac
 from ..utils import memoize
 from ..utils import matrixops as mo
 from ..utils import misc as mx
-from ..simulation import nodesimulation as ns
+from ..simulation import generate_sobol2, generate_uniform, generate_hammersley, generate_halton
 from ..sampling import SubSampler
 from ..simulator import Simulator
 
@@ -306,21 +306,21 @@ class Base(BaseEstimator):
                         seed=self.seed,
                     ).draw()
 
-                except:
+                except:                
 
                     h_sim = {
-                        "sobol": ns.generate_sobol2(
+                        "sobol": generate_sobol2(
                             n_dims=n_features, n_points=self.n_hidden_features
                         ),
-                        "hammersley": ns.generate_hammersley(
+                        "hammersley": generate_hammersley(
                             n_dims=n_features, n_points=self.n_hidden_features
                         ),
-                        "uniform": ns.generate_uniform(
+                        "uniform": generate_uniform(
                             n_dims=n_features,
                             n_points=self.n_hidden_features,
                             seed=self.seed,
                         ),
-                        "halton": ns.generate_halton(
+                        "halton": generate_halton(
                             n_dims=n_features, n_points=self.n_hidden_features
                         ),
                     }
@@ -368,22 +368,22 @@ class Base(BaseEstimator):
                     type_sim=self.nodes_sim,
                     seed=self.seed,
                 ).draw()
-
+                
             except:
-
+                
                 h_sim = {
-                    "sobol": ns.generate_sobol2(
+                    "sobol": generate_sobol2(
                         n_dims=n_features_1, n_points=self.n_hidden_features
                     ),
-                    "hammersley": ns.generate_hammersley(
+                    "hammersley": generate_hammersley(
                         n_dims=n_features_1, n_points=self.n_hidden_features
                     ),
-                    "uniform": ns.generate_uniform(
+                    "uniform": generate_uniform(
                         n_dims=n_features_1,
                         n_points=self.n_hidden_features,
                         seed=self.seed,
                     ),
-                    "halton": ns.generate_halton(
+                    "halton": generate_halton(
                         n_dims=n_features_1, n_points=self.n_hidden_features
                     ),
                 }

@@ -17,6 +17,6 @@ class Simulator:
             "sobol": simulatorc.py_i4_sobol_generate,
             "halton": simulatorc.py_halton_sequence,
             "hammersley": simulatorc.py_hammersley_sequence,
-            "uniform": partial(generate_uniform, seed=self.seed),
+            #"uniform": partial(generate_uniform, seed=self.seed),
         }
         return h_sim[self.type_sim](m=self.m, n=self.n)

@@ -1,3 +1,7 @@
+# version 0.9.6
+
+- Fix numbers' simulations
+
 # version 0.9.4
 
 - Remove memoize from Simulator

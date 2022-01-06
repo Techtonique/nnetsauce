@@ -15,9 +15,9 @@ start = time()
 print(ns.Simulator(n_points=n_points, n_dims=n_dims).draw())
 print(f"timing ns.Simulator {time() - start}")
 
-start = time()
-print(ns.simulation.generate_sobol_randtoolbox(n_dims=n_dims, n_points=n_points))
-print(f"timing generate_sobol_randtoolbox {time() - start}")
+# start = time()
+# print(ns.simulation.generate_sobol_randtoolbox(n_dims=n_dims, n_points=n_points))
+# print(f"timing generate_sobol_randtoolbox {time() - start}")
 
 
 print("\n")
@@ -31,9 +31,9 @@ start = time()
 print(f"timing ns.Simulator (large matrix) {time() - start}")
 
 
-start = time()
-[ns.simulation.generate_sobol_randtoolbox(n_dims=n_dims, n_points=n_points) for _ in tqdm(range(n_repeats))]
-print(f"timing generate_sobol_randtoolbox (large matrix) {time() - start}")
+# start = time()
+# [ns.simulation.generate_sobol_randtoolbox(n_dims=n_dims, n_points=n_points) for _ in tqdm(range(n_repeats))]
+# print(f"timing generate_sobol_randtoolbox (large matrix) {time() - start}")
 
 start = time()
 [ns.simulation.generate_sobol2(n_dims=n_dims, n_points=n_points) for _ in tqdm(range(n_repeats))]
@@ -51,10 +51,10 @@ start = time()
 print(ns.Simulator(n_points=n_points, n_dims=n_dims, type_sim="halton").draw())
 print(f"timing ns.Simulator {time() - start}")
 print("\n")
-start = time()
-print(ns.simulation.generate_halton_randtoolbox(n_dims=n_dims, n_points=n_points))
-print(f"timing generate_halton_randtoolbox {time() - start}")
-print("\n")
+# start = time()
+# print(ns.simulation.generate_halton_randtoolbox(n_dims=n_dims, n_points=n_points))
+# print(f"timing generate_halton_randtoolbox {time() - start}")
+# print("\n")
 start = time()
 print(ns.simulation.generate_halton(n_dims=n_dims, n_points=n_points))
 print(f"timing generate_halton{time() - start}")
@@ -76,9 +76,9 @@ start = time()
 print(f"timing generate_halton (large matrix) {time() - start}")
 
 
-start = time()
-[ns.simulation.generate_halton_randtoolbox(n_dims=n_dims, n_points=n_points) for _ in tqdm(range(n_repeats))]
-print(f"timing generate_halton_randtoolbox(large matrix) {time() - start}")
+# start = time()
+# [ns.simulation.generate_halton_randtoolbox(n_dims=n_dims, n_points=n_points) for _ in tqdm(range(n_repeats))]
+# print(f"timing generate_halton_randtoolbox(large matrix) {time() - start}")
 
 
 print("\n")
