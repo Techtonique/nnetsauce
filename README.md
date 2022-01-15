@@ -70,7 +70,9 @@ A package for Statistical/Machine Learning using Randomized and Quasi-Randomized
 
 ## Quick start
 
-[https://thierrymoudiki.github.io/blog/#QuasiRandomizedNN](https://thierrymoudiki.github.io/blog/#QuasiRandomizedNN)
+There are multiple [examples here on GitHub](https://github.com/Techtonique/nnetsauce/tree/master/examples), plus [notebooks](https://github.com/Techtonique/nnetsauce/tree/master/nnetsauce/demo). 
+
+You can also read these [blog posts](https://thierrymoudiki.github.io/blog/#QuasiRandomizedNN).
 
 ## Contributing
 
