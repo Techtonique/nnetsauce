@@ -53,12 +53,6 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
             (and when relevant).
             Currently available: standardization ('std') or MinMax scaling ('minmax')
 
-        col_sample: float
-            percentage of features randomly chosen for training
-
-        row_sample: float
-            percentage of rows chosen for training, by stratified bootstrapping
-
         seed: int
             reproducibility seed for nodes_sim=='uniform'
 
@@ -106,8 +100,6 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         cluster_encode=True,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
-        col_sample=1,
-        row_sample=1,
         seed=123,
         s1=0.1,
         s2=0.1,
@@ -131,8 +123,6 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
             cluster_encode=cluster_encode,
             type_clust=type_clust,
             type_scaling=type_scaling,
-            col_sample=col_sample,
-            row_sample=row_sample,
             seed=seed,
             backend=backend,
         )
