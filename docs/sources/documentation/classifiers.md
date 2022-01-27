@@ -39,10 +39,10 @@ nnetsauce.AdaBoostClassifier(
 
 AdaBoost Classification (SAMME) model class derived from class Boosting
 
-Attributes: 
+Attributes:
 
     obj: object
-        any object containing a method fit (obj.fit()) and a method predict 
+        any object containing a method fit (obj.fit()) and a method predict
         (obj.predict())
 
     n_estimators: int
@@ -67,23 +67,23 @@ Attributes:
         hyperparameter for 'prelu' or 'elu' activation function
 
     nodes_sim: str
-        type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+        type of simulation for the nodes: 'sobol', 'hammersley', 'halton',
         'uniform'
 
     bias: boolean
-        indicates if the hidden layer contains a bias term (True) or not 
+        indicates if the hidden layer contains a bias term (True) or not
         (False)
 
     dropout: float
-        regularization parameter; (random) percentage of nodes dropped out 
+        regularization parameter; (random) percentage of nodes dropped out
         of the training
 
     direct_link: boolean
-        indicates if the original predictors are included (True) in model's 
+        indicates if the original predictors are included (True) in model's
         fitting or not (False)
 
     n_clusters: int
-        number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
+        number of clusters for 'kmeans' or 'gmm' clustering (could be 0:
             no clustering)
 
     cluster_encode: bool
@@ -91,28 +91,28 @@ Attributes:
         if `False`, then labels are used, without one-hot encoding
 
     type_clust: str
-        type of clustering method: currently k-means ('kmeans') or Gaussian 
+        type of clustering method: currently k-means ('kmeans') or Gaussian
         Mixture Model ('gmm')
 
     type_scaling: a tuple of 3 strings
         scaling methods for inputs, hidden layer, and clustering respectively
-        (and when relevant). 
+        (and when relevant).
         Currently available: standardization ('std') or MinMax scaling ('minmax')
 
     col_sample: float
-        percentage of covariates randomly chosen for training   
+        percentage of covariates randomly chosen for training
 
     row_sample: float
-        percentage of rows chosen for training, by stratified bootstrapping    
+        percentage of rows chosen for training, by stratified bootstrapping
 
-    seed: int 
+    seed: int
         reproducibility seed for nodes_sim=='uniform'
 
     method: str
         type of Adaboost method, 'SAMME' (discrete) or 'SAMME.R' (real)
-        
+
     backend: str
-        "cpu" or "gpu" or "tpu"                
+        "cpu" or "gpu" or "tpu"
 
 
 ----
@@ -132,15 +132,15 @@ Fit Boosting model to training data (X, y).
 Args:
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features.
-    
+
     y: array-like, shape = [n_samples]
         Target values.
 
-    **kwargs: additional parameters to be passed to 
+    **kwargs: additional parameters to be passed to
             self.cook_training_set or self.obj.fit
-       
+
 Returns:
 
      self: object
@@ -163,15 +163,15 @@ Predict test data X.
 Args:
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features.
 
-    **kwargs: additional parameters to be passed to 
+    **kwargs: additional parameters to be passed to
           self.cook_test_set
-       
+
 Returns:
 
-    model predictions: {array-like}        
+    model predictions: {array-like}
 
 
 ----
@@ -191,15 +191,15 @@ Predict probabilities for test data X.
 Args:
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features.
 
-    **kwargs: additional parameters to be passed to 
+    **kwargs: additional parameters to be passed to
           self.cook_test_set
-       
-Returns: 
 
-    probability estimates for test data: {array-like}    
+Returns:
+
+    probability estimates for test data: {array-like}
 
 
 ----
@@ -214,27 +214,27 @@ AdaBoostClassifier.score(X, y, scoring=None, **kwargs)
 ```
 
 
-Score the model on test set features X and response y. 
+Score the model on test set features X and response y.
 
 Args:
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features
 
     y: array-like, shape = [n_samples]
         Target values
 
     scoring: str
-        must be in ('accuracy', 'average_precision', 
-                   'brier_score_loss', 'f1', 'f1_micro', 
-                   'f1_macro', 'f1_weighted',  'f1_samples', 
-                   'neg_log_loss', 'precision', 'recall', 
+        must be in ('accuracy', 'average_precision',
+                   'brier_score_loss', 'f1', 'f1_micro',
+                   'f1_macro', 'f1_weighted',  'f1_samples',
+                   'neg_log_loss', 'precision', 'recall',
                    'roc_auc')
-    
+
     **kwargs: additional parameters to be passed to scoring functions
-       
-Returns: 
+
+Returns:
 
     model scores: {array-like}
 
@@ -268,12 +268,12 @@ nnetsauce.CustomClassifier(
 ```
 
 
-Custom Classification model 
+Custom Classification model
 
 Attributes:
 
     obj: object
-        any object containing a method fit (obj.fit()) and a method predict 
+        any object containing a method fit (obj.fit()) and a method predict
         (obj.predict())
 
     n_hidden_features: int
@@ -286,23 +286,23 @@ Attributes:
         hyperparameter for 'prelu' or 'elu' activation function
 
     nodes_sim: str
-        type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+        type of simulation for the nodes: 'sobol', 'hammersley', 'halton',
         'uniform'
 
     bias: boolean
-        indicates if the hidden layer contains a bias term (True) or not 
+        indicates if the hidden layer contains a bias term (True) or not
         (False)
 
     dropout: float
-        regularization parameter; (random) percentage of nodes dropped out 
+        regularization parameter; (random) percentage of nodes dropped out
         of the training
 
     direct_link: boolean
-        indicates if the original predictors are included (True) in model's 
+        indicates if the original predictors are included (True) in model's
         fitting or not (False)
 
     n_clusters: int
-        number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
+        number of clusters for 'kmeans' or 'gmm' clustering (could be 0:
             no clustering)
 
     cluster_encode: bool
@@ -310,25 +310,25 @@ Attributes:
         if `False`, then labels are used, without one-hot encoding
 
     type_clust: str
-        type of clustering method: currently k-means ('kmeans') or Gaussian 
+        type of clustering method: currently k-means ('kmeans') or Gaussian
         Mixture Model ('gmm')
 
     type_scaling: a tuple of 3 strings
         scaling methods for inputs, hidden layer, and clustering respectively
-        (and when relevant). 
+        (and when relevant).
         Currently available: standardization ('std') or MinMax scaling ('minmax')
 
     col_sample: float
-        percentage of covariates randomly chosen for training   
+        percentage of covariates randomly chosen for training
 
     row_sample: float
-        percentage of rows chosen for training, by stratified bootstrapping    
+        percentage of rows chosen for training, by stratified bootstrapping
 
-    seed: int 
+    seed: int
         reproducibility seed for nodes_sim=='uniform'
 
     backend: str
-        "cpu" or "gpu" or "tpu"                
+        "cpu" or "gpu" or "tpu"
 
 
 ----
@@ -345,18 +345,18 @@ CustomClassifier.fit(X, y, sample_weight=None, **kwargs)
 
 Fit custom model to training data (X, y).
 
-Args: 
+Args:
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features.
-    
+
     y: array-like, shape = [n_samples]
         Target values.
 
-    **kwargs: additional parameters to be passed to 
+    **kwargs: additional parameters to be passed to
                 self.cook_training_set or self.obj.fit
-    
+
 Returns:
 
     self: object
@@ -364,7 +364,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmClassifier.py#L19)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmClassifier.py#L18)</span>
 
 ### GLMClassifier
 
@@ -396,7 +396,7 @@ nnetsauce.GLMClassifier(
 Generalized 'linear' models using quasi-randomized networks (classification)
 
 Attributes:
-   
+
     n_hidden_features: int
         number of nodes in the hidden layer
 
@@ -419,23 +419,23 @@ Attributes:
         hyperparameter for 'prelu' or 'elu' activation function
 
     nodes_sim: str
-        type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+        type of simulation for the nodes: 'sobol', 'hammersley', 'halton',
         'uniform'
 
     bias: boolean
-        indicates if the hidden layer contains a bias term (True) or not 
+        indicates if the hidden layer contains a bias term (True) or not
         (False)
 
     dropout: float
-        regularization parameter; (random) percentage of nodes dropped out 
+        regularization parameter; (random) percentage of nodes dropped out
         of the training
 
     direct_link: boolean
-        indicates if the original predictors are included (True) in model's 
+        indicates if the original predictors are included (True) in model's
         fitting or not (False)
 
     n_clusters: int
-        number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
+        number of clusters for 'kmeans' or 'gmm' clustering (could be 0:
             no clustering)
 
     cluster_encode: bool
@@ -443,24 +443,24 @@ Attributes:
         if `False`, then labels are used, without one-hot encoding
 
     type_clust: str
-        type of clustering method: currently k-means ('kmeans') or Gaussian 
+        type of clustering method: currently k-means ('kmeans') or Gaussian
         Mixture Model ('gmm')
 
     type_scaling: a tuple of 3 strings
         scaling methods for inputs, hidden layer, and clustering respectively
-        (and when relevant). 
+        (and when relevant).
         Currently available: standardization ('std') or MinMax scaling ('minmax')
 
-    optimizer: object 
+    optimizer: object
         optimizer, from class nnetsauce.utils.Optimizer
 
-    seed: int 
+    seed: int
         reproducibility seed for nodes_sim=='uniform'
 
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmClassifier.py#L195)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmClassifier.py#L198)</span>
 
 ### fit
 
@@ -474,19 +474,19 @@ GLMClassifier.fit(
 
 Fit GLM model to training data (X, y).
 
-Args: 
+Args:
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features.
-    
+
     y: array-like, shape = [n_samples]
         Target values.
 
-    **kwargs: additional parameters to be passed to 
+    **kwargs: additional parameters to be passed to
             self.cook_training_set or self.obj.fit
-       
-Returns: 
+
+Returns:
 
     self: object
 
@@ -522,10 +522,10 @@ nnetsauce.MultitaskClassifier(
 
 Multitask Classification model based on regression models, with shared covariates
 
-Attributes: 
+Attributes:
 
     obj: object
-        any object (must be a regression model) containing a method fit (obj.fit()) 
+        any object (must be a regression model) containing a method fit (obj.fit())
         and a method predict (obj.predict())
 
     n_hidden_features: int
@@ -538,23 +538,23 @@ Attributes:
         hyperparameter for 'prelu' or 'elu' activation function
 
     nodes_sim: str
-        type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+        type of simulation for the nodes: 'sobol', 'hammersley', 'halton',
         'uniform'
 
     bias: boolean
-        indicates if the hidden layer contains a bias term (True) or not 
+        indicates if the hidden layer contains a bias term (True) or not
         (False)
 
     dropout: float
-        regularization parameter; (random) percentage of nodes dropped out 
+        regularization parameter; (random) percentage of nodes dropped out
         of the training
 
     direct_link: boolean
-        indicates if the original predictors are included (True) in model's 
+        indicates if the original predictors are included (True) in model's
         fitting or not (False)
 
     n_clusters: int
-        number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
+        number of clusters for 'kmeans' or 'gmm' clustering (could be 0:
             no clustering)
 
     cluster_encode: bool
@@ -562,31 +562,30 @@ Attributes:
         if `False`, then labels are used, without one-hot encoding
 
     type_clust: str
-        type of clustering method: currently k-means ('kmeans') or Gaussian 
+        type of clustering method: currently k-means ('kmeans') or Gaussian
         Mixture Model ('gmm')
 
     type_scaling: a tuple of 3 strings
         scaling methods for inputs, hidden layer, and clustering respectively
-        (and when relevant). 
+        (and when relevant).
         Currently available: standardization ('std') or MinMax scaling ('minmax')
 
     col_sample: float
-        percentage of covariates randomly chosen for training   
+        percentage of covariates randomly chosen for training
 
     row_sample: float
-        percentage of rows chosen for training, by stratified bootstrapping    
+        percentage of rows chosen for training, by stratified bootstrapping
 
-    seed: int 
+    seed: int
         reproducibility seed for nodes_sim=='uniform'
 
     backend: str
-        "cpu" or "gpu" or "tpu"                           
+        "cpu" or "gpu" or "tpu"
 
-References:       
+References:
 
-    [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: 
-    https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters    
-   
+    [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at:
+    https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
 
 
 ----
@@ -606,15 +605,15 @@ Fit MultitaskClassifier to training data (X, y).
 Args:
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features.
-    
+
     y: array-like, shape = [n_samples]
         Target values.
 
-    **kwargs: additional parameters to be passed to 
+    **kwargs: additional parameters to be passed to
             self.cook_training_set or self.obj.fit
-       
+
 Returns:
 
     self: object
@@ -622,7 +621,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/_randomBagClassifier.py#L17)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/_randomBagClassifier.py#L18)</span>
 
 ### RandomBagClassifier
 
@@ -652,12 +651,12 @@ nnetsauce.RandomBagClassifier(
 ```
 
 
-Randomized 'Bagging' Classification model 
+Randomized 'Bagging' Classification model
 
-Attributes: 
+Attributes:
 
     obj: object
-        any object containing a method fit (obj.fit()) and a method predict 
+        any object containing a method fit (obj.fit()) and a method predict
         (obj.predict())
 
     n_estimators: int
@@ -673,23 +672,23 @@ Attributes:
         hyperparameter for 'prelu' or 'elu' activation function
 
     nodes_sim: str
-        type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+        type of simulation for the nodes: 'sobol', 'hammersley', 'halton',
         'uniform'
 
     bias: boolean
-        indicates if the hidden layer contains a bias term (True) or not 
+        indicates if the hidden layer contains a bias term (True) or not
         (False)
 
     dropout: float
-        regularization parameter; (random) percentage of nodes dropped out 
+        regularization parameter; (random) percentage of nodes dropped out
         of the training
 
     direct_link: boolean
-        indicates if the original predictors are included (True) in model's 
+        indicates if the original predictors are included (True) in model's
         fitting or not (False)
 
     n_clusters: int
-        number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
+        number of clusters for 'kmeans' or 'gmm' clustering (could be 0:
             no clustering)
 
     cluster_encode: bool
@@ -697,30 +696,30 @@ Attributes:
         if `False`, then labels are used, without one-hot encoding
 
     type_clust: str
-        type of clustering method: currently k-means ('kmeans') or Gaussian 
+        type of clustering method: currently k-means ('kmeans') or Gaussian
         Mixture Model ('gmm')
 
     type_scaling: a tuple of 3 strings
         scaling methods for inputs, hidden layer, and clustering respectively
-        (and when relevant). 
+        (and when relevant).
         Currently available: standardization ('std') or MinMax scaling ('minmax')
 
     col_sample: float
-        percentage of covariates randomly chosen for training   
+        percentage of covariates randomly chosen for training
 
     row_sample: float
-        percentage of rows chosen for training, by stratified bootstrapping 
+        percentage of rows chosen for training, by stratified bootstrapping
 
-    seed: int 
+    seed: int
         reproducibility seed for nodes_sim=='uniform'
 
     backend: str
-        "cpu" or "gpu" or "tpu"                           
+        "cpu" or "gpu" or "tpu"
 
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/_randomBagClassifier.py#L135)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/_randomBagClassifier.py#L136)</span>
 
 ### fit
 
@@ -735,19 +734,18 @@ Fit Random 'Forest' model to training data (X, y).
 Args:
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features.
-    
+
     y: array-like, shape = [n_samples]
         Target values.
 
-    **kwargs: additional parameters to be passed to 
+    **kwargs: additional parameters to be passed to
             self.cook_training_set or self.obj.fit
-        
-Returns: 
+
+Returns:
 
     self: object
-    
 
 
 ----
@@ -782,7 +780,7 @@ nnetsauce.Ridge2Classifier(
 
 Multinomial logit classification with 2 regularization parameters
 
-Attributes: 
+Attributes:
 
     n_hidden_features: int
         number of nodes in the hidden layer
@@ -794,23 +792,23 @@ Attributes:
         hyperparameter for 'prelu' or 'elu' activation function
 
     nodes_sim: str
-        type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+        type of simulation for the nodes: 'sobol', 'hammersley', 'halton',
         'uniform'
 
     bias: boolean
-        indicates if the hidden layer contains a bias term (True) or not 
+        indicates if the hidden layer contains a bias term (True) or not
         (False)
 
     dropout: float
-        regularization parameter; (random) percentage of nodes dropped out 
+        regularization parameter; (random) percentage of nodes dropped out
         of the training
 
     direct_link: boolean
-        indicates if the original predictors are included (True) in model's 
+        indicates if the original predictors are included (True) in model's
         fitting or not (False)
 
     n_clusters: int
-        number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
+        number of clusters for 'kmeans' or 'gmm' clustering (could be 0:
             no clustering)
 
     cluster_encode: bool
@@ -818,19 +816,19 @@ Attributes:
         if `False`, then labels are used, without one-hot encoding
 
     type_clust: str
-        type of clustering method: currently k-means ('kmeans') or Gaussian 
+        type of clustering method: currently k-means ('kmeans') or Gaussian
         Mixture Model ('gmm')
-        
+
     type_scaling: a tuple of 3 strings
         scaling methods for inputs, hidden layer, and clustering respectively
-        (and when relevant). 
+        (and when relevant).
         Currently available: standardization ('std') or MinMax scaling ('minmax')
 
     col_sample: float
-        percentage of covariates randomly chosen for training   
+        percentage of covariates randomly chosen for training
 
     row_sample: float
-        percentage of rows chosen for training, by stratified bootstrapping    
+        percentage of rows chosen for training, by stratified bootstrapping
 
     lambda1: float
         regularization parameter on direct link
@@ -838,25 +836,25 @@ Attributes:
     lambda2: float
         regularization parameter on hidden layer
 
-    seed: int 
+    seed: int
         reproducibility seed for nodes_sim=='uniform'
 
     backend: str
-        "cpu" or "gpu" or "tpu"                
+        "cpu" or "gpu" or "tpu"
 
 
 References:
 
-    - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: 
+    - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at:
     https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
 
-    - [2] Moudiki, T. (2019). Multinomial logistic regression using quasi-randomized networks. Available at: 
-    https://www.researchgate.net/publication/334706878_Multinomial_logistic_regression_using_quasi-randomized_networks 
+    - [2] Moudiki, T. (2019). Multinomial logistic regression using quasi-randomized networks. Available at:
+    https://www.researchgate.net/publication/334706878_Multinomial_logistic_regression_using_quasi-randomized_networks
 
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2Classifier.py#L264)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2Classifier.py#L271)</span>
 
 ### fit
 
@@ -867,30 +865,30 @@ Ridge2Classifier.fit(X, y, solver="L-BFGS-B", **kwargs)
 
 
 Fit Ridge model to training data (X, y).
-   
+
 for beta: regression coeffs (beta11, ..., beta1p, ..., betaK1, ..., betaKp)
 for K classes and p covariates.
 
 Args:
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features.
-    
+
     y: array-like, shape = [n_samples]
         Target values.
 
-    **kwargs: additional parameters to be passed to 
+    **kwargs: additional parameters to be passed to
             self.cook_training_set or self.obj.fit
-       
-Returns: 
+
+Returns:
 
     self: object
 
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2MultitaskClassifier.py#L19)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2MultitaskClassifier.py#L20)</span>
 
 ### Ridge2MultitaskClassifier
 
@@ -917,7 +915,7 @@ nnetsauce.Ridge2MultitaskClassifier(
 
 Multitask Ridge classification with 2 regularization parameters
 
-Attributes: 
+Attributes:
 
     n_hidden_features: int
         number of nodes in the hidden layer
@@ -929,19 +927,19 @@ Attributes:
         hyperparameter for 'prelu' or 'elu' activation function
 
     nodes_sim: str
-        type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+        type of simulation for the nodes: 'sobol', 'hammersley', 'halton',
         'uniform'
 
     bias: boolean
-        indicates if the hidden layer contains a bias term (True) or not 
+        indicates if the hidden layer contains a bias term (True) or not
         (False)
 
     dropout: float
-        regularization parameter; (random) percentage of nodes dropped out 
+        regularization parameter; (random) percentage of nodes dropped out
         of the training
 
     n_clusters: int
-        number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
+        number of clusters for 'kmeans' or 'gmm' clustering (could be 0:
             no clustering)
 
     cluster_encode: bool
@@ -949,12 +947,12 @@ Attributes:
         if `False`, then labels are used, without one-hot encoding
 
     type_clust: str
-        type of clustering method: currently k-means ('kmeans') or Gaussian 
+        type of clustering method: currently k-means ('kmeans') or Gaussian
         Mixture Model ('gmm')
 
     type_scaling: a tuple of 3 strings
         scaling methods for inputs, hidden layer, and clustering respectively
-        (and when relevant). 
+        (and when relevant).
         Currently available: standardization ('std') or MinMax scaling ('minmax')
 
     lambda1: float
@@ -963,21 +961,21 @@ Attributes:
     lambda2: float
         regularization parameter on hidden layer
 
-    seed: int 
+    seed: int
         reproducibility seed for nodes_sim=='uniform'
 
     backend: str
-        "cpu" or "gpu" or "tpu"                
+        "cpu" or "gpu" or "tpu"
 
-References:  
+References:
 
-    - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: 
+    - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at:
     https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
 
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2MultitaskClassifier.py#L122)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2MultitaskClassifier.py#L123)</span>
 
 ### fit
 
@@ -987,28 +985,28 @@ Ridge2MultitaskClassifier.fit(X, y, **kwargs)
 ```
 
 
-Fit Ridge model to training data (X, y).           
+Fit Ridge model to training data (X, y).
 
 Args:
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features.
-    
+
     y: array-like, shape = [n_samples]
         Target values.
 
-    **kwargs: additional parameters to be passed to 
+    **kwargs: additional parameters to be passed to
             self.cook_training_set or self.obj.fit
-       
-Returns: 
+
+Returns:
 
     self: object
 
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/_randomBagClassifier.py#L17)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/_randomBagClassifier.py#L18)</span>
 
 ### RandomBagClassifier
 
@@ -1038,12 +1036,12 @@ nnetsauce.RandomBagClassifier(
 ```
 
 
-Randomized 'Bagging' Classification model 
+Randomized 'Bagging' Classification model
 
-Attributes: 
+Attributes:
 
     obj: object
-        any object containing a method fit (obj.fit()) and a method predict 
+        any object containing a method fit (obj.fit()) and a method predict
         (obj.predict())
 
     n_estimators: int
@@ -1059,23 +1057,23 @@ Attributes:
         hyperparameter for 'prelu' or 'elu' activation function
 
     nodes_sim: str
-        type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+        type of simulation for the nodes: 'sobol', 'hammersley', 'halton',
         'uniform'
 
     bias: boolean
-        indicates if the hidden layer contains a bias term (True) or not 
+        indicates if the hidden layer contains a bias term (True) or not
         (False)
 
     dropout: float
-        regularization parameter; (random) percentage of nodes dropped out 
+        regularization parameter; (random) percentage of nodes dropped out
         of the training
 
     direct_link: boolean
-        indicates if the original predictors are included (True) in model's 
+        indicates if the original predictors are included (True) in model's
         fitting or not (False)
 
     n_clusters: int
-        number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
+        number of clusters for 'kmeans' or 'gmm' clustering (could be 0:
             no clustering)
 
     cluster_encode: bool
@@ -1083,30 +1081,30 @@ Attributes:
         if `False`, then labels are used, without one-hot encoding
 
     type_clust: str
-        type of clustering method: currently k-means ('kmeans') or Gaussian 
+        type of clustering method: currently k-means ('kmeans') or Gaussian
         Mixture Model ('gmm')
 
     type_scaling: a tuple of 3 strings
         scaling methods for inputs, hidden layer, and clustering respectively
-        (and when relevant). 
+        (and when relevant).
         Currently available: standardization ('std') or MinMax scaling ('minmax')
 
     col_sample: float
-        percentage of covariates randomly chosen for training   
+        percentage of covariates randomly chosen for training
 
     row_sample: float
-        percentage of rows chosen for training, by stratified bootstrapping 
+        percentage of rows chosen for training, by stratified bootstrapping
 
-    seed: int 
+    seed: int
         reproducibility seed for nodes_sim=='uniform'
 
     backend: str
-        "cpu" or "gpu" or "tpu"                           
+        "cpu" or "gpu" or "tpu"
 
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/_randomBagClassifier.py#L135)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/_randomBagClassifier.py#L136)</span>
 
 ### fit
 
@@ -1121,19 +1119,18 @@ Fit Random 'Forest' model to training data (X, y).
 Args:
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features.
-    
+
     y: array-like, shape = [n_samples]
         Target values.
 
-    **kwargs: additional parameters to be passed to 
+    **kwargs: additional parameters to be passed to
             self.cook_training_set or self.obj.fit
-        
-Returns: 
+
+Returns:
 
     self: object
-    
 
 
 ----

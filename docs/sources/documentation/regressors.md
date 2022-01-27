@@ -30,9 +30,9 @@ nnetsauce.BaseRegressor(
 ```
 
 
-Random Vector Functional Link Network regression without shrinkage 
-    
-Attributes:       
+Random Vector Functional Link Network regression without shrinkage
+
+Attributes:
 
     n_hidden_features: int
         number of nodes in the hidden layer
@@ -44,23 +44,23 @@ Attributes:
         hyperparameter for 'prelu' or 'elu' activation function
 
     nodes_sim: str
-        type of simulation for hidden layer nodes: 'sobol', 'hammersley', 'halton', 
+        type of simulation for hidden layer nodes: 'sobol', 'hammersley', 'halton',
         'uniform'
 
     bias: boolean
-        indicates if the hidden layer contains a bias term (True) or 
+        indicates if the hidden layer contains a bias term (True) or
         not (False)
 
     dropout: float
-        regularization parameter; (random) percentage of nodes dropped out 
+        regularization parameter; (random) percentage of nodes dropped out
         of the training
 
     direct_link: boolean
-        indicates if the original features are included (True) in model's 
+        indicates if the original features are included (True) in model's
         fitting or not (False)
 
     n_clusters: int
-        number of clusters for type_clust='kmeans' or type_clust='gmm' 
+        number of clusters for type_clust='kmeans' or type_clust='gmm'
         clustering (could be 0: no clustering)
 
     cluster_encode: bool
@@ -68,25 +68,25 @@ Attributes:
         if `False`, then labels are used, without one-hot encoding
 
     type_clust: str
-        type of clustering method: currently k-means ('kmeans') or Gaussian 
+        type of clustering method: currently k-means ('kmeans') or Gaussian
         Mixture Model ('gmm')
 
     type_scaling: a tuple of 3 strings
         scaling methods for inputs, hidden layer, and clustering respectively
-        (and when relevant). 
+        (and when relevant).
         Currently available: standardization ('std') or MinMax scaling ('minmax')
 
     col_sample: float
         percentage of features randomly chosen for training
 
     row_sample: float
-        percentage of rows chosen for training, by stratified bootstrapping   
+        percentage of rows chosen for training, by stratified bootstrapping
 
-    seed: int 
+    seed: int
         reproducibility seed for nodes_sim=='uniform', clustering and dropout
 
     backend: str
-        "cpu" or "gpu" or "tpu"                
+        "cpu" or "gpu" or "tpu"
 
 
 ----
@@ -106,14 +106,14 @@ Fit BaseRegressor to training data (X, y)
 Args:
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features
-    
+
     y: array-like, shape = [n_samples]
         Target values
 
     **kwargs: additional parameters to be passed to self.cook_training_set
-       
+
 Returns:
 
     self: object
@@ -121,7 +121,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L143)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L145)</span>
 
 ### predict
 
@@ -136,11 +136,11 @@ Predict test data X.
 Args
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features
 
     **kwargs: additional parameters to be passed to self.cook_test_set
-       
+
 Returns:
 
     model predictions: {array-like}
@@ -148,7 +148,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L180)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L182)</span>
 
 ### score
 
@@ -158,25 +158,25 @@ BaseRegressor.score(X, y, scoring=None, **kwargs)
 ```
 
 
-Score the model on test set features X and response y. 
+Score the model on test set features X and response y.
 
 Args:
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features
 
     y: array-like, shape = [n_samples]
         Target values
 
     scoring: str
-        must be in ('explained_variance', 'neg_mean_absolute_error', 
-                    'neg_mean_squared_error', 'neg_mean_squared_log_error', 
+        must be in ('explained_variance', 'neg_mean_absolute_error',
+                    'neg_mean_squared_error', 'neg_mean_squared_log_error',
                     'neg_median_absolute_error', 'r2')
-    
+
     **kwargs: additional parameters to be passed to scoring functions
-       
-Returns: 
+
+Returns:
 
 model scores: {array-like}
 
@@ -201,8 +201,6 @@ nnetsauce.BayesianRVFLRegressor(
     cluster_encode=True,
     type_clust="kmeans",
     type_scaling=("std", "std", "std"),
-    col_sample=1,
-    row_sample=1,
     seed=123,
     s=0.1,
     sigma=0.05,
@@ -217,7 +215,7 @@ nnetsauce.BayesianRVFLRegressor(
 
 Bayesian Random Vector Functional Link Network regression with one prior
 
-Attributes: 
+Attributes:
 
     n_hidden_features: int
         number of nodes in the hidden layer
@@ -235,7 +233,7 @@ Attributes:
         indicates if the hidden layer contains a bias term (True) or not (False)
 
     dropout: float
-        regularization parameter; (random) percentage of nodes dropped out 
+        regularization parameter; (random) percentage of nodes dropped out
         of the training
 
     direct_link: boolean
@@ -253,16 +251,10 @@ Attributes:
 
     type_scaling: a tuple of 3 strings
         scaling methods for inputs, hidden layer, and clustering respectively
-        (and when relevant). 
+        (and when relevant).
         Currently available: standardization ('std') or MinMax scaling ('minmax')
 
-    col_sample: float
-        percentage of features randomly chosen for training  
-
-    row_sample: float
-        percentage of rows chosen for training, by stratified bootstrapping    
-
-    seed: int 
+    seed: int
         reproducibility seed for nodes_sim=='uniform'
 
     s: float
@@ -272,7 +264,7 @@ Attributes:
         std. dev. of residuals in Bayesian Ridge Regression
 
     beta: array-like
-        regression''s fitted parameters 
+        regression''s fitted parameters
 
     Sigma: array-like
         covariance of the distribution of fitted parameters
@@ -281,12 +273,12 @@ Attributes:
         return_std: boolean
 
     backend: str
-        "cpu" or "gpu" or "tpu"                
+        "cpu" or "gpu" or "tpu"
 
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/rvfl/bayesianrvflRegressor.py#L136)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/rvfl/bayesianrvflRegressor.py#L126)</span>
 
 ### fit
 
@@ -301,16 +293,16 @@ Fit BayesianRVFLRegressor to training data (X, y).
 Args:
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features.
-    
+
     y: array-like, shape = [n_samples]
         Target values.
 
-    **kwargs: additional parameters to be passed to 
+    **kwargs: additional parameters to be passed to
             self.cook_training_set
-       
-Returns: 
+
+Returns:
 
     self: object
 
@@ -335,8 +327,6 @@ nnetsauce.BayesianRVFL2Regressor(
     cluster_encode=True,
     type_clust="kmeans",
     type_scaling=("std", "std", "std"),
-    col_sample=1,
-    row_sample=1,
     seed=123,
     s1=0.1,
     s2=0.1,
@@ -352,7 +342,7 @@ nnetsauce.BayesianRVFL2Regressor(
 
 Bayesian Random Vector Functional Link Network regression with two priors
 
-Attributes: 
+Attributes:
 
     n_hidden_features: int
         number of nodes in the hidden layer
@@ -370,7 +360,7 @@ Attributes:
         indicates if the hidden layer contains a bias term (True) or not (False)
 
     dropout: float
-        regularization parameter; (random) percentage of nodes dropped out 
+        regularization parameter; (random) percentage of nodes dropped out
         of the training
 
     direct_link: boolean
@@ -388,50 +378,42 @@ Attributes:
 
     type_scaling: a tuple of 3 strings
         scaling methods for inputs, hidden layer, and clustering respectively
-        (and when relevant). 
+        (and when relevant).
         Currently available: standardization ('std') or MinMax scaling ('minmax')
 
-    col_sample: float
-        percentage of features randomly chosen for training  
-
-    row_sample: float
-        percentage of rows chosen for training, by stratified bootstrapping    
-
-    seed: int 
+    seed: int
         reproducibility seed for nodes_sim=='uniform'
 
     s1: float
         std. dev. of init. regression parameters in Bayesian Ridge Regression
 
     s2: float
-        std. dev. of augmented regression parameters in Bayesian Ridge Regression  
+        std. dev. of augmented regression parameters in Bayesian Ridge Regression
 
     sigma: float
         std. dev. of residuals in Bayesian Ridge Regression
 
     beta: array-like
-        regression''s fitted parameters 
+        regression''s fitted parameters
 
     Sigma: array-like
         covariance of the distribution of fitted parameters
 
     GCV: float
         return_std: boolean
-        
+
     backend: str
-        "cpu" or "gpu" or "tpu"                
+        "cpu" or "gpu" or "tpu"
 
-References:       
+References:
 
-    - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: 
+    - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at:
       https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
-           
-   
 
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/rvfl/bayesianrvfl2Regressor.py#L148)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/rvfl/bayesianrvfl2Regressor.py#L138)</span>
 
 ### fit
 
@@ -443,19 +425,19 @@ BayesianRVFL2Regressor.fit(X, y, **kwargs)
 
 Fit BayesianRVFL2Regressor to training data (X, y)
 
-Args:        
+Args:
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features
-    
+
     y: array-like, shape = [n_samples]
         Target values
 
-    **kwargs: additional parameters to be passed to 
+    **kwargs: additional parameters to be passed to
             self.cook_training_set
-       
-Returns: 
+
+Returns:
 
     self: object
 
@@ -489,14 +471,14 @@ nnetsauce.CustomRegressor(
 ```
 
 
-Custom Regression model 
+Custom Regression model
 
 This class is used to 'augment' any regression model with transformed features.
 
 Attributes:
 
     obj: object
-        any object containing a method fit (obj.fit()) and a method predict 
+        any object containing a method fit (obj.fit()) and a method predict
         (obj.predict())
 
     n_hidden_features: int
@@ -509,23 +491,23 @@ Attributes:
         hyperparameter for 'prelu' or 'elu' activation function
 
     nodes_sim: str
-        type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+        type of simulation for the nodes: 'sobol', 'hammersley', 'halton',
         'uniform'
 
     bias: boolean
-        indicates if the hidden layer contains a bias term (True) or not 
+        indicates if the hidden layer contains a bias term (True) or not
         (False)
 
     dropout: float
-        regularization parameter; (random) percentage of nodes dropped out 
+        regularization parameter; (random) percentage of nodes dropped out
         of the training
 
     direct_link: boolean
-        indicates if the original predictors are included (True) in model's 
+        indicates if the original predictors are included (True) in model's
         fitting or not (False)
 
     n_clusters: int
-        number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
+        number of clusters for 'kmeans' or 'gmm' clustering (could be 0:
             no clustering)
 
     cluster_encode: bool
@@ -533,28 +515,28 @@ Attributes:
         if `False`, then labels are used, without one-hot encoding
 
     type_clust: str
-        type of clustering method: currently k-means ('kmeans') or Gaussian 
+        type of clustering method: currently k-means ('kmeans') or Gaussian
         Mixture Model ('gmm')
 
     type_scaling: a tuple of 3 strings
         scaling methods for inputs, hidden layer, and clustering respectively
-        (and when relevant). 
+        (and when relevant).
         Currently available: standardization ('std') or MinMax scaling ('minmax')
 
     col_sample: float
-        percentage of covariates randomly chosen for training  
+        percentage of covariates randomly chosen for training
 
     row_sample: float
-        percentage of rows chosen for training, by stratified bootstrapping    
+        percentage of rows chosen for training, by stratified bootstrapping
 
-    seed: int 
+    seed: int
         reproducibility seed for nodes_sim=='uniform'
 
     type_fit: str
         'regression'
 
     backend: str
-        "cpu" or "gpu" or "tpu"                           
+        "cpu" or "gpu" or "tpu"
 
 
 ----
@@ -574,23 +556,23 @@ Fit custom model to training data (X, y).
 Args:
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features.
 
     y: array-like, shape = [n_samples]
         Target values.
 
-    **kwargs: additional parameters to be passed to 
+    **kwargs: additional parameters to be passed to
         self.cook_training_set or self.obj.fit
-    
-Returns: 
+
+Returns:
 
     self: object
 
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmRegressor.py#L19)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmRegressor.py#L18)</span>
 
 ### GLMRegressor
 
@@ -639,7 +621,7 @@ Attributes:
         controls compromize between l1 and l2 norm of GLM coefficients on nonlinear features
 
     family: str
-        "gaussian", "laplace" or "poisson" (for now)    
+        "gaussian", "laplace" or "poisson" (for now)
 
     activation_name: str
         activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
@@ -648,23 +630,23 @@ Attributes:
         hyperparameter for 'prelu' or 'elu' activation function
 
     nodes_sim: str
-        type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+        type of simulation for the nodes: 'sobol', 'hammersley', 'halton',
         'uniform'
 
     bias: boolean
-        indicates if the hidden layer contains a bias term (True) or not 
+        indicates if the hidden layer contains a bias term (True) or not
         (False)
 
     dropout: float
-        regularization parameter; (random) percentage of nodes dropped out 
+        regularization parameter; (random) percentage of nodes dropped out
         of the training
 
     direct_link: boolean
-        indicates if the original predictors are included (True) in model's 
+        indicates if the original predictors are included (True) in model's
         fitting or not (False)
 
     n_clusters: int
-        number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
+        number of clusters for 'kmeans' or 'gmm' clustering (could be 0:
             no clustering)
 
     cluster_encode: bool
@@ -672,24 +654,24 @@ Attributes:
         if `False`, then labels are used, without one-hot encoding
 
     type_clust: str
-        type of clustering method: currently k-means ('kmeans') or Gaussian 
+        type of clustering method: currently k-means ('kmeans') or Gaussian
         Mixture Model ('gmm')
-        
+
     type_scaling: a tuple of 3 strings
         scaling methods for inputs, hidden layer, and clustering respectively
-        (and when relevant). 
+        (and when relevant).
         Currently available: standardization ('std') or MinMax scaling ('minmax')
 
-    optimizer: object 
+    optimizer: object
         optimizer, from class nnetsauce.utils.Optimizer
 
-    seed: int 
+    seed: int
         reproducibility seed for nodes_sim=='uniform'
 
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmRegressor.py#L173)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmRegressor.py#L175)</span>
 
 ### fit
 
@@ -706,15 +688,15 @@ Fit GLM model to training data (X, y).
 Args:
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features.
-    
+
     y: array-like, shape = [n_samples]
         Target values.
 
-    **kwargs: additional parameters to be passed to 
+    **kwargs: additional parameters to be passed to
             self.cook_training_set or self.obj.fit
-       
+
 Returns:
 
     self: object
@@ -722,7 +704,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2Regressor.py#L19)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2Regressor.py#L20)</span>
 
 ### Ridge2Regressor
 
@@ -751,7 +733,7 @@ nnetsauce.Ridge2Regressor(
 
 Ridge regression with 2 regularization parameters derived from class Ridge
 
-Attributes: 
+Attributes:
 
     n_hidden_features: int
         number of nodes in the hidden layer
@@ -763,19 +745,19 @@ Attributes:
         hyperparameter for 'prelu' or 'elu' activation function
 
     nodes_sim: str
-        type of simulation for the nodes: 'sobol', 'hammersley', 'halton', 
+        type of simulation for the nodes: 'sobol', 'hammersley', 'halton',
         'uniform'
 
     bias: boolean
-        indicates if the hidden layer contains a bias term (True) or not 
+        indicates if the hidden layer contains a bias term (True) or not
         (False)
 
     dropout: float
-        regularization parameter; (random) percentage of nodes dropped out 
+        regularization parameter; (random) percentage of nodes dropped out
         of the training
 
     n_clusters: int
-        number of clusters for 'kmeans' or 'gmm' clustering (could be 0: 
+        number of clusters for 'kmeans' or 'gmm' clustering (could be 0:
             no clustering)
 
     cluster_encode: bool
@@ -783,19 +765,19 @@ Attributes:
         if `False`, then labels are used, without one-hot encoding
 
     type_clust: str
-        type of clustering method: currently k-means ('kmeans') or Gaussian 
+        type of clustering method: currently k-means ('kmeans') or Gaussian
         Mixture Model ('gmm')
 
     type_scaling: a tuple of 3 strings
         scaling methods for inputs, hidden layer, and clustering respectively
-        (and when relevant). 
+        (and when relevant).
         Currently available: standardization ('std') or MinMax scaling ('minmax')
 
     col_sample: float
-        percentage of covariates randomly chosen for training   
+        percentage of covariates randomly chosen for training
 
     row_sample: float
-        percentage of rows chosen for training, by stratified bootstrapping    
+        percentage of rows chosen for training, by stratified bootstrapping
 
     lambda1: float
         regularization parameter on direct link
@@ -803,16 +785,16 @@ Attributes:
     lambda2: float
         regularization parameter on hidden layer
 
-    seed: int 
+    seed: int
         reproducibility seed for nodes_sim=='uniform'
-        
+
     backend: str
-        'cpu' or 'gpu' or 'tpu'                
+        'cpu' or 'gpu' or 'tpu'
 
-References: 
+References:
 
-    - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: 
-    https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters    
+    - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at:
+    https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
 
 
 ----
@@ -827,21 +809,21 @@ Ridge2Regressor.fit(X, y, **kwargs)
 ```
 
 
-Fit Ridge model to training data (X, y).           
+Fit Ridge model to training data (X, y).
 
 Args:
 
     X: {array-like}, shape = [n_samples, n_features]
-        Training vectors, where n_samples is the number 
+        Training vectors, where n_samples is the number
         of samples and n_features is the number of features.
-    
+
     y: array-like, shape = [n_samples]
         Target values.
 
-    **kwargs: additional parameters to be passed to 
+    **kwargs: additional parameters to be passed to
             self.cook_training_set or self.obj.fit
-       
-Returns: 
+
+Returns:
 
     self: object
 
