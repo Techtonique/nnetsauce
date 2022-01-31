@@ -110,8 +110,6 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
             cluster_encode=cluster_encode,
             type_clust=type_clust,
             type_scaling=type_scaling,
-            col_sample=1,
-            row_sample=1,
             lambda1=lambda1,
             lambda2=lambda2,
             seed=seed,

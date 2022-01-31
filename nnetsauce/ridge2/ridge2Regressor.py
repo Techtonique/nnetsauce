@@ -60,12 +60,6 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
             (and when relevant).
             Currently available: standardization ('std') or MinMax scaling ('minmax')
 
-        col_sample: float
-            percentage of covariates randomly chosen for training
-
-        row_sample: float
-            percentage of rows chosen for training, by stratified bootstrapping
-
         lambda1: float
             regularization parameter on direct link
 
@@ -99,8 +93,6 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
         cluster_encode=True,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
-        col_sample=1,
-        row_sample=1,
         lambda1=0.1,
         lambda2=0.1,
         seed=123,
@@ -118,8 +110,6 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
             cluster_encode=cluster_encode,
             type_clust=type_clust,
             type_scaling=type_scaling,
-            col_sample=col_sample,
-            row_sample=row_sample,
             lambda1=lambda1,
             lambda2=lambda2,
             seed=seed,

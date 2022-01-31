@@ -61,9 +61,6 @@ class MTS(Base):
             (and when relevant).
             Currently available: standardization ('std') or MinMax scaling ('minmax').
 
-        col_sample: float.
-            percentage of covariates randomly chosen for training.
-
         lags: int.
             number of lags used for each time series.
 
@@ -90,13 +87,12 @@ class MTS(Base):
         cluster_encode=True,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
-        col_sample=1,
         lags=1,
         seed=123,
         backend="cpu",
     ):
 
-        assert np.int(lags) == lags, "parameter 'lags' should be an integer"
+        assert int(lags) == lags, "parameter 'lags' should be an integer"
 
         super().__init__(
             n_hidden_features=n_hidden_features,
@@ -110,7 +106,6 @@ class MTS(Base):
             cluster_encode=cluster_encode,
             type_clust=type_clust,
             type_scaling=type_scaling,
-            col_sample=col_sample,
             seed=seed,
             backend=backend,
         )
