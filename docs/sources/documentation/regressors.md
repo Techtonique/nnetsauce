@@ -721,8 +721,6 @@ nnetsauce.Ridge2Regressor(
     cluster_encode=True,
     type_clust="kmeans",
     type_scaling=("std", "std", "std"),
-    col_sample=1,
-    row_sample=1,
     lambda1=0.1,
     lambda2=0.1,
     seed=123,
@@ -773,12 +771,6 @@ Attributes:
         (and when relevant).
         Currently available: standardization ('std') or MinMax scaling ('minmax')
 
-    col_sample: float
-        percentage of covariates randomly chosen for training
-
-    row_sample: float
-        percentage of rows chosen for training, by stratified bootstrapping
-
     lambda1: float
         regularization parameter on direct link
 
@@ -799,7 +791,7 @@ References:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2Regressor.py#L131)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2Regressor.py#L121)</span>
 
 ### fit
 

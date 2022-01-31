@@ -23,7 +23,6 @@ nnetsauce.MTS(
     cluster_encode=True,
     type_clust="kmeans",
     type_scaling=("std", "std", "std"),
-    col_sample=1,
     lags=1,
     seed=123,
     backend="cpu",
@@ -79,9 +78,6 @@ Attributes:
         (and when relevant).
         Currently available: standardization ('std') or MinMax scaling ('minmax').
 
-    col_sample: float.
-        percentage of covariates randomly chosen for training.
-
     lags: int.
         number of lags used for each time series.
 
@@ -94,7 +90,7 @@ Attributes:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L130)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L125)</span>
 
 ### fit
 
@@ -127,7 +123,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L212)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L207)</span>
 
 ### predict
 
