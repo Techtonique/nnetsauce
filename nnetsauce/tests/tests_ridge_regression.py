@@ -158,7 +158,6 @@ class TestRidge2Regressor(ut.TestCase):
             nodes_sim="uniform",
             activation_name="tanh",
             n_clusters=0,
-            col_sample=1,
             seed=5260,
             lambda1=0.1,
             lambda2=0.01,
@@ -170,7 +169,6 @@ class TestRidge2Regressor(ut.TestCase):
             nodes_sim="uniform",
             activation_name="tanh",
             n_clusters=0,
-            col_sample=0.8,
             seed=2763,
             lambda1=0.01,
             lambda2=0.1,
@@ -183,7 +181,6 @@ class TestRidge2Regressor(ut.TestCase):
             activation_name="tanh",
             n_clusters=2,
             cluster_encode=False,
-            col_sample=0.8,
             seed=2763,
             lambda1=0.1,
             lambda2=0.01,
@@ -206,15 +203,15 @@ class TestRidge2Regressor(ut.TestCase):
 
         fit_obj3.fit(X_train, y_train)
         err3 = fit_obj3.predict(X_test) - y_test
-        rmse3 = np.sqrt(np.mean(err3 ** 2))
+        rmse3 = np.sqrt(np.mean(err3 ** 2))        
 
         fit_obj4.fit(X_train, y_train)
         err4 = fit_obj4.predict(X_test) - y_test
-        rmse4 = np.sqrt(np.mean(err4 ** 2))
+        rmse4 = np.sqrt(np.mean(err4 ** 2))        
 
         fit_obj5.fit(X_train, y_train)
         err5 = fit_obj5.predict(X_test) - y_test
-        rmse5 = np.sqrt(np.mean(err5 ** 2))
+        rmse5 = np.sqrt(np.mean(err5 ** 2))        
 
         fit_obj6.fit(X_train, y_train)
         err6 = fit_obj6.predict(X_test) - y_test
@@ -226,7 +223,7 @@ class TestRidge2Regressor(ut.TestCase):
 
         fit_obj8.fit(X_train, y_train)
         err8 = fit_obj8.predict(X_test) - y_test
-        rmse8 = np.sqrt(np.mean(err8 ** 2))
+        rmse8 = np.sqrt(np.mean(err8 ** 2))        
 
         fit_obj9.fit(X_train, y_train)
         err9 = fit_obj9.predict(X_test) - y_test
@@ -250,9 +247,9 @@ class TestRidge2Regressor(ut.TestCase):
 
         self.assertTrue(np.allclose(np.round(rmse, 3), 5.435, atol=1e-3))
         self.assertTrue(np.allclose(np.round(rmse2, 3), 19.947, atol=1e-3))
-        self.assertFalse(np.allclose(np.round(rmse3, 3), 1.934, atol=1e-3))
-        self.assertTrue(np.allclose(np.round(rmse4, 3), 10.098, atol=1e-3))
-        self.assertTrue(np.allclose(np.round(rmse5, 3), 22.201, atol=1e-3))
+        self.assertTrue(np.allclose(np.round(rmse3, 3), 1.934, atol=1e-3))
+        self.assertTrue(np.allclose(np.round(rmse4, 3), 10.160, atol=1e-3))
+        self.assertTrue(np.allclose(np.round(rmse5, 3), 22.427, atol=1e-3))
         self.assertTrue(np.allclose(np.round(rmse6, 3), 0.614, atol=1e-3))
         self.assertTrue(np.allclose(np.round(rmse7, 3), 6.789, atol=1e-3))
         self.assertTrue(
@@ -268,12 +265,12 @@ class TestRidge2Regressor(ut.TestCase):
             np.allclose(fit_obj2.predict(X_test[0, :]), 283.416245307822)
         )
 
-        self.assertTrue(np.allclose(rmse8, 22.454022827189572))
+        self.assertTrue(np.allclose(np.round(rmse8, 3), 22.422, atol=1e-3))
         self.assertTrue(np.allclose(rmse9, 21.466986827736815))
         self.assertTrue(np.allclose(rmse10, 0.8446477775597262))
         self.assertTrue(np.allclose(rmse11, 22.26762496538532))
-        self.assertTrue(np.allclose(rmse12, 22.988764118548282))
-        self.assertTrue(np.allclose(rmse13, 2.8462188301137354))
+        self.assertTrue(np.allclose(np.round(rmse12, 3), 22.802, atol=1e-3))
+        self.assertTrue(np.allclose(np.round(rmse13, 3), 4.054, atol=1e-3))
 
     def test_score(self):
 

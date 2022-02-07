@@ -198,7 +198,7 @@ class TestBase(ut.TestCase):
 
         fit_obj4.fit(X_train, y_train)
         err4 = fit_obj4.predict(X_test) - y_test
-        rmse4 = np.sqrt(np.mean(err4 ** 2))
+        rmse4 = np.sqrt(np.mean(err4 ** 2))        
 
         fit_obj5.fit(X_train, y_train)
         err5 = fit_obj5.predict(X_test) - y_test
@@ -239,7 +239,7 @@ class TestBase(ut.TestCase):
         self.assertTrue(np.allclose(rmse, 63.243819280710575))
         self.assertTrue(np.allclose(rmse2, 19.404919470812349))
         self.assertFalse(np.allclose(rmse3, 0))
-        self.assertTrue(np.allclose(rmse4, 208.284))
+        self.assertTrue(np.allclose(rmse4, 73.021))
         self.assertFalse(np.allclose(rmse5, 0))
         self.assertTrue(np.allclose(rmse6, 62.613229649101946))
         self.assertTrue(np.allclose(rmse7, 63.048908568696184))

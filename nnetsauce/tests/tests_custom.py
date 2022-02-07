@@ -139,10 +139,10 @@ class TestCustom(ut.TestCase):
 
         fit_obj4.fit(X_train, y_train)
         err4 = fit_obj4.predict(X_test) - y_test
-        rmse4 = np.sqrt(np.mean(err4 ** 2))
+        rmse4 = np.sqrt(np.mean(err4 ** 2))        
 
         err4_1 = fit_obj4.predict(X_test[0, :]) - y_test[0]
-        rmse4_1 = np.sqrt(np.mean(err4_1 ** 2))
+        rmse4_1 = np.sqrt(np.mean(err4_1 ** 2))        
 
         fit_obj8.fit(X_train, y_train)
         err8 = fit_obj8.predict(X_test) - y_test
@@ -153,8 +153,8 @@ class TestCustom(ut.TestCase):
 
         fit_obj6.fit(Z[0:100, :], t[0:100])
         pred6 = fit_obj6.predict(Z[106, :])
-        pred6_proba1 = fit_obj6.predict_proba(Z[100, :])
-        pred6_proba2 = fit_obj6.predict_proba(Z[100:120, :])
+        pred6_proba1 = fit_obj6.predict_proba(Z[100, :])        
+        pred6_proba2 = fit_obj6.predict_proba(Z[100:120, :])        
 
         score6 = fit_obj6.score(Z[100:120, :], t[100:120])
 
@@ -168,13 +168,13 @@ class TestCustom(ut.TestCase):
         self.assertTrue(np.allclose(rmse, 64.933610490495667))
         self.assertTrue(np.allclose(rmse2, 12.968755131423396))
         self.assertTrue(np.allclose(rmse3, 26.716371782298673))
-        self.assertTrue(np.allclose(rmse4, 3.3480684032382375))
-        self.assertTrue(np.allclose(rmse4_1, 3.4339085800638713e-05))
+        self.assertTrue(np.allclose(rmse4, 6.064066131839398))
+        self.assertTrue(np.allclose(rmse4_1, 9.814839074806514e-07))
         self.assertTrue(np.allclose(rmse8, 64.93379560651447))
         self.assertTrue(np.allclose(pred5, 1))
         self.assertTrue(np.allclose(pred6, 1))
-        self.assertTrue(np.allclose(pred6_proba1[0], 0.50507336437937767))
-        self.assertTrue(np.allclose(pred6_proba2[3, 0], 0.4836233209751839))
+        self.assertTrue(np.allclose(pred6_proba1[0], 0.505123268419112))
+        self.assertTrue(np.allclose(pred6_proba2[3, 0], 0.4836380065375998))
         self.assertTrue(np.allclose(score6, 0.94999999999999996))
         self.assertTrue(np.allclose(score7, 0.85))
         self.assertTrue(np.allclose(rmse9, 76.12747461579583))

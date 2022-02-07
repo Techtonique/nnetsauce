@@ -28,7 +28,6 @@ fit_obj = ns.Ridge2Classifier(lambda1 = 6.90185578e+04,
                              lambda2 = 3.17392781e+02, 
                              n_hidden_features=95, 
                              n_clusters=2, 
-                             row_sample = 4.63427734e-01, 
                              dropout = 3.62817383e-01,
                              type_clust = "gmm")
 
@@ -59,7 +58,6 @@ fit_obj = ns.Ridge2Classifier(lambda1 = 8.64135756e+04,
                              lambda2 = 8.27514666e+04, 
                              n_hidden_features=109, 
                              n_clusters=3, 
-                             row_sample = 5.54907227e-01, 
                              dropout = 1.84484863e-01,
                              type_clust = "gmm")
 
@@ -83,7 +81,6 @@ fit_obj = ns.Ridge2Classifier(lambda1 = 1.87500081e+04,
                              lambda2 = 3.12500069e+04, 
                              n_hidden_features=47, 
                              n_clusters=3, 
-                             row_sample = 7.37500000e-01, 
                              dropout = 1.31250000e-01,
                              type_clust = "gmm")
 
@@ -111,7 +108,6 @@ fit_obj = ns.Ridge2Classifier(lambda1 = 7.11914091e+04,
                              lambda2 = 4.63867241e+04, 
                              n_hidden_features=13, 
                              n_clusters=0, 
-                             row_sample = 7.65039063e-01, 
                              dropout = 5.21582031e-01,
                              type_clust = "gmm")
 
