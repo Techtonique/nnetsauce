@@ -14,7 +14,7 @@ class CustomRegressor(Custom, RegressorMixin):
 
     This class is used to 'augment' any regression model with transformed features.
 
-    Attributes:
+    Parameters:
 
         obj: object
             any object containing a method fit (obj.fit()) and a method predict
@@ -77,6 +77,12 @@ class CustomRegressor(Custom, RegressorMixin):
         backend: str
             "cpu" or "gpu" or "tpu"
 
+    Examples:
+
+    ```python 
+    TBD
+    ```
+
     """
 
     # construct the object -----
@@ -125,7 +131,7 @@ class CustomRegressor(Custom, RegressorMixin):
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit custom model to training data (X, y).
 
-        Args:
+        Parameters:
 
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number
@@ -166,7 +172,7 @@ class CustomRegressor(Custom, RegressorMixin):
     def predict(self, X, **kwargs):
         """Predict test data X.
 
-        Args:
+        Parameters:
 
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number
@@ -203,7 +209,7 @@ class CustomRegressor(Custom, RegressorMixin):
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 
 
-        Args: 
+        Parameters: 
     
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number 
