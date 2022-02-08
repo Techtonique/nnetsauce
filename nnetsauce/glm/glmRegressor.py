@@ -281,11 +281,11 @@ class GLMRegressor(GLM, RegressorMixin):
             )
 
             return (
-                self.y_mean
+                self.y_mean_
                 + np.dot(self.cook_test_set(new_X, **kwargs), self.beta_)
             )[0]
 
-        return self.y_mean + np.dot(self.cook_test_set(X, **kwargs), self.beta_)
+        return self.y_mean_ + np.dot(self.cook_test_set(X, **kwargs), self.beta_)
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 
