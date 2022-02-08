@@ -18,7 +18,7 @@ import pickle
 class AdaBoostClassifier(Boosting, ClassifierMixin):
     """AdaBoost Classification (SAMME) model class derived from class Boosting
 
-    Attributes:
+    Parameters:
 
         obj: object
             any object containing a method fit (obj.fit()) and a method predict
@@ -93,6 +93,14 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         backend: str
             "cpu" or "gpu" or "tpu"
 
+    Attributes:
+
+        alpha_: list
+            AdaBoost coefficients alpha_m
+
+        base_learners_: dict
+            a dictionary containing the base learners        
+
     """
 
     # construct the object -----
@@ -145,18 +153,19 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         )
 
         self.type_fit = "classification"
-        self.alpha = []
-        self.w = []
-        self.base_learners = dict.fromkeys(range(n_estimators))
         self.verbose = verbose
         self.method = method
         self.reg_lambda = reg_lambda
         self.reg_alpha = reg_alpha
 
+        self.alpha_ = []
+        self.base_learners_ = dict.fromkeys(range(n_estimators))  
+
+
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit Boosting model to training data (X, y).
 
-        Args:
+        Parameters:
 
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number
@@ -224,7 +233,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
             err_m = 1e6
             err_bound = 1 - 1 / self.n_classes
-            self.alpha.append(1.0)
+            self.alpha_.append(1.0)
             x_range_n = range(n)
 
             for m in range(self.n_estimators):
@@ -233,7 +242,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                     X, y, sample_weight=np.ravel(w_m, order="C"), **kwargs
                 ).predict(X)
 
-                self.base_learners.update(
+                self.base_learners_.update(
                     {m: pickle.loads(pickle.dumps(base_learner, -1))}
                 )
 
@@ -257,7 +266,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                     (self.n_classes - 1) * (1 - err_m) / err_m
                 )
 
-                self.alpha.append(alpha_m)
+                self.alpha_.append(alpha_m)
 
                 w_m_temp = [exp(alpha_m * cond[i]) for i in x_range_n]
 
@@ -273,7 +282,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             if self.verbose == 1:
                 pbar.update(self.n_estimators)
 
-            self.n_estimators = len(self.base_learners)
+            self.n_estimators = len(self.base_learners_)
 
             return self
 
@@ -299,7 +308,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                     a=probs, a_min=2.220446049250313e-16, a_max=1.0, out=probs
                 )
 
-                self.base_learners.update(
+                self.base_learners_.update(
                     {m: pickle.loads(pickle.dumps(base_learner, -1))}
                 )
 
@@ -320,14 +329,14 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             if self.verbose == 1:
                 pbar.update(self.n_estimators)
 
-            self.n_estimators = len(self.base_learners)
+            self.n_estimators = len(self.base_learners_)
 
             return self
 
     def predict(self, X, **kwargs):
         """Predict test data X.
 
-        Args:
+        Parameters:
 
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number
@@ -346,7 +355,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
 
-        Args:
+        Parameters:
 
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number
@@ -361,7 +370,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
         """
 
-        n_iter = len(self.base_learners)
+        n_iter = len(self.base_learners_)
 
         if self.method == "SAMME":
 
@@ -370,11 +379,11 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             # if self.verbose == 1:
             #    pbar = Progbar(n_iter)
 
-            for (idx, base_learner) in self.base_learners.items():
+            for (idx, base_learner) in self.base_learners_.items():
 
                 preds = base_learner.predict(X, **kwargs)
 
-                ensemble_learner += self.alpha[idx] * mo.one_hot_encode2(
+                ensemble_learner += self.alpha_[idx] * mo.one_hot_encode2(
                     preds, self.n_classes
                 )
 
@@ -396,7 +405,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         # if self.verbose == 1:
         #    pbar = Progbar(n_iter)
 
-        for idx, base_learner in self.base_learners.items():
+        for idx, base_learner in self.base_learners_.items():
 
             probs = base_learner.predict_proba(X, **kwargs)
 
@@ -425,7 +434,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
     def score(self, X, y, scoring=None, **kwargs):
         """Score the model on test set features X and response y.
 
-        Args:
+        Parameters:
 
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number

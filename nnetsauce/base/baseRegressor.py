@@ -70,6 +70,14 @@ class BaseRegressor(Base, RegressorMixin):
         backend: str
             "cpu" or "gpu" or "tpu"
 
+    Attributes:
+
+        beta_: vector
+            regression coefficients  
+
+        GCV_: float
+            Generalized Cross-Validation error          
+
     """
 
     # construct the object -----
@@ -136,9 +144,9 @@ class BaseRegressor(Base, RegressorMixin):
             X=scaled_Z, y=centered_y, backend=self.backend
         )
 
-        self.beta = fit_obj["beta_hat"]
+        self.beta_ = fit_obj["beta_hat"]
 
-        self.GCV = fit_obj["GCV"]
+        self.GCV_ = fit_obj["GCV"]
 
         return self
 
@@ -170,13 +178,13 @@ class BaseRegressor(Base, RegressorMixin):
                 self.y_mean_
                 + mo.safe_sparse_dot(
                     a=self.cook_test_set(new_X, **kwargs),
-                    b=self.beta,
+                    b=self.beta_,
                     backend=self.backend,
                 )
             )[0]
 
         return self.y_mean_ + mo.safe_sparse_dot(
-            a=self.cook_test_set(X, **kwargs), b=self.beta, backend=self.backend
+            a=self.cook_test_set(X, **kwargs), b=self.beta_, backend=self.backend
         )
 
     def score(self, X, y, scoring=None, **kwargs):
