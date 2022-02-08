@@ -18,7 +18,7 @@ from scipy.special import logsumexp, expit, erf
 class GLMClassifier(GLM, ClassifierMixin):
     """Generalized 'linear' models using quasi-randomized networks (classification)
 
-    Attributes:
+    Parameters:
 
         n_hidden_features: int
             number of nodes in the hidden layer
@@ -79,6 +79,17 @@ class GLMClassifier(GLM, ClassifierMixin):
 
         seed: int
             reproducibility seed for nodes_sim=='uniform'
+
+    Attributes:
+
+        beta_: vector
+            regression coefficients
+
+    Examples:
+
+    ```python
+    TBD
+    ```            
 
     """
 
@@ -231,9 +242,7 @@ class GLMClassifier(GLM, ClassifierMixin):
             y
         ), "y must contain only integers"  # change is_factor and subsampling everywhere
 
-        self.beta = None
-
-        self.n_iter = 0
+        self.beta_ = None
 
         n, p = X.shape
 
@@ -272,7 +281,7 @@ class GLMClassifier(GLM, ClassifierMixin):
             **kwargs
         )
 
-        self.beta = self.optimizer.results[0]
+        self.beta_ = self.optimizer.results[0]
 
         return self
 
@@ -329,7 +338,7 @@ class GLMClassifier(GLM, ClassifierMixin):
 
         ZB = mo.safe_sparse_dot(
             Z,
-            self.beta.reshape(
+            self.beta_.reshape(
                 self.n_classes,
                 X.shape[1] + self.n_hidden_features + self.n_clusters,
             ).T,

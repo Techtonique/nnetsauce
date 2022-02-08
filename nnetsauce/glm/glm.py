@@ -13,7 +13,7 @@ from ..optimizers import Optimizer
 class GLM(Base):
     """Generalized 'linear' models for quasi-randomized networks (nonlinear models!)
 
-    Attributes:
+    Parameters:
 
         n_hidden_features: int
             number of nodes in the hidden layer
@@ -75,6 +75,10 @@ class GLM(Base):
         seed: int
             reproducibility seed for nodes_sim=='uniform' and clustering
 
+    Attributes:
+
+        beta_: vector
+            regression coefficients
     """
 
     # construct the object -----
@@ -120,7 +124,7 @@ class GLM(Base):
         self.lambda2 = lambda2
         self.alpha2 = alpha2
         self.optimizer = optimizer
-        self.beta = None
+        self.beta_ = None
 
     def compute_XB(self, X, beta=None, row_index=None):
 
@@ -132,19 +136,19 @@ class GLM(Base):
 
             return np.dot(X[row_index, :], beta)
 
-        # self.beta is not None in this case
+        # self.beta_ is None in this case
         if row_index is None:
 
-            return np.dot(X, self.beta)
+            return np.dot(X, self.beta_)
 
-        return np.dot(X[row_index, :], self.beta)
+        return np.dot(X[row_index, :], self.beta_)
 
     def compute_XB2(self, X, beta=None, row_index=None):
         def f00(X):
-            return np.dot(X, self.beta)
+            return np.dot(X, self.beta_)
 
         def f01(X):
-            return np.dot(X[row_index, :], self.beta)
+            return np.dot(X[row_index, :], self.beta_)
 
         def f11(X):
             return np.dot(X[row_index, :], beta)

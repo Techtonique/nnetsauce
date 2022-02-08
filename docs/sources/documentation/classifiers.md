@@ -498,7 +498,7 @@ nnetsauce.GLMClassifier(
 
 Generalized 'linear' models using quasi-randomized networks (classification)
 
-Attributes:
+Parameters:
 
     n_hidden_features: int
         number of nodes in the hidden layer
@@ -560,10 +560,21 @@ Attributes:
     seed: int
         reproducibility seed for nodes_sim=='uniform'
 
+Attributes:
+
+    beta_: vector
+        regression coefficients
+
+Examples:
+
+```python
+TBD
+```            
+
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmClassifier.py#L198)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmClassifier.py#L209)</span>
 
 ### fit
 

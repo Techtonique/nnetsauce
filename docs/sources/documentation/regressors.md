@@ -549,7 +549,7 @@ Parameters:
 Examples:
 
 ```python 
-a = a + 1   
+TBD
 ```
 
 
@@ -682,10 +682,21 @@ Attributes:
     seed: int
         reproducibility seed for nodes_sim=='uniform'
 
+Attributes:
+
+    beta_: vector
+        regression coefficients
+
+Examples:
+
+```python
+TBD
+```            
+
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmRegressor.py#L175)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmRegressor.py#L186)</span>
 
 ### fit
 
