@@ -32,7 +32,7 @@ nnetsauce.BaseRegressor(
 
 Random Vector Functional Link Network regression without shrinkage
 
-Attributes:
+Parameters:
 
     n_hidden_features: int
         number of nodes in the hidden layer
@@ -88,10 +88,18 @@ Attributes:
     backend: str
         "cpu" or "gpu" or "tpu"
 
+Attributes:
+
+    beta_: vector
+        regression coefficients  
+
+    GCV_: float
+        Generalized Cross-Validation error          
+
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L114)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L122)</span>
 
 ### fit
 
@@ -103,7 +111,7 @@ BaseRegressor.fit(X, y, **kwargs)
 
 Fit BaseRegressor to training data (X, y)
 
-Args:
+Parameters:
 
     X: {array-like}, shape = [n_samples, n_features]
         Training vectors, where n_samples is the number
@@ -121,7 +129,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L145)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L153)</span>
 
 ### predict
 
@@ -133,7 +141,7 @@ BaseRegressor.predict(X, **kwargs)
 
 Predict test data X.
 
-Args
+Parameters:
 
     X: {array-like}, shape = [n_samples, n_features]
         Training vectors, where n_samples is the number
@@ -148,7 +156,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L182)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L190)</span>
 
 ### score
 
@@ -160,7 +168,7 @@ BaseRegressor.score(X, y, scoring=None, **kwargs)
 
 Score the model on test set features X and response y.
 
-Args:
+Parameters:
 
     X: {array-like}, shape = [n_samples, n_features]
         Training vectors, where n_samples is the number

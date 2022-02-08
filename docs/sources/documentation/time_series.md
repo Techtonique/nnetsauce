@@ -123,7 +123,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L207)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L206)</span>
 
 ### predict
 

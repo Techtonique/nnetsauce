@@ -39,7 +39,7 @@ nnetsauce.AdaBoostClassifier(
 
 AdaBoost Classification (SAMME) model class derived from class Boosting
 
-Attributes:
+Parameters:
 
     obj: object
         any object containing a method fit (obj.fit()) and a method predict
@@ -114,10 +114,18 @@ Attributes:
     backend: str
         "cpu" or "gpu" or "tpu"
 
+Attributes:
+
+    alpha_: list
+        AdaBoost coefficients alpha_m
+
+    base_learners_: dict
+        a dictionary containing the base learners        
+
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L156)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L165)</span>
 
 ### fit
 
@@ -129,7 +137,7 @@ AdaBoostClassifier.fit(X, y, sample_weight=None, **kwargs)
 
 Fit Boosting model to training data (X, y).
 
-Args:
+Parameters:
 
     X: {array-like}, shape = [n_samples, n_features]
         Training vectors, where n_samples is the number
@@ -148,7 +156,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L327)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L336)</span>
 
 ### predict
 
@@ -160,7 +168,7 @@ AdaBoostClassifier.predict(X, **kwargs)
 
 Predict test data X.
 
-Args:
+Parameters:
 
     X: {array-like}, shape = [n_samples, n_features]
         Training vectors, where n_samples is the number
@@ -176,7 +184,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L346)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L355)</span>
 
 ### predict_proba
 
@@ -188,7 +196,7 @@ AdaBoostClassifier.predict_proba(X, **kwargs)
 
 Predict probabilities for test data X.
 
-Args:
+Parameters:
 
     X: {array-like}, shape = [n_samples, n_features]
         Training vectors, where n_samples is the number
@@ -204,7 +212,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L425)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L434)</span>
 
 ### score
 
@@ -216,7 +224,7 @@ AdaBoostClassifier.score(X, y, scoring=None, **kwargs)
 
 Score the model on test set features X and response y.
 
-Args:
+Parameters:
 
     X: {array-like}, shape = [n_samples, n_features]
         Training vectors, where n_samples is the number
