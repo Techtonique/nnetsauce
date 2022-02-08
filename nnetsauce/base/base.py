@@ -28,7 +28,7 @@ class Base(BaseEstimator):
 
     This class contains the most important data preprocessing/feature engineering methods.
 
-    Attributes:
+    Parameters:
 
         n_hidden_features: int
             number of nodes in the hidden layer
@@ -217,7 +217,7 @@ class Base(BaseEstimator):
     def encode_clusters(self, X=None, predict=False, **kwargs):  #
         """Create new covariates with kmeans or GMM clustering
 
-        Args:
+        Parameters:
 
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number
@@ -276,7 +276,7 @@ class Base(BaseEstimator):
     def create_layer(self, scaled_X, W=None):
         """Create hidden layer.
 
-        Args:
+        Parameters:
 
             scaled_X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number
@@ -427,7 +427,7 @@ class Base(BaseEstimator):
     def cook_training_set(self, y=None, X=None, W=None, **kwargs):
         """Create new hidden features for training set, with hidden layer, center the response.
 
-        Args:
+        Parameters:
 
             y: array-like, shape = [n_samples]
                 Target values
@@ -603,7 +603,7 @@ class Base(BaseEstimator):
     def cook_test_set(self, X, **kwargs):
         """Transform data from test set, with hidden layer.
 
-        Args:
+        Parameters:
 
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number
