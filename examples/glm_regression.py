@@ -22,7 +22,7 @@ start = time()
 obj2.fit(X_train, y_train, learning_rate=0.1, batch_prop=0.25, verbose=2)
 print(f"\n Elapsed: {time() - start}")
 # plt.plot(obj2.optimizer.results[2])
-print(obj2.beta)
+print(obj2.beta_)
 print("RMSE: ")
 print(np.sqrt(obj2.score(X_test, y_test))) # RMSE
 
@@ -33,7 +33,7 @@ start = time()
 obj2.fit(X_train, y_train, learning_rate=0.01, batch_prop=0.8, verbose=2)
 print(f"\n Elapsed: {time() - start}")
 plt.plot(obj2.optimizer.results[2])
-print(obj2.beta)
+print(obj2.beta_)
 print("RMSE: ")
 print(np.sqrt(obj2.score(X_test, y_test))) # RMSE
 
@@ -45,7 +45,7 @@ start = time()
 obj2.fit(X_train, y_train, batch_prop=0.25, verbose=2)
 print(f"\n Elapsed: {time() - start}")
 plt.plot(obj2.optimizer.results[2])
-print(obj2.beta)
+print(obj2.beta_)
 print("RMSE: ")
 print(np.sqrt(obj2.score(X_test, y_test))) # RMSE
 
@@ -55,7 +55,7 @@ start = time()
 obj2.fit(X_train, y_train, learning_rate=0.01, batch_prop=0.8, verbose=2)
 print(f"\n Elapsed: {time() - start}")
 plt.plot(obj2.optimizer.results[2])
-print(obj2.beta)
+print(obj2.beta_)
 print("RMSE: ")
 print(np.sqrt(obj2.score(X_test, y_test))) # RMSE 
 
@@ -67,7 +67,7 @@ start = time()
 obj2.fit(X_train, y_train, learning_rate=0.1, batch_prop=0.5, verbose=2)
 print(f"\n Elapsed: {time() - start}")
 plt.plot(obj2.optimizer.results[2])
-print(obj2.beta)
+print(obj2.beta_)
 print("RMSE: ")
 print(np.sqrt(obj2.score(X_test, y_test))) # RMSE
 
@@ -77,7 +77,7 @@ start = time()
 obj2.fit(X_train, y_train, learning_rate=0.1, batch_prop=0.5, verbose=2)
 print(f"\n Elapsed: {time() - start}")
 plt.plot(obj2.optimizer.results[2])
-print(obj2.beta)
+print(obj2.beta_)
 print("RMSE: ")
 print(np.sqrt(obj2.score(X_test, y_test))) # RMSE
 
