@@ -483,7 +483,7 @@ Custom Regression model
 
 This class is used to 'augment' any regression model with transformed features.
 
-Attributes:
+Parameters:
 
     obj: object
         any object containing a method fit (obj.fit()) and a method predict
@@ -546,10 +546,16 @@ Attributes:
     backend: str
         "cpu" or "gpu" or "tpu"
 
+Examples:
+
+```python 
+a = a + 1   
+```
+
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/custom/customRegressor.py#L125)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/custom/customRegressor.py#L131)</span>
 
 ### fit
 
@@ -561,7 +567,7 @@ CustomRegressor.fit(X, y, sample_weight=None, **kwargs)
 
 Fit custom model to training data (X, y).
 
-Args:
+Parameters:
 
     X: {array-like}, shape = [n_samples, n_features]
         Training vectors, where n_samples is the number
