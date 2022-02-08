@@ -146,7 +146,7 @@ class CustomClassifier(Custom, ClassifierMixin):
                 scaled_Z,
                 output_y,
                 sample_weight=np.ravel(sample_weight, order="C")[
-                    self.index_row
+                    self.index_row_
                 ],
                 # **kwargs
             )

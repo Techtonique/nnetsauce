@@ -200,7 +200,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
             if len(X.shape) == 1:
 
                 return (
-                    self.y_mean
+                    self.y_mean_
                     + mo.safe_sparse_dot(
                         a=self.cook_test_set(new_X, **kwargs),
                         b=self.beta,
@@ -208,7 +208,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
                     )
                 )[0]
 
-            return self.y_mean + mo.safe_sparse_dot(
+            return self.y_mean_ + mo.safe_sparse_dot(
                 a=self.cook_test_set(X, **kwargs),
                 b=self.beta,
                 backend=self.backend,
@@ -231,7 +231,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
                 )
 
                 return (
-                    self.y_mean + pred_obj["preds"][0],
+                    self.y_mean_ + pred_obj["preds"][0],
                     pred_obj["preds_std"][0],
                 )
 
@@ -247,7 +247,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
                 backend=self.backend,
             )
 
-            return (self.y_mean + pred_obj["preds"], pred_obj["preds_std"])
+            return (self.y_mean_ + pred_obj["preds"], pred_obj["preds_std"])
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 

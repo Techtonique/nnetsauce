@@ -225,7 +225,7 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
             )
 
             return (
-                self.y_mean
+                self.y_mean_
                 + mo.safe_sparse_dot(
                     a=self.cook_test_set(new_X, **kwargs),
                     b=self.beta,
@@ -233,7 +233,7 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
                 )
             )[0]
 
-        return self.y_mean + mo.safe_sparse_dot(
+        return self.y_mean_ + mo.safe_sparse_dot(
             a=self.cook_test_set(X, **kwargs), b=self.beta, backend=self.backend
         )
 

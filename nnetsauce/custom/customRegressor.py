@@ -190,13 +190,13 @@ class CustomRegressor(Custom, RegressorMixin):
             )
 
             return (
-                self.y_mean
+                self.y_mean_
                 + self.obj.predict(
                     self.cook_test_set(new_X, **kwargs), **kwargs
                 )
             )[0]
 
-        return self.y_mean + self.obj.predict(
+        return self.y_mean_ + self.obj.predict(
             self.cook_test_set(X, **kwargs), **kwargs
         )
 
