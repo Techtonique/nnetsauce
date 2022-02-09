@@ -15,7 +15,7 @@ from functools import partial
 class MTS(Base):
     """Univariate and multivariate time series (MTS) forecasting with Quasi-Randomized networks
 
-    Attributes:
+    Parameters:
 
         obj: object.
             any object containing a method fit (obj.fit()) and a method predict
@@ -69,6 +69,58 @@ class MTS(Base):
 
         backend: str.
             "cpu" or "gpu" or "tpu".
+
+    Attributes:
+
+        fit_objs_: dict
+            objects adjusted to each individual time series
+
+        y_: {array-like}
+            MTS responses (most recent observations first)
+
+        X_: {array-like}
+            MTS lags
+
+        xreg_: {array-like}
+            external regressors
+
+        y_means_: dict
+            a dictionary of each series mean values
+
+        preds_: {array-like}
+            successive model predictions
+
+        preds_std_: {array-like}
+            standard deviation around the predictions 
+        
+        return_std_: boolean
+            return uncertainty or not (set in predict)  
+
+    Examples:
+
+    ```python
+    import nnetsauce as ns
+    import numpy as np    
+    from sklearn import linear_model
+    np.random.seed(123)
+
+    M = np.random.rand(10, 3)
+    M[:,0] = 10*M[:,0]
+    M[:,2] = 25*M[:,2]
+    print(M)
+
+    # Adjust Bayesian Ridge
+    regr4 = linear_model.BayesianRidge()
+    obj_MTS = ns.MTS(regr4, lags = 1, n_hidden_features=5)
+    obj_MTS.fit(M)
+    print(obj_MTS.predict())
+
+    # with credible intervals
+    print(obj_MTS.predict(return_std=True, level=80))
+
+    print(obj_MTS.predict(return_std=True, level=95))
+    ```
+
     """
 
     # construct the object -----
@@ -113,19 +165,20 @@ class MTS(Base):
         self.obj = obj
         self.n_series = None
         self.lags = lags
-        self.fit_objs = {}
-        self.y = None  # MTS responses (most recent observations first)
-        self.X = None  # MTS lags
-        self.xreg = None
-        self.y_means = {}
-        self.preds = None
-        self.preds_std = []
-        self.row_sample = 1
+        self.fit_objs_ = {}
+        self.y_ = None  # MTS responses (most recent observations first)
+        self.X_ = None  # MTS lags
+        self.xreg_ = None
+        self.y_means_ = {}
+        self.preds_ = None
+        self.preds_std_ = []
+        self.return_std_ = None
+        
 
     def fit(self, X, xreg=None):
         """Fit MTS model to training data X, with optional regressors xreg
 
-        Args:
+        Parameters:
 
             X: {array-like}, shape = [n_samples, n_features]
                 Training time series, where n_samples is the number
@@ -154,11 +207,11 @@ class MTS(Base):
 
         rep_1_n = np.repeat(1, n)
 
-        self.y = None
-        self.X = None
+        self.y_ = None
+        self.X_ = None
         self.n_series = p
-        self.fit_objs.clear()
-        self.y_means.clear()
+        self.fit_objs_.clear()
+        self.y_means_.clear()
 
         if p > 1:
             # multivariate time series
@@ -169,10 +222,10 @@ class MTS(Base):
                 X.reshape(-1, 1)[::-1], self.lags
             )
 
-        self.y = mts_input[0]
-        # print(f"self.y: \n {self.y} \n ")
+        self.y_ = mts_input[0]
+        # print(f"self.y_: \n {self.y_} \n ")
         # print(f"mts_input[1]: \n {mts_input[1]} \n ")
-        self.X = mts_input[1]
+        self.X_ = mts_input[1]
 
         if xreg is not None:
 
@@ -180,33 +233,33 @@ class MTS(Base):
                 xreg.shape[0] == n
             ), "'xreg' and 'X' must have the same number or observations"
 
-            self.xreg = xreg
+            self.xreg_ = xreg
 
             xreg_input = ts.create_train_inputs(xreg[::-1], self.lags)
 
             dummy_y, scaled_Z = self.cook_training_set(
                 y=rep_1_n,
-                X=mo.cbind(self.X, xreg_input[1], backend=self.backend)                
+                X=mo.cbind(self.X_, xreg_input[1], backend=self.backend)                
             )
 
         else:  # xreg is None
 
             # avoids scaling X p times in the loop
-            dummy_y, scaled_Z = self.cook_training_set(y=rep_1_n, X=self.X)
+            dummy_y, scaled_Z = self.cook_training_set(y=rep_1_n, X=self.X_)
 
         # loop on all the time series and adjust self.obj.fit
         for i in range(p):
-            y_mean = np.mean(self.y[:, i])
-            self.y_means[i] = y_mean
-            self.obj.fit(scaled_Z, self.y[:, i] - y_mean)
-            self.fit_objs[i] = pickle.loads(pickle.dumps(self.obj, -1))
+            y_mean = np.mean(self.y_[:, i])
+            self.y_means_[i] = y_mean
+            self.obj.fit(scaled_Z, self.y_[:, i] - y_mean)
+            self.fit_objs_[i] = pickle.loads(pickle.dumps(self.obj, -1))
 
         return self
 
     def predict(self, h=5, level=95, new_xreg=None, **kwargs):
         """Forecast all the time series, h steps ahead
 
-        Args:
+        Parameters:
 
             h: {integer}
                 Forecasting horizon
@@ -227,22 +280,22 @@ class MTS(Base):
             model predictions for horizon = h: {array-like}
         """
 
-        self.return_std = False
+        self.return_std_ = False
 
-        if self.xreg is not None:
+        if self.xreg_ is not None:
             assert new_xreg is not None, "'new_xreg' must be provided"
 
-        self.preds = None  # do not remove (!)
+        self.preds_ = None  # do not remove (!)
 
-        self.preds = pickle.loads(pickle.dumps(self.y, -1))
+        self.preds_ = pickle.loads(pickle.dumps(self.y_, -1))
 
         n_features = self.n_series * self.lags
 
         if "return_std" in kwargs:
 
-            self.preds_std = np.zeros(h)
+            self.preds_std_ = np.zeros(h)
 
-            self.return_std = kwargs["return_std"]
+            self.return_std_ = kwargs["return_std"]
 
             qt = norm.ppf(1 - 0.5 * (1 - level / 100))
 
@@ -251,8 +304,8 @@ class MTS(Base):
             try:
                 n_obs_xreg, n_features_xreg = new_xreg.shape
                 assert (
-                    n_features_xreg == self.xreg.shape[1]
-                ), "check number of series provided for 'new_xreg' (compare with self.xreg.shape[1])"
+                    n_features_xreg == self.xreg_.shape[1]
+                ), "check number of series provided for 'new_xreg' (compare with self.xreg_.shape[1])"
             except:
                 n_obs_xreg = new_xreg.shape  # one series
 
@@ -264,12 +317,12 @@ class MTS(Base):
 
             n_features_total = n_features + n_features_xreg
 
-            inv_new_xreg = mo.rbind(self.xreg, new_xreg)[::-1]
+            inv_new_xreg = mo.rbind(self.xreg_, new_xreg)[::-1]
 
             # Loop on horizon h
             for i in range(h):
 
-                new_obs = ts.reformat_response(self.preds, self.lags)
+                new_obs = ts.reformat_response(self.preds_, self.lags)
 
                 new_obs_xreg = ts.reformat_response(inv_new_xreg, self.lags)
 
@@ -287,11 +340,11 @@ class MTS(Base):
                     cooked_new_X, **kwargs
                 )
 
-                if self.return_std == False:  # std. dev. is not returned
+                if self.return_std_ == False:  # std. dev. is not returned
 
                     preds = np.array(
                         [
-                            (self.y_means[j] + predicted_cooked_new_X[0])
+                            (self.y_means_[j] + predicted_cooked_new_X[0])
                             for j in range(self.n_series)
                         ]
                     )
@@ -300,20 +353,20 @@ class MTS(Base):
 
                     preds = np.array(
                         [
-                            (self.y_means[j] + predicted_cooked_new_X[0][0])
+                            (self.y_means_[j] + predicted_cooked_new_X[0][0])
                             for j in range(self.n_series)
                         ]
                     )
 
-                    self.preds_std[i] = predicted_cooked_new_X[1][0]
+                    self.preds_std_[i] = predicted_cooked_new_X[1][0]
 
-                self.preds = mo.rbind(preds, self.preds)
+                self.preds_ = mo.rbind(preds, self.preds_)
 
         else:  # No additional regressor provided
 
             for i in range(h):
 
-                new_obs = ts.reformat_response(self.preds, self.lags)
+                new_obs = ts.reformat_response(self.preds_, self.lags)
 
                 new_X = mo.rbind(
                     new_obs.reshape(1, n_features),
@@ -326,11 +379,11 @@ class MTS(Base):
                     cooked_new_X, **kwargs
                 )
 
-                if self.return_std == False:  # std. dev. is not returned
+                if self.return_std_ == False:  # std. dev. is not returned
 
                     preds = np.array(
                         [
-                            (self.y_means[j] + predicted_cooked_new_X[0])
+                            (self.y_means_[j] + predicted_cooked_new_X[0])
                             for j in range(self.n_series)
                         ]
                     )
@@ -339,35 +392,35 @@ class MTS(Base):
 
                     preds = np.array(
                         [
-                            (self.y_means[j] + predicted_cooked_new_X[0][0])
+                            (self.y_means_[j] + predicted_cooked_new_X[0][0])
                             for j in range(self.n_series)
                         ]
                     )
 
-                    self.preds_std[i] = predicted_cooked_new_X[1][0]
+                    self.preds_std_[i] = predicted_cooked_new_X[1][0]
 
-                self.preds = mo.rbind(preds, self.preds)
+                self.preds_ = mo.rbind(preds, self.preds_)
 
         # function's return
 
-        self.preds = self.preds[0:h, :][::-1]
+        self.preds_ = self.preds_[0:h, :][::-1]
 
-        if self.return_std == False:  # std. dev. is returned
+        if self.return_std_ == False:  # std. dev. is returned
 
-            return self.preds
+            return self.preds_
 
         # std. dev. is not returned
-        self.preds_std = self.preds_std[::-1].reshape(h, 1)
+        self.preds_std_ = self.preds_std_[::-1].reshape(h, 1)
 
-        self.preds_std = np.repeat(self.preds_std, self.n_series).reshape(
+        self.preds_std_ = np.repeat(self.preds_std_, self.n_series).reshape(
             -1, self.n_series
         )
 
         return {
-            "mean": self.preds,
-            "std": self.preds_std,
-            "lower": self.preds - qt * self.preds_std,
-            "upper": self.preds + qt * self.preds_std,
+            "mean": self.preds_,
+            "std": self.preds_std_,
+            "lower": self.preds_ - qt * self.preds_std_,
+            "upper": self.preds_ + qt * self.preds_std_,
         }
 
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):

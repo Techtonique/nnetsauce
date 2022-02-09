@@ -32,7 +32,7 @@ nnetsauce.MTS(
 
 Univariate and multivariate time series (MTS) forecasting with Quasi-Randomized networks
 
-Attributes:
+Parameters:
 
     obj: object.
         any object containing a method fit (obj.fit()) and a method predict
@@ -87,10 +87,61 @@ Attributes:
     backend: str.
         "cpu" or "gpu" or "tpu".
 
+Attributes:
+
+    fit_objs_: dict
+        objects adjusted to each individual time series
+
+    y_: {array-like}
+        MTS responses (most recent observations first)
+
+    X_: {array-like}
+        MTS lags
+
+    xreg_: {array-like}
+        external regressors
+
+    y_means_: dict
+        a dictionary of each series mean values
+
+    preds_: {array-like}
+        successive model predictions
+
+    preds_std_: {array-like}
+        standard deviation around the predictions 
+    
+    return_std_: boolean
+        return uncertainty or not (set in predict)  
+
+Examples:
+
+```python
+import nnetsauce as ns
+import numpy as np    
+from sklearn import linear_model
+np.random.seed(123)
+
+M = np.random.rand(10, 3)
+M[:,0] = 10*M[:,0]
+M[:,2] = 25*M[:,2]
+print(M)
+
+# Adjust Bayesian Ridge
+regr4 = linear_model.BayesianRidge()
+obj_MTS = ns.MTS(regr4, lags = 1, n_hidden_features=5)
+obj_MTS.fit(M)
+print(obj_MTS.predict())
+
+# with credible intervals
+print(obj_MTS.predict(return_std=True, level=80))
+
+print(obj_MTS.predict(return_std=True, level=95))
+```
+
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L125)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L178)</span>
 
 ### fit
 
@@ -102,7 +153,7 @@ MTS.fit(X, xreg=None)
 
 Fit MTS model to training data X, with optional regressors xreg
 
-Args:
+Parameters:
 
     X: {array-like}, shape = [n_samples, n_features]
         Training time series, where n_samples is the number
@@ -123,7 +174,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L206)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L259)</span>
 
 ### predict
 
@@ -135,7 +186,7 @@ MTS.predict(h=5, level=95, new_xreg=None, **kwargs)
 
 Forecast all the time series, h steps ahead
 
-Args:
+Parameters:
 
     h: {integer}
         Forecasting horizon
