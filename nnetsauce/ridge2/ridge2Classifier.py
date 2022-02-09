@@ -17,7 +17,7 @@ from scipy.special import logsumexp
 class Ridge2Classifier(Ridge2, ClassifierMixin):
     """Multinomial logit classification with 2 regularization parameters
 
-    Attributes:
+    Parameters:
 
         n_hidden_features: int
             number of nodes in the hidden layer
@@ -73,14 +73,48 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
         backend: str
             "cpu" or "gpu" or "tpu"
 
+    Examples:
 
-    References:
+    See also [https://github.com/Techtonique/nnetsauce/blob/master/examples/ridge_classification.py](https://github.com/Techtonique/nnetsauce/blob/master/examples/ridge_classification.py)
 
-        - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at:
-        https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
+    ```python
+    import nnetsauce as ns
+    import numpy as np
+    from sklearn.datasets import load_breast_cancer
+    from sklearn.model_selection import train_test_split
+    from time import time
 
-        - [2] Moudiki, T. (2019). Multinomial logistic regression using quasi-randomized networks. Available at:
-        https://www.researchgate.net/publication/334706878_Multinomial_logistic_regression_using_quasi-randomized_networks
+
+    breast_cancer = load_breast_cancer()
+    X = breast_cancer.data
+    y = breast_cancer.target
+
+    # split data into training test and test set
+    np.random.seed(123)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+    # create the model with nnetsauce
+    fit_obj = ns.Ridge2Classifier(lambda1 = 6.90185578e+04, 
+                                lambda2 = 3.17392781e+02, 
+                                n_hidden_features=95, 
+                                n_clusters=2, 
+                                dropout = 3.62817383e-01,
+                                type_clust = "gmm")
+
+    # fit the model on training set
+    start = time()
+    fit_obj.fit(X_train, y_train)
+    print(f"Elapsed {time() - start}") 
+
+    # get the accuracy on test set
+    start = time()
+    print(fit_obj.score(X_test, y_test))
+    print(f"Elapsed {time() - start}") 
+
+    # get area under the curve on test set (auc)
+    print(fit_obj.score(X_test, y_test, scoring="roc_auc"))    
+    ```
+    
 
     """
 
