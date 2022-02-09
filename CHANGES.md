@@ -1,3 +1,8 @@
+# version 0.10.0
+
+- rename attributes with underscore
+- add more examples to documentation
+
 # version 0.9.6
 
 - Fix numbers' simulations
