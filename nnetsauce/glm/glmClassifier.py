@@ -87,9 +87,7 @@ class GLMClassifier(GLM, ClassifierMixin):
 
     Examples:
 
-    ```python
-    TBD
-    ```            
+    See [https://github.com/Techtonique/nnetsauce/blob/master/examples/glm_classification.py](https://github.com/Techtonique/nnetsauce/blob/master/examples/glm_classification.py)    
 
     """
 

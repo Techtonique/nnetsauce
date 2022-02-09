@@ -90,9 +90,7 @@ class GLMRegressor(GLM, RegressorMixin):
 
     Examples:
 
-    ```python
-    TBD
-    ```            
+    See [https://github.com/Techtonique/nnetsauce/blob/master/examples/glm_regression.py](https://github.com/Techtonique/nnetsauce/blob/master/examples/glm_regression.py)
 
     """
 
