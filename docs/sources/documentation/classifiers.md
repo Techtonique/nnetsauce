@@ -567,14 +567,12 @@ Attributes:
 
 Examples:
 
-```python
-TBD
-```            
+See [https://github.com/Techtonique/nnetsauce/blob/master/examples/glm_classification.py](https://github.com/Techtonique/nnetsauce/blob/master/examples/glm_classification.py)    
 
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmClassifier.py#L209)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmClassifier.py#L207)</span>
 
 ### fit
 
@@ -636,7 +634,7 @@ nnetsauce.MultitaskClassifier(
 
 Multitask Classification model based on regression models, with shared covariates
 
-Attributes:
+Parameters:
 
     obj: object
         any object (must be a regression model) containing a method fit (obj.fit())
@@ -696,15 +694,56 @@ Attributes:
     backend: str
         "cpu" or "gpu" or "tpu"
 
-References:
+Attributes:
 
-    [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at:
-    https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
+    fit_objs_: dict
+        objects adjusted to each individual time series
+
+    n_classes_: int
+        number of classes for the classifier
+
+Examples:
+
+See also [https://github.com/Techtonique/nnetsauce/blob/master/examples/mtask_classification.py](https://github.com/Techtonique/nnetsauce/blob/master/examples/mtask_classification.py)
+
+```python
+import nnetsauce as ns
+import numpy as np
+from sklearn.datasets import load_breast_cancer
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+from time import time
+
+breast_cancer = load_breast_cancer()
+Z = breast_cancer.data
+t = breast_cancer.target
+
+X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2, 
+                                                    random_state=123+2*10)
+
+# Linear Regression is used 
+regr = LinearRegression()
+fit_obj = ns.MultitaskClassifier(regr, n_hidden_features=5, 
+                            n_clusters=2, type_clust="gmm")
+
+start = time()
+fit_obj.fit(X_train, y_train)
+print(f"Elapsed {time() - start}") 
+
+print(fit_obj.score(X_test, y_test))
+print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
+
+start = time()
+preds = fit_obj.predict(X_test)
+print(f"Elapsed {time() - start}") 
+print(metrics.classification_report(preds, y_test))
+```
 
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/multitask/multitaskClassifier.py#L129)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/multitask/multitaskClassifier.py#L170)</span>
 
 ### fit
 
