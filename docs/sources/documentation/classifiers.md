@@ -1033,6 +1033,12 @@ Parameters:
     backend: str
         "cpu" or "gpu" or "tpu"
 
+Attributes:
+
+    beta_: {array-like}
+        regression coefficients        
+
+
 Examples:
 
 See also [https://github.com/Techtonique/nnetsauce/blob/master/examples/ridge_classification.py](https://github.com/Techtonique/nnetsauce/blob/master/examples/ridge_classification.py)
@@ -1078,7 +1084,7 @@ print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2Classifier.py#L295)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2Classifier.py#L301)</span>
 
 ### fit
 
@@ -1139,7 +1145,7 @@ nnetsauce.Ridge2MultitaskClassifier(
 
 Multitask Ridge classification with 2 regularization parameters
 
-Attributes:
+Parameters:
 
     n_hidden_features: int
         number of nodes in the hidden layer
@@ -1191,15 +1197,51 @@ Attributes:
     backend: str
         "cpu" or "gpu" or "tpu"
 
-References:
+Attributes:
 
-    - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at:
-    https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
+    beta_: {array-like}
+        regression coefficients        
+
+Examples:
+
+See also [https://github.com/Techtonique/nnetsauce/blob/master/examples/ridgemtask_classification.py](https://github.com/Techtonique/nnetsauce/blob/master/examples/ridgemtask_classification.py)
+
+```python
+import nnetsauce as ns
+import numpy as np
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+from time import time
+
+breast_cancer = load_breast_cancer()
+Z = breast_cancer.data
+t = breast_cancer.target
+np.random.seed(123)
+X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
+
+fit_obj = ns.Ridge2MultitaskClassifier(n_hidden_features=int(9.83730469e+01), 
+                                dropout=4.31054687e-01, 
+                                n_clusters=int(1.71484375e+00),
+                                lambda1=1.24023438e+01, lambda2=7.30263672e+03)
+
+start = time()
+fit_obj.fit(X_train, y_train)
+print(f"Elapsed {time() - start}") 
+
+print(fit_obj.score(X_test, y_test))
+print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
+
+start = time()
+preds = fit_obj.predict(X_test)
+print(f"Elapsed {time() - start}") 
+print(metrics.classification_report(preds, y_test))    
+```
 
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2MultitaskClassifier.py#L121)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2MultitaskClassifier.py#L157)</span>
 
 ### fit
 

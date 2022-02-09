@@ -754,7 +754,7 @@ nnetsauce.Ridge2Regressor(
 
 Ridge regression with 2 regularization parameters derived from class Ridge
 
-Attributes:
+Parameters:
 
     n_hidden_features: int
         number of nodes in the hidden layer
@@ -806,6 +806,11 @@ Attributes:
     backend: str
         'cpu' or 'gpu' or 'tpu'
 
+Attributes:
+
+    beta_: {array-like}
+        regression coefficients        
+
 References:
 
     - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at:
@@ -814,7 +819,7 @@ References:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2Regressor.py#L121)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2Regressor.py#L126)</span>
 
 ### fit
 

@@ -73,6 +73,12 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
         backend: str
             "cpu" or "gpu" or "tpu"
 
+    Attributes:
+    
+        beta_: {array-like}
+            regression coefficients        
+
+
     Examples:
 
     See also [https://github.com/Techtonique/nnetsauce/blob/master/examples/ridge_classification.py](https://github.com/Techtonique/nnetsauce/blob/master/examples/ridge_classification.py)
@@ -328,7 +334,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
         loglik_func, grad_func, hessian_func = self.loglik(X=scaled_Z, Y=Y)
 
         if solver == "L-BFGS-B":
-            self.beta = minimize(
+            self.beta_ = minimize(
                 fun=loglik_func,
                 x0=np.zeros(scaled_Z.shape[1] * self.n_classes),
                 jac=grad_func,
@@ -336,7 +342,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
             ).x
 
         if solver in ("Newton-CG", "trust-ncg"):
-            self.beta = minimize(
+            self.beta_ = minimize(
                 fun=loglik_func,
                 x0=np.zeros(scaled_Z.shape[1] * self.n_classes),
                 jac=grad_func,
@@ -398,7 +404,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
 
         ZB = mo.safe_sparse_dot(
             a=Z,
-            b=self.beta.reshape(
+            b=self.beta_.reshape(
                 self.n_classes,
                 X.shape[1] + self.n_hidden_features + self.n_clusters,
             ).T,
