@@ -75,12 +75,10 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
     Attributes:
     
         beta_: {array-like}
-            regression coefficients        
+            regression coefficients   
 
-    References:
-
-        - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at:
-        https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
+        y_mean_: float
+            average response         
 
     """
 
