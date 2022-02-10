@@ -104,9 +104,6 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         s1=0.1,
         s2=0.1,
         sigma=0.05,
-        #beta=None,
-        #Sigma=None,
-        #GCV=None,
         return_std=True,
         backend="cpu",
     ):
@@ -131,8 +128,8 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         self.s2 = s2
         self.sigma = sigma
         self.beta_ = None
-        self.Sigma = None
-        self.GCV = None
+        self.Sigma_ = None
+        self.GCV_ = None
         self.return_std = return_std
 
     def fit(self, X, y, **kwargs):
@@ -193,9 +190,9 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         self.beta_ = fit_obj["beta_hat"]
 
         if self.return_std == True:
-            self.Sigma = fit_obj["Sigma_hat"]
+            self.Sigma_ = fit_obj["Sigma_hat"]
 
-        self.GCV = fit_obj["GCV"]
+        self.GCV_ = fit_obj["GCV"]
 
         return self
 
@@ -256,7 +253,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
                     X_star=Z,
                     return_cov=self.return_std,
                     beta_hat_=self.beta_,
-                    Sigma_hat_=self.Sigma,
+                    Sigma_hat_=self.Sigma_,
                     backend=self.backend,
                 )
 
@@ -271,7 +268,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
                 X_star=Z,
                 return_cov=self.return_std,
                 beta_hat_=self.beta_,
-                Sigma_hat_=self.Sigma,
+                Sigma_hat_=self.Sigma_,
                 backend=self.backend,
             )
 
