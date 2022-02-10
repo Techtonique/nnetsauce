@@ -94,9 +94,9 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
         seed=123,
         s=0.1,
         sigma=0.05,
-        beta=None,
-        Sigma=None,
-        GCV=None,
+        #beta=None,
+        #Sigma=None,
+        #GCV=None,
         return_std=True,
         backend="cpu",
     ):
@@ -118,9 +118,9 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
         )
         self.s = s
         self.sigma = sigma
-        self.beta = beta
-        self.Sigma = Sigma
-        self.GCV = GCV
+        self.beta_ = None
+        self.Sigma = None
+        self.GCV = None
         self.return_std = return_std
 
     def fit(self, X, y, **kwargs):
@@ -156,7 +156,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
             backend=self.backend,
         )
 
-        self.beta = fit_obj["beta_hat"]
+        self.beta_ = fit_obj["beta_hat"]
 
         if self.return_std == True:
             self.Sigma = fit_obj["Sigma_hat"]
@@ -203,14 +203,14 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
                     self.y_mean_
                     + mo.safe_sparse_dot(
                         a=self.cook_test_set(new_X, **kwargs),
-                        b=self.beta,
+                        b=self.beta_,
                         backend=self.backend,
                     )
                 )[0]
 
             return self.y_mean_ + mo.safe_sparse_dot(
                 a=self.cook_test_set(X, **kwargs),
-                b=self.beta,
+                b=self.beta_,
                 backend=self.backend,
             )
 
@@ -225,7 +225,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
                     sigma=self.sigma,
                     X_star=Z,
                     return_cov=True,
-                    beta_hat_=self.beta,
+                    beta_hat_=self.beta_,
                     Sigma_hat_=self.Sigma,
                     backend=self.backend,
                 )
@@ -242,7 +242,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
                 sigma=self.sigma,
                 X_star=Z,
                 return_cov=True,
-                beta_hat_=self.beta,
+                beta_hat_=self.beta_,
                 Sigma_hat_=self.Sigma,
                 backend=self.backend,
             )

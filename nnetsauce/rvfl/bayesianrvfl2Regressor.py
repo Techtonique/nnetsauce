@@ -104,9 +104,9 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         s1=0.1,
         s2=0.1,
         sigma=0.05,
-        beta=None,
-        Sigma=None,
-        GCV=None,
+        #beta=None,
+        #Sigma=None,
+        #GCV=None,
         return_std=True,
         backend="cpu",
     ):
@@ -130,9 +130,9 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         self.s1 = s1
         self.s2 = s2
         self.sigma = sigma
-        self.beta = beta
-        self.Sigma = Sigma
-        self.GCV = GCV
+        self.beta_ = None
+        self.Sigma = None
+        self.GCV = None
         self.return_std = return_std
 
     def fit(self, X, y, **kwargs):
@@ -190,7 +190,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
             backend=self.backend,
         )
 
-        self.beta = fit_obj["beta_hat"]
+        self.beta_ = fit_obj["beta_hat"]
 
         if self.return_std == True:
             self.Sigma = fit_obj["Sigma_hat"]
@@ -237,13 +237,13 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
                     self.y_mean_
                     + mo.safe_sparse_dot(
                         self.cook_test_set(new_X, **kwargs),
-                        self.beta,
+                        self.beta_,
                         backend=self.backend,
                     )
                 )[0]
 
             return self.y_mean_ + mo.safe_sparse_dot(
-                self.cook_test_set(X, **kwargs), self.beta, backend=self.backend
+                self.cook_test_set(X, **kwargs), self.beta_, backend=self.backend
             )
 
         else:  # confidence interval required for preds?
@@ -255,7 +255,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
                 pred_obj = lmf.beta_Sigma_hat_rvfl2(
                     X_star=Z,
                     return_cov=self.return_std,
-                    beta_hat_=self.beta,
+                    beta_hat_=self.beta_,
                     Sigma_hat_=self.Sigma,
                     backend=self.backend,
                 )
@@ -270,7 +270,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
             pred_obj = lmf.beta_Sigma_hat_rvfl2(
                 X_star=Z,
                 return_cov=self.return_std,
-                beta_hat_=self.beta,
+                beta_hat_=self.beta_,
                 Sigma_hat_=self.Sigma,
                 backend=self.backend,
             )
