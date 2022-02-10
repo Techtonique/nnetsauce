@@ -212,9 +212,6 @@ nnetsauce.BayesianRVFLRegressor(
     seed=123,
     s=0.1,
     sigma=0.05,
-    beta=None,
-    Sigma=None,
-    GCV=None,
     return_std=True,
     backend="cpu",
 )
@@ -223,7 +220,7 @@ nnetsauce.BayesianRVFLRegressor(
 
 Bayesian Random Vector Functional Link Network regression with one prior
 
-Attributes:
+Parameters:
 
     n_hidden_features: int
         number of nodes in the hidden layer
@@ -271,22 +268,36 @@ Attributes:
     sigma: float
         std. dev. of residuals in Bayesian Ridge Regression
 
-    beta: array-like
-        regression''s fitted parameters
-
-    Sigma: array-like
-        covariance of the distribution of fitted parameters
-
-    GCV: float
-        return_std: boolean
+    return_std: boolean
+        if True, uncertainty around predictions is evaluated
 
     backend: str
         "cpu" or "gpu" or "tpu"
 
+Attributes:
+
+    beta_: array-like
+        regression''s coefficients
+
+    Sigma_: array-like
+        covariance of the distribution of fitted parameters
+
+    GCV_: float
+        Generalized cross-validation error
+
+    y_mean_: float
+        average response    
+
+Examples:
+
+```python
+TBD
+```
+
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/rvfl/bayesianrvflRegressor.py#L126)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/rvfl/bayesianrvflRegressor.py#L137)</span>
 
 ### fit
 
@@ -298,7 +309,7 @@ BayesianRVFLRegressor.fit(X, y, **kwargs)
 
 Fit BayesianRVFLRegressor to training data (X, y).
 
-Args:
+Parameters:
 
     X: {array-like}, shape = [n_samples, n_features]
         Training vectors, where n_samples is the number
@@ -339,9 +350,6 @@ nnetsauce.BayesianRVFL2Regressor(
     s1=0.1,
     s2=0.1,
     sigma=0.05,
-    beta=None,
-    Sigma=None,
-    GCV=None,
     return_std=True,
     backend="cpu",
 )
@@ -350,7 +358,7 @@ nnetsauce.BayesianRVFL2Regressor(
 
 Bayesian Random Vector Functional Link Network regression with two priors
 
-Attributes:
+Parameters:
 
     n_hidden_features: int
         number of nodes in the hidden layer
@@ -401,27 +409,36 @@ Attributes:
     sigma: float
         std. dev. of residuals in Bayesian Ridge Regression
 
-    beta: array-like
-        regression''s fitted parameters
-
-    Sigma: array-like
-        covariance of the distribution of fitted parameters
-
-    GCV: float
-        return_std: boolean
+    return_std: boolean
+        if True, uncertainty around predictions is evaluated
 
     backend: str
         "cpu" or "gpu" or "tpu"
 
-References:
+Attributes:
 
-    - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at:
-      https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
+    beta_: array-like
+        regression''s coefficients
+
+    Sigma_: array-like
+        covariance of the distribution of fitted parameters
+
+    GCV_: float
+        Generalized cross-validation error
+
+    y_mean_: float
+        average response    
+
+Examples:
+
+```python
+TBD
+```
 
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/rvfl/bayesianrvfl2Regressor.py#L138)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/rvfl/bayesianrvfl2Regressor.py#L143)</span>
 
 ### fit
 
@@ -433,7 +450,7 @@ BayesianRVFL2Regressor.fit(X, y, **kwargs)
 
 Fit BayesianRVFL2Regressor to training data (X, y)
 
-Args:
+Parameters:
 
     X: {array-like}, shape = [n_samples, n_features]
         Training vectors, where n_samples is the number

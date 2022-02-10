@@ -14,7 +14,7 @@ from sklearn.base import RegressorMixin
 class BayesianRVFL2Regressor(Base, RegressorMixin):
     """Bayesian Random Vector Functional Link Network regression with two priors
 
-    Attributes:
+    Parameters:
 
         n_hidden_features: int
             number of nodes in the hidden layer
@@ -65,23 +65,31 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         sigma: float
             std. dev. of residuals in Bayesian Ridge Regression
 
-        beta: array-like
-            regression''s fitted parameters
-
-        Sigma: array-like
-            covariance of the distribution of fitted parameters
-
-        GCV: float
-            return_std: boolean
+        return_std: boolean
+            if True, uncertainty around predictions is evaluated
 
         backend: str
             "cpu" or "gpu" or "tpu"
 
-    References:
+    Attributes:
 
-        - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at:
-          https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
+        beta_: array-like
+            regression''s coefficients
 
+        Sigma_: array-like
+            covariance of the distribution of fitted parameters
+
+        GCV_: float
+            Generalized cross-validation error
+
+        y_mean_: float
+            average response    
+
+    Examples:
+
+    ```python
+    TBD
+    ```
 
     """
 
@@ -135,7 +143,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
     def fit(self, X, y, **kwargs):
         """Fit BayesianRVFL2Regressor to training data (X, y)
 
-        Args:
+        Parameters:
 
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number
@@ -199,7 +207,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
     def predict(self, X, return_std=False, **kwargs):
         """Predict test data X.
 
-        Args:
+        Parameters:
 
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number
@@ -277,7 +285,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 
 
-        Args:
+        Parameters:
         
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number 
