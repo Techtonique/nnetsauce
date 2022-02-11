@@ -14,7 +14,7 @@ from sklearn.base import RegressorMixin
 class BaseRegressor(Base, RegressorMixin):
     """Random Vector Functional Link Network regression without shrinkage
 
-    Attributes:
+    Parameters:
 
         n_hidden_features: int
             number of nodes in the hidden layer
@@ -70,6 +70,14 @@ class BaseRegressor(Base, RegressorMixin):
         backend: str
             "cpu" or "gpu" or "tpu"
 
+    Attributes:
+
+        beta_: vector
+            regression coefficients  
+
+        GCV_: float
+            Generalized Cross-Validation error          
+
     """
 
     # construct the object -----
@@ -114,7 +122,7 @@ class BaseRegressor(Base, RegressorMixin):
     def fit(self, X, y, **kwargs):
         """Fit BaseRegressor to training data (X, y)
 
-        Args:
+        Parameters:
 
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number
@@ -136,16 +144,16 @@ class BaseRegressor(Base, RegressorMixin):
             X=scaled_Z, y=centered_y, backend=self.backend
         )
 
-        self.beta = fit_obj["beta_hat"]
+        self.beta_ = fit_obj["beta_hat"]
 
-        self.GCV = fit_obj["GCV"]
+        self.GCV_ = fit_obj["GCV"]
 
         return self
 
     def predict(self, X, **kwargs):
         """Predict test data X.
 
-        Args
+        Parameters:
 
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number
@@ -167,22 +175,22 @@ class BaseRegressor(Base, RegressorMixin):
             )
 
             return (
-                self.y_mean
+                self.y_mean_
                 + mo.safe_sparse_dot(
                     a=self.cook_test_set(new_X, **kwargs),
-                    b=self.beta,
+                    b=self.beta_,
                     backend=self.backend,
                 )
             )[0]
 
-        return self.y_mean + mo.safe_sparse_dot(
-            a=self.cook_test_set(X, **kwargs), b=self.beta, backend=self.backend
+        return self.y_mean_ + mo.safe_sparse_dot(
+            a=self.cook_test_set(X, **kwargs), b=self.beta_, backend=self.backend
         )
 
     def score(self, X, y, scoring=None, **kwargs):
         """Score the model on test set features X and response y.
 
-        Args:
+        Parameters:
 
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number

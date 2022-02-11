@@ -83,6 +83,15 @@ class GLMRegressor(GLM, RegressorMixin):
         seed: int
             reproducibility seed for nodes_sim=='uniform'
 
+    Attributes:
+
+        beta_: vector
+            regression coefficients
+
+    Examples:
+
+    See [https://github.com/Techtonique/nnetsauce/blob/master/examples/glm_regression.py](https://github.com/Techtonique/nnetsauce/blob/master/examples/glm_regression.py)
+
     """
 
     # construct the object -----
@@ -204,7 +213,7 @@ class GLMRegressor(GLM, RegressorMixin):
 
         """
 
-        self.beta = None
+        self.beta_ = None
 
         self.n_iter = 0
 
@@ -239,7 +248,7 @@ class GLMRegressor(GLM, RegressorMixin):
             **kwargs
         )
 
-        self.beta = self.optimizer.results[0]
+        self.beta_ = self.optimizer.results[0]
 
         return self
 
@@ -270,11 +279,11 @@ class GLMRegressor(GLM, RegressorMixin):
             )
 
             return (
-                self.y_mean
-                + np.dot(self.cook_test_set(new_X, **kwargs), self.beta)
+                self.y_mean_
+                + np.dot(self.cook_test_set(new_X, **kwargs), self.beta_)
             )[0]
 
-        return self.y_mean + np.dot(self.cook_test_set(X, **kwargs), self.beta)
+        return self.y_mean_ + np.dot(self.cook_test_set(X, **kwargs), self.beta_)
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 

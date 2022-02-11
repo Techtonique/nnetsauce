@@ -60,7 +60,11 @@ devtools::install_github("Techtonique/nnetsauce/R-package")
 library(nnetsauce)
 ```
 
-__General rule for using the package in R__:  object accesses with `.`'s are replaced by `$`'s. See also [Quick start](#quick-start).
+__General rule for using the package in R__:  object accesses with `.`'s are replaced by `$`'s. R Examples can be found in the package, once installed, by typing (in R console):
+```R
+?nnetsauce::MultitaskClassifier
+```
+For a list of available models, visit [https://techtonique.github.io/nnetsauce/](https://techtonique.github.io/nnetsauce/).
 
 
 

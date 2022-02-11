@@ -20,7 +20,7 @@ if platform.system() in ("Linux", "Darwin"):
 class Ridge2Regressor(Ridge2, RegressorMixin):
     """Ridge regression with 2 regularization parameters derived from class Ridge
 
-    Attributes:
+    Parameters:
 
         n_hidden_features: int
             number of nodes in the hidden layer
@@ -72,10 +72,13 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
         backend: str
             'cpu' or 'gpu' or 'tpu'
 
-    References:
+    Attributes:
+    
+        beta_: {array-like}
+            regression coefficients   
 
-        - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at:
-        https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
+        y_mean_: float
+            average response         
 
     """
 
@@ -189,7 +192,7 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
             backend=self.backend,
         )
 
-        self.beta = mo.safe_sparse_dot(
+        self.beta_ = mo.safe_sparse_dot(
             a=inv,
             b=mo.crossprod(x=scaled_Z, y=centered_y, backend=self.backend),
             backend=self.backend,
@@ -225,16 +228,16 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
             )
 
             return (
-                self.y_mean
+                self.y_mean_
                 + mo.safe_sparse_dot(
                     a=self.cook_test_set(new_X, **kwargs),
-                    b=self.beta,
+                    b=self.beta_,
                     backend=self.backend,
                 )
             )[0]
 
-        return self.y_mean + mo.safe_sparse_dot(
-            a=self.cook_test_set(X, **kwargs), b=self.beta, backend=self.backend
+        return self.y_mean_ + mo.safe_sparse_dot(
+            a=self.cook_test_set(X, **kwargs), b=self.beta_, backend=self.backend
         )
 
     def score(self, X, y, scoring=None, **kwargs):

@@ -20,7 +20,7 @@ if platform.system() in ("Linux", "Darwin"):
 class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
     """Multitask Ridge classification with 2 regularization parameters
 
-    Attributes:
+    Parameters:
 
         n_hidden_features: int
             number of nodes in the hidden layer
@@ -72,10 +72,46 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
         backend: str
             "cpu" or "gpu" or "tpu"
 
-    References:
+    Attributes:
+    
+        beta_: {array-like}
+            regression coefficients        
 
-        - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at:
-        https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
+    Examples:
+
+    See also [https://github.com/Techtonique/nnetsauce/blob/master/examples/ridgemtask_classification.py](https://github.com/Techtonique/nnetsauce/blob/master/examples/ridgemtask_classification.py)
+
+    ```python
+    import nnetsauce as ns
+    import numpy as np
+    from sklearn.datasets import load_breast_cancer
+    from sklearn.model_selection import train_test_split
+    from sklearn import metrics
+    from time import time
+
+    breast_cancer = load_breast_cancer()
+    Z = breast_cancer.data
+    t = breast_cancer.target
+    np.random.seed(123)
+    X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
+
+    fit_obj = ns.Ridge2MultitaskClassifier(n_hidden_features=int(9.83730469e+01), 
+                                    dropout=4.31054687e-01, 
+                                    n_clusters=int(1.71484375e+00),
+                                    lambda1=1.24023438e+01, lambda2=7.30263672e+03)
+
+    start = time()
+    fit_obj.fit(X_train, y_train)
+    print(f"Elapsed {time() - start}") 
+
+    print(fit_obj.score(X_test, y_test))
+    print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
+
+    start = time()
+    preds = fit_obj.predict(X_test)
+    print(f"Elapsed {time() - start}") 
+    print(metrics.classification_report(preds, y_test))    
+    ```
 
     """
 
@@ -196,7 +232,7 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
             backend=self.backend,
         )
 
-        self.beta = mo.safe_sparse_dot(
+        self.beta_ = mo.safe_sparse_dot(
             a=inv,
             b=mo.crossprod(x=scaled_Z, y=Y, backend=self.backend),
             backend=self.backend,
@@ -257,7 +293,7 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
 
             Z = self.cook_test_set(X, **kwargs)
 
-        ZB = mo.safe_sparse_dot(a=Z, b=self.beta, backend=self.backend)
+        ZB = mo.safe_sparse_dot(a=Z, b=self.beta_, backend=self.backend)
 
         exp_ZB = np.exp(ZB)
 

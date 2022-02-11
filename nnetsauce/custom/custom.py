@@ -12,7 +12,7 @@ class Custom(Base):
 
     This class is used to 'augment' any model with transformed features.
 
-    Attributes:
+    Parameters:
 
         obj: object
             any object containing a method fit (obj.fit()) and a method predict

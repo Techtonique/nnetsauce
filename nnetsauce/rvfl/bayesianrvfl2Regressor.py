@@ -14,7 +14,7 @@ from sklearn.base import RegressorMixin
 class BayesianRVFL2Regressor(Base, RegressorMixin):
     """Bayesian Random Vector Functional Link Network regression with two priors
 
-    Attributes:
+    Parameters:
 
         n_hidden_features: int
             number of nodes in the hidden layer
@@ -65,23 +65,31 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         sigma: float
             std. dev. of residuals in Bayesian Ridge Regression
 
-        beta: array-like
-            regression''s fitted parameters
-
-        Sigma: array-like
-            covariance of the distribution of fitted parameters
-
-        GCV: float
-            return_std: boolean
+        return_std: boolean
+            if True, uncertainty around predictions is evaluated
 
         backend: str
             "cpu" or "gpu" or "tpu"
 
-    References:
+    Attributes:
 
-        - [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at:
-          https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
+        beta_: array-like
+            regression''s coefficients
 
+        Sigma_: array-like
+            covariance of the distribution of fitted parameters
+
+        GCV_: float
+            Generalized cross-validation error
+
+        y_mean_: float
+            average response    
+
+    Examples:
+
+    ```python
+    TBD
+    ```
 
     """
 
@@ -104,9 +112,6 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         s1=0.1,
         s2=0.1,
         sigma=0.05,
-        beta=None,
-        Sigma=None,
-        GCV=None,
         return_std=True,
         backend="cpu",
     ):
@@ -130,15 +135,15 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         self.s1 = s1
         self.s2 = s2
         self.sigma = sigma
-        self.beta = beta
-        self.Sigma = Sigma
-        self.GCV = GCV
+        self.beta_ = None
+        self.Sigma_ = None
+        self.GCV_ = None
         self.return_std = return_std
 
     def fit(self, X, y, **kwargs):
         """Fit BayesianRVFL2Regressor to training data (X, y)
 
-        Args:
+        Parameters:
 
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number
@@ -190,19 +195,19 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
             backend=self.backend,
         )
 
-        self.beta = fit_obj["beta_hat"]
+        self.beta_ = fit_obj["beta_hat"]
 
         if self.return_std == True:
-            self.Sigma = fit_obj["Sigma_hat"]
+            self.Sigma_ = fit_obj["Sigma_hat"]
 
-        self.GCV = fit_obj["GCV"]
+        self.GCV_ = fit_obj["GCV"]
 
         return self
 
     def predict(self, X, return_std=False, **kwargs):
         """Predict test data X.
 
-        Args:
+        Parameters:
 
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number
@@ -234,16 +239,16 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
             if len(X.shape) == 1:
 
                 return (
-                    self.y_mean
+                    self.y_mean_
                     + mo.safe_sparse_dot(
                         self.cook_test_set(new_X, **kwargs),
-                        self.beta,
+                        self.beta_,
                         backend=self.backend,
                     )
                 )[0]
 
-            return self.y_mean + mo.safe_sparse_dot(
-                self.cook_test_set(X, **kwargs), self.beta, backend=self.backend
+            return self.y_mean_ + mo.safe_sparse_dot(
+                self.cook_test_set(X, **kwargs), self.beta_, backend=self.backend
             )
 
         else:  # confidence interval required for preds?
@@ -255,13 +260,13 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
                 pred_obj = lmf.beta_Sigma_hat_rvfl2(
                     X_star=Z,
                     return_cov=self.return_std,
-                    beta_hat_=self.beta,
-                    Sigma_hat_=self.Sigma,
+                    beta_hat_=self.beta_,
+                    Sigma_hat_=self.Sigma_,
                     backend=self.backend,
                 )
 
                 return (
-                    self.y_mean + pred_obj["preds"][0],
+                    self.y_mean_ + pred_obj["preds"][0],
                     pred_obj["preds_std"][0],
                 )
 
@@ -270,17 +275,17 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
             pred_obj = lmf.beta_Sigma_hat_rvfl2(
                 X_star=Z,
                 return_cov=self.return_std,
-                beta_hat_=self.beta,
-                Sigma_hat_=self.Sigma,
+                beta_hat_=self.beta_,
+                Sigma_hat_=self.Sigma_,
                 backend=self.backend,
             )
 
-            return (self.y_mean + pred_obj["preds"], pred_obj["preds_std"])
+            return (self.y_mean_ + pred_obj["preds"], pred_obj["preds_std"])
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 
 
-        Args:
+        Parameters:
         
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number 

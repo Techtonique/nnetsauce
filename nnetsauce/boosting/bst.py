@@ -10,7 +10,7 @@ from ..base import Base
 class Boosting(Base):
     """Boosting model class derived from class Base
 
-    Attributes:
+    Parameters:
 
         obj: object
             any object containing a method fit (obj.fit()) and a method predict

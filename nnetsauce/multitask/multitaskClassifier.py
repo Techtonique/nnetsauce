@@ -15,7 +15,7 @@ from sklearn.base import ClassifierMixin
 class MultitaskClassifier(Base, ClassifierMixin):
     """Multitask Classification model based on regression models, with shared covariates
 
-    Attributes:
+    Parameters:
 
         obj: object
             any object (must be a regression model) containing a method fit (obj.fit())
@@ -75,10 +75,51 @@ class MultitaskClassifier(Base, ClassifierMixin):
         backend: str
             "cpu" or "gpu" or "tpu"
 
-    References:
+    Attributes:
 
-        [1] Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at:
-        https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
+        fit_objs_: dict
+            objects adjusted to each individual time series
+
+        n_classes_: int
+            number of classes for the classifier
+    
+    Examples:
+
+    See also [https://github.com/Techtonique/nnetsauce/blob/master/examples/mtask_classification.py](https://github.com/Techtonique/nnetsauce/blob/master/examples/mtask_classification.py)
+
+    ```python
+    import nnetsauce as ns
+    import numpy as np
+    from sklearn.datasets import load_breast_cancer
+    from sklearn.linear_model import LinearRegression
+    from sklearn.model_selection import train_test_split
+    from sklearn import metrics
+    from time import time
+
+    breast_cancer = load_breast_cancer()
+    Z = breast_cancer.data
+    t = breast_cancer.target
+
+    X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2, 
+                                                        random_state=123+2*10)
+
+    # Linear Regression is used 
+    regr = LinearRegression()
+    fit_obj = ns.MultitaskClassifier(regr, n_hidden_features=5, 
+                                n_clusters=2, type_clust="gmm")
+
+    start = time()
+    fit_obj.fit(X_train, y_train)
+    print(f"Elapsed {time() - start}") 
+
+    print(fit_obj.score(X_test, y_test))
+    print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
+
+    start = time()
+    preds = fit_obj.predict(X_test)
+    print(f"Elapsed {time() - start}") 
+    print(metrics.classification_report(preds, y_test))
+    ```
 
     """
 
@@ -124,7 +165,7 @@ class MultitaskClassifier(Base, ClassifierMixin):
 
         self.type_fit = "classification"
         self.obj = obj
-        self.fit_objs = {}
+        self.fit_objs_ = {}
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit MultitaskClassifier to training data (X, y).
@@ -151,15 +192,15 @@ class MultitaskClassifier(Base, ClassifierMixin):
 
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
-        self.n_classes = len(np.unique(y))
+        self.n_classes_ = len(np.unique(y))
 
         # multitask response
-        Y = mo.one_hot_encode2(output_y, self.n_classes)
+        Y = mo.one_hot_encode2(output_y, self.n_classes_)
 
         # if sample_weight is None:
-        for i in range(self.n_classes):
+        for i in range(self.n_classes_):
 
-            self.fit_objs[i] = pickle.loads(
+            self.fit_objs_[i] = pickle.loads(
                 pickle.dumps(self.obj.fit(scaled_Z, Y[:, i], **kwargs), -1)
             )
 
@@ -205,7 +246,7 @@ class MultitaskClassifier(Base, ClassifierMixin):
 
         shape_X = X.shape
 
-        probs = np.zeros((shape_X[0], self.n_classes))
+        probs = np.zeros((shape_X[0], self.n_classes_))
 
         if len(shape_X) == 1:
 
@@ -219,18 +260,18 @@ class MultitaskClassifier(Base, ClassifierMixin):
             Z = self.cook_test_set(new_X, **kwargs)
 
             # loop on all the classes
-            for i in range(self.n_classes):
+            for i in range(self.n_classes_):
 
-                probs[:, i] = self.fit_objs[i].predict(Z, **kwargs)[0]
+                probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)[0]
 
         else:
 
             Z = self.cook_test_set(X, **kwargs)
 
             # loop on all the classes
-            for i in range(self.n_classes):
+            for i in range(self.n_classes_):
 
-                probs[:, i] = self.fit_objs[i].predict(Z, **kwargs)
+                probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)
 
         expit_raw_probs = expit(probs)
 
