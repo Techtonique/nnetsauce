@@ -7,7 +7,7 @@ nnetsauce
 
 Randomized and Quasi-Randomized (neural) networks.  
 
-![PyPI](https://img.shields.io/pypi/v/nnetsauce) [![PyPI - License](https://img.shields.io/pypi/l/nnetsauce)](https://github.com/thierrymoudiki/nnetsauce/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce)
+![PyPI](https://img.shields.io/pypi/v/nnetsauce) [![PyPI - License](https://img.shields.io/pypi/l/nnetsauce)](https://github.com/thierrymoudiki/nnetsauce/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce) [![conda Downloads]](https://anaconda.org/conda-forge/nnetsauce/badges/downloads.svg)
 [![Documentation](https://img.shields.io/badge/documentation-is_here-green)](https://techtonique.github.io/nnetsauce/)
 
 
@@ -34,8 +34,13 @@ Randomized and Quasi-Randomized (neural) networks.
 pip install nnetsauce
 ```
 
+- __2nd method__: using `conda` (Linux and macOS only for now)
 
-- __2nd method__: from Github, for the development version
+```bash
+conda install -c conda-forge nnetsauce 
+```
+
+- __3rd method__: from Github, for the development version
 
 ```bash
 pip install git+https://github.com/Techtonique/nnetsauce.git
