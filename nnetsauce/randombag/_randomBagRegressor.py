@@ -89,42 +89,8 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
 
     Examples:
 
-    See also [https://github.com/Techtonique/nnetsauce/blob/master/examples/randombag_classification.py](https://github.com/Techtonique/nnetsauce/blob/master/examples/randombag_classification.py)
-
     ```python
-    import nnetsauce as ns
-    from sklearn.datasets import load_breast_cancer
-    from sklearn.tree import DecisionTreeClassifier
-    from sklearn.model_selection import train_test_split
-    from sklearn import metrics
-    from time import time
-
-
-    breast_cancer = load_breast_cancer()
-    Z = breast_cancer.data
-    t = breast_cancer.target
-    np.random.seed(123)
-    X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
-    
-    # decision tree
-    clf = DecisionTreeClassifier(max_depth=2, random_state=123)
-    fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=2,
-                                    direct_link=True,
-                                    n_estimators=100, 
-                                    col_sample=0.9, row_sample=0.9,
-                                    dropout=0.3, n_clusters=0, verbose=1)
-
-    start = time()
-    fit_obj.fit(X_train, y_train)
-    print(f"Elapsed {time() - start}") 
-
-    print(fit_obj.score(X_test, y_test))
-    print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
-
-    start = time()
-    preds = fit_obj.predict(X_test)
-    print(f"Elapsed {time() - start}") 
-    print(metrics.classification_report(preds, y_test))    
+    TBD
     ```
 
     """
