@@ -180,7 +180,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         self.voter_ = {}
 
     def fit(self, X, y, **kwargs):
-        """Fit Random 'Forest' model to training data (X, y).
+        """Fit Random 'Bagging' model to training data (X, y).
 
         Args:
 
