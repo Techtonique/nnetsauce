@@ -3,7 +3,7 @@
 # License: BSD 3
 
 import numpy as np
-import sklearn.metrics as skm2
+import sklearn.metrics as skm
 from .bag import RandomBag
 from ..custom import CustomRegressor
 from ..utils import misc as mx
@@ -140,7 +140,7 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
             backend=backend,
         )
 
-        self.type_fit = "classification"
+        self.type_fit = "regression"
         self.verbose = verbose
         self.n_jobs = n_jobs
         self.voter_ = {}
@@ -188,7 +188,7 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
         if self.n_jobs is None:
 
             # rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators, int verbose, int seed):
-            self.voter_ = randombagc.rbagloop(
+            self.voter_ = randombagc.rbagloop2(
                 base_learner, X, y, self.n_estimators, self.verbose, self.seed
             )
 
@@ -199,15 +199,12 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
         # 2 - Parallel training -----
         # buggy
         # if self.n_jobs is not None:
-        def fit_estimators(m):
-            # try:
+        def fit_estimators(m):            
             base_learner.fit(X, y, **kwargs)
             self.voter_.update({m: pickle.loads(pickle.dumps(base_learner, -1))})
             base_learner.set_params(
                 seed=self.seed + (m + 1) * 1000,
             )
-            # except:
-            #    pass
 
         if self.verbose == 1:
 
@@ -239,11 +236,11 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
 
         Returns:
 
-            probability estimates for test data: {array-like}
+            estimates for test data: {array-like}
 
         """
 
-        def calculate_preds(voter, weights=None, verbose=None):
+        def calculate_preds(voter, weights=None):
 
             ensemble_preds = 0
 
@@ -255,19 +252,8 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
 
                 for idx, elt in voter.items():
 
-                    try:
+                    ensemble_preds += elt.predict(X)
 
-                        ensemble_preds += elt.predict(X)
-
-                        # if verbose == 1:
-                        #    pbar.update(idx)
-
-                    except:
-
-                        continue
-
-                # if verbose == 1:
-                #    pbar.update(n_iter)
                 return ensemble_preds / n_iter
 
             # if weights is not None:
@@ -275,65 +261,19 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
 
                 ensemble_preds += weights[idx] * elt.predict(X)
 
-                # if verbose == 1:
-                #    pbar.update(idx)
-
-            # if verbose == 1:
-            #    pbar.update(n_iter)
-
             return ensemble_preds
 
-        # end calculate_probas ----
-
-        if self.n_jobs is None:
-
-            # if self.verbose == 1:
-            #    pbar = Progbar(self.n_estimators)
-
-            if weights is None:
-
-                return calculate_probas(self.voter_, verbose=self.verbose)
-
-            # if weights is not None:
-            self.weights = weights
-
-            return calculate_probas(self.voter_, weights, verbose=self.verbose)
-
-        # if self.n_jobs is not None:
-        def predict_estimator(m):
-            try:
-                return self.voter_[m].predict(X)
-            except:
-                pass
-
-        if self.verbose == 1:
-
-            preds = Parallel(n_jobs=self.n_jobs, prefer="threads")(
-                delayed(predict_estimator)(m)
-                for m in tqdm(range(self.n_estimators))
-            )
-
-        else:
-
-            preds = Parallel(n_jobs=self.n_jobs, prefer="threads")(
-                delayed(predict_estimator)(m) for m in range(self.n_estimators)
-            )
-
-        ensemble_preds = 0
+        # end calculate_preds ----
 
         if weights is None:
 
-            for i in range(self.n_estimators):
+            return calculate_preds(self.voter_)
 
-                ensemble_preds += preds[i]
+        # if weights is not None:
+        self.weights = weights
 
-            return ensemble_preds / self.n_estimators
+        return calculate_preds(self.voter_, weights)
 
-        for i in range(self.n_estimators):
-
-            ensemble_preds += weights[i] * preds[i]
-
-        return ensemble_preds
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 
