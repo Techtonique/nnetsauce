@@ -3,7 +3,7 @@
 # License: BSD 3
 
 import numpy as np
-import sklearn.metrics as skm2
+import sklearn.metrics as skm
 from ..base import Base
 from ..utils import misc as mx
 from ..utils import matrixops as mo
