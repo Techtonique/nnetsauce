@@ -173,6 +173,7 @@ pip install coverage
 ```bash
 git clone https://github.com/Techtonique/nnetsauce.git
 cd nnetsauce
+python setup.py build_ext --inplace
 nose2 --with-coverage
 ```
 
@@ -194,11 +195,6 @@ coverage html
 
 - [https://techtonique.github.io/nnetsauce/](https://techtonique.github.io/nnetsauce/)
 
-## Dependencies 
-
-- Numpy
-- Scipy
-- scikit-learn
 
 ## Citation
 
