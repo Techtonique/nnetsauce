@@ -49,7 +49,7 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
             of the training
 
         direct_link: boolean
-            indicates if the original predictors are included (True) in model's
+            indicates if the original predictors are included (True) in model''s
             fitting or not (False)
 
         n_clusters: int
@@ -90,7 +90,29 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
     Examples:
 
     ```python
-    TBD
+    import numpy as np 
+    import nnetsauce as ns
+    from sklearn.datasets import fetch_california_housing
+    from sklearn.tree import DecisionTreeRegressor
+    from sklearn.model_selection import train_test_split
+
+    X, y = fetch_california_housing(return_X_y=True, as_frame=False)
+
+    # split data into training test and test set
+    X_train, X_test, y_train, y_test = train_test_split(X, y, 
+                                                        test_size=0.2, random_state=13)
+
+    # Requires further tuning
+    obj = DecisionTreeRegressor(max_depth=3, random_state=123)
+    obj2 = ns.RandomBagRegressor(obj=obj, direct_link=False,
+                                n_estimators=50, 
+                                col_sample=0.9, row_sample=0.9,
+                                dropout=0, n_clusters=0, verbose=1)
+    
+    obj2.fit(X_train, y_train)        
+
+    print(np.sqrt(obj2.score(X_test, y_test))) # RMSE
+
     ```
 
     """
