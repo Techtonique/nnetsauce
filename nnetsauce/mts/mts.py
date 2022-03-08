@@ -3,6 +3,7 @@
 # License: BSD 3 Clear Clause
 
 import numpy as np
+import pandas as pd
 from ..base import Base
 from scipy.stats import norm
 from ..utils import matrixops as mo
