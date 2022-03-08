@@ -1,3 +1,8 @@
+# version 0.11.0
+
+- Implement RandomBagRegressor
+- Use of a DataFrame in MTS
+
 # version 0.10.0
 
 - rename attributes with underscore
