@@ -97,6 +97,9 @@ class MTS(Base):
         return_std_: boolean
             return uncertainty or not (set in predict)  
 
+        df_: data frame
+            the input data frame, in case a data.frame is provided to `fit`    
+
     Examples:
 
     ```python
@@ -174,7 +177,8 @@ class MTS(Base):
         self.preds_ = None
         self.preds_std_ = []
         self.return_std_ = None
-        
+        self.df_ = None
+
 
     def fit(self, X, xreg=None):
         """Fit MTS model to training data X, with optional regressors xreg
@@ -197,6 +201,10 @@ class MTS(Base):
 
             self: object
         """
+
+        if (isinstance(X, pd.DataFrame)):
+            self.df_ = X
+            X = X.values        
 
         try:
             # multivariate time series
@@ -278,8 +286,12 @@ class MTS(Base):
 
         Returns:
 
-            model predictions for horizon = h: {array-like}
+            model predictions for horizon = h: {array-like}, data frame or tuple
+            standard deviation is returned when `obj.predict` can return standard deviation
         """
+
+        if self.df_ is not None: # `fit` takes a data frame input
+            output_dates, frequency = ts.compute_output_dates(self.df_, h)
 
         self.return_std_ = False
 
@@ -402,27 +414,42 @@ class MTS(Base):
 
                 self.preds_ = mo.rbind(preds, self.preds_)
 
-        # function's return
+        # function's return        
 
-        self.preds_ = self.preds_[0:h, :][::-1]
+        if self.df_ is None: 
 
-        if self.return_std_ == False:  # std. dev. is returned
+            self.preds_ = self.preds_[0:h, :][::-1]        
+
+            if self.return_std_ == False:  # std. dev. is not returned
+
+                return self.preds_
+
+            # std. dev. is returned
+            self.preds_std_ = self.preds_std_[::-1].reshape(h, 1)
+
+            self.preds_std_ = np.repeat(self.preds_std_, self.n_series).reshape(
+                -1, self.n_series
+            )
+
+            return (self.preds_, self.preds_std_)                
+
+        # if self.df_ is not None (return data frames)
+
+        self.preds_ = pd.DataFrame(self.preds_[0:h, :][::-1], columns=self.df_.columns, 
+        index = output_dates)
+
+        if self.return_std_ == False:  # std. dev. is not returned
 
             return self.preds_
 
-        # std. dev. is not returned
+        # std. dev. is returned
         self.preds_std_ = self.preds_std_[::-1].reshape(h, 1)
 
-        self.preds_std_ = np.repeat(self.preds_std_, self.n_series).reshape(
+        self.preds_std_ = pd.DataFrame(np.repeat(self.preds_std_, self.n_series).reshape(
             -1, self.n_series
-        )
+        ), columns=self.df_.columns, index = output_dates)
 
-        return {
-            "mean": self.preds_,
-            "std": self.preds_std_,
-            "lower": self.preds_ - qt * self.preds_std_,
-            "upper": self.preds_ + qt * self.preds_std_,
-        }
+        return (self.preds_, self.preds_std_)                      
 
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):
         """ Train on training_index, score on testing_index. """
