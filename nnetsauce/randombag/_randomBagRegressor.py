@@ -90,7 +90,7 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
     Examples:
 
     ```python
-    import numpy as np 
+    import numpy as np
     import nnetsauce as ns
     from sklearn.datasets import fetch_california_housing
     from sklearn.tree import DecisionTreeRegressor
@@ -99,17 +99,17 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
     X, y = fetch_california_housing(return_X_y=True, as_frame=False)
 
     # split data into training test and test set
-    X_train, X_test, y_train, y_test = train_test_split(X, y, 
+    X_train, X_test, y_train, y_test = train_test_split(X, y,
                                                         test_size=0.2, random_state=13)
 
     # Requires further tuning
     obj = DecisionTreeRegressor(max_depth=3, random_state=123)
     obj2 = ns.RandomBagRegressor(obj=obj, direct_link=False,
-                                n_estimators=50, 
+                                n_estimators=50,
                                 col_sample=0.9, row_sample=0.9,
                                 dropout=0, n_clusters=0, verbose=1)
-    
-    obj2.fit(X_train, y_train)        
+
+    obj2.fit(X_train, y_train)
 
     print(np.sqrt(obj2.score(X_test, y_test))) # RMSE
 
@@ -221,9 +221,11 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
         # 2 - Parallel training -----
         # buggy
         # if self.n_jobs is not None:
-        def fit_estimators(m):            
+        def fit_estimators(m):
             base_learner.fit(X, y, **kwargs)
-            self.voter_.update({m: pickle.loads(pickle.dumps(base_learner, -1))})
+            self.voter_.update(
+                {m: pickle.loads(pickle.dumps(base_learner, -1))}
+            )
             base_learner.set_params(
                 seed=self.seed + (m + 1) * 1000,
             )
@@ -243,7 +245,7 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
         self.n_estimators = len(self.voter_)
 
         return self
-    
+
     def predict(self, X, weights=None, **kwargs):
         """Predict for test data X.
 
@@ -295,7 +297,6 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
         self.weights = weights
 
         return calculate_preds(self.voter_, weights)
-
 
     def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 

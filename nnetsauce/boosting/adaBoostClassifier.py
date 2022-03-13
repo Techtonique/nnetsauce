@@ -99,7 +99,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             AdaBoost coefficients alpha_m
 
         base_learners_: dict
-            a dictionary containing the base learners  
+            a dictionary containing the base learners
 
     Examples:
 
@@ -121,32 +121,32 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
     X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
     # SAMME.R
-    clf = LogisticRegression(solver='liblinear', multi_class = 'ovr', 
+    clf = LogisticRegression(solver='liblinear', multi_class = 'ovr',
                             random_state=123)
-    fit_obj = ns.AdaBoostClassifier(clf, 
-                                    n_hidden_features=int(11.22338867), 
+    fit_obj = ns.AdaBoostClassifier(clf,
+                                    n_hidden_features=int(11.22338867),
                                     direct_link=True,
                                     n_estimators=250, learning_rate=0.01126343,
                                     col_sample=0.72684326, row_sample=0.86429443,
                                     dropout=0.63078613, n_clusters=2,
                                     type_clust="gmm",
-                                    verbose=1, seed = 123, 
-                                    method="SAMME.R")  
+                                    verbose=1, seed = 123,
+                                    method="SAMME.R")
 
-    start = time() 
-    fit_obj.fit(X_train, y_train) 
-    print(f"Elapsed {time() - start}") 
+    start = time()
+    fit_obj.fit(X_train, y_train)
+    print(f"Elapsed {time() - start}")
 
-    start = time() 
+    start = time()
     print(fit_obj.score(X_test, y_test))
-    print(f"Elapsed {time() - start}") 
+    print(f"Elapsed {time() - start}")
 
-    preds = fit_obj.predict(X_test)                        
+    preds = fit_obj.predict(X_test)
 
     print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
     print(metrics.classification_report(preds, y_test))
 
-    ```              
+    ```
 
     """
 
@@ -206,8 +206,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         self.reg_alpha = reg_alpha
 
         self.alpha_ = []
-        self.base_learners_ = dict.fromkeys(range(n_estimators))  
-
+        self.base_learners_ = dict.fromkeys(range(n_estimators))
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit Boosting model to training data (X, y).

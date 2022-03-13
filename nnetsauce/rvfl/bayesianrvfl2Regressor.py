@@ -83,7 +83,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
             Generalized cross-validation error
 
         y_mean_: float
-            average response    
+            average response
 
     Examples:
 
@@ -248,7 +248,9 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
                 )[0]
 
             return self.y_mean_ + mo.safe_sparse_dot(
-                self.cook_test_set(X, **kwargs), self.beta_, backend=self.backend
+                self.cook_test_set(X, **kwargs),
+                self.beta_,
+                backend=self.backend,
             )
 
         else:  # confidence interval required for preds?

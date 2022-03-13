@@ -92,13 +92,13 @@ class MTS(Base):
             successive model predictions
 
         preds_std_: {array-like}
-            standard deviation around the predictions 
-        
+            standard deviation around the predictions
+
         return_std_: boolean
-            return uncertainty or not (set in predict)  
+            return uncertainty or not (set in predict)
 
         df_: data frame
-            the input data frame, in case a data.frame is provided to `fit`    
+            the input data frame, in case a data.frame is provided to `fit`
 
     Examples:
 
@@ -106,7 +106,7 @@ class MTS(Base):
 
     ```python
     import nnetsauce as ns
-    import numpy as np    
+    import numpy as np
     from sklearn import linear_model
     np.random.seed(123)
 
@@ -131,12 +131,12 @@ class MTS(Base):
 
     ```python
     import nnetsauce as ns
-    import numpy as np    
+    import numpy as np
     from sklearn import linear_model
-    
+
     dataset = {
     'date' : ['2001-01-01', '2002-01-01', '2003-01-01', '2004-01-01', '2005-01-01'],
-    'series1' : [34, 30, 35.6, 33.3, 38.1],    
+    'series1' : [34, 30, 35.6, 33.3, 38.1],
     'series2' : [4, 5.5, 5.6, 6.3, 5.1],
     'series3' : [100, 100.5, 100.6, 100.2, 100.1]}
     df = pd.DataFrame(dataset).set_index('date')
@@ -208,7 +208,6 @@ class MTS(Base):
         self.return_std_ = None
         self.df_ = None
 
-
     def fit(self, X, xreg=None):
         """Fit MTS model to training data X, with optional regressors xreg
 
@@ -231,9 +230,9 @@ class MTS(Base):
             self: object
         """
 
-        if (isinstance(X, pd.DataFrame)):
+        if isinstance(X, pd.DataFrame):
             self.df_ = X
-            X = X.values        
+            X = X.values
 
         try:
             # multivariate time series
@@ -277,7 +276,7 @@ class MTS(Base):
 
             dummy_y, scaled_Z = self.cook_training_set(
                 y=rep_1_n,
-                X=mo.cbind(self.X_, xreg_input[1], backend=self.backend)                
+                X=mo.cbind(self.X_, xreg_input[1], backend=self.backend),
             )
 
         else:  # xreg is None
@@ -316,11 +315,11 @@ class MTS(Base):
         Returns:
 
             model predictions for horizon = h: {array-like}, data frame or tuple.
-            Standard deviation and prediction intervals are returned when 
+            Standard deviation and prediction intervals are returned when
             `obj.predict` can return standard deviation
         """
 
-        if self.df_ is not None: # `fit` takes a data frame input
+        if self.df_ is not None:  # `fit` takes a data frame input
             output_dates, frequency = ts.compute_output_dates(self.df_, h)
 
         self.return_std_ = False
@@ -444,11 +443,11 @@ class MTS(Base):
 
                 self.preds_ = mo.rbind(preds, self.preds_)
 
-        # function's return        
+        # function's return
 
-        if self.df_ is None: 
+        if self.df_ is None:
 
-            self.preds_ = self.preds_[0:h, :][::-1]        
+            self.preds_ = self.preds_[0:h, :][::-1]
 
             if self.return_std_ == False:  # std. dev. is not returned
 
@@ -461,13 +460,20 @@ class MTS(Base):
                 -1, self.n_series
             )
 
-            return (self.preds_, self.preds_std_, self.preds_ - multiplier*self.preds_std_, 
-            self.preds_ + multiplier*self.preds_std_)                
+            return (
+                self.preds_,
+                self.preds_std_,
+                self.preds_ - multiplier * self.preds_std_,
+                self.preds_ + multiplier * self.preds_std_,
+            )
 
         # if self.df_ is not None (return data frames)
 
-        self.preds_ = pd.DataFrame(self.preds_[0:h, :][::-1], columns=self.df_.columns, 
-        index = output_dates)
+        self.preds_ = pd.DataFrame(
+            self.preds_[0:h, :][::-1],
+            columns=self.df_.columns,
+            index=output_dates,
+        )
 
         if self.return_std_ == False:  # std. dev. is not returned
 
@@ -476,12 +482,20 @@ class MTS(Base):
         # std. dev. is returned
         self.preds_std_ = self.preds_std_[::-1].reshape(h, 1)
 
-        self.preds_std_ = pd.DataFrame(np.repeat(self.preds_std_, self.n_series).reshape(
-            -1, self.n_series
-        ), columns=self.df_.columns, index = output_dates)
+        self.preds_std_ = pd.DataFrame(
+            np.repeat(self.preds_std_, self.n_series).reshape(
+                -1, self.n_series
+            ),
+            columns=self.df_.columns,
+            index=output_dates,
+        )
 
-        return (self.preds_, self.preds_std_, self.preds_ - multiplier*self.preds_std_, 
-            self.preds_ + multiplier*self.preds_std_)                      
+        return (
+            self.preds_,
+            self.preds_std_,
+            self.preds_ - multiplier * self.preds_std_,
+            self.preds_ + multiplier * self.preds_std_,
+        )
 
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):
         """ Train on training_index, score on testing_index. """
@@ -545,10 +559,12 @@ class MTS(Base):
             "r2": skm2.r2_score,
         }
 
-        if p > 1: 
+        if p > 1:
             return tuple(
                 [
-                    scoring_options[scoring](X_test[:, i], preds[:, i], **kwargs)
+                    scoring_options[scoring](
+                        X_test[:, i], preds[:, i], **kwargs
+                    )
                     for i in range(p)
                 ]
             )

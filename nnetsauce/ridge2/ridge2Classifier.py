@@ -74,9 +74,9 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
             "cpu" or "gpu" or "tpu"
 
     Attributes:
-    
+
         beta_: {array-like}
-            regression coefficients        
+            regression coefficients
 
 
     Examples:
@@ -100,27 +100,27 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
     # create the model with nnetsauce
-    fit_obj = ns.Ridge2Classifier(lambda1 = 6.90185578e+04, 
-                                lambda2 = 3.17392781e+02, 
-                                n_hidden_features=95, 
-                                n_clusters=2, 
+    fit_obj = ns.Ridge2Classifier(lambda1 = 6.90185578e+04,
+                                lambda2 = 3.17392781e+02,
+                                n_hidden_features=95,
+                                n_clusters=2,
                                 dropout = 3.62817383e-01,
                                 type_clust = "gmm")
 
     # fit the model on training set
     start = time()
     fit_obj.fit(X_train, y_train)
-    print(f"Elapsed {time() - start}") 
+    print(f"Elapsed {time() - start}")
 
     # get the accuracy on test set
     start = time()
     print(fit_obj.score(X_test, y_test))
-    print(f"Elapsed {time() - start}") 
+    print(f"Elapsed {time() - start}")
 
     # get area under the curve on test set (auc)
-    print(fit_obj.score(X_test, y_test, scoring="roc_auc"))    
+    print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
     ```
-    
+
 
     """
 

@@ -14,7 +14,12 @@ from ..utils import activations as ac
 from ..utils import memoize
 from ..utils import matrixops as mo
 from ..utils import misc as mx
-from ..simulation import generate_sobol2, generate_uniform, generate_hammersley, generate_halton
+from ..simulation import (
+    generate_sobol2,
+    generate_uniform,
+    generate_hammersley,
+    generate_halton,
+)
 from ..sampling import SubSampler
 from ..simulator import Simulator
 
@@ -169,7 +174,7 @@ class Base(BaseEstimator):
         self.n_clusters = n_clusters
         self.subsampler_ = None
         self.index_col_ = None
-        self.index_row_ = True        
+        self.index_row_ = True
         self.clustering_obj_ = None
         self.clustering_scaler_ = None
         self.nn_scaler_ = None
@@ -306,7 +311,7 @@ class Base(BaseEstimator):
                         seed=self.seed,
                     ).draw()
 
-                except:                
+                except:
 
                     h_sim = {
                         "sobol": generate_sobol2(
@@ -368,9 +373,9 @@ class Base(BaseEstimator):
                     type_sim=self.nodes_sim,
                     seed=self.seed,
                 ).draw()
-                
+
             except:
-                
+
                 h_sim = {
                     "sobol": generate_sobol2(
                         n_dims=n_features_1, n_points=self.n_hidden_features
@@ -581,7 +586,9 @@ class Base(BaseEstimator):
             n, p = Z.shape
 
             self.subsampler_ = (
-                SubSampler(y=self.y_, row_sample=self.row_sample, seed=self.seed)
+                SubSampler(
+                    y=self.y_, row_sample=self.row_sample, seed=self.seed
+                )
                 if y is None
                 else SubSampler(y=y, row_sample=self.row_sample, seed=self.seed)
             )

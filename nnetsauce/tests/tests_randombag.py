@@ -3,7 +3,11 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 import unittest as ut
 import nnetsauce as ns
 from sklearn.model_selection import train_test_split
-from sklearn.datasets import load_breast_cancer, load_wine, fetch_california_housing
+from sklearn.datasets import (
+    load_breast_cancer,
+    load_wine,
+    fetch_california_housing,
+)
 from sklearn.linear_model import LogisticRegression
 
 
@@ -27,9 +31,9 @@ class TestRandomBag(ut.TestCase):
 
         X2, y2 = fetch_california_housing(return_X_y=True, as_frame=False)
         # split data into training test and test set
-        X_train2, X_test2, y_train2, y_test2 = train_test_split(X2, y2, 
-                                                    test_size=0.2, random_state=13)
-
+        X_train2, X_test2, y_train2, y_test2 = train_test_split(
+            X2, y2, test_size=0.2, random_state=13
+        )
 
         clf = DecisionTreeClassifier(max_depth=1, random_state=14235)
         fit_obj = ns.RandomBagClassifier(
@@ -96,10 +100,16 @@ class TestRandomBag(ut.TestCase):
         )
 
         obj = DecisionTreeRegressor(max_depth=3, random_state=123)
-        fit_obj4 = ns.RandomBagRegressor(obj=obj, direct_link=False,
-                             n_estimators=50, 
-                             col_sample=0.9, row_sample=0.9,
-                             dropout=0, n_clusters=0, verbose=1)        
+        fit_obj4 = ns.RandomBagRegressor(
+            obj=obj,
+            direct_link=False,
+            n_estimators=50,
+            col_sample=0.9,
+            row_sample=0.9,
+            dropout=0,
+            n_clusters=0,
+            verbose=1,
+        )
 
         fit_obj.fit(X_train, y_train)
         preds1 = fit_obj.predict_proba(X_test)
@@ -110,7 +120,7 @@ class TestRandomBag(ut.TestCase):
         fit_obj3.fit(Z_train, t_train)
         preds3 = fit_obj3.predict_proba(Z_test)
 
-        fit_obj4.fit(X_train2, y_train2)  
+        fit_obj4.fit(X_train2, y_train2)
         preds4 = fit_obj4.predict(X_test2)
 
         self.assertTrue(np.allclose(preds1[0, 0], 0.043789295499125226))

@@ -203,15 +203,15 @@ class TestRidge2Regressor(ut.TestCase):
 
         fit_obj3.fit(X_train, y_train)
         err3 = fit_obj3.predict(X_test) - y_test
-        rmse3 = np.sqrt(np.mean(err3 ** 2))        
+        rmse3 = np.sqrt(np.mean(err3 ** 2))
 
         fit_obj4.fit(X_train, y_train)
         err4 = fit_obj4.predict(X_test) - y_test
-        rmse4 = np.sqrt(np.mean(err4 ** 2))        
+        rmse4 = np.sqrt(np.mean(err4 ** 2))
 
         fit_obj5.fit(X_train, y_train)
         err5 = fit_obj5.predict(X_test) - y_test
-        rmse5 = np.sqrt(np.mean(err5 ** 2))        
+        rmse5 = np.sqrt(np.mean(err5 ** 2))
 
         fit_obj6.fit(X_train, y_train)
         err6 = fit_obj6.predict(X_test) - y_test
@@ -223,7 +223,7 @@ class TestRidge2Regressor(ut.TestCase):
 
         fit_obj8.fit(X_train, y_train)
         err8 = fit_obj8.predict(X_test) - y_test
-        rmse8 = np.sqrt(np.mean(err8 ** 2))        
+        rmse8 = np.sqrt(np.mean(err8 ** 2))
 
         fit_obj9.fit(X_train, y_train)
         err9 = fit_obj9.predict(X_test) - y_test

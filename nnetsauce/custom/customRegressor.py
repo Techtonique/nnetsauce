@@ -79,7 +79,7 @@ class CustomRegressor(Custom, RegressorMixin):
 
     Examples:
 
-    ```python 
+    ```python
     TBD
     ```
 

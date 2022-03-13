@@ -73,10 +73,10 @@ class BaseRegressor(Base, RegressorMixin):
     Attributes:
 
         beta_: vector
-            regression coefficients  
+            regression coefficients
 
         GCV_: float
-            Generalized Cross-Validation error          
+            Generalized Cross-Validation error
 
     """
 
@@ -184,7 +184,9 @@ class BaseRegressor(Base, RegressorMixin):
             )[0]
 
         return self.y_mean_ + mo.safe_sparse_dot(
-            a=self.cook_test_set(X, **kwargs), b=self.beta_, backend=self.backend
+            a=self.cook_test_set(X, **kwargs),
+            b=self.beta_,
+            backend=self.backend,
         )
 
     def score(self, X, y, scoring=None, **kwargs):

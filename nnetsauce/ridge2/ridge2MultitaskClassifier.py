@@ -73,9 +73,9 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
             "cpu" or "gpu" or "tpu"
 
     Attributes:
-    
+
         beta_: {array-like}
-            regression coefficients        
+            regression coefficients
 
     Examples:
 
@@ -95,22 +95,22 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
     np.random.seed(123)
     X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
-    fit_obj = ns.Ridge2MultitaskClassifier(n_hidden_features=int(9.83730469e+01), 
-                                    dropout=4.31054687e-01, 
+    fit_obj = ns.Ridge2MultitaskClassifier(n_hidden_features=int(9.83730469e+01),
+                                    dropout=4.31054687e-01,
                                     n_clusters=int(1.71484375e+00),
                                     lambda1=1.24023438e+01, lambda2=7.30263672e+03)
 
     start = time()
     fit_obj.fit(X_train, y_train)
-    print(f"Elapsed {time() - start}") 
+    print(f"Elapsed {time() - start}")
 
     print(fit_obj.score(X_test, y_test))
     print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
 
     start = time()
     preds = fit_obj.predict(X_test)
-    print(f"Elapsed {time() - start}") 
-    print(metrics.classification_report(preds, y_test))    
+    print(f"Elapsed {time() - start}")
+    print(metrics.classification_report(preds, y_test))
     ```
 
     """

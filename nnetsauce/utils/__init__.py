@@ -5,7 +5,12 @@ from .misc import merge_two_dicts, is_factor
 from .model_selection import TimeSeriesSplit
 from .progress_bar import Progbar
 from .psdcheck import isPD, nearestPD
-from .timeseries import compute_output_dates, create_lags, create_train_inputs, reformat_response
+from .timeseries import (
+    compute_output_dates,
+    create_lags,
+    create_train_inputs,
+    reformat_response,
+)
 
 
 __all__ = [

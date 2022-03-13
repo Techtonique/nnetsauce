@@ -80,7 +80,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
             Generalized cross-validation error
 
         y_mean_: float
-            average response    
+            average response
 
     Examples:
 

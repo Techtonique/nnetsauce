@@ -136,7 +136,6 @@ saved_primes = [
 ]
 
 
-
 def get_phi(p, k):
     p_ = p
     k_ = k
@@ -151,12 +150,14 @@ def get_phi(p, k):
 
 # uniform numbers' generation
 
+
 def generate_uniform(n_dims=2, n_points=10, seed=123):
     np.random.seed(seed=seed)
     return np.random.random((n_dims, n_points))
 
 
 # hammersley numbers' generation
+
 
 def generate_hammersley(n_dims=2, n_points=100, primes=None):
     def func_hammersley(n_dims=n_dims, n_points=(n_points + 1), primes=primes):
@@ -172,6 +173,7 @@ def generate_hammersley(n_dims=2, n_points=100, primes=None):
 
 # halton numbers' generation (python)
 
+
 def generate_halton(n_dims=2, n_points=10, primes=None):
     def func_halton(n_dims=n_dims, n_points=(n_points + 1), primes=primes):
         primes = primes if primes is not None else saved_primes
@@ -184,11 +186,13 @@ def generate_halton(n_dims=2, n_points=10, primes=None):
 
 # sobol numbers' generation (python)
 
+
 def generate_sobol2(n_dims=2, n_points=10):
     return np.array(i4_sobol_generate(m=n_dims, n=n_points, skip=2))
 
 
 # sobol numbers' generation (cpp)
+
 
 def generate_sobol_cpp(n_dims=2, n_points=10):
     try:
@@ -201,6 +205,7 @@ def generate_sobol_cpp(n_dims=2, n_points=10):
 
 
 # halton numbers' generation (cpp)
+
 
 def generate_halton_cpp(n_dims=2, n_points=10):
     try:

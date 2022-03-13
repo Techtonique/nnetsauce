@@ -139,10 +139,10 @@ class TestCustom(ut.TestCase):
 
         fit_obj4.fit(X_train, y_train)
         err4 = fit_obj4.predict(X_test) - y_test
-        rmse4 = np.sqrt(np.mean(err4 ** 2))        
+        rmse4 = np.sqrt(np.mean(err4 ** 2))
 
         err4_1 = fit_obj4.predict(X_test[0, :]) - y_test[0]
-        rmse4_1 = np.sqrt(np.mean(err4_1 ** 2))        
+        rmse4_1 = np.sqrt(np.mean(err4_1 ** 2))
 
         fit_obj8.fit(X_train, y_train)
         err8 = fit_obj8.predict(X_test) - y_test
@@ -153,8 +153,8 @@ class TestCustom(ut.TestCase):
 
         fit_obj6.fit(Z[0:100, :], t[0:100])
         pred6 = fit_obj6.predict(Z[106, :])
-        pred6_proba1 = fit_obj6.predict_proba(Z[100, :])        
-        pred6_proba2 = fit_obj6.predict_proba(Z[100:120, :])        
+        pred6_proba1 = fit_obj6.predict_proba(Z[100, :])
+        pred6_proba2 = fit_obj6.predict_proba(Z[100:120, :])
 
         score6 = fit_obj6.score(Z[100:120, :], t[100:120])
 

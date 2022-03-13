@@ -73,12 +73,12 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
             'cpu' or 'gpu' or 'tpu'
 
     Attributes:
-    
+
         beta_: {array-like}
-            regression coefficients   
+            regression coefficients
 
         y_mean_: float
-            average response         
+            average response
 
     """
 
@@ -237,7 +237,9 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
             )[0]
 
         return self.y_mean_ + mo.safe_sparse_dot(
-            a=self.cook_test_set(X, **kwargs), b=self.beta_, backend=self.backend
+            a=self.cook_test_set(X, **kwargs),
+            b=self.beta_,
+            backend=self.backend,
         )
 
     def score(self, X, y, scoring=None, **kwargs):

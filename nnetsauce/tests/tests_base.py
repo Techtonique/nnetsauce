@@ -198,7 +198,7 @@ class TestBase(ut.TestCase):
 
         fit_obj4.fit(X_train, y_train)
         err4 = fit_obj4.predict(X_test) - y_test
-        rmse4 = np.sqrt(np.mean(err4 ** 2))        
+        rmse4 = np.sqrt(np.mean(err4 ** 2))
 
         fit_obj5.fit(X_train, y_train)
         err5 = fit_obj5.predict(X_test) - y_test
