@@ -4,7 +4,7 @@ _In alphabetical order_
 
 All models possess methods: `fit`, `predict`.
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L15)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L16)</span>
 
 ### MTS
 
@@ -113,7 +113,12 @@ Attributes:
     return_std_: boolean
         return uncertainty or not (set in predict)  
 
+    df_: data frame
+        the input data frame, in case a data.frame is provided to `fit`    
+
 Examples:
+
+Example 1:
 
 ```python
 import nnetsauce as ns
@@ -138,10 +143,37 @@ print(obj_MTS.predict(return_std=True, level=80))
 print(obj_MTS.predict(return_std=True, level=95))
 ```
 
+Example 2:
+
+```python
+import nnetsauce as ns
+import numpy as np    
+from sklearn import linear_model
+
+dataset = {
+'date' : ['2001-01-01', '2002-01-01', '2003-01-01', '2004-01-01', '2005-01-01'],
+'series1' : [34, 30, 35.6, 33.3, 38.1],    
+'series2' : [4, 5.5, 5.6, 6.3, 5.1],
+'series3' : [100, 100.5, 100.6, 100.2, 100.1]}
+df = pd.DataFrame(dataset).set_index('date')
+print(df)
+
+# Adjust Bayesian Ridge
+regr5 = linear_model.BayesianRidge()
+obj_MTS = ns.MTS(regr5, lags = 1, n_hidden_features=5)
+obj_MTS.fit(df)
+print(obj_MTS.predict())
+
+# with credible intervals
+print(obj_MTS.predict(return_std=True, level=80))
+
+print(obj_MTS.predict(return_std=True, level=95))
+```
+
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L178)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L212)</span>
 
 ### fit
 
@@ -174,7 +206,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L259)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L297)</span>
 
 ### predict
 
@@ -204,7 +236,9 @@ Parameters:
 
 Returns:
 
-    model predictions for horizon = h: {array-like}
+    model predictions for horizon = h: {array-like}, data frame or tuple.
+    Standard deviation and prediction intervals are returned when 
+    `obj.predict` can return standard deviation
 
 
 ----

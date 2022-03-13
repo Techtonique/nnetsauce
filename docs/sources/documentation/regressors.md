@@ -848,7 +848,7 @@ Attributes:
 Examples:
 
 ```python
-
+import numpy as np 
 import nnetsauce as ns
 from sklearn.datasets import fetch_california_housing
 from sklearn.tree import DecisionTreeRegressor
@@ -861,7 +861,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y,
                                                     test_size=0.2, random_state=13)
 
 # Requires further tuning
-obj = DecisionTreeRegressor(max_depth=2, random_state=123)
+obj = DecisionTreeRegressor(max_depth=3, random_state=123)
 obj2 = ns.RandomBagRegressor(obj=obj, direct_link=False,
                             n_estimators=50, 
                             col_sample=0.9, row_sample=0.9,
