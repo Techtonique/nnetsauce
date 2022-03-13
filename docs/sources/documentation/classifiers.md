@@ -120,7 +120,7 @@ Attributes:
         AdaBoost coefficients alpha_m
 
     base_learners_: dict
-        a dictionary containing the base learners  
+        a dictionary containing the base learners
 
 Examples:
 
@@ -142,37 +142,37 @@ np.random.seed(123)
 X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
 # SAMME.R
-clf = LogisticRegression(solver='liblinear', multi_class = 'ovr', 
+clf = LogisticRegression(solver='liblinear', multi_class = 'ovr',
                         random_state=123)
-fit_obj = ns.AdaBoostClassifier(clf, 
-                                n_hidden_features=int(11.22338867), 
+fit_obj = ns.AdaBoostClassifier(clf,
+                                n_hidden_features=int(11.22338867),
                                 direct_link=True,
                                 n_estimators=250, learning_rate=0.01126343,
                                 col_sample=0.72684326, row_sample=0.86429443,
                                 dropout=0.63078613, n_clusters=2,
                                 type_clust="gmm",
-                                verbose=1, seed = 123, 
-                                method="SAMME.R")  
+                                verbose=1, seed = 123,
+                                method="SAMME.R")
 
-start = time() 
-fit_obj.fit(X_train, y_train) 
-print(f"Elapsed {time() - start}") 
+start = time()
+fit_obj.fit(X_train, y_train)
+print(f"Elapsed {time() - start}")
 
-start = time() 
+start = time()
 print(fit_obj.score(X_test, y_test))
-print(f"Elapsed {time() - start}") 
+print(f"Elapsed {time() - start}")
 
-preds = fit_obj.predict(X_test)                        
+preds = fit_obj.predict(X_test)
 
 print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
 print(metrics.classification_report(preds, y_test))
 
-```              
+```
 
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L212)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L211)</span>
 
 ### fit
 
@@ -203,7 +203,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L383)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L382)</span>
 
 ### predict
 
@@ -231,7 +231,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L402)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L401)</span>
 
 ### predict_proba
 
@@ -259,7 +259,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L481)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L480)</span>
 
 ### score
 
@@ -387,7 +387,7 @@ Attributes:
 
 Examples:
 
-```python 
+```python
 import nnetsauce as ns
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
@@ -400,10 +400,10 @@ y = digits.target
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
                                                     random_state=123)
 
-# layer 1 (base layer) ----    
+# layer 1 (base layer) ----
 layer1_regr = RandomForestClassifier(n_estimators=10, random_state=123)
 
-start = time() 
+start = time()
 
 layer1_regr.fit(X_train, y_train)
 
@@ -411,9 +411,9 @@ layer1_regr.fit(X_train, y_train)
 print(layer1_regr.score(X_test, y_test))
 
 # layer 2 using layer 1 ----
-layer2_regr = ns.CustomClassifier(obj = layer1_regr, n_hidden_features=5, 
-                        direct_link=True, bias=True, 
-                        nodes_sim='uniform', activation_name='relu', 
+layer2_regr = ns.CustomClassifier(obj = layer1_regr, n_hidden_features=5,
+                        direct_link=True, bias=True,
+                        nodes_sim='uniform', activation_name='relu',
                         n_clusters=2, seed=123)
 layer2_regr.fit(X_train, y_train)
 
@@ -421,17 +421,17 @@ layer2_regr.fit(X_train, y_train)
 print(layer2_regr.score(X_test, y_test))
 
 # layer 3 using layer 2 ----
-layer3_regr = ns.CustomClassifier(obj = layer2_regr, n_hidden_features=10, 
+layer3_regr = ns.CustomClassifier(obj = layer2_regr, n_hidden_features=10,
                         direct_link=True, bias=True, dropout=0.7,
-                        nodes_sim='uniform', activation_name='relu', 
+                        nodes_sim='uniform', activation_name='relu',
                         n_clusters=2, seed=123)
 layer3_regr.fit(X_train, y_train)
 
 # Accuracy in layer 3
 print(layer3_regr.score(X_test, y_test))
 
-print(f"Elapsed {time() - start}")  
-```        
+print(f"Elapsed {time() - start}")
+```
 
 
 ----
@@ -567,7 +567,7 @@ Attributes:
 
 Examples:
 
-See [https://github.com/Techtonique/nnetsauce/blob/master/examples/glm_classification.py](https://github.com/Techtonique/nnetsauce/blob/master/examples/glm_classification.py)    
+See [https://github.com/Techtonique/nnetsauce/blob/master/examples/glm_classification.py](https://github.com/Techtonique/nnetsauce/blob/master/examples/glm_classification.py)
 
 
 ----
@@ -719,24 +719,24 @@ breast_cancer = load_breast_cancer()
 Z = breast_cancer.data
 t = breast_cancer.target
 
-X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2, 
+X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2,
                                                     random_state=123+2*10)
 
-# Linear Regression is used 
+# Linear Regression is used
 regr = LinearRegression()
-fit_obj = ns.MultitaskClassifier(regr, n_hidden_features=5, 
+fit_obj = ns.MultitaskClassifier(regr, n_hidden_features=5,
                             n_clusters=2, type_clust="gmm")
 
 start = time()
 fit_obj.fit(X_train, y_train)
-print(f"Elapsed {time() - start}") 
+print(f"Elapsed {time() - start}")
 
 print(fit_obj.score(X_test, y_test))
 print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
 
 start = time()
 preds = fit_obj.predict(X_test)
-print(f"Elapsed {time() - start}") 
+print(f"Elapsed {time() - start}")
 print(metrics.classification_report(preds, y_test))
 ```
 
@@ -898,21 +898,21 @@ X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 clf = DecisionTreeClassifier(max_depth=2, random_state=123)
 fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=2,
                                 direct_link=True,
-                                n_estimators=100, 
+                                n_estimators=100,
                                 col_sample=0.9, row_sample=0.9,
                                 dropout=0.3, n_clusters=0, verbose=1)
 
 start = time()
 fit_obj.fit(X_train, y_train)
-print(f"Elapsed {time() - start}") 
+print(f"Elapsed {time() - start}")
 
 print(fit_obj.score(X_test, y_test))
 print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
 
 start = time()
 preds = fit_obj.predict(X_test)
-print(f"Elapsed {time() - start}") 
-print(metrics.classification_report(preds, y_test))    
+print(f"Elapsed {time() - start}")
+print(metrics.classification_report(preds, y_test))
 ```
 
 
@@ -1036,7 +1036,7 @@ Parameters:
 Attributes:
 
     beta_: {array-like}
-        regression coefficients        
+        regression coefficients
 
 
 Examples:
@@ -1060,25 +1060,25 @@ np.random.seed(123)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
 # create the model with nnetsauce
-fit_obj = ns.Ridge2Classifier(lambda1 = 6.90185578e+04, 
-                            lambda2 = 3.17392781e+02, 
-                            n_hidden_features=95, 
-                            n_clusters=2, 
+fit_obj = ns.Ridge2Classifier(lambda1 = 6.90185578e+04,
+                            lambda2 = 3.17392781e+02,
+                            n_hidden_features=95,
+                            n_clusters=2,
                             dropout = 3.62817383e-01,
                             type_clust = "gmm")
 
 # fit the model on training set
 start = time()
 fit_obj.fit(X_train, y_train)
-print(f"Elapsed {time() - start}") 
+print(f"Elapsed {time() - start}")
 
 # get the accuracy on test set
 start = time()
 print(fit_obj.score(X_test, y_test))
-print(f"Elapsed {time() - start}") 
+print(f"Elapsed {time() - start}")
 
 # get area under the curve on test set (auc)
-print(fit_obj.score(X_test, y_test, scoring="roc_auc"))    
+print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
 ```
 
 
@@ -1200,7 +1200,7 @@ Parameters:
 Attributes:
 
     beta_: {array-like}
-        regression coefficients        
+        regression coefficients
 
 Examples:
 
@@ -1220,22 +1220,22 @@ t = breast_cancer.target
 np.random.seed(123)
 X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
-fit_obj = ns.Ridge2MultitaskClassifier(n_hidden_features=int(9.83730469e+01), 
-                                dropout=4.31054687e-01, 
+fit_obj = ns.Ridge2MultitaskClassifier(n_hidden_features=int(9.83730469e+01),
+                                dropout=4.31054687e-01,
                                 n_clusters=int(1.71484375e+00),
                                 lambda1=1.24023438e+01, lambda2=7.30263672e+03)
 
 start = time()
 fit_obj.fit(X_train, y_train)
-print(f"Elapsed {time() - start}") 
+print(f"Elapsed {time() - start}")
 
 print(fit_obj.score(X_test, y_test))
 print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
 
 start = time()
 preds = fit_obj.predict(X_test)
-print(f"Elapsed {time() - start}") 
-print(metrics.classification_report(preds, y_test))    
+print(f"Elapsed {time() - start}")
+print(metrics.classification_report(preds, y_test))
 ```
 
 

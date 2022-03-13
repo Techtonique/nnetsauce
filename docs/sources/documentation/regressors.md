@@ -91,10 +91,10 @@ Parameters:
 Attributes:
 
     beta_: vector
-        regression coefficients  
+        regression coefficients
 
     GCV_: float
-        Generalized Cross-Validation error          
+        Generalized Cross-Validation error
 
 
 ----
@@ -156,7 +156,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L190)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L192)</span>
 
 ### score
 
@@ -286,7 +286,7 @@ Attributes:
         Generalized cross-validation error
 
     y_mean_: float
-        average response    
+        average response
 
 Examples:
 
@@ -427,7 +427,7 @@ Attributes:
         Generalized cross-validation error
 
     y_mean_: float
-        average response    
+        average response
 
 Examples:
 
@@ -565,7 +565,7 @@ Parameters:
 
 Examples:
 
-```python 
+```python
 TBD
 ```
 
@@ -848,7 +848,7 @@ Attributes:
 Examples:
 
 ```python
-import numpy as np 
+import numpy as np
 import nnetsauce as ns
 from sklearn.datasets import fetch_california_housing
 from sklearn.tree import DecisionTreeRegressor
@@ -857,17 +857,17 @@ from sklearn.model_selection import train_test_split
 X, y = fetch_california_housing(return_X_y=True, as_frame=False)
 
 # split data into training test and test set
-X_train, X_test, y_train, y_test = train_test_split(X, y, 
+X_train, X_test, y_train, y_test = train_test_split(X, y,
                                                     test_size=0.2, random_state=13)
 
 # Requires further tuning
 obj = DecisionTreeRegressor(max_depth=3, random_state=123)
 obj2 = ns.RandomBagRegressor(obj=obj, direct_link=False,
-                            n_estimators=50, 
+                            n_estimators=50,
                             col_sample=0.9, row_sample=0.9,
                             dropout=0, n_clusters=0, verbose=1)
 
-obj2.fit(X_train, y_train)        
+obj2.fit(X_train, y_train)
 
 print(np.sqrt(obj2.score(X_test, y_test))) # RMSE
 
@@ -989,10 +989,10 @@ Parameters:
 Attributes:
 
     beta_: {array-like}
-        regression coefficients   
+        regression coefficients
 
     y_mean_: float
-        average response         
+        average response
 
 
 ----
