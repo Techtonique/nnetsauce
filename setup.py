@@ -8,6 +8,7 @@ import os
 import platform
 import shutil
 from distutils.command.clean import clean as Clean
+from distutils.command.sdist import sdist
 from pkg_resources import parse_version
 import traceback
 import importlib
@@ -38,7 +39,7 @@ LICENSE = 'BSD3 Clause Clear'
 # does not need the compiled code
 import nnetsauce
 
-__version__ = "0.11.0"
+__version__ = "0.11.1"
 
 VERSION = __version__
 
@@ -126,7 +127,7 @@ class CleanCommand(Clean):
 
 
 cmdclass = {'clean': CleanCommand}
-
+cmdclass['sdist'] = sdist
 # custom build_ext command to set OpenMP compile flags depending on os and
 # compiler
 # build_ext has to be imported after setuptools
