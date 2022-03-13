@@ -315,8 +315,8 @@ class MTS(Base):
 
         Returns:
 
-            model predictions for horizon = h: {array-like}, data frame or tuple
-            standard deviation and prediction intervals are returned when 
+            model predictions for horizon = h: {array-like}, data frame or tuple.
+            Standard deviation and prediction intervals are returned when 
             `obj.predict` can return standard deviation
         """
 
