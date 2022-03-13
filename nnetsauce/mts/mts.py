@@ -488,11 +488,21 @@ class MTS(Base):
         ), "Non-overlapping 'training_index' and 'testing_index' required"
 
         # Dimensions
-        n, p = X.shape
+        try:
+            # multivariate time series
+            n, p = X.shape
+        except:
+            # univariate time series
+            n = X.shape[0]
+            p = 1
 
         # Training and testing sets
-        X_train = X[training_index, :]
-        X_test = X[testing_index, :]
+        if p > 1:
+            X_train = X[training_index, :]
+            X_test = X[testing_index, :]
+        else:
+            X_train = X[training_index]
+            X_test = X[testing_index]
 
         # Horizon
         h = len(testing_index)
@@ -532,9 +542,12 @@ class MTS(Base):
             "r2": skm2.r2_score,
         }
 
-        return tuple(
-            [
-                scoring_options[scoring](X_test[:, i], preds[:, i], **kwargs)
-                for i in range(p)
-            ]
-        )
+        if p > 1: 
+            return tuple(
+                [
+                    scoring_options[scoring](X_test[:, i], preds[:, i], **kwargs)
+                    for i in range(p)
+                ]
+            )
+        else:
+            return scoring_options[scoring](X_test, preds)
