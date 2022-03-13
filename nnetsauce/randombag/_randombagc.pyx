@@ -30,7 +30,59 @@ from ..utils import Progbar
 
 # 1 main fitting loop -----       
 
+# For classification
 def rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators, int verbose, int seed):
+
+    cdef int m 
+    cdef dict voter
+
+    voter = {}    
+
+    if verbose == 1:
+
+        pbar = Progbar(n_estimators)
+
+        for m in range(n_estimators):   
+            
+            try:
+                    
+                base_learner.fit(np.asarray(X), np.asarray(y))
+                
+                voter[m] = pickle.loads(pickle.dumps(base_learner, -1))                
+
+                base_learner.set_params(seed=seed + (m + 1) * 1000)
+
+                pbar.update(m)
+
+            except:
+
+                pbar.update(m)
+
+                continue
+    
+        pbar.update(n_estimators)
+    
+        return voter
+
+    # verbose != 1:
+    for m in range(n_estimators):   
+        
+        try:
+                
+            base_learner.fit(np.asarray(X), np.asarray(y))
+
+            voter[m] = pickle.loads(pickle.dumps(base_learner, -1))                
+
+            base_learner.set_params(seed=seed + (m + 1) * 1000)            
+
+        except:            
+
+            continue
+
+    return voter
+
+# For regression
+def rbagloop2(object base_learner, double[:,:] X, double[:] y, int n_estimators, int verbose, int seed):
 
     cdef int m 
     cdef dict voter

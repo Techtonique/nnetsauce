@@ -3,20 +3,20 @@
 # License: BSD 3
 
 import numpy as np
-import sklearn.metrics as skm2
+import sklearn.metrics as skm
 from .bag import RandomBag
-from ..custom import CustomClassifier
+from ..custom import CustomRegressor
 from ..utils import misc as mx
 from ..utils import Progbar
-from sklearn.base import ClassifierMixin
+from sklearn.base import RegressorMixin
 import pickle
 from joblib import Parallel, delayed
 from tqdm import tqdm
 from . import _randombagc as randombagc
 
 
-class RandomBagClassifier(RandomBag, ClassifierMixin):
-    """Randomized 'Bagging' Classification model
+class RandomBagRegressor(RandomBag, RegressorMixin):
+    """Randomized 'Bagging' Regression model
 
     Parameters:
 
@@ -49,7 +49,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             of the training
 
         direct_link: boolean
-            indicates if the original predictors are included (True) in model's
+            indicates if the original predictors are included (True) in model''s
             fitting or not (False)
 
         n_clusters: int
@@ -89,42 +89,30 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
     Examples:
 
-    See also [https://github.com/Techtonique/nnetsauce/blob/master/examples/randombag_classification.py](https://github.com/Techtonique/nnetsauce/blob/master/examples/randombag_classification.py)
-
     ```python
+    import numpy as np 
     import nnetsauce as ns
-    from sklearn.datasets import load_breast_cancer
-    from sklearn.tree import DecisionTreeClassifier
+    from sklearn.datasets import fetch_california_housing
+    from sklearn.tree import DecisionTreeRegressor
     from sklearn.model_selection import train_test_split
-    from sklearn import metrics
-    from time import time
 
+    X, y = fetch_california_housing(return_X_y=True, as_frame=False)
 
-    breast_cancer = load_breast_cancer()
-    Z = breast_cancer.data
-    t = breast_cancer.target
-    np.random.seed(123)
-    X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
+    # split data into training test and test set
+    X_train, X_test, y_train, y_test = train_test_split(X, y, 
+                                                        test_size=0.2, random_state=13)
+
+    # Requires further tuning
+    obj = DecisionTreeRegressor(max_depth=3, random_state=123)
+    obj2 = ns.RandomBagRegressor(obj=obj, direct_link=False,
+                                n_estimators=50, 
+                                col_sample=0.9, row_sample=0.9,
+                                dropout=0, n_clusters=0, verbose=1)
     
-    # decision tree
-    clf = DecisionTreeClassifier(max_depth=2, random_state=123)
-    fit_obj = ns.RandomBagClassifier(clf, n_hidden_features=2,
-                                    direct_link=True,
-                                    n_estimators=100, 
-                                    col_sample=0.9, row_sample=0.9,
-                                    dropout=0.3, n_clusters=0, verbose=1)
+    obj2.fit(X_train, y_train)        
 
-    start = time()
-    fit_obj.fit(X_train, y_train)
-    print(f"Elapsed {time() - start}") 
+    print(np.sqrt(obj2.score(X_test, y_test))) # RMSE
 
-    print(fit_obj.score(X_test, y_test))
-    print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
-
-    start = time()
-    preds = fit_obj.predict(X_test)
-    print(f"Elapsed {time() - start}") 
-    print(metrics.classification_report(preds, y_test))    
     ```
 
     """
@@ -174,7 +162,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             backend=backend,
         )
 
-        self.type_fit = "classification"
+        self.type_fit = "regression"
         self.verbose = verbose
         self.n_jobs = n_jobs
         self.voter_ = {}
@@ -200,12 +188,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
         """
 
-        assert mx.is_factor(y), "y must contain only integers"
-
-        # training
-        self.n_classes = len(np.unique(y))
-
-        base_learner = CustomClassifier(
+        base_learner = CustomRegressor(
             self.obj,
             n_hidden_features=self.n_hidden_features,
             activation_name=self.activation_name,
@@ -227,7 +210,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         if self.n_jobs is None:
 
             # rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators, int verbose, int seed):
-            self.voter_ = randombagc.rbagloop(
+            self.voter_ = randombagc.rbagloop2(
                 base_learner, X, y, self.n_estimators, self.verbose, self.seed
             )
 
@@ -238,15 +221,12 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         # 2 - Parallel training -----
         # buggy
         # if self.n_jobs is not None:
-        def fit_estimators(m):
-            # try:
+        def fit_estimators(m):            
             base_learner.fit(X, y, **kwargs)
             self.voter_.update({m: pickle.loads(pickle.dumps(base_learner, -1))})
             base_learner.set_params(
                 seed=self.seed + (m + 1) * 1000,
             )
-            # except:
-            #    pass
 
         if self.verbose == 1:
 
@@ -263,9 +243,9 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         self.n_estimators = len(self.voter_)
 
         return self
-
+    
     def predict(self, X, weights=None, **kwargs):
-        """Predict test data X.
+        """Predict for test data X.
 
         Args:
 
@@ -278,32 +258,13 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
         Returns:
 
-            model predictions: {array-like}
-
-        """
-        return self.predict_proba(X, weights, **kwargs).argmax(axis=1)
-
-    def predict_proba(self, X, weights=None, **kwargs):
-        """Predict probabilities for test data X.
-
-        Args:
-
-            X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number
-                of samples and n_features is the number of features.
-
-            **kwargs: additional parameters to be passed to
-                    self.cook_test_set
-
-        Returns:
-
-            probability estimates for test data: {array-like}
+            estimates for test data: {array-like}
 
         """
 
-        def calculate_probas(voter, weights=None, verbose=None):
+        def calculate_preds(voter, weights=None):
 
-            ensemble_proba = 0
+            ensemble_preds = 0
 
             n_iter = len(voter)
 
@@ -313,88 +274,30 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
                 for idx, elt in voter.items():
 
-                    try:
+                    ensemble_preds += elt.predict(X)
 
-                        ensemble_proba += elt.predict_proba(X)
-
-                        # if verbose == 1:
-                        #    pbar.update(idx)
-
-                    except:
-
-                        continue
-
-                # if verbose == 1:
-                #    pbar.update(n_iter)
-
-                return ensemble_proba / n_iter
+                return ensemble_preds / n_iter
 
             # if weights is not None:
             for idx, elt in voter.items():
 
-                ensemble_proba += weights[idx] * elt.predict_proba(X)
+                ensemble_preds += weights[idx] * elt.predict(X)
 
-                # if verbose == 1:
-                #    pbar.update(idx)
+            return ensemble_preds
 
-            # if verbose == 1:
-            #    pbar.update(n_iter)
-
-            return ensemble_proba
-
-        # end calculate_probas ----
-
-        if self.n_jobs is None:
-
-            # if self.verbose == 1:
-            #    pbar = Progbar(self.n_estimators)
-
-            if weights is None:
-
-                return calculate_probas(self.voter_, verbose=self.verbose)
-
-            # if weights is not None:
-            self.weights = weights
-
-            return calculate_probas(self.voter_, weights, verbose=self.verbose)
-
-        # if self.n_jobs is not None:
-        def predict_estimator(m):
-            try:
-                return self.voter_[m].predict_proba(X)
-            except:
-                pass
-
-        if self.verbose == 1:
-
-            preds = Parallel(n_jobs=self.n_jobs, prefer="threads")(
-                delayed(predict_estimator)(m)
-                for m in tqdm(range(self.n_estimators))
-            )
-
-        else:
-
-            preds = Parallel(n_jobs=self.n_jobs, prefer="threads")(
-                delayed(predict_estimator)(m) for m in range(self.n_estimators)
-            )
-
-        ensemble_proba = 0
+        # end calculate_preds ----
 
         if weights is None:
 
-            for i in range(self.n_estimators):
+            return calculate_preds(self.voter_)
 
-                ensemble_proba += preds[i]
+        # if weights is not None:
+        self.weights = weights
 
-            return ensemble_proba / self.n_estimators
+        return calculate_preds(self.voter_, weights)
 
-        for i in range(self.n_estimators):
 
-            ensemble_proba += weights[i] * preds[i]
-
-        return ensemble_proba
-
-    def score(self, X, y, weights=None, scoring=None, **kwargs):
+    def score(self, X, y, scoring=None, **kwargs):
         """ Score the model on test set features X and response y. 
 
         Args:
@@ -416,47 +319,36 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         Returns: 
         
             model scores: {array-like}
-
+            
         """
 
-        preds = self.predict(X, weights, **kwargs)
+        preds = self.predict(X)
+
+        if type(preds) == tuple:  # if there are std. devs in the predictions
+            preds = preds[0]
 
         if scoring is None:
-            scoring = "accuracy"
+            scoring = "neg_mean_squared_error"
 
         # check inputs
         assert scoring in (
-            "accuracy",
-            "average_precision",
-            "brier_score_loss",
-            "f1",
-            "f1_micro",
-            "f1_macro",
-            "f1_weighted",
-            "f1_samples",
-            "neg_log_loss",
-            "precision",
-            "recall",
-            "roc_auc",
-        ), "'scoring' should be in ('accuracy', 'average_precision', \
-                           'brier_score_loss', 'f1', 'f1_micro', \
-                           'f1_macro', 'f1_weighted',  'f1_samples', \
-                           'neg_log_loss', 'precision', 'recall', \
-                           'roc_auc')"
+            "explained_variance",
+            "neg_mean_absolute_error",
+            "neg_mean_squared_error",
+            "neg_mean_squared_log_error",
+            "neg_median_absolute_error",
+            "r2",
+        ), "'scoring' should be in ('explained_variance', 'neg_mean_absolute_error', \
+                           'neg_mean_squared_error', 'neg_mean_squared_log_error', \
+                           'neg_median_absolute_error', 'r2')"
 
         scoring_options = {
-            "accuracy": skm2.accuracy_score,
-            "average_precision": skm2.average_precision_score,
-            "brier_score_loss": skm2.brier_score_loss,
-            "f1": skm2.f1_score,
-            "f1_micro": skm2.f1_score,
-            "f1_macro": skm2.f1_score,
-            "f1_weighted": skm2.f1_score,
-            "f1_samples": skm2.f1_score,
-            "neg_log_loss": skm2.log_loss,
-            "precision": skm2.precision_score,
-            "recall": skm2.recall_score,
-            "roc_auc": skm2.roc_auc_score,
+            "explained_variance": skm.explained_variance_score,
+            "neg_mean_absolute_error": skm.median_absolute_error,
+            "neg_mean_squared_error": skm.mean_squared_error,
+            "neg_mean_squared_log_error": skm.mean_squared_log_error,
+            "neg_median_absolute_error": skm.median_absolute_error,
+            "r2": skm.r2_score,
         }
 
         return scoring_options[scoring](y, preds, **kwargs)

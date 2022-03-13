@@ -3,6 +3,7 @@
 # License: BSD 3 Clear Clause
 
 import numpy as np
+import pandas as pd
 from ..base import Base
 from scipy.stats import norm
 from ..utils import matrixops as mo
@@ -96,7 +97,12 @@ class MTS(Base):
         return_std_: boolean
             return uncertainty or not (set in predict)  
 
+        df_: data frame
+            the input data frame, in case a data.frame is provided to `fit`    
+
     Examples:
+
+    Example 1:
 
     ```python
     import nnetsauce as ns
@@ -113,6 +119,33 @@ class MTS(Base):
     regr4 = linear_model.BayesianRidge()
     obj_MTS = ns.MTS(regr4, lags = 1, n_hidden_features=5)
     obj_MTS.fit(M)
+    print(obj_MTS.predict())
+
+    # with credible intervals
+    print(obj_MTS.predict(return_std=True, level=80))
+
+    print(obj_MTS.predict(return_std=True, level=95))
+    ```
+
+    Example 2:
+
+    ```python
+    import nnetsauce as ns
+    import numpy as np    
+    from sklearn import linear_model
+    
+    dataset = {
+    'date' : ['2001-01-01', '2002-01-01', '2003-01-01', '2004-01-01', '2005-01-01'],
+    'series1' : [34, 30, 35.6, 33.3, 38.1],    
+    'series2' : [4, 5.5, 5.6, 6.3, 5.1],
+    'series3' : [100, 100.5, 100.6, 100.2, 100.1]}
+    df = pd.DataFrame(dataset).set_index('date')
+    print(df)
+
+    # Adjust Bayesian Ridge
+    regr5 = linear_model.BayesianRidge()
+    obj_MTS = ns.MTS(regr5, lags = 1, n_hidden_features=5)
+    obj_MTS.fit(df)
     print(obj_MTS.predict())
 
     # with credible intervals
@@ -173,7 +206,8 @@ class MTS(Base):
         self.preds_ = None
         self.preds_std_ = []
         self.return_std_ = None
-        
+        self.df_ = None
+
 
     def fit(self, X, xreg=None):
         """Fit MTS model to training data X, with optional regressors xreg
@@ -196,6 +230,10 @@ class MTS(Base):
 
             self: object
         """
+
+        if (isinstance(X, pd.DataFrame)):
+            self.df_ = X
+            X = X.values        
 
         try:
             # multivariate time series
@@ -277,8 +315,13 @@ class MTS(Base):
 
         Returns:
 
-            model predictions for horizon = h: {array-like}
+            model predictions for horizon = h: {array-like}, data frame or tuple.
+            Standard deviation and prediction intervals are returned when 
+            `obj.predict` can return standard deviation
         """
+
+        if self.df_ is not None: # `fit` takes a data frame input
+            output_dates, frequency = ts.compute_output_dates(self.df_, h)
 
         self.return_std_ = False
 
@@ -297,7 +340,7 @@ class MTS(Base):
 
             self.return_std_ = kwargs["return_std"]
 
-            qt = norm.ppf(1 - 0.5 * (1 - level / 100))
+            multiplier = norm.ppf(1 - 0.5 * (1 - level / 100))
 
         if new_xreg is not None:  # Additional regressors provided
 
@@ -401,27 +444,44 @@ class MTS(Base):
 
                 self.preds_ = mo.rbind(preds, self.preds_)
 
-        # function's return
+        # function's return        
 
-        self.preds_ = self.preds_[0:h, :][::-1]
+        if self.df_ is None: 
 
-        if self.return_std_ == False:  # std. dev. is returned
+            self.preds_ = self.preds_[0:h, :][::-1]        
+
+            if self.return_std_ == False:  # std. dev. is not returned
+
+                return self.preds_
+
+            # std. dev. is returned
+            self.preds_std_ = self.preds_std_[::-1].reshape(h, 1)
+
+            self.preds_std_ = np.repeat(self.preds_std_, self.n_series).reshape(
+                -1, self.n_series
+            )
+
+            return (self.preds_, self.preds_std_, self.preds_ - multiplier*self.preds_std_, 
+            self.preds_ + multiplier*self.preds_std_)                
+
+        # if self.df_ is not None (return data frames)
+
+        self.preds_ = pd.DataFrame(self.preds_[0:h, :][::-1], columns=self.df_.columns, 
+        index = output_dates)
+
+        if self.return_std_ == False:  # std. dev. is not returned
 
             return self.preds_
 
-        # std. dev. is not returned
+        # std. dev. is returned
         self.preds_std_ = self.preds_std_[::-1].reshape(h, 1)
 
-        self.preds_std_ = np.repeat(self.preds_std_, self.n_series).reshape(
+        self.preds_std_ = pd.DataFrame(np.repeat(self.preds_std_, self.n_series).reshape(
             -1, self.n_series
-        )
+        ), columns=self.df_.columns, index = output_dates)
 
-        return {
-            "mean": self.preds_,
-            "std": self.preds_std_,
-            "lower": self.preds_ - qt * self.preds_std_,
-            "upper": self.preds_ + qt * self.preds_std_,
-        }
+        return (self.preds_, self.preds_std_, self.preds_ - multiplier*self.preds_std_, 
+            self.preds_ + multiplier*self.preds_std_)                      
 
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):
         """ Train on training_index, score on testing_index. """
@@ -431,11 +491,21 @@ class MTS(Base):
         ), "Non-overlapping 'training_index' and 'testing_index' required"
 
         # Dimensions
-        n, p = X.shape
+        try:
+            # multivariate time series
+            n, p = X.shape
+        except:
+            # univariate time series
+            n = X.shape[0]
+            p = 1
 
         # Training and testing sets
-        X_train = X[training_index, :]
-        X_test = X[testing_index, :]
+        if p > 1:
+            X_train = X[training_index, :]
+            X_test = X[testing_index, :]
+        else:
+            X_train = X[training_index]
+            X_test = X[testing_index]
 
         # Horizon
         h = len(testing_index)
@@ -475,9 +545,12 @@ class MTS(Base):
             "r2": skm2.r2_score,
         }
 
-        return tuple(
-            [
-                scoring_options[scoring](X_test[:, i], preds[:, i], **kwargs)
-                for i in range(p)
-            ]
-        )
+        if p > 1: 
+            return tuple(
+                [
+                    scoring_options[scoring](X_test[:, i], preds[:, i], **kwargs)
+                    for i in range(p)
+                ]
+            )
+        else:
+            return scoring_options[scoring](X_test, preds)

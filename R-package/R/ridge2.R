@@ -3,6 +3,8 @@
 
 #' Multinomial logit, quasi-randomized classification model with 2 shrinkage parameters
 #'
+#' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
+#'
 #' @param n_hidden_features
 #' @param activation_name
 #' @param a
@@ -88,6 +90,8 @@ Ridge2Classifier <- function(n_hidden_features = 5L,
 
 #' Multitask quasi-randomized classification model with 2 shrinkage parameters
 #'
+#' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
+#'
 #' @param n_hidden_features
 #' @param activation_name
 #' @param a
@@ -171,6 +175,8 @@ Ridge2MultitaskClassifier <- function(n_hidden_features=5L,
 
 
 #' Quasi-randomized regression model with 2 shrinkage parameters
+#'
+#' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 #'
 #' @param n_hidden_features
 #' @param activation_name

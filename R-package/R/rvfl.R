@@ -5,6 +5,8 @@
 
 #' Bayesian Random Vector Functional link network with 1 shrinkage parameter
 #'
+#' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
+#'
 #' @param n_hidden_features
 #' @param activation_name
 #' @param a
@@ -70,6 +72,8 @@ BayesianRVFLRegressor <- function(n_hidden_features=5L,
 
 
 #' Bayesian Random Vector Functional link network with 2 shrinkage parameters
+#'
+#' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 #'
 #' @param n_hidden_features
 #' @param activation_name
