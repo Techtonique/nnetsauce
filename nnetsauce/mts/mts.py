@@ -144,7 +144,7 @@ class MTS(Base):
 
     # Adjust Bayesian Ridge
     regr5 = linear_model.BayesianRidge()
-    obj_MTS = ns.MTS(regr4, lags = 1, n_hidden_features=5)
+    obj_MTS = ns.MTS(regr5, lags = 1, n_hidden_features=5)
     obj_MTS.fit(df)
     print(obj_MTS.predict())
 
@@ -316,7 +316,8 @@ class MTS(Base):
         Returns:
 
             model predictions for horizon = h: {array-like}, data frame or tuple
-            standard deviation is returned when `obj.predict` can return standard deviation
+            standard deviation and prediction intervals are returned when 
+            `obj.predict` can return standard deviation
         """
 
         if self.df_ is not None: # `fit` takes a data frame input
@@ -339,7 +340,7 @@ class MTS(Base):
 
             self.return_std_ = kwargs["return_std"]
 
-            qt = norm.ppf(1 - 0.5 * (1 - level / 100))
+            multiplier = norm.ppf(1 - 0.5 * (1 - level / 100))
 
         if new_xreg is not None:  # Additional regressors provided
 
@@ -460,7 +461,8 @@ class MTS(Base):
                 -1, self.n_series
             )
 
-            return (self.preds_, self.preds_std_)                
+            return (self.preds_, self.preds_std_, self.preds_ - multiplier*self.preds_std_, 
+            self.preds_ + multiplier*self.preds_std_)                
 
         # if self.df_ is not None (return data frames)
 
@@ -478,7 +480,8 @@ class MTS(Base):
             -1, self.n_series
         ), columns=self.df_.columns, index = output_dates)
 
-        return (self.preds_, self.preds_std_)                      
+        return (self.preds_, self.preds_std_, self.preds_ - multiplier*self.preds_std_, 
+            self.preds_ + multiplier*self.preds_std_)                      
 
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):
         """ Train on training_index, score on testing_index. """
