@@ -1,0 +1,23 @@
+Metadata-Version: 2.1
+Name: nnetsauce
+Version: 0.11.0
+Summary: Randomized and Quasi-Randomized (neural) networks
+Maintainer: T. Moudiki
+Maintainer-email: thierry.moudiki@gmail.com
+License: BSD3 Clause Clear
+Platform: UNKNOWN
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Requires-Python: >=3.5
+Provides-Extra: alldeps
+License-File: LICENSE
+
+A package for Statistical/Machine Learning using Randomized and Quasi-Randomized (neural) networks
+
