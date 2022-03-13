@@ -1,5 +1,7 @@
 #' Multivariate Time Series
 #'
+#' Parameters description can be found at \url{https://techtonique.github.io/nnetsauce/}
+#'
 #' @param obj
 #' @param n_hidden_features
 #' @param activation_name

@@ -3,6 +3,8 @@
 
 #' Bootstrap aggregating with quasi-randomized layer (classification)
 #'
+#' Parameters description can be found at \url{https://techtonique.github.io/nnetsauce/}
+#'
 #' @param obj
 #' @param n_estimators
 #' @param n_hidden_features
@@ -82,6 +84,8 @@ RandomBagClassifier <- function(obj,
 # 2 - Regressors ---------------------------------------------------------
 
 #' Bootstrap aggregating with quasi-randomized layer (regression)
+#'
+#' Parameters description can be found at \url{https://techtonique.github.io/nnetsauce/}
 #'
 #' @param obj
 #' @param n_estimators

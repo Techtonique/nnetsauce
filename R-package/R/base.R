@@ -6,6 +6,8 @@
 
 #' Linear regressor with a quasi-randomized layer
 #'
+#' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
+#'
 #' @param n_hidden_features
 #' @param activation_name
 #' @param a
