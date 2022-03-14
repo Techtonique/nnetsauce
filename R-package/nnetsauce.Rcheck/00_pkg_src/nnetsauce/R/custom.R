@@ -4,6 +4,8 @@
 
 #' Custom classifier with quasi-randomized layer
 #'
+#' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
+#'
 #' @param obj
 #' @param n_hidden_features
 #' @param activation_name
@@ -75,6 +77,8 @@ CustomClassifier <- function(obj,
 
 
 #'  Custom regressor with quasi-randomized layer
+#'
+#' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 #'
 #' @param obj
 #' @param n_hidden_features

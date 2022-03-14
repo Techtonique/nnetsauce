@@ -7,21 +7,6 @@
 #'
 #' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 #'
-#' @param n_hidden_features
-#' @param activation_name
-#' @param a
-#' @param nodes_sim
-#' @param bias
-#' @param dropout
-#' @param direct_link
-#' @param n_clusters
-#' @param cluster_encode
-#' @param type_clust
-#' @param seed
-#' @param s
-#' @param sigma
-#' @param backend
-#'
 #' @return
 #' @export
 #'
@@ -74,24 +59,7 @@ BayesianRVFLRegressor <- function(n_hidden_features=5L,
 #' Bayesian Random Vector Functional link network with 2 shrinkage parameters
 #'
 #' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
-#'
-#' @param n_hidden_features
-#' @param activation_name
-#' @param a
-#' @param nodes_sim
-#' @param bias
-#' @param dropout
-#' @param direct_link
-#' @param n_clusters
-#' @param cluster_encode
-#' @param type_clust
-#' @param seed
-#' @param s1
-#' @param s2
-#' @param sigma
-#' @param backend
-#'
-#' @return
+#'#' @return
 #' @export
 #'
 #' @examples

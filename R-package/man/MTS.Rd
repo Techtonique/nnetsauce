@@ -16,20 +16,16 @@ MTS(
   n_clusters = 2L,
   cluster_encode = TRUE,
   type_clust = "kmeans",
-  col_sample = 1,
   seed = 123L,
   lags = 1L,
   backend = c("cpu", "gpu", "tpu")
 )
 }
-\arguments{
-\item{backend}{}
-}
 \value{
 
 }
 \description{
-Multivariate Time Series
+Parameters description can be found at \url{https://techtonique.github.io/nnetsauce/}
 }
 \examples{
 

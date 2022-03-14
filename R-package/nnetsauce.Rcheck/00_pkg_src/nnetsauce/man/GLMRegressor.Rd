@@ -2,7 +2,7 @@
 % Please edit documentation in R/glm.R
 \name{GLMRegressor}
 \alias{GLMRegressor}
-\title{Generalized nonlinears models for continuous output (regression)}
+\title{Generalized nonlinear models for continuous output (regression)}
 \usage{
 GLMRegressor(
   n_hidden_features = 5L,
@@ -32,5 +32,5 @@ GLMRegressor(
 
 }
 \description{
-Generalized nonlinears models for continuous output (regression)
+Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 }

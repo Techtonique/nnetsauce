@@ -27,7 +27,7 @@ Ridge2MultitaskClassifier(
 
 }
 \description{
-Multitask quasi-randomized classification model with 2 shrinkage parameters
+Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 }
 \examples{
 

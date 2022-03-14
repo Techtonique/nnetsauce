@@ -1,4 +1,6 @@
-#' Generalized nonlinears models for Classification
+#' Generalized nonlinear models for Classification
+#'
+#' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 #'
 #' @param n_hidden_features
 #' @param lambda1
@@ -63,7 +65,9 @@ GLMClassifier <- function(n_hidden_features=5L,
                    seed=seed)
 }
 
-#' Generalized nonlinears models for continuous output (regression)
+#' Generalized nonlinear models for continuous output (regression)
+#'
+#' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 #'
 #' @param n_hidden_features
 #' @param lambda1

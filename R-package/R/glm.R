@@ -2,24 +2,6 @@
 #'
 #' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 #'
-#' @param n_hidden_features
-#' @param lambda1
-#' @param alpha1
-#' @param lambda2
-#' @param alpha2
-#' @param family
-#' @param activation_name
-#' @param a
-#' @param nodes_sim
-#' @param bias
-#' @param dropout
-#' @param direct_link
-#' @param n_clusters
-#' @param cluster_encode
-#' @param type_clust
-#' @param type_scaling
-#' @param seed
-#'
 #' @return
 #' @export
 #'
@@ -68,24 +50,6 @@ GLMClassifier <- function(n_hidden_features=5L,
 #' Generalized nonlinear models for continuous output (regression)
 #'
 #' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
-#'
-#' @param n_hidden_features
-#' @param lambda1
-#' @param alpha1
-#' @param lambda2
-#' @param alpha2
-#' @param family
-#' @param activation_name
-#' @param a
-#' @param nodes_sim
-#' @param bias
-#' @param dropout
-#' @param direct_link
-#' @param n_clusters
-#' @param cluster_encode
-#' @param type_clust
-#' @param type_scaling
-#' @param seed
 #'
 #' @return
 #' @export

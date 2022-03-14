@@ -1,7 +1,9 @@
 
 # 1 - Classifiers ---------------------------------------------------------
 
-#' Bootstrap aggregating with quasi-randomized layer
+#' Bootstrap aggregating with quasi-randomized layer (classification)
+#'
+#' Parameters description can be found at \url{https://techtonique.github.io/nnetsauce/}
 #'
 #' @param obj
 #' @param n_estimators
@@ -81,3 +83,82 @@ RandomBagClassifier <- function(obj,
 
 # 2 - Regressors ---------------------------------------------------------
 
+#' Bootstrap aggregating with quasi-randomized layer (regression)
+#'
+#' Parameters description can be found at \url{https://techtonique.github.io/nnetsauce/}
+#'
+#' @param obj
+#' @param n_estimators
+#' @param n_hidden_features
+#' @param activation_name
+#' @param a
+#' @param nodes_sim
+#' @param bias
+#' @param dropout
+#' @param direct_link
+#' @param n_clusters
+#' @param cluster_encode
+#' @param type_clust
+#' @param col_sample
+#' @param row_sample
+#' @param n_jobs
+#' @param seed
+#' @param verbose
+#' @param backend
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#'
+#' library(datasets)
+#'
+#' n <- 20 ; p <- 5
+#' X <- matrix(rnorm(n * p), n, p) # no intercept!
+#' y <- rnorm(n)
+#'
+#' obj <- sklearn$tree$DecisionTreeRegressor()
+#' obj2 <- RandomBagRegressor(obj)
+#' obj2$fit(X[1:12,], y[1:12])
+#' print(obj2$score(X[13:20, ], y[13:20]))
+#'
+RandomBagRegressor <- function(obj,
+                                n_estimators=10L,
+                                n_hidden_features=1L,
+                                activation_name="relu",
+                                a=0.01,
+                                nodes_sim="sobol",
+                                bias=TRUE,
+                                dropout=0,
+                                direct_link=FALSE,
+                                n_clusters=2L,
+                                cluster_encode=TRUE,
+                                type_clust="kmeans",
+                                col_sample=1,
+                                row_sample=1,
+                                n_jobs=NULL,
+                                seed=123L,
+                                verbose=1L,
+                                backend=c("cpu", "gpu", "tpu"))
+{
+  backend <- match.arg(backend)
+
+  ns$RandomBagRegressor(obj=obj,
+                         n_estimators=n_estimators,
+                         n_hidden_features=n_hidden_features,
+                         activation_name=activation_name,
+                         a=a,
+                         nodes_sim=nodes_sim,
+                         bias=bias,
+                         dropout=dropout,
+                         direct_link=direct_link,
+                         n_clusters=n_clusters,
+                         cluster_encode=cluster_encode,
+                         type_clust=type_clust,
+                         col_sample=col_sample,
+                         row_sample=row_sample,
+                         n_jobs=n_jobs,
+                         seed=seed,
+                         verbose=verbose,
+                         backend=backend)
+}

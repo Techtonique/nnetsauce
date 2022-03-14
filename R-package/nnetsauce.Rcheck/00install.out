@@ -6,629 +6,288 @@
 *** installing help indices
 ** building package indices
 ** testing if installed package can be loaded from temporary location
-Found existing installation: nnetsauce 0.8.3
-Uninstalling nnetsauce-0.8.3:
-  Successfully uninstalled nnetsauce-0.8.3
-Requirement already up-to-date: numpy in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (1.19.4)
-Requirement already up-to-date: rpy2 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (3.3.6)
-Requirement already satisfied, skipping upgrade: jinja2 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from rpy2) (2.11.2)
-Requirement already satisfied, skipping upgrade: pytest in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from rpy2) (6.1.2)
-Requirement already satisfied, skipping upgrade: cffi>=1.10.0 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from rpy2) (1.14.4)
-Requirement already satisfied, skipping upgrade: tzlocal in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from rpy2) (2.1)
-Requirement already satisfied, skipping upgrade: pytz in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from rpy2) (2020.4)
-Requirement already satisfied, skipping upgrade: MarkupSafe>=0.23 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from jinja2->rpy2) (1.1.1)
-Requirement already satisfied, skipping upgrade: attrs>=17.4.0 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from pytest->rpy2) (20.3.0)
-Requirement already satisfied, skipping upgrade: py>=1.8.2 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from pytest->rpy2) (1.9.0)
-Requirement already satisfied, skipping upgrade: importlib-metadata>=0.12; python_version < "3.8" in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from pytest->rpy2) (3.1.0)
-Requirement already satisfied, skipping upgrade: packaging in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from pytest->rpy2) (20.4)
-Requirement already satisfied, skipping upgrade: iniconfig in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from pytest->rpy2) (1.1.1)
-Requirement already satisfied, skipping upgrade: pluggy<1.0,>=0.12 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from pytest->rpy2) (0.13.1)
-Requirement already satisfied, skipping upgrade: toml in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from pytest->rpy2) (0.10.2)
-Requirement already satisfied, skipping upgrade: pycparser in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from cffi>=1.10.0->rpy2) (2.20)
-Requirement already satisfied, skipping upgrade: zipp>=0.5 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from importlib-metadata>=0.12; python_version < "3.8"->pytest->rpy2) (3.4.0)
-Requirement already satisfied, skipping upgrade: pyparsing>=2.0.2 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from packaging->pytest->rpy2) (2.4.7)
-Requirement already satisfied, skipping upgrade: six in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from packaging->pytest->rpy2) (1.15.0)
-Requirement already up-to-date: scipy in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (1.5.4)
-Requirement already satisfied, skipping upgrade: numpy>=1.14.5 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from scipy) (1.19.4)
-Requirement already up-to-date: six in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (1.15.0)
-Requirement already up-to-date: tqdm in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (4.54.0)
-Requirement already up-to-date: sklearn in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (0.0)
-Requirement already satisfied, skipping upgrade: scikit-learn in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from sklearn) (0.23.2)
-Requirement already satisfied, skipping upgrade: threadpoolctl>=2.0.0 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from scikit-learn->sklearn) (2.1.0)
-Requirement already satisfied, skipping upgrade: joblib>=0.11 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from scikit-learn->sklearn) (0.17.0)
-Requirement already satisfied, skipping upgrade: numpy>=1.13.3 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from scikit-learn->sklearn) (1.19.4)
-Requirement already satisfied, skipping upgrade: scipy>=0.19.1 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from scikit-learn->sklearn) (1.5.4)
+WARNING: Skipping nnetsauce as it is not installed.
+Activated conda python: /cloud/home/.local/share/r-miniconda/envs/r-reticulate/bin/python
+Requirement already satisfied: numpy in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (1.22.3)
+Activated conda python: /cloud/home/.local/share/r-miniconda/envs/r-reticulate/bin/python
+Requirement already satisfied: rpy2 in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (3.4.5)
+Requirement already satisfied: jinja2 in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (from rpy2) (3.0.3)
+Requirement already satisfied: pytz in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (from rpy2) (2021.3)
+Requirement already satisfied: cffi>=1.10.0 in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (from rpy2) (1.15.0)
+Requirement already satisfied: tzlocal in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (from rpy2) (4.1)
+Requirement already satisfied: pycparser in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (from cffi>=1.10.0->rpy2) (2.21)
+Requirement already satisfied: MarkupSafe>=2.0 in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (from jinja2->rpy2) (2.1.0)
+Requirement already satisfied: backports.zoneinfo in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (from tzlocal->rpy2) (0.2.1)
+Requirement already satisfied: pytz-deprecation-shim in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (from tzlocal->rpy2) (0.1.0.post0)
+Requirement already satisfied: tzdata in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (from pytz-deprecation-shim->tzlocal->rpy2) (2021.5)
+Activated conda python: /cloud/home/.local/share/r-miniconda/envs/r-reticulate/bin/python
+Requirement already satisfied: scipy in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (1.8.0)
+Requirement already satisfied: numpy<1.25.0,>=1.17.3 in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (from scipy) (1.22.3)
+Activated conda python: /cloud/home/.local/share/r-miniconda/envs/r-reticulate/bin/python
+Requirement already satisfied: six in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (1.16.0)
+Activated conda python: /cloud/home/.local/share/r-miniconda/envs/r-reticulate/bin/python
+Requirement already satisfied: tqdm in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (4.63.0)
+Activated conda python: /cloud/home/.local/share/r-miniconda/envs/r-reticulate/bin/python
+Requirement already satisfied: sklearn in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (0.0)
+Requirement already satisfied: scikit-learn in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (from sklearn) (1.0.2)
+Requirement already satisfied: threadpoolctl>=2.0.0 in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (from scikit-learn->sklearn) (3.1.0)
+Requirement already satisfied: numpy>=1.14.6 in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (from scikit-learn->sklearn) (1.22.3)
+Requirement already satisfied: scipy>=1.1.0 in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (from scikit-learn->sklearn) (1.8.0)
+Requirement already satisfied: joblib>=0.11 in /cloud/home/.local/share/r-miniconda/envs/r-reticulate/lib/python3.8/site-packages (from scikit-learn->sklearn) (1.1.0)
+Activated conda python: /cloud/home/.local/share/r-miniconda/envs/r-reticulate/bin/python
 Collecting nnetsauce
-  Using cached nnetsauce-0.7.3.tar.gz (83 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/09/f8/49/d0d06a733213c5938de84a92ec3d06b2173926e576e06f3a07/jax-0.2.6-py3-none-any.whl
-Collecting jaxlib>=0.1.51
-  Using cached jaxlib-0.1.57-cp36-none-manylinux2010_x86_64.whl (33.3 MB)
-Collecting numpy>=1.13.0
-  Using cached numpy-1.19.4-cp36-cp36m-manylinux2010_x86_64.whl (14.5 MB)
-Collecting scipy>=0.19.0
-  Using cached scipy-1.5.4-cp36-cp36m-manylinux1_x86_64.whl (25.9 MB)
-Collecting joblib>=0.14.0
-  Using cached joblib-0.17.0-py3-none-any.whl (301 kB)
-Collecting scikit-learn>=0.18.0
-  Using cached scikit_learn-0.23.2-cp36-cp36m-manylinux1_x86_64.whl (6.8 MB)
-Collecting threadpoolctl>=2.0.0
-  Using cached threadpoolctl-2.1.0-py3-none-any.whl (12 kB)
-Collecting tqdm==4.48.1
-  Using cached tqdm-4.48.1-py2.py3-none-any.whl (68 kB)
-Collecting absl-py
-  Using cached absl_py-0.11.0-py3-none-any.whl (127 kB)
-Collecting opt-einsum
-  Using cached opt_einsum-3.3.0-py3-none-any.whl (65 kB)
-Collecting flatbuffers
-  Using cached flatbuffers-1.12-py2.py3-none-any.whl (15 kB)
-Collecting six
-  Using cached six-1.15.0-py2.py3-none-any.whl (10 kB)
-Building wheels for collected packages: nnetsauce
-  Building wheel for nnetsauce (setup.py): started
-  Building wheel for nnetsauce (setup.py): finished with status 'error'
-  ERROR: Command errored out with exit status 1:
-   command: /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/bin/python -u -c 'import sys, setuptools, tokenize; sys.argv[0] = '"'"'/tmp/Rtmp9CTRvy/working_dir/pip-install-ncw4j13g/nnetsauce/setup.py'"'"'; __file__='"'"'/tmp/Rtmp9CTRvy/working_dir/pip-install-ncw4j13g/nnetsauce/setup.py'"'"';f=getattr(tokenize, '"'"'open'"'"', open)(__file__);code=f.read().replace('"'"'\r\n'"'"', '"'"'\n'"'"');f.close();exec(compile(code, __file__, '"'"'exec'"'"'))' bdist_wheel -d /tmp/Rtmp9CTRvy/working_dir/pip-wheel-i830n_2e
-       cwd: /tmp/Rtmp9CTRvy/working_dir/pip-install-ncw4j13g/nnetsauce/
-  Complete output (26 lines):
-  Partial import of nnetsauce during the build process.
-  Traceback (most recent call last):
-    File "<string>", line 1, in <module>
-    File "/tmp/Rtmp9CTRvy/working_dir/pip-install-ncw4j13g/nnetsauce/setup.py", line 303, in <module>
-      setup_package()
-    File "/tmp/Rtmp9CTRvy/working_dir/pip-install-ncw4j13g/nnetsauce/setup.py", line 299, in setup_package
-      setup(**metadata)
-    File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/core.py", line 135, in setup
-      config = configuration()
-    File "/tmp/Rtmp9CTRvy/working_dir/pip-install-ncw4j13g/nnetsauce/setup.py", line 183, in configuration
-      config.add_subpackage('nnetsauce')
-    File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 1020, in add_subpackage
-      caller_level = 2)
-    File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 989, in get_subpackage
-      caller_level = caller_level + 1)
-    File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 926, in _get_configuration_from_setup_py
-      config = setup_module.configuration(*args)
-    File "nnetsauce/setup.py", line 44, in configuration
-      config.add_subpackage("tests")
-    File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 1020, in add_subpackage
-      caller_level = 2)
-    File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 982, in get_subpackage
-      caller_level = caller_level+1)
-    File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 774, in __init__
-      raise ValueError("%r is not a directory" % (package_path,))
-  ValueError: 'nnetsauce/tests' is not a directory
-  ----------------------------------------
-  ERROR: Failed building wheel for nnetsauce
-  Running setup.py clean for nnetsauce
-Failed to build nnetsauce
-Installing collected packages: numpy, six, absl-py, opt-einsum, jax, flatbuffers, scipy, jaxlib, joblib, threadpoolctl, scikit-learn, tqdm, nnetsauce
-    Running setup.py install for nnetsauce: started
-    Running setup.py install for nnetsauce: finished with status 'error'
-    ERROR: Command errored out with exit status 1:
-     command: /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/bin/python -u -c 'import sys, setuptools, tokenize; sys.argv[0] = '"'"'/tmp/Rtmp9CTRvy/working_dir/pip-install-ncw4j13g/nnetsauce/setup.py'"'"'; __file__='"'"'/tmp/Rtmp9CTRvy/working_dir/pip-install-ncw4j13g/nnetsauce/setup.py'"'"';f=getattr(tokenize, '"'"'open'"'"', open)(__file__);code=f.read().replace('"'"'\r\n'"'"', '"'"'\n'"'"');f.close();exec(compile(code, __file__, '"'"'exec'"'"'))' install --record /tmp/Rtmp9CTRvy/working_dir/pip-record-soj39b0n/install-record.txt --single-version-externally-managed --compile --install-headers /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/include/python3.6m/nnetsauce
-         cwd: /tmp/Rtmp9CTRvy/working_dir/pip-install-ncw4j13g/nnetsauce/
-    Complete output (26 lines):
-    Partial import of nnetsauce during the build process.
-    Traceback (most recent call last):
-      File "<string>", line 1, in <module>
-      File "/tmp/Rtmp9CTRvy/working_dir/pip-install-ncw4j13g/nnetsauce/setup.py", line 303, in <module>
-        setup_package()
-      File "/tmp/Rtmp9CTRvy/working_dir/pip-install-ncw4j13g/nnetsauce/setup.py", line 299, in setup_package
-        setup(**metadata)
-      File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/core.py", line 135, in setup
-        config = configuration()
-      File "/tmp/Rtmp9CTRvy/working_dir/pip-install-ncw4j13g/nnetsauce/setup.py", line 183, in configuration
-        config.add_subpackage('nnetsauce')
-      File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 1020, in add_subpackage
-        caller_level = 2)
-      File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 989, in get_subpackage
-        caller_level = caller_level + 1)
-      File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 926, in _get_configuration_from_setup_py
-        config = setup_module.configuration(*args)
-      File "nnetsauce/setup.py", line 44, in configuration
-        config.add_subpackage("tests")
-      File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 1020, in add_subpackage
-        caller_level = 2)
-      File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 982, in get_subpackage
-        caller_level = caller_level+1)
-      File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 774, in __init__
-        raise ValueError("%r is not a directory" % (package_path,))
-    ValueError: 'nnetsauce/tests' is not a directory
-    ----------------------------------------
-ERROR: Command errored out with exit status 1: /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/bin/python -u -c 'import sys, setuptools, tokenize; sys.argv[0] = '"'"'/tmp/Rtmp9CTRvy/working_dir/pip-install-ncw4j13g/nnetsauce/setup.py'"'"'; __file__='"'"'/tmp/Rtmp9CTRvy/working_dir/pip-install-ncw4j13g/nnetsauce/setup.py'"'"';f=getattr(tokenize, '"'"'open'"'"', open)(__file__);code=f.read().replace('"'"'\r\n'"'"', '"'"'\n'"'"');f.close();exec(compile(code, __file__, '"'"'exec'"'"'))' install --record /tmp/Rtmp9CTRvy/working_dir/pip-record-soj39b0n/install-record.txt --single-version-externally-managed --compile --install-headers /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/include/python3.6m/nnetsauce Check the logs for full command output.
+  Using cached nnetsauce-0.11.1.tar.gz (209 kB)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'error'
+  error: subprocess-exited-with-error
+  
+  × python setup.py egg_info did not run successfully.
+  │ exit code: 1
+  ╰─> [7 lines of output]
+      Partial import of nnetsauce during the build process.
+      Traceback (most recent call last):
+        File "<string>", line 2, in <module>
+        File "<pip-setuptools-caller>", line 34, in <module>
+        File "/tmp/RtmpxCcYrd/working_dir/pip-install-kozj1fzh/nnetsauce_0282224e9a9f4ed798aad2ae26e7a69e/setup.py", line 48, in <module>
+          with open(path.join(here, 'requirements.txt'), encoding='utf-8') as f:
+      FileNotFoundError: [Errno 2] No such file or directory: '/tmp/RtmpxCcYrd/working_dir/pip-install-kozj1fzh/nnetsauce_0282224e9a9f4ed798aad2ae26e7a69e/requirements.txt'
+      [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+
+× Encountered error while generating package metadata.
+╰─> See above for output.
+
+note: This is an issue with the package mentioned above, not pip.
+hint: See above for details.
+Activated conda python: /cloud/home/.local/share/r-miniconda/envs/r-reticulate/bin/python
 Collecting git+https://github.com/Techtonique/nnetsauce.git
-  Cloning https://github.com/Techtonique/nnetsauce.git to /tmp/Rtmp9CTRvy/working_dir/pip-req-build-1uoxc0zd
+  Cloning https://github.com/Techtonique/nnetsauce.git to /tmp/RtmpxCcYrd/working_dir/pip-req-build-vtdt9cm_
+  Running command git clone --filter=blob:none --quiet https://github.com/Techtonique/nnetsauce.git /tmp/RtmpxCcYrd/working_dir/pip-req-build-vtdt9cm_
+  Resolved https://github.com/Techtonique/nnetsauce.git to commit 4bfaf6cc011f1c434713ee909fdbf495e7739d01
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
 Collecting cython>=0.29.21
-  Using cached Cython-0.29.21-cp36-cp36m-manylinux1_x86_64.whl (2.0 MB)
+  Using cached Cython-0.29.28-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl (1.9 MB)
 Collecting numpy>=1.13.0
-  Using cached numpy-1.19.4-cp36-cp36m-manylinux2010_x86_64.whl (14.5 MB)
+  Using cached numpy-1.22.3-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.8 MB)
 Collecting scipy>=0.19.0
-  Using cached scipy-1.5.4-cp36-cp36m-manylinux1_x86_64.whl (25.9 MB)
+  Using cached scipy-1.8.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (41.6 MB)
 Collecting joblib>=0.14.0
-  Using cached joblib-0.17.0-py3-none-any.whl (301 kB)
+  Using cached joblib-1.1.0-py2.py3-none-any.whl (306 kB)
 Collecting scikit-learn>=0.18.0
-  Using cached scikit_learn-0.23.2-cp36-cp36m-manylinux1_x86_64.whl (6.8 MB)
+  Using cached scikit_learn-1.0.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (26.7 MB)
 Collecting threadpoolctl>=2.0.0
-  Using cached threadpoolctl-2.1.0-py3-none-any.whl (12 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/09/f8/49/d0d06a733213c5938de84a92ec3d06b2173926e576e06f3a07/jax-0.2.6-py3-none-any.whl
+  Using cached threadpoolctl-3.1.0-py3-none-any.whl (14 kB)
+Collecting jax>=0.1.72
+  Using cached jax-0.3.1-py3-none-any.whl
 Collecting jaxlib>=0.1.51
-  Using cached jaxlib-0.1.57-cp36-none-manylinux2010_x86_64.whl (33.3 MB)
-Collecting absl-py==0.10.0
-  Using cached absl_py-0.10.0-py3-none-any.whl (127 kB)
-Collecting alabaster==0.7.12
+  Using cached jaxlib-0.3.0-cp38-none-manylinux2010_x86_64.whl (65.4 MB)
+Collecting absl-py>=0.10.0
+  Using cached absl_py-1.0.0-py3-none-any.whl (126 kB)
+Collecting alabaster>=0.7.12
   Using cached alabaster-0.7.12-py2.py3-none-any.whl (14 kB)
-Collecting appdirs==1.4.4
+Collecting appdirs>=1.4.4
   Using cached appdirs-1.4.4-py2.py3-none-any.whl (9.6 kB)
-Collecting attrs==19.3.0
-  Using cached attrs-19.3.0-py2.py3-none-any.whl (39 kB)
-Collecting Babel==2.8.0
-  Using cached Babel-2.8.0-py2.py3-none-any.whl (8.6 MB)
-Collecting black==19.10b0
-  Using cached black-19.10b0-py36-none-any.whl (97 kB)
-Collecting bleach==3.2.1
-  Using cached bleach-3.2.1-py2.py3-none-any.whl (145 kB)
-Collecting certifi==2020.6.20
-  Using cached certifi-2020.6.20-py2.py3-none-any.whl (156 kB)
-Collecting cffi==1.14.0
-  Using cached cffi-1.14.0-cp36-cp36m-manylinux1_x86_64.whl (399 kB)
-Collecting chardet==3.0.4
-  Using cached chardet-3.0.4-py2.py3-none-any.whl (133 kB)
-Collecting click==7.1.2
-  Using cached click-7.1.2-py2.py3-none-any.whl (82 kB)
-Collecting colorama==0.4.3
-  Using cached colorama-0.4.3-py2.py3-none-any.whl (15 kB)
-Collecting coverage==5.2
-  Using cached coverage-5.2-cp36-cp36m-manylinux1_x86_64.whl (229 kB)
-Collecting cycler==0.10.0
-  Using cached cycler-0.10.0-py2.py3-none-any.whl (6.5 kB)
-Collecting docutils==0.16
-  Using cached docutils-0.16-py2.py3-none-any.whl (548 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/6e/9c/ed/4499c9865ac1002697793e0ae05ba6be33553d098f3347fb94/future-0.18.2-py3-none-any.whl
-Collecting gitdb==4.0.5
-  Using cached gitdb-4.0.5-py3-none-any.whl (63 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/d8/f0/0b/39e61c87ef3202d62f7617821af306a13d1325453c4e127072/GitPython-0.3.6-py3-none-any.whl
-Collecting idna==2.10
-  Using cached idna-2.10-py2.py3-none-any.whl (58 kB)
-Collecting imagesize==1.2.0
-  Using cached imagesize-1.2.0-py2.py3-none-any.whl (4.8 kB)
-Collecting importlib-metadata==1.7.0
-  Using cached importlib_metadata-1.7.0-py2.py3-none-any.whl (31 kB)
-Collecting Jinja2==2.11.2
-  Using cached Jinja2-2.11.2-py2.py3-none-any.whl (125 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/dd/45/9b/e90c5a2a2dd646a1bb8a076cace3935b51c3745e9e2ca47263/keras_autodoc-0.5.1-py3-none-any.whl
-Collecting keyring==21.4.0
-  Using cached keyring-21.4.0-py3-none-any.whl (31 kB)
-Collecting kiwisolver==1.2.0
-  Using cached kiwisolver-1.2.0-cp36-cp36m-manylinux1_x86_64.whl (88 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/2e/bd/a8/d11e2300992209f109960d20facdd55076682bf3a192bc10ba/livereload-2.6.3-py2.py3-none-any.whl
-Collecting lunr==0.5.8
-  Using cached lunr-0.5.8-py2.py3-none-any.whl (2.3 MB)
-Collecting Markdown==3.2.2
-  Using cached Markdown-3.2.2-py3-none-any.whl (88 kB)
-Collecting MarkupSafe==1.1.1
-  Using cached MarkupSafe-1.1.1-cp36-cp36m-manylinux1_x86_64.whl (27 kB)
-Collecting matplotlib==3.3.1
-  Using cached matplotlib-3.3.1-cp36-cp36m-manylinux1_x86_64.whl (11.6 MB)
-Collecting mkdocs==1.1.2
-  Using cached mkdocs-1.1.2-py3-none-any.whl (6.4 MB)
-Collecting mkdocs-bootswatch==1.1
+Collecting attrs>=19.3.0
+  Using cached attrs-21.4.0-py2.py3-none-any.whl (60 kB)
+Collecting Babel>=2.8.0
+  Using cached Babel-2.9.1-py2.py3-none-any.whl (8.8 MB)
+Collecting black>=19.10b0
+  Using cached black-22.1.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.5 MB)
+Collecting bleach>=3.3.0
+  Using cached bleach-4.1.0-py2.py3-none-any.whl (157 kB)
+Collecting certifi>=2020.6.20
+  Using cached certifi-2021.10.8-py2.py3-none-any.whl (149 kB)
+Collecting cffi>=1.14.0
+  Using cached cffi-1.15.0-cp38-cp38-manylinux_2_12_x86_64.manylinux2010_x86_64.whl (446 kB)
+Collecting chardet>=3.0.4
+  Using cached chardet-4.0.0-py2.py3-none-any.whl (178 kB)
+Collecting click>=7.1.2
+  Using cached click-8.0.4-py3-none-any.whl (97 kB)
+Collecting colorama>=0.4.3
+  Using cached colorama-0.4.4-py2.py3-none-any.whl (16 kB)
+Collecting coverage>=5.2
+  Using cached coverage-6.3.2-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (212 kB)
+Collecting cycler>=0.10.0
+  Using cached cycler-0.11.0-py3-none-any.whl (6.4 kB)
+Collecting docutils>=0.16
+  Using cached docutils-0.18.1-py2.py3-none-any.whl (570 kB)
+Collecting flatbuffers>=1.12
+  Using cached flatbuffers-2.0-py2.py3-none-any.whl (26 kB)
+Collecting future>=0.18.2
+  Using cached future-0.18.2-py3-none-any.whl
+Collecting gitdb>=4.0.5
+  Using cached gitdb-4.0.9-py3-none-any.whl (63 kB)
+Collecting GitPython>=0.3.6
+  Using cached GitPython-3.1.27-py3-none-any.whl (181 kB)
+Collecting idna>=2.10
+  Using cached idna-3.3-py3-none-any.whl (61 kB)
+Collecting imagesize>=1.2.0
+  Using cached imagesize-1.3.0-py2.py3-none-any.whl (5.2 kB)
+Collecting importlib-metadata>=1.7.0
+  Using cached importlib_metadata-4.11.3-py3-none-any.whl (18 kB)
+Collecting Jinja2>=2.11.3
+  Using cached Jinja2-3.0.3-py3-none-any.whl (133 kB)
+Collecting keras-autodoc>=0.5.1
+  Using cached keras_autodoc-0.7.0-py3-none-any.whl
+Collecting keyring>=21.4.0
+  Using cached keyring-23.5.0-py3-none-any.whl (33 kB)
+Collecting kiwisolver>=1.2.0
+  Using cached kiwisolver-1.3.2-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl (1.2 MB)
+Collecting livereload>=2.6.3
+  Using cached livereload-2.6.3-py2.py3-none-any.whl
+Collecting lunr>=0.5.8
+  Using cached lunr-0.6.2-py2.py3-none-any.whl (35 kB)
+Collecting Markdown>=3.2.2
+  Using cached Markdown-3.3.6-py3-none-any.whl (97 kB)
+Collecting MarkupSafe>=1.1.1
+  Using cached MarkupSafe-2.1.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (25 kB)
+Collecting matplotlib>=3.3.1
+  Using cached matplotlib-3.5.1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl (11.3 MB)
+Collecting mkdocs>=1.1.2
+  Using cached mkdocs-1.2.3-py3-none-any.whl (6.4 MB)
+Collecting mkdocs-bootswatch>=1.1
   Using cached mkdocs_bootswatch-1.1-py2.py3-none-any.whl (560 kB)
-Collecting more-itertools==8.4.0
-  Using cached more_itertools-8.4.0-py3-none-any.whl (43 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/de/5e/42/64abaeca668161c3e2cecc24f864a8fc421e3d07a104fc8a51/nltk-3.5-py3-none-any.whl
-Collecting nose2==0.9.2
-  Using cached nose2-0.9.2-py2.py3-none-any.whl (137 kB)
-Collecting opt-einsum==3.3.0
+Collecting more-itertools>=8.4.0
+  Using cached more_itertools-8.12.0-py3-none-any.whl (54 kB)
+Collecting nltk>=3.5
+  Using cached nltk-3.7-py3-none-any.whl (1.5 MB)
+Collecting nose2>=0.9.2
+  Using cached nose2-0.11.0-py2.py3-none-any.whl (144 kB)
+Collecting opt-einsum>=3.3.0
   Using cached opt_einsum-3.3.0-py3-none-any.whl (65 kB)
-Collecting packaging==20.4
-  Using cached packaging-20.4-py2.py3-none-any.whl (37 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/e1/32/91/afe2cabe6f77819de11759f2a07d538cd521ef3a9dd81ba0b4/pathlib-1.0.1-py3-none-any.whl
-Collecting pathspec==0.8.0
-  Using cached pathspec-0.8.0-py2.py3-none-any.whl (28 kB)
-Collecting Pillow==7.2.0
-  Using cached Pillow-7.2.0-cp36-cp36m-manylinux1_x86_64.whl (2.2 MB)
-Collecting pkginfo==1.5.0.1
-  Using cached pkginfo-1.5.0.1-py2.py3-none-any.whl (25 kB)
-Collecting pluggy==0.13.1
-  Using cached pluggy-0.13.1-py2.py3-none-any.whl (18 kB)
-Collecting py==1.9.0
-  Using cached py-1.9.0-py2.py3-none-any.whl (99 kB)
-Collecting pycparser==2.20
-  Using cached pycparser-2.20-py2.py3-none-any.whl (112 kB)
-Collecting Pygments==2.6.1
-  Using cached Pygments-2.6.1-py3-none-any.whl (914 kB)
-Collecting pyparsing==2.4.7
-  Using cached pyparsing-2.4.7-py2.py3-none-any.whl (67 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/62/54/e7/b6603f3c19326c69f1cda93186b3934af8fe8b5b1c0f91fd11/pypi_publisher-0.0.4-py2.py3-none-any.whl
-Collecting pytest==5.4.3
-  Using cached pytest-5.4.3-py3-none-any.whl (248 kB)
-Collecting python-dateutil==2.8.1
-  Using cached python_dateutil-2.8.1-py2.py3-none-any.whl (227 kB)
-Collecting pytz==2020.1
-  Using cached pytz-2020.1-py2.py3-none-any.whl (510 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/e5/9d/ad/2ee53cf262cba1ffd8afe1487eef788ea3f260b7e6232a80fc/PyYAML-5.3.1-cp36-cp36m-linux_x86_64.whl
-Collecting readme-renderer==26.0
-  Using cached readme_renderer-26.0-py2.py3-none-any.whl (15 kB)
-Collecting regex==2020.7.14
-  Using cached regex-2020.7.14-cp36-cp36m-manylinux2010_x86_64.whl (660 kB)
-Collecting requests==2.24.0
-  Using cached requests-2.24.0-py2.py3-none-any.whl (61 kB)
-Collecting requests-toolbelt==0.9.1
+Collecting packaging>=20.4
+  Using cached packaging-21.3-py3-none-any.whl (40 kB)
+Collecting pandas>=1.3.5
+  Using cached pandas-1.4.1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (11.7 MB)
+Collecting pathspec>=0.8.0
+  Using cached pathspec-0.9.0-py2.py3-none-any.whl (31 kB)
+Collecting Pillow>=8.2.0
+  Using cached Pillow-9.0.1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (4.3 MB)
+Collecting pkginfo>=1.5.0.1
+  Using cached pkginfo-1.8.2-py2.py3-none-any.whl (26 kB)
+Collecting pluggy>=0.13.1
+  Using cached pluggy-1.0.0-py2.py3-none-any.whl (13 kB)
+Collecting py>=1.10.0
+  Using cached py-1.11.0-py2.py3-none-any.whl (98 kB)
+Collecting pycparser>=2.20
+  Using cached pycparser-2.21-py2.py3-none-any.whl (118 kB)
+Collecting Pygments>=2.7.4
+  Using cached Pygments-2.11.2-py3-none-any.whl (1.1 MB)
+Collecting pyparsing>=2.4.7
+  Using cached pyparsing-3.0.7-py3-none-any.whl (98 kB)
+Collecting pypi-publisher>=0.0.4
+  Using cached pypi_publisher-0.0.4-py2.py3-none-any.whl
+Collecting pytest>=5.4.3
+  Using cached pytest-7.1.0-py3-none-any.whl (297 kB)
+Collecting python-dateutil>=2.8.1
+  Using cached python_dateutil-2.8.2-py2.py3-none-any.whl (247 kB)
+Collecting pytz>=2020.1
+  Using cached pytz-2021.3-py2.py3-none-any.whl (503 kB)
+Collecting PyYAML>=5.4
+  Using cached PyYAML-6.0-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl (701 kB)
+Collecting readme-renderer>=26.0
+  Using cached readme_renderer-34.0-py3-none-any.whl (16 kB)
+Collecting regex>=2020.7.14
+  Using cached regex-2022.3.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (764 kB)
+Collecting requests>=2.24.0
+  Using cached requests-2.27.1-py2.py3-none-any.whl (63 kB)
+Collecting requests-toolbelt>=0.9.1
   Using cached requests_toolbelt-0.9.1-py2.py3-none-any.whl (54 kB)
-Collecting rfc3986==1.4.0
-  Using cached rfc3986-1.4.0-py2.py3-none-any.whl (31 kB)
-Collecting six==1.15.0
-  Using cached six-1.15.0-py2.py3-none-any.whl (10 kB)
-Collecting smmap==3.0.4
-  Using cached smmap-3.0.4-py2.py3-none-any.whl (25 kB)
-Collecting snowballstemmer==2.0.0
-  Using cached snowballstemmer-2.0.0-py2.py3-none-any.whl (97 kB)
-Collecting Sphinx==3.1.2
-  Using cached Sphinx-3.1.2-py3-none-any.whl (2.9 MB)
-Collecting sphinx-rtd-theme==0.5.0
-  Using cached sphinx_rtd_theme-0.5.0-py2.py3-none-any.whl (10.8 MB)
-Collecting sphinxcontrib-applehelp==1.0.2
+Collecting rfc3986>=1.4.0
+  Using cached rfc3986-2.0.0-py2.py3-none-any.whl (31 kB)
+Collecting six>=1.15.0
+  Using cached six-1.16.0-py2.py3-none-any.whl (11 kB)
+Collecting smmap>=3.0.4
+  Using cached smmap-5.0.0-py3-none-any.whl (24 kB)
+Collecting snowballstemmer>=2.0.0
+  Using cached snowballstemmer-2.2.0-py2.py3-none-any.whl (93 kB)
+Collecting Sphinx>=3.1.2
+  Using cached Sphinx-4.4.0-py3-none-any.whl (3.1 MB)
+Collecting sphinx-rtd-theme>=0.5.0
+  Using cached sphinx_rtd_theme-1.0.0-py2.py3-none-any.whl (2.8 MB)
+Collecting sphinxcontrib-applehelp>=1.0.2
   Using cached sphinxcontrib_applehelp-1.0.2-py2.py3-none-any.whl (121 kB)
-Collecting sphinxcontrib-devhelp==1.0.2
+Collecting sphinxcontrib-devhelp>=1.0.2
   Using cached sphinxcontrib_devhelp-1.0.2-py2.py3-none-any.whl (84 kB)
-Collecting sphinxcontrib-htmlhelp==1.0.3
-  Using cached sphinxcontrib_htmlhelp-1.0.3-py2.py3-none-any.whl (96 kB)
-Collecting sphinxcontrib-jsmath==1.0.1
+Collecting sphinxcontrib-htmlhelp>=1.0.3
+  Using cached sphinxcontrib_htmlhelp-2.0.0-py2.py3-none-any.whl (100 kB)
+Collecting sphinxcontrib-jsmath>=1.0.1
   Using cached sphinxcontrib_jsmath-1.0.1-py2.py3-none-any.whl (5.1 kB)
-Collecting sphinxcontrib-qthelp==1.0.3
+Collecting sphinxcontrib-qthelp>=1.0.3
   Using cached sphinxcontrib_qthelp-1.0.3-py2.py3-none-any.whl (90 kB)
-Collecting sphinxcontrib-serializinghtml==1.1.4
-  Using cached sphinxcontrib_serializinghtml-1.1.4-py2.py3-none-any.whl (89 kB)
-Collecting toml==0.10.1
-  Using cached toml-0.10.1-py2.py3-none-any.whl (19 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/37/a7/db/2d592e44029ef817f3ef63ea991db34191cebaef087a96f505/tornado-6.0.4-cp36-cp36m-linux_x86_64.whl
-Collecting tqdm==4.48.1
-  Using cached tqdm-4.48.1-py2.py3-none-any.whl (68 kB)
-Collecting twine==3.2.0
-  Using cached twine-3.2.0-py3-none-any.whl (34 kB)
-Collecting typed-ast==1.4.1
-  Using cached typed_ast-1.4.1-cp36-cp36m-manylinux1_x86_64.whl (737 kB)
-Collecting tzlocal==2.1
-  Using cached tzlocal-2.1-py2.py3-none-any.whl (16 kB)
-Collecting urllib3==1.25.9
-  Using cached urllib3-1.25.9-py2.py3-none-any.whl (126 kB)
-Collecting wcwidth==0.2.5
+Collecting sphinxcontrib-serializinghtml>=1.1.4
+  Using cached sphinxcontrib_serializinghtml-1.1.5-py2.py3-none-any.whl (94 kB)
+Collecting toml>=0.10.1
+  Using cached toml-0.10.2-py2.py3-none-any.whl (16 kB)
+Collecting tornado>=6.0.4
+  Using cached tornado-6.1-cp38-cp38-manylinux2010_x86_64.whl (427 kB)
+Collecting tqdm>=4.48.1
+  Using cached tqdm-4.63.0-py2.py3-none-any.whl (76 kB)
+Collecting twine>=3.2.0
+  Using cached twine-3.8.0-py3-none-any.whl (36 kB)
+Collecting typed-ast>=1.4.1
+  Using cached typed_ast-1.5.2-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl (897 kB)
+Collecting tzlocal>=2.1
+  Using cached tzlocal-4.1-py3-none-any.whl (19 kB)
+Collecting urllib3>=1.21.1
+  Using cached urllib3-1.26.8-py2.py3-none-any.whl (138 kB)
+Collecting wcwidth>=0.2.5
   Using cached wcwidth-0.2.5-py2.py3-none-any.whl (30 kB)
-Collecting webencodings==0.5.1
+Collecting webencodings>=0.5.1
   Using cached webencodings-0.5.1-py2.py3-none-any.whl (11 kB)
-Collecting zipp==3.1.0
-  Using cached zipp-3.1.0-py3-none-any.whl (4.9 kB)
-Collecting flatbuffers
-  Using cached flatbuffers-1.12-py2.py3-none-any.whl (15 kB)
-Collecting jeepney>=0.4.2; sys_platform == "linux"
-  Using cached jeepney-0.6.0-py3-none-any.whl (45 kB)
-Collecting SecretStorage>=3; sys_platform == "linux"
-  Using cached SecretStorage-3.3.0-py3-none-any.whl (14 kB)
-Collecting setuptools
-  Using cached setuptools-50.3.2-py3-none-any.whl (785 kB)
+Collecting zipp>=3.1.0
+  Using cached zipp-3.7.0-py3-none-any.whl (5.3 kB)
+Collecting platformdirs>=2
+  Using cached platformdirs-2.5.1-py3-none-any.whl (14 kB)
+Collecting mypy-extensions>=0.4.3
+  Using cached mypy_extensions-0.4.3-py2.py3-none-any.whl (4.5 kB)
+Collecting typing-extensions>=3.10.0.0
+  Using cached typing_extensions-4.1.1-py3-none-any.whl (26 kB)
+Collecting tomli>=1.1.0
+  Using cached tomli-2.0.1-py3-none-any.whl (12 kB)
+Collecting black>=19.10b0
+  Using cached black-20.8b1-py3-none-any.whl
+Collecting jeepney>=0.4.2
+  Using cached jeepney-0.7.1-py3-none-any.whl (54 kB)
+Collecting SecretStorage>=3.2
+  Using cached SecretStorage-3.3.1-py3-none-any.whl (15 kB)
+Collecting fonttools>=4.22.0
+  Using cached fonttools-4.30.0-py3-none-any.whl (898 kB)
+Collecting watchdog>=2.0
+  Using cached watchdog-2.1.6-py3-none-manylinux2014_x86_64.whl (76 kB)
+Collecting mergedeep>=1.3.4
+  Using cached mergedeep-1.3.4-py3-none-any.whl (6.4 kB)
+Collecting pyyaml-env-tag>=0.1
+  Using cached pyyaml_env_tag-0.1-py3-none-any.whl (3.9 kB)
+Collecting ghp-import>=1.0
+  Using cached ghp_import-2.0.2-py3-none-any.whl (11 kB)
+Collecting GitPython>=0.3.6
+  Using cached GitPython-0.3.6-py3-none-any.whl
+Collecting iniconfig
+  Using cached iniconfig-1.1.1-py2.py3-none-any.whl (5.0 kB)
+Collecting charset-normalizer~=2.0.0
+  Using cached charset_normalizer-2.0.12-py3-none-any.whl (39 kB)
+Collecting docutils>=0.16
+  Using cached docutils-0.17.1-py2.py3-none-any.whl (575 kB)
+Collecting pytz-deprecation-shim
+  Using cached pytz_deprecation_shim-0.1.0.post0-py2.py3-none-any.whl (15 kB)
+Collecting backports.zoneinfo
+  Using cached backports.zoneinfo-0.2.1-cp38-cp38-manylinux1_x86_64.whl (74 kB)
 Collecting cryptography>=2.0
-  Using cached cryptography-3.2.1-cp35-abi3-manylinux2010_x86_64.whl (2.6 MB)
+  Using cached cryptography-36.0.1-cp36-abi3-manylinux_2_24_x86_64.whl (3.6 MB)
+Collecting tzdata
+  Using cached tzdata-2021.5-py2.py3-none-any.whl (339 kB)
 Building wheels for collected packages: nnetsauce
   Building wheel for nnetsauce (setup.py): started
   Building wheel for nnetsauce (setup.py): still running...
+  Building wheel for nnetsauce (setup.py): still running...
   Building wheel for nnetsauce (setup.py): finished with status 'done'
-  Created wheel for nnetsauce: filename=nnetsauce-0.8.3-cp36-cp36m-linux_x86_64.whl size=1809051 sha256=bf5e09d2d334b86c388da752bdcc2d86e3173e7087b0c5db15af1bb09ccde9cd
-  Stored in directory: /tmp/Rtmp9CTRvy/working_dir/pip-ephem-wheel-cache-k20635i3/wheels/32/b4/45/9f7d18a3eb94f07519803ded22f49cb666968d08c4effd781c
+  Created wheel for nnetsauce: filename=nnetsauce-0.11.1-cp38-cp38-linux_x86_64.whl size=2747676 sha256=33386819f4745e838b1cbff9a4f7b15b002bb02d569a666daf735a3e4bfafef8
+  Stored in directory: /tmp/RtmpxCcYrd/working_dir/pip-ephem-wheel-cache-qomwz3um/wheels/1e/d4/dd/d6c4ec217b4b1cb419d4e7ac541888c55d307db2ddf2cd01cb
 Successfully built nnetsauce
-Installing collected packages: cython, numpy, scipy, joblib, threadpoolctl, scikit-learn, six, absl-py, opt-einsum, jax, flatbuffers, jaxlib, alabaster, appdirs, attrs, pytz, Babel, toml, typed-ast, regex, pathspec, click, black, pyparsing, packaging, webencodings, bleach, certifi, pycparser, cffi, chardet, colorama, coverage, cycler, docutils, future, smmap, gitdb, GitPython, idna, imagesize, zipp, importlib-metadata, MarkupSafe, Jinja2, Markdown, sphinxcontrib-htmlhelp, snowballstemmer, urllib3, requests, Pygments, sphinxcontrib-serializinghtml, setuptools, sphinxcontrib-applehelp, sphinxcontrib-qthelp, sphinxcontrib-jsmath, sphinxcontrib-devhelp, Sphinx, keras-autodoc, jeepney, cryptography, SecretStorage, keyring, kiwisolver, tornado, livereload, lunr, python-dateutil, Pillow, matplotlib, PyYAML, mkdocs, mkdocs-bootswatch, more-itertools, tqdm, nltk, nose2, pathlib, pkginfo, pluggy, py, pypi-publisher, wcwidth, pytest, readme-renderer, requests-toolbelt, rfc3986, sphinx-rtd-theme, twine, tzlocal, nnetsauce
-Successfully installed Babel-2.8.0 GitPython-0.3.6 Jinja2-2.11.2 Markdown-3.2.2 MarkupSafe-1.1.1 Pillow-7.2.0 PyYAML-5.3.1 Pygments-2.6.1 SecretStorage-3.3.0 Sphinx-3.1.2 absl-py-0.11.0 alabaster-0.7.12 appdirs-1.4.4 attrs-20.3.0 black-19.10b0 bleach-3.2.1 certifi-2020.11.8 cffi-1.14.4 chardet-3.0.4 click-7.1.2 colorama-0.4.3 coverage-5.2 cryptography-3.2.1 cycler-0.10.0 cython-0.29.21 docutils-0.16 flatbuffers-1.12 future-0.18.2 gitdb-4.0.5 idna-2.10 imagesize-1.2.0 importlib-metadata-3.1.0 jax-0.2.6 jaxlib-0.1.57 jeepney-0.6.0 joblib-0.17.0 keras-autodoc-0.5.1 keyring-21.4.0 kiwisolver-1.2.0 livereload-2.6.3 lunr-0.5.8 matplotlib-3.3.1 mkdocs-1.1.2 mkdocs-bootswatch-1.1 more-itertools-8.4.0 nltk-3.5 nnetsauce-0.8.3 nose2-0.9.2 numpy-1.19.4 opt-einsum-3.3.0 packaging-20.4 pathlib-1.0.1 pathspec-0.8.0 pkginfo-1.5.0.1 pluggy-0.13.1 py-1.9.0 pycparser-2.20 pyparsing-2.4.7 pypi-publisher-0.0.4 pytest-6.1.2 python-dateutil-2.8.1 pytz-2020.4 readme-renderer-26.0 regex-2020.7.14 requests-2.24.0 requests-toolbelt-0.9.1 rfc3986-1.4.0 scikit-learn-0.23.2 scipy-1.5.4 setuptools-50.3.2 six-1.15.0 smmap-3.0.4 snowballstemmer-2.0.0 sphinx-rtd-theme-0.5.0 sphinxcontrib-applehelp-1.0.2 sphinxcontrib-devhelp-1.0.2 sphinxcontrib-htmlhelp-1.0.3 sphinxcontrib-jsmath-1.0.1 sphinxcontrib-qthelp-1.0.3 sphinxcontrib-serializinghtml-1.1.4 threadpoolctl-2.1.0 toml-0.10.2 tornado-6.0.4 tqdm-4.54.0 twine-3.2.0 typed-ast-1.4.1 tzlocal-2.1 urllib3-1.25.9 wcwidth-0.2.5 webencodings-0.5.1 zipp-3.4.0
+Installing collected packages: webencodings, wcwidth, snowballstemmer, pytz, pkginfo, mypy-extensions, iniconfig, flatbuffers, certifi, appdirs, alabaster, zipp, watchdog, urllib3, tzdata, typing-extensions, typed-ast, tqdm, tornado, tomli, toml, threadpoolctl, sphinxcontrib-serializinghtml, sphinxcontrib-qthelp, sphinxcontrib-jsmath, sphinxcontrib-htmlhelp, sphinxcontrib-devhelp, sphinxcontrib-applehelp, smmap, six, rfc3986, regex, PyYAML, pyparsing, Pygments, pycparser, py, pluggy, Pillow, pathspec, numpy, more-itertools, mergedeep, MarkupSafe, lunr, kiwisolver, joblib, jeepney, imagesize, idna, future, fonttools, docutils, cython, cycler, coverage, colorama, click, charset-normalizer, chardet, backports.zoneinfo, Babel, attrs, scipy, requests, pyyaml-env-tag, pytz-deprecation-shim, python-dateutil, packaging, opt-einsum, nose2, nltk, livereload, Jinja2, importlib-metadata, gitdb, cffi, black, absl-py, tzlocal, Sphinx, scikit-learn, requests-toolbelt, pytest, pandas, matplotlib, Markdown, jaxlib, jax, GitPython, ghp-import, cryptography, bleach, sphinx-rtd-theme, SecretStorage, readme-renderer, pypi-publisher, mkdocs, keras-autodoc, mkdocs-bootswatch, keyring, twine, nnetsauce
+Successfully installed Babel-2.9.1 GitPython-0.3.6 Jinja2-3.0.3 Markdown-3.3.6 MarkupSafe-2.1.0 Pillow-9.0.1 PyYAML-6.0 Pygments-2.11.2 SecretStorage-3.3.1 Sphinx-4.4.0 absl-py-1.0.0 alabaster-0.7.12 appdirs-1.4.4 attrs-21.4.0 backports.zoneinfo-0.2.1 black-20.8b1 bleach-4.1.0 certifi-2021.10.8 cffi-1.15.0 chardet-4.0.0 charset-normalizer-2.0.12 click-8.0.4 colorama-0.4.4 coverage-6.3.2 cryptography-36.0.1 cycler-0.11.0 cython-0.29.28 docutils-0.17.1 flatbuffers-2.0 fonttools-4.30.0 future-0.18.2 ghp-import-2.0.2 gitdb-4.0.9 idna-3.3 imagesize-1.3.0 importlib-metadata-4.11.3 iniconfig-1.1.1 jax-0.3.1 jaxlib-0.3.0 jeepney-0.7.1 joblib-1.1.0 keras-autodoc-0.7.0 keyring-23.5.0 kiwisolver-1.3.2 livereload-2.6.3 lunr-0.6.2 matplotlib-3.5.1 mergedeep-1.3.4 mkdocs-1.2.3 mkdocs-bootswatch-1.1 more-itertools-8.12.0 mypy-extensions-0.4.3 nltk-3.7 nnetsauce-0.11.1 nose2-0.11.0 numpy-1.22.3 opt-einsum-3.3.0 packaging-21.3 pandas-1.4.1 pathspec-0.9.0 pkginfo-1.8.2 pluggy-1.0.0 py-1.11.0 pycparser-2.21 pyparsing-3.0.7 pypi-publisher-0.0.4 pytest-7.1.0 python-dateutil-2.8.2 pytz-2021.3 pytz-deprecation-shim-0.1.0.post0 pyyaml-env-tag-0.1 readme-renderer-34.0 regex-2022.3.2 requests-2.27.1 requests-toolbelt-0.9.1 rfc3986-2.0.0 scikit-learn-1.0.2 scipy-1.8.0 six-1.16.0 smmap-5.0.0 snowballstemmer-2.2.0 sphinx-rtd-theme-1.0.0 sphinxcontrib-applehelp-1.0.2 sphinxcontrib-devhelp-1.0.2 sphinxcontrib-htmlhelp-2.0.0 sphinxcontrib-jsmath-1.0.1 sphinxcontrib-qthelp-1.0.3 sphinxcontrib-serializinghtml-1.1.5 threadpoolctl-3.1.0 toml-0.10.2 tomli-2.0.1 tornado-6.1 tqdm-4.63.0 twine-3.8.0 typed-ast-1.5.2 typing-extensions-4.1.1 tzdata-2021.5 tzlocal-4.1 urllib3-1.26.8 watchdog-2.1.6 wcwidth-0.2.5 webencodings-0.5.1 zipp-3.7.0
 ** testing if installed package can be loaded from final location
-Found existing installation: nnetsauce 0.8.3
-Uninstalling nnetsauce-0.8.3:
-  Successfully uninstalled nnetsauce-0.8.3
-Requirement already up-to-date: numpy in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (1.19.4)
-Requirement already up-to-date: rpy2 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (3.3.6)
-Requirement already satisfied, skipping upgrade: jinja2 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from rpy2) (2.11.2)
-Requirement already satisfied, skipping upgrade: pytest in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from rpy2) (6.1.2)
-Requirement already satisfied, skipping upgrade: cffi>=1.10.0 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from rpy2) (1.14.4)
-Requirement already satisfied, skipping upgrade: tzlocal in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from rpy2) (2.1)
-Requirement already satisfied, skipping upgrade: pytz in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from rpy2) (2020.4)
-Requirement already satisfied, skipping upgrade: MarkupSafe>=0.23 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from jinja2->rpy2) (1.1.1)
-Requirement already satisfied, skipping upgrade: packaging in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from pytest->rpy2) (20.4)
-Requirement already satisfied, skipping upgrade: importlib-metadata>=0.12; python_version < "3.8" in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from pytest->rpy2) (3.1.0)
-Requirement already satisfied, skipping upgrade: attrs>=17.4.0 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from pytest->rpy2) (20.3.0)
-Requirement already satisfied, skipping upgrade: py>=1.8.2 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from pytest->rpy2) (1.9.0)
-Requirement already satisfied, skipping upgrade: pluggy<1.0,>=0.12 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from pytest->rpy2) (0.13.1)
-Requirement already satisfied, skipping upgrade: toml in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from pytest->rpy2) (0.10.2)
-Requirement already satisfied, skipping upgrade: iniconfig in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from pytest->rpy2) (1.1.1)
-Requirement already satisfied, skipping upgrade: pycparser in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from cffi>=1.10.0->rpy2) (2.20)
-Requirement already satisfied, skipping upgrade: pyparsing>=2.0.2 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from packaging->pytest->rpy2) (2.4.7)
-Requirement already satisfied, skipping upgrade: six in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from packaging->pytest->rpy2) (1.15.0)
-Requirement already satisfied, skipping upgrade: zipp>=0.5 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from importlib-metadata>=0.12; python_version < "3.8"->pytest->rpy2) (3.4.0)
-Requirement already up-to-date: scipy in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (1.5.4)
-Requirement already satisfied, skipping upgrade: numpy>=1.14.5 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from scipy) (1.19.4)
-Requirement already up-to-date: six in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (1.15.0)
-Requirement already up-to-date: tqdm in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (4.54.0)
-Requirement already up-to-date: sklearn in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (0.0)
-Requirement already satisfied, skipping upgrade: scikit-learn in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from sklearn) (0.23.2)
-Requirement already satisfied, skipping upgrade: joblib>=0.11 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from scikit-learn->sklearn) (0.17.0)
-Requirement already satisfied, skipping upgrade: numpy>=1.13.3 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from scikit-learn->sklearn) (1.19.4)
-Requirement already satisfied, skipping upgrade: threadpoolctl>=2.0.0 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from scikit-learn->sklearn) (2.1.0)
-Requirement already satisfied, skipping upgrade: scipy>=0.19.1 in /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages (from scikit-learn->sklearn) (1.5.4)
-Collecting nnetsauce
-  Using cached nnetsauce-0.7.3.tar.gz (83 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/09/f8/49/d0d06a733213c5938de84a92ec3d06b2173926e576e06f3a07/jax-0.2.6-py3-none-any.whl
-Collecting jaxlib>=0.1.51
-  Using cached jaxlib-0.1.57-cp36-none-manylinux2010_x86_64.whl (33.3 MB)
-Collecting numpy>=1.13.0
-  Using cached numpy-1.19.4-cp36-cp36m-manylinux2010_x86_64.whl (14.5 MB)
-Collecting scipy>=0.19.0
-  Using cached scipy-1.5.4-cp36-cp36m-manylinux1_x86_64.whl (25.9 MB)
-Collecting joblib>=0.14.0
-  Using cached joblib-0.17.0-py3-none-any.whl (301 kB)
-Collecting scikit-learn>=0.18.0
-  Using cached scikit_learn-0.23.2-cp36-cp36m-manylinux1_x86_64.whl (6.8 MB)
-Collecting threadpoolctl>=2.0.0
-  Using cached threadpoolctl-2.1.0-py3-none-any.whl (12 kB)
-Collecting tqdm==4.48.1
-  Using cached tqdm-4.48.1-py2.py3-none-any.whl (68 kB)
-Collecting opt-einsum
-  Using cached opt_einsum-3.3.0-py3-none-any.whl (65 kB)
-Collecting absl-py
-  Using cached absl_py-0.11.0-py3-none-any.whl (127 kB)
-Collecting flatbuffers
-  Using cached flatbuffers-1.12-py2.py3-none-any.whl (15 kB)
-Collecting six
-  Using cached six-1.15.0-py2.py3-none-any.whl (10 kB)
-Building wheels for collected packages: nnetsauce
-  Building wheel for nnetsauce (setup.py): started
-  Building wheel for nnetsauce (setup.py): finished with status 'error'
-  ERROR: Command errored out with exit status 1:
-   command: /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/bin/python -u -c 'import sys, setuptools, tokenize; sys.argv[0] = '"'"'/tmp/Rtmp9CTRvy/working_dir/pip-install-c5sp1pp9/nnetsauce/setup.py'"'"'; __file__='"'"'/tmp/Rtmp9CTRvy/working_dir/pip-install-c5sp1pp9/nnetsauce/setup.py'"'"';f=getattr(tokenize, '"'"'open'"'"', open)(__file__);code=f.read().replace('"'"'\r\n'"'"', '"'"'\n'"'"');f.close();exec(compile(code, __file__, '"'"'exec'"'"'))' bdist_wheel -d /tmp/Rtmp9CTRvy/working_dir/pip-wheel-ivjc07q6
-       cwd: /tmp/Rtmp9CTRvy/working_dir/pip-install-c5sp1pp9/nnetsauce/
-  Complete output (26 lines):
-  Partial import of nnetsauce during the build process.
-  Traceback (most recent call last):
-    File "<string>", line 1, in <module>
-    File "/tmp/Rtmp9CTRvy/working_dir/pip-install-c5sp1pp9/nnetsauce/setup.py", line 303, in <module>
-      setup_package()
-    File "/tmp/Rtmp9CTRvy/working_dir/pip-install-c5sp1pp9/nnetsauce/setup.py", line 299, in setup_package
-      setup(**metadata)
-    File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/core.py", line 135, in setup
-      config = configuration()
-    File "/tmp/Rtmp9CTRvy/working_dir/pip-install-c5sp1pp9/nnetsauce/setup.py", line 183, in configuration
-      config.add_subpackage('nnetsauce')
-    File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 1020, in add_subpackage
-      caller_level = 2)
-    File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 989, in get_subpackage
-      caller_level = caller_level + 1)
-    File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 926, in _get_configuration_from_setup_py
-      config = setup_module.configuration(*args)
-    File "nnetsauce/setup.py", line 44, in configuration
-      config.add_subpackage("tests")
-    File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 1020, in add_subpackage
-      caller_level = 2)
-    File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 982, in get_subpackage
-      caller_level = caller_level+1)
-    File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 774, in __init__
-      raise ValueError("%r is not a directory" % (package_path,))
-  ValueError: 'nnetsauce/tests' is not a directory
-  ----------------------------------------
-  ERROR: Failed building wheel for nnetsauce
-  Running setup.py clean for nnetsauce
-Failed to build nnetsauce
-Installing collected packages: numpy, opt-einsum, six, absl-py, jax, flatbuffers, scipy, jaxlib, joblib, threadpoolctl, scikit-learn, tqdm, nnetsauce
-    Running setup.py install for nnetsauce: started
-    Running setup.py install for nnetsauce: finished with status 'error'
-    ERROR: Command errored out with exit status 1:
-     command: /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/bin/python -u -c 'import sys, setuptools, tokenize; sys.argv[0] = '"'"'/tmp/Rtmp9CTRvy/working_dir/pip-install-c5sp1pp9/nnetsauce/setup.py'"'"'; __file__='"'"'/tmp/Rtmp9CTRvy/working_dir/pip-install-c5sp1pp9/nnetsauce/setup.py'"'"';f=getattr(tokenize, '"'"'open'"'"', open)(__file__);code=f.read().replace('"'"'\r\n'"'"', '"'"'\n'"'"');f.close();exec(compile(code, __file__, '"'"'exec'"'"'))' install --record /tmp/Rtmp9CTRvy/working_dir/pip-record-3sdgnatg/install-record.txt --single-version-externally-managed --compile --install-headers /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/include/python3.6m/nnetsauce
-         cwd: /tmp/Rtmp9CTRvy/working_dir/pip-install-c5sp1pp9/nnetsauce/
-    Complete output (26 lines):
-    Partial import of nnetsauce during the build process.
-    Traceback (most recent call last):
-      File "<string>", line 1, in <module>
-      File "/tmp/Rtmp9CTRvy/working_dir/pip-install-c5sp1pp9/nnetsauce/setup.py", line 303, in <module>
-        setup_package()
-      File "/tmp/Rtmp9CTRvy/working_dir/pip-install-c5sp1pp9/nnetsauce/setup.py", line 299, in setup_package
-        setup(**metadata)
-      File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/core.py", line 135, in setup
-        config = configuration()
-      File "/tmp/Rtmp9CTRvy/working_dir/pip-install-c5sp1pp9/nnetsauce/setup.py", line 183, in configuration
-        config.add_subpackage('nnetsauce')
-      File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 1020, in add_subpackage
-        caller_level = 2)
-      File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 989, in get_subpackage
-        caller_level = caller_level + 1)
-      File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 926, in _get_configuration_from_setup_py
-        config = setup_module.configuration(*args)
-      File "nnetsauce/setup.py", line 44, in configuration
-        config.add_subpackage("tests")
-      File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 1020, in add_subpackage
-        caller_level = 2)
-      File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 982, in get_subpackage
-        caller_level = caller_level+1)
-      File "/home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/lib/python3.6/site-packages/numpy/distutils/misc_util.py", line 774, in __init__
-        raise ValueError("%r is not a directory" % (package_path,))
-    ValueError: 'nnetsauce/tests' is not a directory
-    ----------------------------------------
-ERROR: Command errored out with exit status 1: /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/bin/python -u -c 'import sys, setuptools, tokenize; sys.argv[0] = '"'"'/tmp/Rtmp9CTRvy/working_dir/pip-install-c5sp1pp9/nnetsauce/setup.py'"'"'; __file__='"'"'/tmp/Rtmp9CTRvy/working_dir/pip-install-c5sp1pp9/nnetsauce/setup.py'"'"';f=getattr(tokenize, '"'"'open'"'"', open)(__file__);code=f.read().replace('"'"'\r\n'"'"', '"'"'\n'"'"');f.close();exec(compile(code, __file__, '"'"'exec'"'"'))' install --record /tmp/Rtmp9CTRvy/working_dir/pip-record-3sdgnatg/install-record.txt --single-version-externally-managed --compile --install-headers /home/rstudio-user/.local/share/r-miniconda/envs/r-reticulate/include/python3.6m/nnetsauce Check the logs for full command output.
-Collecting git+https://github.com/Techtonique/nnetsauce.git
-  Cloning https://github.com/Techtonique/nnetsauce.git to /tmp/Rtmp9CTRvy/working_dir/pip-req-build-114loh9z
-Collecting cython>=0.29.21
-  Using cached Cython-0.29.21-cp36-cp36m-manylinux1_x86_64.whl (2.0 MB)
-Collecting numpy>=1.13.0
-  Using cached numpy-1.19.4-cp36-cp36m-manylinux2010_x86_64.whl (14.5 MB)
-Collecting scipy>=0.19.0
-  Using cached scipy-1.5.4-cp36-cp36m-manylinux1_x86_64.whl (25.9 MB)
-Collecting joblib>=0.14.0
-  Using cached joblib-0.17.0-py3-none-any.whl (301 kB)
-Collecting scikit-learn>=0.18.0
-  Using cached scikit_learn-0.23.2-cp36-cp36m-manylinux1_x86_64.whl (6.8 MB)
-Collecting threadpoolctl>=2.0.0
-  Using cached threadpoolctl-2.1.0-py3-none-any.whl (12 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/09/f8/49/d0d06a733213c5938de84a92ec3d06b2173926e576e06f3a07/jax-0.2.6-py3-none-any.whl
-Collecting jaxlib>=0.1.51
-  Using cached jaxlib-0.1.57-cp36-none-manylinux2010_x86_64.whl (33.3 MB)
-Collecting absl-py==0.10.0
-  Using cached absl_py-0.10.0-py3-none-any.whl (127 kB)
-Collecting alabaster==0.7.12
-  Using cached alabaster-0.7.12-py2.py3-none-any.whl (14 kB)
-Collecting appdirs==1.4.4
-  Using cached appdirs-1.4.4-py2.py3-none-any.whl (9.6 kB)
-Collecting attrs==19.3.0
-  Using cached attrs-19.3.0-py2.py3-none-any.whl (39 kB)
-Collecting Babel==2.8.0
-  Using cached Babel-2.8.0-py2.py3-none-any.whl (8.6 MB)
-Collecting black==19.10b0
-  Using cached black-19.10b0-py36-none-any.whl (97 kB)
-Collecting bleach==3.2.1
-  Using cached bleach-3.2.1-py2.py3-none-any.whl (145 kB)
-Collecting certifi==2020.6.20
-  Using cached certifi-2020.6.20-py2.py3-none-any.whl (156 kB)
-Collecting cffi==1.14.0
-  Using cached cffi-1.14.0-cp36-cp36m-manylinux1_x86_64.whl (399 kB)
-Collecting chardet==3.0.4
-  Using cached chardet-3.0.4-py2.py3-none-any.whl (133 kB)
-Collecting click==7.1.2
-  Using cached click-7.1.2-py2.py3-none-any.whl (82 kB)
-Collecting colorama==0.4.3
-  Using cached colorama-0.4.3-py2.py3-none-any.whl (15 kB)
-Collecting coverage==5.2
-  Using cached coverage-5.2-cp36-cp36m-manylinux1_x86_64.whl (229 kB)
-Collecting cycler==0.10.0
-  Using cached cycler-0.10.0-py2.py3-none-any.whl (6.5 kB)
-Collecting docutils==0.16
-  Using cached docutils-0.16-py2.py3-none-any.whl (548 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/6e/9c/ed/4499c9865ac1002697793e0ae05ba6be33553d098f3347fb94/future-0.18.2-py3-none-any.whl
-Collecting gitdb==4.0.5
-  Using cached gitdb-4.0.5-py3-none-any.whl (63 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/d8/f0/0b/39e61c87ef3202d62f7617821af306a13d1325453c4e127072/GitPython-0.3.6-py3-none-any.whl
-Collecting idna==2.10
-  Using cached idna-2.10-py2.py3-none-any.whl (58 kB)
-Collecting imagesize==1.2.0
-  Using cached imagesize-1.2.0-py2.py3-none-any.whl (4.8 kB)
-Collecting importlib-metadata==1.7.0
-  Using cached importlib_metadata-1.7.0-py2.py3-none-any.whl (31 kB)
-Collecting Jinja2==2.11.2
-  Using cached Jinja2-2.11.2-py2.py3-none-any.whl (125 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/dd/45/9b/e90c5a2a2dd646a1bb8a076cace3935b51c3745e9e2ca47263/keras_autodoc-0.5.1-py3-none-any.whl
-Collecting keyring==21.4.0
-  Using cached keyring-21.4.0-py3-none-any.whl (31 kB)
-Collecting kiwisolver==1.2.0
-  Using cached kiwisolver-1.2.0-cp36-cp36m-manylinux1_x86_64.whl (88 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/2e/bd/a8/d11e2300992209f109960d20facdd55076682bf3a192bc10ba/livereload-2.6.3-py2.py3-none-any.whl
-Collecting lunr==0.5.8
-  Using cached lunr-0.5.8-py2.py3-none-any.whl (2.3 MB)
-Collecting Markdown==3.2.2
-  Using cached Markdown-3.2.2-py3-none-any.whl (88 kB)
-Collecting MarkupSafe==1.1.1
-  Using cached MarkupSafe-1.1.1-cp36-cp36m-manylinux1_x86_64.whl (27 kB)
-Collecting matplotlib==3.3.1
-  Using cached matplotlib-3.3.1-cp36-cp36m-manylinux1_x86_64.whl (11.6 MB)
-Collecting mkdocs==1.1.2
-  Using cached mkdocs-1.1.2-py3-none-any.whl (6.4 MB)
-Collecting mkdocs-bootswatch==1.1
-  Using cached mkdocs_bootswatch-1.1-py2.py3-none-any.whl (560 kB)
-Collecting more-itertools==8.4.0
-  Using cached more_itertools-8.4.0-py3-none-any.whl (43 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/de/5e/42/64abaeca668161c3e2cecc24f864a8fc421e3d07a104fc8a51/nltk-3.5-py3-none-any.whl
-Collecting nose2==0.9.2
-  Using cached nose2-0.9.2-py2.py3-none-any.whl (137 kB)
-Collecting opt-einsum==3.3.0
-  Using cached opt_einsum-3.3.0-py3-none-any.whl (65 kB)
-Collecting packaging==20.4
-  Using cached packaging-20.4-py2.py3-none-any.whl (37 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/e1/32/91/afe2cabe6f77819de11759f2a07d538cd521ef3a9dd81ba0b4/pathlib-1.0.1-py3-none-any.whl
-Collecting pathspec==0.8.0
-  Using cached pathspec-0.8.0-py2.py3-none-any.whl (28 kB)
-Collecting Pillow==7.2.0
-  Using cached Pillow-7.2.0-cp36-cp36m-manylinux1_x86_64.whl (2.2 MB)
-Collecting pkginfo==1.5.0.1
-  Using cached pkginfo-1.5.0.1-py2.py3-none-any.whl (25 kB)
-Collecting pluggy==0.13.1
-  Using cached pluggy-0.13.1-py2.py3-none-any.whl (18 kB)
-Collecting py==1.9.0
-  Using cached py-1.9.0-py2.py3-none-any.whl (99 kB)
-Collecting pycparser==2.20
-  Using cached pycparser-2.20-py2.py3-none-any.whl (112 kB)
-Collecting Pygments==2.6.1
-  Using cached Pygments-2.6.1-py3-none-any.whl (914 kB)
-Collecting pyparsing==2.4.7
-  Using cached pyparsing-2.4.7-py2.py3-none-any.whl (67 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/62/54/e7/b6603f3c19326c69f1cda93186b3934af8fe8b5b1c0f91fd11/pypi_publisher-0.0.4-py2.py3-none-any.whl
-Collecting pytest==5.4.3
-  Using cached pytest-5.4.3-py3-none-any.whl (248 kB)
-Collecting python-dateutil==2.8.1
-  Using cached python_dateutil-2.8.1-py2.py3-none-any.whl (227 kB)
-Collecting pytz==2020.1
-  Using cached pytz-2020.1-py2.py3-none-any.whl (510 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/e5/9d/ad/2ee53cf262cba1ffd8afe1487eef788ea3f260b7e6232a80fc/PyYAML-5.3.1-cp36-cp36m-linux_x86_64.whl
-Collecting readme-renderer==26.0
-  Using cached readme_renderer-26.0-py2.py3-none-any.whl (15 kB)
-Collecting regex==2020.7.14
-  Using cached regex-2020.7.14-cp36-cp36m-manylinux2010_x86_64.whl (660 kB)
-Collecting requests==2.24.0
-  Using cached requests-2.24.0-py2.py3-none-any.whl (61 kB)
-Collecting requests-toolbelt==0.9.1
-  Using cached requests_toolbelt-0.9.1-py2.py3-none-any.whl (54 kB)
-Collecting rfc3986==1.4.0
-  Using cached rfc3986-1.4.0-py2.py3-none-any.whl (31 kB)
-Collecting six==1.15.0
-  Using cached six-1.15.0-py2.py3-none-any.whl (10 kB)
-Collecting smmap==3.0.4
-  Using cached smmap-3.0.4-py2.py3-none-any.whl (25 kB)
-Collecting snowballstemmer==2.0.0
-  Using cached snowballstemmer-2.0.0-py2.py3-none-any.whl (97 kB)
-Collecting Sphinx==3.1.2
-  Using cached Sphinx-3.1.2-py3-none-any.whl (2.9 MB)
-Collecting sphinx-rtd-theme==0.5.0
-  Using cached sphinx_rtd_theme-0.5.0-py2.py3-none-any.whl (10.8 MB)
-Collecting sphinxcontrib-applehelp==1.0.2
-  Using cached sphinxcontrib_applehelp-1.0.2-py2.py3-none-any.whl (121 kB)
-Collecting sphinxcontrib-devhelp==1.0.2
-  Using cached sphinxcontrib_devhelp-1.0.2-py2.py3-none-any.whl (84 kB)
-Collecting sphinxcontrib-htmlhelp==1.0.3
-  Using cached sphinxcontrib_htmlhelp-1.0.3-py2.py3-none-any.whl (96 kB)
-Collecting sphinxcontrib-jsmath==1.0.1
-  Using cached sphinxcontrib_jsmath-1.0.1-py2.py3-none-any.whl (5.1 kB)
-Collecting sphinxcontrib-qthelp==1.0.3
-  Using cached sphinxcontrib_qthelp-1.0.3-py2.py3-none-any.whl (90 kB)
-Collecting sphinxcontrib-serializinghtml==1.1.4
-  Using cached sphinxcontrib_serializinghtml-1.1.4-py2.py3-none-any.whl (89 kB)
-Collecting toml==0.10.1
-  Using cached toml-0.10.1-py2.py3-none-any.whl (19 kB)
-Processing /home/rstudio-user/.cache/pip/wheels/37/a7/db/2d592e44029ef817f3ef63ea991db34191cebaef087a96f505/tornado-6.0.4-cp36-cp36m-linux_x86_64.whl
-Collecting tqdm==4.48.1
-  Using cached tqdm-4.48.1-py2.py3-none-any.whl (68 kB)
-Collecting twine==3.2.0
-  Using cached twine-3.2.0-py3-none-any.whl (34 kB)
-Collecting typed-ast==1.4.1
-  Using cached typed_ast-1.4.1-cp36-cp36m-manylinux1_x86_64.whl (737 kB)
-Collecting tzlocal==2.1
-  Using cached tzlocal-2.1-py2.py3-none-any.whl (16 kB)
-Collecting urllib3==1.25.9
-  Using cached urllib3-1.25.9-py2.py3-none-any.whl (126 kB)
-Collecting wcwidth==0.2.5
-  Using cached wcwidth-0.2.5-py2.py3-none-any.whl (30 kB)
-Collecting webencodings==0.5.1
-  Using cached webencodings-0.5.1-py2.py3-none-any.whl (11 kB)
-Collecting zipp==3.1.0
-  Using cached zipp-3.1.0-py3-none-any.whl (4.9 kB)
-Collecting flatbuffers
-  Using cached flatbuffers-1.12-py2.py3-none-any.whl (15 kB)
-Collecting SecretStorage>=3; sys_platform == "linux"
-  Using cached SecretStorage-3.3.0-py3-none-any.whl (14 kB)
-Collecting jeepney>=0.4.2; sys_platform == "linux"
-  Using cached jeepney-0.6.0-py3-none-any.whl (45 kB)
-Collecting setuptools
-  Using cached setuptools-50.3.2-py3-none-any.whl (785 kB)
-Collecting cryptography>=2.0
-  Using cached cryptography-3.2.1-cp35-abi3-manylinux2010_x86_64.whl (2.6 MB)
-Building wheels for collected packages: nnetsauce
-  Building wheel for nnetsauce (setup.py): started
-  Building wheel for nnetsauce (setup.py): still running...
-  Building wheel for nnetsauce (setup.py): finished with status 'done'
-  Created wheel for nnetsauce: filename=nnetsauce-0.8.3-cp36-cp36m-linux_x86_64.whl size=1809085 sha256=c5f660c2c22ce3ae4e51abf5c7fb5ee1bad281b4a69affeb24171183234b2fc5
-  Stored in directory: /tmp/Rtmp9CTRvy/working_dir/pip-ephem-wheel-cache-pwa43ccs/wheels/32/b4/45/9f7d18a3eb94f07519803ded22f49cb666968d08c4effd781c
-Successfully built nnetsauce
-Installing collected packages: cython, numpy, scipy, joblib, threadpoolctl, scikit-learn, opt-einsum, six, absl-py, jax, flatbuffers, jaxlib, alabaster, appdirs, attrs, pytz, Babel, click, regex, typed-ast, pathspec, toml, black, webencodings, pyparsing, packaging, bleach, certifi, pycparser, cffi, chardet, colorama, coverage, cycler, docutils, future, smmap, gitdb, GitPython, idna, imagesize, zipp, importlib-metadata, MarkupSafe, Jinja2, Markdown, sphinxcontrib-applehelp, Pygments, sphinxcontrib-jsmath, urllib3, requests, sphinxcontrib-devhelp, setuptools, snowballstemmer, sphinxcontrib-qthelp, sphinxcontrib-serializinghtml, sphinxcontrib-htmlhelp, Sphinx, keras-autodoc, jeepney, cryptography, SecretStorage, keyring, kiwisolver, tornado, livereload, lunr, python-dateutil, Pillow, matplotlib, PyYAML, mkdocs, mkdocs-bootswatch, more-itertools, tqdm, nltk, nose2, pathlib, pkginfo, pluggy, py, pypi-publisher, wcwidth, pytest, readme-renderer, requests-toolbelt, rfc3986, sphinx-rtd-theme, twine, tzlocal, nnetsauce
-Successfully installed Babel-2.8.0 GitPython-0.3.6 Jinja2-2.11.2 Markdown-3.2.2 MarkupSafe-1.1.1 Pillow-7.2.0 PyYAML-5.3.1 Pygments-2.6.1 SecretStorage-3.3.0 Sphinx-3.1.2 absl-py-0.11.0 alabaster-0.7.12 appdirs-1.4.4 attrs-20.3.0 black-19.10b0 bleach-3.2.1 certifi-2020.11.8 cffi-1.14.4 chardet-3.0.4 click-7.1.2 colorama-0.4.3 coverage-5.2 cryptography-3.2.1 cycler-0.10.0 cython-0.29.21 docutils-0.16 flatbuffers-1.12 future-0.18.2 gitdb-4.0.5 idna-2.10 imagesize-1.2.0 importlib-metadata-3.1.0 jax-0.2.6 jaxlib-0.1.57 jeepney-0.6.0 joblib-0.17.0 keras-autodoc-0.5.1 keyring-21.4.0 kiwisolver-1.2.0 livereload-2.6.3 lunr-0.5.8 matplotlib-3.3.1 mkdocs-1.1.2 mkdocs-bootswatch-1.1 more-itertools-8.4.0 nltk-3.5 nnetsauce-0.8.3 nose2-0.9.2 numpy-1.19.4 opt-einsum-3.3.0 packaging-20.4 pathlib-1.0.1 pathspec-0.8.0 pkginfo-1.5.0.1 pluggy-0.13.1 py-1.9.0 pycparser-2.20 pyparsing-2.4.7 pypi-publisher-0.0.4 pytest-6.1.2 python-dateutil-2.8.1 pytz-2020.4 readme-renderer-26.0 regex-2020.7.14 requests-2.24.0 requests-toolbelt-0.9.1 rfc3986-1.4.0 scikit-learn-0.23.2 scipy-1.5.4 setuptools-50.3.2 six-1.15.0 smmap-3.0.4 snowballstemmer-2.0.0 sphinx-rtd-theme-0.5.0 sphinxcontrib-applehelp-1.0.2 sphinxcontrib-devhelp-1.0.2 sphinxcontrib-htmlhelp-1.0.3 sphinxcontrib-jsmath-1.0.1 sphinxcontrib-qthelp-1.0.3 sphinxcontrib-serializinghtml-1.1.4 threadpoolctl-2.1.0 toml-0.10.2 tornado-6.0.4 tqdm-4.54.0 twine-3.2.0 typed-ast-1.4.1 tzlocal-2.1 urllib3-1.25.9 wcwidth-0.2.5 webencodings-0.5.1 zipp-3.4.0
-** testing if installed package keeps a record of temporary installation path
-* DONE (nnetsauce)
-Failed to create bus connection: No such file or directory
-Warning in system("timedatectl", intern = TRUE) :
-  running command 'timedatectl' had status 1

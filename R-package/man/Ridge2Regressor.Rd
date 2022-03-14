@@ -14,22 +14,17 @@ Ridge2Regressor(
   n_clusters = 2L,
   cluster_encode = TRUE,
   type_clust = "kmeans",
-  col_sample = 1,
-  row_sample = 1,
   lambda1 = 0.1,
   lambda2 = 0.1,
   seed = 123L,
   backend = c("cpu", "gpu", "tpu")
 )
 }
-\arguments{
-\item{backend}{}
-}
 \value{
 
 }
 \description{
-Quasi-randomized regression model with 2 shrinkage parameters
+Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 }
 \examples{
 

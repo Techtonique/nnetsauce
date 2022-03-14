@@ -2,7 +2,7 @@
 % Please edit documentation in R/glm.R
 \name{GLMClassifier}
 \alias{GLMClassifier}
-\title{Generalized nonlinears models for Classification}
+\title{Generalized nonlinear models for Classification}
 \usage{
 GLMClassifier(
   n_hidden_features = 5L,
@@ -32,5 +32,5 @@ GLMClassifier(
 
 }
 \description{
-Generalized nonlinears models for Classification
+Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 }

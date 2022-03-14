@@ -28,14 +28,11 @@ AdaBoostClassifier(
   backend = c("cpu", "gpu", "tpu")
 )
 }
-\arguments{
-\item{backend}{}
-}
 \value{
 
 }
 \description{
-Adaboost classifier with quasi-randomized hidden layer
+Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 }
 \examples{
 

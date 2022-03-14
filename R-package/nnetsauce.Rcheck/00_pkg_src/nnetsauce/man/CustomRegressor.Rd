@@ -29,7 +29,7 @@ CustomRegressor(
 
 }
 \description{
-Custom regressor with quasi-randomized layer
+Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 }
 \examples{
 

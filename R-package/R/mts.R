@@ -2,21 +2,6 @@
 #'
 #' Parameters description can be found at \url{https://techtonique.github.io/nnetsauce/}
 #'
-#' @param obj
-#' @param n_hidden_features
-#' @param activation_name
-#' @param a
-#' @param nodes_sim
-#' @param bias
-#' @param dropout
-#' @param direct_link
-#' @param n_clusters
-#' @param cluster_encode
-#' @param type_clust
-#' @param seed
-#' @param lags
-#' @param backend
-#'
 #' @return
 #' @export
 #'

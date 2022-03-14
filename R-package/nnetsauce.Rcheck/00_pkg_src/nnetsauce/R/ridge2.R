@@ -3,6 +3,8 @@
 
 #' Multinomial logit, quasi-randomized classification model with 2 shrinkage parameters
 #'
+#' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
+#'
 #' @param n_hidden_features
 #' @param activation_name
 #' @param a
@@ -13,8 +15,6 @@
 #' @param n_clusters
 #' @param cluster_encode
 #' @param type_clust
-#' @param col_sample
-#' @param row_sample
 #' @param lambda1
 #' @param lambda2
 #' @param seed
@@ -62,8 +62,6 @@ Ridge2Classifier <- function(n_hidden_features = 5L,
                              n_clusters = 2L,
                              cluster_encode = TRUE,
                              type_clust = "kmeans", # type_scaling
-                             col_sample = 1,
-                             row_sample = 1,
                              lambda1 = 0.1,
                              lambda2 = 0.1,
                              seed = 123L,
@@ -82,8 +80,6 @@ Ridge2Classifier <- function(n_hidden_features = 5L,
     n_clusters = n_clusters,
     cluster_encode = cluster_encode,
     type_clust = type_clust,
-    col_sample = col_sample,
-    row_sample = row_sample,
     lambda1 = lambda1,
     lambda2 = lambda2,
     seed = seed,
@@ -93,6 +89,8 @@ Ridge2Classifier <- function(n_hidden_features = 5L,
 
 
 #' Multitask quasi-randomized classification model with 2 shrinkage parameters
+#'
+#' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 #'
 #' @param n_hidden_features
 #' @param activation_name
@@ -178,6 +176,8 @@ Ridge2MultitaskClassifier <- function(n_hidden_features=5L,
 
 #' Quasi-randomized regression model with 2 shrinkage parameters
 #'
+#' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
+#'
 #' @param n_hidden_features
 #' @param activation_name
 #' @param a
@@ -187,8 +187,6 @@ Ridge2MultitaskClassifier <- function(n_hidden_features=5L,
 #' @param n_clusters
 #' @param cluster_encode
 #' @param type_clust
-#' @param col_sample
-#' @param row_sample
 #' @param lambda1
 #' @param lambda2
 #' @param seed
@@ -217,8 +215,6 @@ Ridge2Regressor <- function(n_hidden_features=5L,
                             n_clusters=2L,
                             cluster_encode=TRUE,
                             type_clust="kmeans", # type_scaling
-                            col_sample=1,
-                            row_sample=1,
                             lambda1=0.1,
                             lambda2=0.1,
                             seed=123L,
@@ -235,8 +231,6 @@ Ridge2Regressor <- function(n_hidden_features=5L,
                      n_clusters=n_clusters,
                      cluster_encode=cluster_encode,
                      type_clust=type_clust, # type_scaling
-                     col_sample=col_sample,
-                     row_sample=row_sample,
                      lambda1=lambda1,
                      lambda2=lambda2,
                      seed=seed,

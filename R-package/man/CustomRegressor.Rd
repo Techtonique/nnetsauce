@@ -22,14 +22,11 @@ CustomRegressor(
   backend = c("cpu", "gpu", "tpu")
 )
 }
-\arguments{
-\item{backend}{}
-}
 \value{
 
 }
 \description{
-Custom regressor with quasi-randomized layer
+Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 }
 \examples{
 

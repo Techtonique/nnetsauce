@@ -9,6 +9,7 @@ GLMRegressor	GLMRegressor
 MTS	MTS
 MultitaskClassifier	MultitaskClassifier
 RandomBagClassifier	RandomBagClassifier
+RandomBagRegressor	RandomBagRegressor
 Ridge2Classifier	Ridge2Classifier
 Ridge2MultitaskClassifier	Ridge2MultitaskClassifier
 Ridge2Regressor	Ridge2Regressor

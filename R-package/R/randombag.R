@@ -5,25 +5,6 @@
 #'
 #' Parameters description can be found at \url{https://techtonique.github.io/nnetsauce/}
 #'
-#' @param obj
-#' @param n_estimators
-#' @param n_hidden_features
-#' @param activation_name
-#' @param a
-#' @param nodes_sim
-#' @param bias
-#' @param dropout
-#' @param direct_link
-#' @param n_clusters
-#' @param cluster_encode
-#' @param type_clust
-#' @param col_sample
-#' @param row_sample
-#' @param n_jobs
-#' @param seed
-#' @param verbose
-#' @param backend
-#'
 #' @return
 #' @export
 #'
@@ -86,25 +67,6 @@ RandomBagClassifier <- function(obj,
 #' Bootstrap aggregating with quasi-randomized layer (regression)
 #'
 #' Parameters description can be found at \url{https://techtonique.github.io/nnetsauce/}
-#'
-#' @param obj
-#' @param n_estimators
-#' @param n_hidden_features
-#' @param activation_name
-#' @param a
-#' @param nodes_sim
-#' @param bias
-#' @param dropout
-#' @param direct_link
-#' @param n_clusters
-#' @param cluster_encode
-#' @param type_clust
-#' @param col_sample
-#' @param row_sample
-#' @param n_jobs
-#' @param seed
-#' @param verbose
-#' @param backend
 #'
 #' @return
 #' @export

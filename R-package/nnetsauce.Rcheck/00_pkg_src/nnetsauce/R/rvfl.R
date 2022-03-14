@@ -5,6 +5,8 @@
 
 #' Bayesian Random Vector Functional link network with 1 shrinkage parameter
 #'
+#' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
+#'
 #' @param n_hidden_features
 #' @param activation_name
 #' @param a
@@ -15,8 +17,6 @@
 #' @param n_clusters
 #' @param cluster_encode
 #' @param type_clust
-#' @param col_sample
-#' @param row_sample
 #' @param seed
 #' @param s
 #' @param sigma
@@ -46,8 +46,6 @@ BayesianRVFLRegressor <- function(n_hidden_features=5L,
                                   n_clusters=2L,
                                   cluster_encode=TRUE,
                                   type_clust="kmeans",
-                                  col_sample=1,
-                                  row_sample=1,
                                   s=0.1,
                                   sigma=0.05,
                                   seed=123L,
@@ -66,8 +64,6 @@ BayesianRVFLRegressor <- function(n_hidden_features=5L,
                            n_clusters=n_clusters,
                            cluster_encode=cluster_encode,
                            type_clust=type_clust,
-                           col_sample=col_sample,
-                           row_sample=row_sample,
                            seed=seed,
                            s=s,
                            sigma=sigma,
@@ -76,6 +72,8 @@ BayesianRVFLRegressor <- function(n_hidden_features=5L,
 
 
 #' Bayesian Random Vector Functional link network with 2 shrinkage parameters
+#'
+#' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 #'
 #' @param n_hidden_features
 #' @param activation_name
@@ -87,8 +85,6 @@ BayesianRVFLRegressor <- function(n_hidden_features=5L,
 #' @param n_clusters
 #' @param cluster_encode
 #' @param type_clust
-#' @param col_sample
-#' @param row_sample
 #' @param seed
 #' @param s1
 #' @param s2
@@ -119,8 +115,6 @@ BayesianRVFL2Regressor <- function(n_hidden_features=5L,
                                    n_clusters=2L,
                                    cluster_encode=TRUE,
                                    type_clust="kmeans",
-                                   col_sample=1,
-                                   row_sample=1,
                                    s1=0.1,
                                    s2=0.1,
                                    sigma=0.05,
@@ -140,8 +134,6 @@ BayesianRVFL2Regressor <- function(n_hidden_features=5L,
                            n_clusters=n_clusters,
                            cluster_encode=cluster_encode,
                            type_clust=type_clust,
-                           col_sample=col_sample,
-                           row_sample=row_sample,
                            seed=seed,
                            s1=s1,
                            s2=s2,

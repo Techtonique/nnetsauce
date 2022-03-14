@@ -20,14 +20,11 @@ Ridge2MultitaskClassifier(
   backend = c("cpu", "gpu", "tpu")
 )
 }
-\arguments{
-\item{backend}{}
-}
 \value{
 
 }
 \description{
-Multitask quasi-randomized classification model with 2 shrinkage parameters
+Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 }
 \examples{
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/randombag.R
 \name{RandomBagClassifier}
 \alias{RandomBagClassifier}
-\title{Bootstrap aggregating with quasi-randomized layer}
+\title{Bootstrap aggregating with quasi-randomized layer (classification)}
 \usage{
 RandomBagClassifier(
   obj,
@@ -32,7 +32,7 @@ RandomBagClassifier(
 
 }
 \description{
-Bootstrap aggregating with quasi-randomized layer
+Parameters description can be found at \url{https://techtonique.github.io/nnetsauce/}
 }
 \examples{
 

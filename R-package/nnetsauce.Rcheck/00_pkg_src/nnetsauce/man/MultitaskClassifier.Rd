@@ -29,7 +29,7 @@ MultitaskClassifier(
 
 }
 \description{
-Multitask Classification model based on regression models, with shared covariates
+Parameters description can be found at \url{https://techtonique.github.io/nnetsauce/}
 }
 \examples{
 

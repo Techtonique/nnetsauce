@@ -8,15 +8,16 @@ BayesianRVFLRegressor   Bayesian Random Vector Functional link network
                         with 1 shrinkage parameter
 CustomClassifier        Custom classifier with quasi-randomized layer
 CustomRegressor         Custom regressor with quasi-randomized layer
-GLMClassifier           Generalized nonlinears models for
-                        Classification
-GLMRegressor            Generalized nonlinears models for continuous
+GLMClassifier           Generalized nonlinear models for Classification
+GLMRegressor            Generalized nonlinear models for continuous
                         output (regression)
 MTS                     Multivariate Time Series
 MultitaskClassifier     Multitask Classification model based on
                         regression models, with shared covariates
 RandomBagClassifier     Bootstrap aggregating with quasi-randomized
-                        layer
+                        layer (classification)
+RandomBagRegressor      Bootstrap aggregating with quasi-randomized
+                        layer (regression)
 Ridge2Classifier        Multinomial logit, quasi-randomized
                         classification model with 2 shrinkage
                         parameters

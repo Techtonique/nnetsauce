@@ -3,6 +3,8 @@
 
 #' Adaboost classifier with quasi-randomized hidden layer
 #'
+#' Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
+#'
 #' @param obj
 #' @param n_estimators
 #' @param learning_rate

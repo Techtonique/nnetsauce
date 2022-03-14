@@ -15,8 +15,6 @@ BayesianRVFL2Regressor(
   n_clusters = 2L,
   cluster_encode = TRUE,
   type_clust = "kmeans",
-  col_sample = 1,
-  row_sample = 1,
   s1 = 0.1,
   s2 = 0.1,
   sigma = 0.05,
@@ -24,14 +22,9 @@ BayesianRVFL2Regressor(
   backend = c("cpu", "gpu", "tpu")
 )
 }
-\arguments{
-\item{backend}{}
-}
-\value{
-
-}
 \description{
-Bayesian Random Vector Functional link network with 2 shrinkage parameters
+Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
+#' @return
 }
 \examples{
 

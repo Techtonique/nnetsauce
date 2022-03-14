@@ -1,5 +1,7 @@
 #' Multivariate Time Series
 #'
+#' Parameters description can be found at \url{https://techtonique.github.io/nnetsauce/}
+#'
 #' @param obj
 #' @param n_hidden_features
 #' @param activation_name
@@ -11,7 +13,6 @@
 #' @param n_clusters
 #' @param cluster_encode
 #' @param type_clust
-#' @param col_sample
 #' @param seed
 #' @param lags
 #' @param backend
@@ -55,7 +56,6 @@ MTS <- function(obj,
                 n_clusters=2L,
                 cluster_encode=TRUE,
                 type_clust="kmeans",
-                col_sample=1,
                 seed=123L,
                 lags=1L,
                 backend=c("cpu", "gpu", "tpu"))
@@ -73,7 +73,6 @@ MTS <- function(obj,
          n_clusters=n_clusters,
          cluster_encode=cluster_encode,
          type_clust=type_clust,
-         col_sample=col_sample,
          seed=seed,
          lags=lags,
          backend=backend)
