@@ -22,11 +22,17 @@ print(f"X_test.shape: {X_test.shape}")
 print("\n")
 
 # Requires further tuning
-obj = DecisionTreeRegressor(max_depth=3, random_state=123)
-obj2 = ns.RandomBagRegressor(obj=obj, direct_link=False,
-                             n_estimators=50, 
-                             col_sample=0.9, row_sample=0.9,
-                             dropout=0, n_clusters=0, verbose=1)
+obj = DecisionTreeRegressor()
+obj2 = ns.RandomBagRegressor(obj = obj,
+                               direct_link=True,
+                               n_estimators=50,
+                               n_hidden_features=5, 
+                               n_clusters=3,                              
+                               dropout = 0.7946672521272369,
+                               col_sample = 0.7305452927102478,
+                               row_sample = 0.9247504466856605,
+                               type_clust = "gmm", 
+                               verbose = 1)
 
 start = time()
 obj2.fit(X_train, y_train)
