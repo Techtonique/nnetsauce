@@ -45,12 +45,12 @@ def rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators
         for m in range(n_estimators):   
             
             try:
-                    
+
+                base_learner.set_params(seed=seed + m * 1000)
+
                 base_learner.fit(np.asarray(X), np.asarray(y))
                 
-                voter[m] = pickle.loads(pickle.dumps(base_learner, -1))                
-
-                base_learner.set_params(seed=seed + (m + 1) * 1000)
+                voter[m] = pickle.loads(pickle.dumps(base_learner, -1))                                
 
                 pbar.update(m)
 
@@ -68,12 +68,12 @@ def rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators
     for m in range(n_estimators):   
         
         try:
+
+            base_learner.set_params(seed=seed + m * 1000)
                 
             base_learner.fit(np.asarray(X), np.asarray(y))
 
             voter[m] = pickle.loads(pickle.dumps(base_learner, -1))                
-
-            base_learner.set_params(seed=seed + (m + 1) * 1000)            
 
         except:            
 
@@ -96,12 +96,12 @@ def rbagloop2(object base_learner, double[:,:] X, double[:] y, int n_estimators,
         for m in range(n_estimators):   
             
             try:
-                    
+
+                base_learner.set_params(seed=seed + m * 1000)
+
                 base_learner.fit(np.asarray(X), np.asarray(y))
                 
                 voter[m] = pickle.loads(pickle.dumps(base_learner, -1))                
-
-                base_learner.set_params(seed=seed + (m + 1) * 1000)
 
                 pbar.update(m)
 
@@ -119,12 +119,11 @@ def rbagloop2(object base_learner, double[:,:] X, double[:] y, int n_estimators,
     for m in range(n_estimators):   
         
         try:
+            base_learner.set_params(seed=seed + m * 1000)
                 
             base_learner.fit(np.asarray(X), np.asarray(y))
 
-            voter[m] = pickle.loads(pickle.dumps(base_learner, -1))                
-
-            base_learner.set_params(seed=seed + (m + 1) * 1000)            
+            voter[m] = pickle.loads(pickle.dumps(base_learner, -1))                         
 
         except:            
 
