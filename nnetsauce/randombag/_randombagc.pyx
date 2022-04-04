@@ -31,7 +31,8 @@ from ..utils import Progbar
 # 1 main fitting loop -----       
 
 # For classification
-def rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators, int verbose, int seed):
+#def rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators, int verbose, int seed):
+def rbagloop(object base_learner, np.ndarray X, np.ndarray y, int n_estimators, int verbose, int seed):
 
     cdef int m 
     cdef dict voter
@@ -48,7 +49,7 @@ def rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators
 
                 base_learner.set_params(seed=seed + m * 1000)
 
-                base_learner.fit(np.asarray(X), np.asarray(y))
+                base_learner.fit(X, y)
                 
                 voter[m] = pickle.loads(pickle.dumps(base_learner, -1))                                
 
@@ -71,7 +72,7 @@ def rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators
 
             base_learner.set_params(seed=seed + m * 1000)
                 
-            base_learner.fit(np.asarray(X), np.asarray(y))
+            base_learner.fit(X, y)
 
             voter[m] = pickle.loads(pickle.dumps(base_learner, -1))                
 
@@ -82,7 +83,7 @@ def rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators
     return voter
 
 # For regression
-def rbagloop2(object base_learner, double[:,:] X, double[:] y, int n_estimators, int verbose, int seed):
+def rbagloop2(object base_learner, np.ndarray X, np.ndarray y, int n_estimators, int verbose, int seed):
 
     cdef int m 
     cdef dict voter
@@ -99,7 +100,7 @@ def rbagloop2(object base_learner, double[:,:] X, double[:] y, int n_estimators,
 
                 base_learner.set_params(seed=seed + m * 1000)
 
-                base_learner.fit(np.asarray(X), np.asarray(y))
+                base_learner.fit(X, y)
                 
                 voter[m] = pickle.loads(pickle.dumps(base_learner, -1))                
 
@@ -121,7 +122,7 @@ def rbagloop2(object base_learner, double[:,:] X, double[:] y, int n_estimators,
         try:
             base_learner.set_params(seed=seed + m * 1000)
                 
-            base_learner.fit(np.asarray(X), np.asarray(y))
+            base_learner.fit(X, y)
 
             voter[m] = pickle.loads(pickle.dumps(base_learner, -1))                         
 
