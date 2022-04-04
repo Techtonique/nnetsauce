@@ -222,25 +222,24 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
         # buggy
         # if self.n_jobs is not None:
         def fit_estimators(m):
-            base_learner.fit(X, y, **kwargs)
-            self.voter_.update(
-                {m: pickle.loads(pickle.dumps(base_learner, -1))}
-            )
-            base_learner.set_params(
-                seed=self.seed + (m + 1) * 1000,
-            )
+            base_learner__ = pickle.loads(pickle.dumps(base_learner, -1))
+            base_learner__.set_params(seed=self.seed + m * 1000)
+            base_learner__.fit(X, y, **kwargs)
+            return base_learner__          
 
         if self.verbose == 1:
 
-            Parallel(n_jobs=self.n_jobs, prefer="threads")(
+            voters_list = Parallel(n_jobs=self.n_jobs, prefer="threads")(
                 delayed(fit_estimators)(m)
                 for m in tqdm(range(self.n_estimators))
             )
         else:
 
-            Parallel(n_jobs=self.n_jobs, prefer="threads")(
+            voters_list = Parallel(n_jobs=self.n_jobs, prefer="threads")(
                 delayed(fit_estimators)(m) for m in range(self.n_estimators)
             )
+
+        self.voter_ = {i: elt for i, elt in enumerate(voters_list)}    
 
         self.n_estimators = len(self.voter_)
 
