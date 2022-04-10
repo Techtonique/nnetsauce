@@ -14,7 +14,7 @@ from functools import partial
 
 
 class MTS(Base):
-    """Univariate and multivariate time series (MTS) forecasting with Quasi-Randomized networks
+    """Univariate and multivariate time series (MTS) forecasting with Quasi-Randomized networks (Work in progress /!\)
 
     Parameters:
 
