@@ -7,7 +7,7 @@ from sklearn import linear_model
 from sklearn.ensemble import RandomForestRegressor
 np.random.seed(123)
 
-"""
+
 M = np.random.rand(10, 3)
 M[:,0] = 10*M[:,0]
 M[:,2] = 25*M[:,2]
@@ -79,9 +79,9 @@ obj_MTS.fit(df)
 print(obj_MTS.predict())
 print("\n")
 
-"""
 
-# example with dataframes (#3)
+print("\n")
+print("example 3 with dataframes ----- \n")
 
 dataset = {
 'date' : ['2001-01-01', '2002-01-01', '2003-01-01', '2004-01-01', '2005-01-01'],
@@ -96,10 +96,8 @@ print(df.columns)
 regr5 = linear_model.BayesianRidge()
 obj_MTS = ns.MTS(regr5, lags = 2, n_hidden_features=5)
 obj_MTS.fit(df)
-print(obj_MTS.predict(return_std=True)) 
-
-
-
+print(obj_MTS.predict()) 
 # with credible intervals
-#print(obj_MTS.predict(return_std=True, level=80))
-#print(obj_MTS.predict(return_std=True, level=95))
+print(obj_MTS.predict(return_std=True, level=80))
+print(obj_MTS.predict(return_std=True, level=95))
+print(obj_MTS.predict())

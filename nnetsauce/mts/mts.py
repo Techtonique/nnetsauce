@@ -376,7 +376,7 @@ class MTS(Base):
             self.preds_ = self.preds_[0:h, :][::-1]
             if "return_std" not in kwargs:
                 return self.preds_            
-            self.preds_std_ = np.asarray(self.preds_std_)
+            self.preds_std_ = np.asarray(self.preds_std_)[::-1]
             return self.preds_, self.preds_std_
 
         # if self.df_ is not None (return data frames)
@@ -387,8 +387,9 @@ class MTS(Base):
         )
         if "return_std" not in kwargs:
             return self.preds_
+
         self.preds_std_ = pd.DataFrame(
-            self.preds_std_[::-1],
+            np.asarray(self.preds_std_)[::-1],
             columns=self.df_.columns,
             index=output_dates,
         )
