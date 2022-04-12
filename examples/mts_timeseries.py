@@ -7,9 +7,11 @@ from sklearn import linear_model
 from sklearn.ensemble import RandomForestRegressor
 np.random.seed(123)
 
+"""
 M = np.random.rand(10, 3)
 M[:,0] = 10*M[:,0]
 M[:,2] = 25*M[:,2]
+
 print(M)
 print("\n")
 
@@ -17,8 +19,8 @@ print("\n")
 regr4 = linear_model.BayesianRidge()
 obj_MTS = ns.MTS(regr4, lags = 1, n_hidden_features=5)
 obj_MTS.fit(M)
-print(obj_MTS.predict())
-print("\n")
+print(obj_MTS.df_)
+print(obj_MTS.predict(return_std=True))
 
 # with credible intervals
 print(obj_MTS.predict(return_std=True, level=80))
@@ -77,6 +79,8 @@ obj_MTS.fit(df)
 print(obj_MTS.predict())
 print("\n")
 
+"""
+
 # example with dataframes (#3)
 
 dataset = {
@@ -86,14 +90,16 @@ dataset = {
 'series3' : [100, 100.5, 100.6, 100.2, 100.1]}
 df = pd.DataFrame(dataset).set_index('date')
 print(df)
+print(df.columns)
 
 # Adjust Bayesian Ridge
 regr5 = linear_model.BayesianRidge()
-obj_MTS = ns.MTS(regr5, lags = 1, n_hidden_features=5)
+obj_MTS = ns.MTS(regr5, lags = 2, n_hidden_features=5)
 obj_MTS.fit(df)
-print(obj_MTS.predict())
+print(obj_MTS.predict(return_std=True)) 
+
+
 
 # with credible intervals
-print(obj_MTS.predict(return_std=True, level=80))
-
-print(obj_MTS.predict(return_std=True, level=95))
+#print(obj_MTS.predict(return_std=True, level=80))
+#print(obj_MTS.predict(return_std=True, level=95))
