@@ -136,7 +136,6 @@ print("err_xreg")
 print(rmse_xreg)
 print("\n") 
 
-
 print("example 5 with dataframes and xreg ----- \n")
 
 dataset = {
@@ -146,17 +145,22 @@ dataset = {
 'series3' : [100, 100.5, 100.6, 100.2, 100.1]}
 df = pd.DataFrame(dataset).set_index('date')
 print(df)
-print(df.columns)
 
 Xreg_train = pd.DataFrame(np.random.rand(5, 3))
 Xreg_test = pd.DataFrame(np.random.rand(5, 3))
 print("Xreg_train")
 print(Xreg_train)
+print("Xreg_test")
+print(Xreg_test)
 
 # Adjust Bayesian Ridge with external regressors
 regr5 = linear_model.BayesianRidge()
-obj_MTS = ns.MTS(regr5, lags = 1, n_hidden_features=3, n_clusters=2)
-obj_MTS.fit(df, xreg=Xreg_train)
-print(obj_MTS.predict(new_xreg=Xreg_test)) 
+obj_MTS = ns.MTS(regr5, lags = 2, n_hidden_features=5, n_clusters=2)
+
+#obj_MTS.fit(df)
+#print(obj_MTS.predict()) 
 # with credible intervals
-print(obj_MTS.predict(return_std=True,new_xreg=Xreg_test, level=95))
+#print(obj_MTS.predict(return_std=True, level=95))
+
+obj_MTS.fit(df, xreg=Xreg_train)
+print(obj_MTS.predict(new_xreg=Xreg_test, return_std=True)) 
