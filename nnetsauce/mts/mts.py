@@ -260,15 +260,17 @@ class MTS(Base):
             )
 
         self.y_ = mts_input[0]
-        # print(f"self.y_: \n {self.y_} \n ")
-        # print(f"mts_input[1]: \n {mts_input[1]} \n ")
+        
         self.X_ = mts_input[1]
 
         if xreg is not None:
 
+            if isinstance(xreg, pd.DataFrame):
+                xreg = xreg.values
+
             assert (
                 xreg.shape[0] == n
-            ), "'xreg' and 'X' must have the same number or observations"
+            ), "'xreg' and 'X' must have the same number of observations"
 
             self.xreg_ = xreg
 
@@ -320,182 +322,112 @@ class MTS(Base):
         """
 
         if self.df_ is not None:  # `fit` takes a data frame input
-            output_dates, frequency = ts.compute_output_dates(self.df_, h)
+                output_dates, frequency = ts.compute_output_dates(self.df_, h)
 
         self.return_std_ = False
-
-        if self.xreg_ is not None:
-            assert new_xreg is not None, "'new_xreg' must be provided"
 
         self.preds_ = None  # do not remove (!)
 
         self.preds_ = pickle.loads(pickle.dumps(self.y_, -1))
 
-        n_features = self.n_series * self.lags
+        y_means_ = np.asarray([self.y_means_[i] for i in range(self.n_series)])
+
+        n_features = self.n_series * self.lags # check that /!\
 
         if "return_std" in kwargs:
+            self.return_std_ = True 
+            self.preds_std_ = []
 
-            self.preds_std_ = np.zeros(h)
+        if self.xreg_ is None: # no external regressors
 
-            self.return_std_ = kwargs["return_std"]
+            for i in range(h):
 
-            multiplier = norm.ppf(1 - 0.5 * (1 - level / 100))
+                new_obs = ts.reformat_response(self.preds_, self.lags)
 
-        if new_xreg is not None:  # Additional regressors provided
+                new_X = new_obs.reshape(1, n_features)
+
+                cooked_new_X = self.cook_test_set(new_X, **kwargs)
+
+                if "return_std" in kwargs:
+                    self.preds_std_.append([np.asscalar(self.fit_objs_[i].predict(cooked_new_X, return_std=True)[1]) for i in range(self.n_series)])
+
+                predicted_cooked_new_X = np.asarray([np.asscalar(self.fit_objs_[i].predict(
+                    cooked_new_X)) for i in range(self.n_series)])
+
+                preds = np.asarray(y_means_ + predicted_cooked_new_X)                                                                     
+                
+                self.preds_ = mo.rbind(preds, self.preds_)
+        
+        else: # if self.xreg_ is not None: # with external regressors
+            
+            assert new_xreg is not None, "'new_xreg' must be provided to predict()"
+
+            if isinstance(new_xreg, pd.DataFrame):
+                new_xreg = new_xreg.values
 
             try:
                 n_obs_xreg, n_features_xreg = new_xreg.shape
                 assert (
                     n_features_xreg == self.xreg_.shape[1]
-                ), "check number of series provided for 'new_xreg' (compare with self.xreg_.shape[1])"
+                ), "check number of inputs provided for 'new_xreg' (compare with self.xreg_.shape[1])"
             except:
                 n_obs_xreg = new_xreg.shape  # one series
 
             assert (
                 n_obs_xreg == h
-            ), "please provide values of regressors 'new_xreg' for the whole horizon 'h'"
+            ), "please provide values of regressors 'new_xreg' for the whole horizon 'h'"            
 
             n_features_xreg = n_features_xreg * self.lags
 
-            n_features_total = n_features + n_features_xreg
+            inv_new_xreg = mo.rbind(self.xreg_, new_xreg)[::-1]   
 
-            inv_new_xreg = mo.rbind(self.xreg_, new_xreg)[::-1]
-
-            # Loop on horizon h
             for i in range(h):
 
                 new_obs = ts.reformat_response(self.preds_, self.lags)
 
                 new_obs_xreg = ts.reformat_response(inv_new_xreg, self.lags)
 
-                new_X = mo.rbind(
-                    np.union1d(
-                        new_obs.reshape(1, n_features),
-                        new_obs_xreg.reshape(1, n_features_xreg),
-                    ),
-                    np.ones(n_features_total).reshape(1, n_features_total),
-                )
-
+                new_X = np.concatenate(                            
+                            (new_obs, new_obs_xreg), axis=None
+                        ).reshape(1, -1)
+                    
                 cooked_new_X = self.cook_test_set(new_X, **kwargs)
 
-                predicted_cooked_new_X = self.obj.predict(
-                    cooked_new_X, **kwargs
-                )
+                if "return_std" in kwargs:
+                    self.preds_std_.append([np.asscalar(self.fit_objs_[i].predict(
+                        cooked_new_X, return_std=True)[1]) for i in range(self.n_series)])
 
-                if self.return_std_ == False:  # std. dev. is not returned
+                predicted_cooked_new_X = np.asarray([np.asscalar(self.fit_objs_[i].predict(
+                    cooked_new_X)) for i in range(self.n_series)])
 
-                    preds = np.array(
-                        [
-                            (self.y_means_[j] + predicted_cooked_new_X[0])
-                            for j in range(self.n_series)
-                        ]
-                    )
-
-                else:  # std. dev. is returned
-
-                    preds = np.array(
-                        [
-                            (self.y_means_[j] + predicted_cooked_new_X[0][0])
-                            for j in range(self.n_series)
-                        ]
-                    )
-
-                    self.preds_std_[i] = predicted_cooked_new_X[1][0]
-
-                self.preds_ = mo.rbind(preds, self.preds_)
-
-        else:  # No additional regressor provided
-
-            for i in range(h):
-
-                new_obs = ts.reformat_response(self.preds_, self.lags)
-
-                new_X = mo.rbind(
-                    new_obs.reshape(1, n_features),
-                    np.ones(n_features).reshape(1, n_features),
-                )
-
-                cooked_new_X = self.cook_test_set(new_X, **kwargs)
-
-                predicted_cooked_new_X = self.obj.predict(
-                    cooked_new_X, **kwargs
-                )
-
-                if self.return_std_ == False:  # std. dev. is not returned
-
-                    preds = np.array(
-                        [
-                            (self.y_means_[j] + predicted_cooked_new_X[0])
-                            for j in range(self.n_series)
-                        ]
-                    )
-
-                else:  # std. dev. is returned
-
-                    preds = np.array(
-                        [
-                            (self.y_means_[j] + predicted_cooked_new_X[0][0])
-                            for j in range(self.n_series)
-                        ]
-                    )
-
-                    self.preds_std_[i] = predicted_cooked_new_X[1][0]
-
-                self.preds_ = mo.rbind(preds, self.preds_)
-
+                preds = np.asarray(y_means_ + predicted_cooked_new_X)                                                                     
+                
+                self.preds_ = mo.rbind(preds, self.preds_)        
+        
         # function's return
-
         if self.df_ is None:
-
             self.preds_ = self.preds_[0:h, :][::-1]
-
-            if self.return_std_ == False:  # std. dev. is not returned
-
-                return self.preds_
-
-            # std. dev. is returned
-            self.preds_std_ = self.preds_std_[::-1].reshape(h, 1)
-
-            self.preds_std_ = np.repeat(self.preds_std_, self.n_series).reshape(
-                -1, self.n_series
-            )
-
-            return (
-                self.preds_,
-                self.preds_std_,
-                self.preds_ - multiplier * self.preds_std_,
-                self.preds_ + multiplier * self.preds_std_,
-            )
+            if "return_std" not in kwargs:
+                return self.preds_                          
+            self.preds_std_ = np.asarray(self.preds_std_)
+            return self.preds_, self.preds_std_
 
         # if self.df_ is not None (return data frames)
-
         self.preds_ = pd.DataFrame(
             self.preds_[0:h, :][::-1],
             columns=self.df_.columns,
             index=output_dates,
         )
-
-        if self.return_std_ == False:  # std. dev. is not returned
-
+        if "return_std" not in kwargs:
             return self.preds_
-
-        # std. dev. is returned
-        self.preds_std_ = self.preds_std_[::-1].reshape(h, 1)
-
         self.preds_std_ = pd.DataFrame(
-            np.repeat(self.preds_std_, self.n_series).reshape(
-                -1, self.n_series
-            ),
+            np.asarray(self.preds_std_),
             columns=self.df_.columns,
             index=output_dates,
         )
+        return self.preds_, self.preds_std_
 
-        return (
-            self.preds_,
-            self.preds_std_,
-            self.preds_ - multiplier * self.preds_std_,
-            self.preds_ + multiplier * self.preds_std_,
-        )
+
 
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):
         """ Train on training_index, score on testing_index. """

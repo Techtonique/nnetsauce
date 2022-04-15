@@ -108,7 +108,7 @@ class TestRandomBag(ut.TestCase):
             row_sample=0.9,
             dropout=0,
             n_clusters=0,
-            verbose=1,
+            verbose=0,
         )
 
         fit_obj.fit(X_train, y_train)
