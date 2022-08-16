@@ -39,7 +39,7 @@ LICENSE = 'BSD3 Clause Clear'
 # does not need the compiled code
 import nnetsauce
 
-__version__ = "0.11.4"
+__version__ = "0.11.5"
 
 VERSION = __version__
 

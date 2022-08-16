@@ -1,3 +1,11 @@
+# version 0.11.5
+
+- Avoid division by zero in scaling
+
+# version 0.11.4
+
+- less dependencies in setup 
+
 # version 0.11.0
 
 - Implement RandomBagRegressor
