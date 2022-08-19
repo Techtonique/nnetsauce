@@ -4,7 +4,7 @@ _In alphabetical order_
 
 All models possess methods `fit`, `predict`, `predict_proba`, and `score`. For scoring metrics, refer to [scoring metrics](scoring_metrics.md).
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L18)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/boosting/adaBoostClassifier.py#L18)</span>
 
 ### AdaBoostClassifier
 
@@ -172,7 +172,7 @@ print(metrics.classification_report(preds, y_test))
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L211)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/boosting/adaBoostClassifier.py#L211)</span>
 
 ### fit
 
@@ -203,7 +203,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L382)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/boosting/adaBoostClassifier.py#L382)</span>
 
 ### predict
 
@@ -231,7 +231,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L401)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/boosting/adaBoostClassifier.py#L401)</span>
 
 ### predict_proba
 
@@ -259,7 +259,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/boosting/adaBoostClassifier.py#L480)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/boosting/adaBoostClassifier.py#L480)</span>
 
 ### score
 
@@ -296,7 +296,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/custom/customClassifier.py#L12)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/custom/customClassifier.py#L12)</span>
 
 ### CustomClassifier
 
@@ -436,7 +436,7 @@ print(f"Elapsed {time() - start}")
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/custom/customClassifier.py#L168)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/custom/customClassifier.py#L168)</span>
 
 ### fit
 
@@ -467,7 +467,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmClassifier.py#L18)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/glm/glmClassifier.py#L18)</span>
 
 ### GLMClassifier
 
@@ -572,7 +572,7 @@ See [https://github.com/Techtonique/nnetsauce/blob/master/examples/glm_classific
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmClassifier.py#L207)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/glm/glmClassifier.py#L207)</span>
 
 ### fit
 
@@ -605,7 +605,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/multitask/multitaskClassifier.py#L15)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/multitask/multitaskClassifier.py#L15)</span>
 
 ### MultitaskClassifier
 
@@ -743,7 +743,7 @@ print(metrics.classification_report(preds, y_test))
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/multitask/multitaskClassifier.py#L170)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/multitask/multitaskClassifier.py#L170)</span>
 
 ### fit
 
@@ -774,7 +774,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/_randomBagClassifier.py#L18)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/randombag/_randomBagClassifier.py#L18)</span>
 
 ### RandomBagClassifier
 
@@ -918,7 +918,7 @@ print(metrics.classification_report(preds, y_test))
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/_randomBagClassifier.py#L182)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/randombag/_randomBagClassifier.py#L182)</span>
 
 ### fit
 
@@ -949,7 +949,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2Classifier.py#L17)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/ridge2/ridge2Classifier.py#L17)</span>
 
 ### Ridge2Classifier
 
@@ -1084,7 +1084,7 @@ print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2Classifier.py#L301)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/ridge2/ridge2Classifier.py#L301)</span>
 
 ### fit
 
@@ -1118,7 +1118,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2MultitaskClassifier.py#L20)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/ridge2/ridge2MultitaskClassifier.py#L20)</span>
 
 ### Ridge2MultitaskClassifier
 
@@ -1241,7 +1241,7 @@ print(metrics.classification_report(preds, y_test))
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2MultitaskClassifier.py#L157)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/ridge2/ridge2MultitaskClassifier.py#L157)</span>
 
 ### fit
 

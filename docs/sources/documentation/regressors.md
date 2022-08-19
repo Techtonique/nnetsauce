@@ -4,7 +4,7 @@ _In alphabetical order_
 
 All models possess methods `fit`, `predict`, and `score`. Methods `predict` and `score` are only documented for the first model; the __same principles apply subsequently__. For scoring metrics, refer to [scoring metrics](scoring_metrics.md). 
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L14)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/base/baseRegressor.py#L14)</span>
 
 ### BaseRegressor
 
@@ -99,7 +99,7 @@ Attributes:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L122)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/base/baseRegressor.py#L122)</span>
 
 ### fit
 
@@ -129,7 +129,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L153)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/base/baseRegressor.py#L153)</span>
 
 ### predict
 
@@ -156,7 +156,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/base/baseRegressor.py#L192)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/base/baseRegressor.py#L192)</span>
 
 ### score
 
@@ -191,7 +191,7 @@ model scores: {array-like}
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/rvfl/bayesianrvflRegressor.py#L14)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/rvfl/bayesianrvflRegressor.py#L14)</span>
 
 ### BayesianRVFLRegressor
 
@@ -297,7 +297,7 @@ TBD
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/rvfl/bayesianrvflRegressor.py#L137)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/rvfl/bayesianrvflRegressor.py#L137)</span>
 
 ### fit
 
@@ -328,7 +328,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/rvfl/bayesianrvfl2Regressor.py#L14)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/rvfl/bayesianrvfl2Regressor.py#L14)</span>
 
 ### BayesianRVFL2Regressor
 
@@ -438,7 +438,7 @@ TBD
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/rvfl/bayesianrvfl2Regressor.py#L143)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/rvfl/bayesianrvfl2Regressor.py#L143)</span>
 
 ### fit
 
@@ -469,7 +469,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/custom/customRegressor.py#L12)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/custom/customRegressor.py#L12)</span>
 
 ### CustomRegressor
 
@@ -572,7 +572,7 @@ TBD
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/custom/customRegressor.py#L131)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/custom/customRegressor.py#L131)</span>
 
 ### fit
 
@@ -603,7 +603,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmRegressor.py#L18)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/glm/glmRegressor.py#L18)</span>
 
 ### GLMRegressor
 
@@ -711,7 +711,7 @@ See [https://github.com/Techtonique/nnetsauce/blob/master/examples/glm_regressio
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/glm/glmRegressor.py#L184)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/glm/glmRegressor.py#L184)</span>
 
 ### fit
 
@@ -744,7 +744,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/_randomBagRegressor.py#L18)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/randombag/_randomBagRegressor.py#L18)</span>
 
 ### RandomBagRegressor
 
@@ -876,7 +876,7 @@ print(np.sqrt(obj2.score(X_test, y_test))) # RMSE
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/randombag/_randomBagRegressor.py#L170)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/randombag/_randomBagRegressor.py#L170)</span>
 
 ### fit
 
@@ -907,7 +907,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2Regressor.py#L20)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/ridge2/ridge2Regressor.py#L20)</span>
 
 ### Ridge2Regressor
 
@@ -997,7 +997,7 @@ Attributes:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/ridge2/ridge2Regressor.py#L124)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/ridge2/ridge2Regressor.py#L124)</span>
 
 ### fit
 

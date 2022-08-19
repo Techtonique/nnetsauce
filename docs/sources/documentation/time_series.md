@@ -4,7 +4,7 @@ _In alphabetical order_
 
 All models possess methods: `fit`, `predict`.
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L16)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/mts/mts.py#L16)</span>
 
 ### MTS
 
@@ -30,7 +30,7 @@ nnetsauce.MTS(
 ```
 
 
-Univariate and multivariate time series (MTS) forecasting with Quasi-Randomized networks
+Univariate and multivariate time series (MTS) forecasting with Quasi-Randomized networks (Work in progress /!\)
 
 Parameters:
 
@@ -173,7 +173,7 @@ print(obj_MTS.predict(return_std=True, level=95))
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L211)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/mts/mts.py#L211)</span>
 
 ### fit
 
@@ -206,7 +206,7 @@ Returns:
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/nnetsauce/mts/mts.py#L296)</span>
+<span style="float:right;">[[source]](https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/mts/mts.py#L298)</span>
 
 ### predict
 

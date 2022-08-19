@@ -56,7 +56,7 @@ def generate(dest_dir):
 
     doc_generator = keras_autodoc.DocumentationGenerator(
         PAGES,
-        'https://github.com/Techtonique/nnetsauce',
+        'https://github.com/Techtonique/nnetsauce/blob/master',
         template_dir,
         #nnetsauce_dir / 'examples'
     )
