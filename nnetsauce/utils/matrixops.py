@@ -1,6 +1,5 @@
 import numpy as np
 import platform
-from .memoize import memoize
 from jax import device_put
 from scipy import sparse
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
@@ -21,7 +20,6 @@ def cbind(x, y, backend="cpu"):
 
 
 # center... response
-@memoize
 def center_response(y):
     y_mean = np.mean(y)
     return y_mean, (y - y_mean)

@@ -5,23 +5,20 @@
 import numpy as np
 import platform
 import warnings
+
 from functools import partial
 from sklearn.base import BaseEstimator
-from sklearn.cluster import KMeans
-from sklearn.mixture import GaussianMixture
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from ..utils import activations as ac
-from ..utils import memoize
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 from ..simulation import (
-    generate_sobol2,
+    generate_sobol,
     generate_uniform,
     generate_hammersley,
     generate_halton,
 )
 from ..sampling import SubSampler
-from ..simulator import Simulator
+
 
 if platform.system() in ("Linux", "Darwin"):
     import jax.nn as jnn
@@ -302,19 +299,8 @@ class Base(BaseEstimator):
 
             if W is None:
 
-                try:  # use Simulator here
-
-                    self.W_ = Simulator(
-                        n_points=self.n_hidden_features,
-                        n_dims=n_features,
-                        type_sim=self.nodes_sim,
-                        seed=self.seed,
-                    ).draw()
-
-                except:
-
-                    h_sim = {
-                        "sobol": generate_sobol2(
+                h_sim = {
+                        "sobol": generate_sobol(
                             n_dims=n_features, n_points=self.n_hidden_features
                         ),
                         "hammersley": generate_hammersley(
@@ -330,7 +316,7 @@ class Base(BaseEstimator):
                         ),
                     }
 
-                    self.W_ = h_sim[self.nodes_sim]
+                self.W_ = h_sim[self.nodes_sim]
 
                 assert (
                     scaled_X.shape[1] == self.W_.shape[0]
@@ -365,35 +351,24 @@ class Base(BaseEstimator):
 
             n_features_1 = n_features + 1
 
-            try:
-
-                self.W_ = Simulator(
-                    n_points=self.n_hidden_features,
+            h_sim = {
+                "sobol": generate_sobol(
+                    n_dims=n_features_1, n_points=self.n_hidden_features
+                ),
+                "hammersley": generate_hammersley(
+                    n_dims=n_features_1, n_points=self.n_hidden_features
+                ),
+                "uniform": generate_uniform(
                     n_dims=n_features_1,
-                    type_sim=self.nodes_sim,
+                    n_points=self.n_hidden_features,
                     seed=self.seed,
-                ).draw()
+                ),
+                "halton": generate_halton(
+                    n_dims=n_features_1, n_points=self.n_hidden_features
+                ),
+            }
 
-            except:
-
-                h_sim = {
-                    "sobol": generate_sobol2(
-                        n_dims=n_features_1, n_points=self.n_hidden_features
-                    ),
-                    "hammersley": generate_hammersley(
-                        n_dims=n_features_1, n_points=self.n_hidden_features
-                    ),
-                    "uniform": generate_uniform(
-                        n_dims=n_features_1,
-                        n_points=self.n_hidden_features,
-                        seed=self.seed,
-                    ),
-                    "halton": generate_halton(
-                        n_dims=n_features_1, n_points=self.n_hidden_features
-                    ),
-                }
-
-                self.W_ = h_sim[self.nodes_sim]
+            self.W_ = h_sim[self.nodes_sim]
 
             return mo.dropout(
                 x=self.activation_func(

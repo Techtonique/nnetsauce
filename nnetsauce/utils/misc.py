@@ -1,6 +1,4 @@
 import numpy as np
-from .memoize import memoize
-
 
 # merge two dictionaries
 def merge_two_dicts(x, y):
@@ -10,7 +8,6 @@ def merge_two_dicts(x, y):
 
 
 # check if x is int
-@memoize
 def is_int(x):
     try:
         return int(x) == x
@@ -19,13 +16,11 @@ def is_int(x):
 
 
 # check if x is float
-@memoize
 def is_float(x):
     return isinstance(x, float)
 
 
 # check if the response contains only integers
-@memoize
 def is_factor(y):
     return not np.mod(y, 1).any()
 
