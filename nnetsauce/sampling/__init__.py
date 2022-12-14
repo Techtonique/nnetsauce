@@ -1,3 +1,3 @@
-from ._rowsubsampling import SubSampler
+from .rowsubsampling import SubSampler
 
 __all__ = ["SubSampler"]

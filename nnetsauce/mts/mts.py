@@ -349,10 +349,10 @@ class MTS(Base):
                 cooked_new_X = self.cook_test_set(new_X, **kwargs)
 
                 if "return_std" in kwargs:
-                    self.preds_std_.append([np.asscalar(self.fit_objs_[i].predict(cooked_new_X, return_std=True)[1]) for i in range(self.n_series)])
+                    self.preds_std_.append([np.asarray(self.fit_objs_[i].predict(cooked_new_X, return_std=True)[1]).item() for i in range(self.n_series)])
 
-                predicted_cooked_new_X = np.asarray([np.asscalar(self.fit_objs_[i].predict(
-                    cooked_new_X)) for i in range(self.n_series)])
+                predicted_cooked_new_X = np.asarray([np.asarray(self.fit_objs_[i].predict(
+                    cooked_new_X)).item() for i in range(self.n_series)])
 
                 preds = np.asarray(y_means_ + predicted_cooked_new_X)                                                                     
                 
@@ -394,11 +394,11 @@ class MTS(Base):
                 cooked_new_X = self.cook_test_set(new_X, **kwargs)
 
                 if "return_std" in kwargs:
-                    self.preds_std_.append([np.asscalar(self.fit_objs_[i].predict(
-                        cooked_new_X, return_std=True)[1]) for i in range(self.n_series)])
+                    self.preds_std_.append([np.asarray(self.fit_objs_[i].predict(
+                        cooked_new_X, return_std=True)[1]).item() for i in range(self.n_series)])
 
-                predicted_cooked_new_X = np.asarray([np.asscalar(self.fit_objs_[i].predict(
-                    cooked_new_X)) for i in range(self.n_series)])
+                predicted_cooked_new_X = np.asarray([np.asarray(self.fit_objs_[i].predict(
+                    cooked_new_X)).item() for i in range(self.n_series)])
 
                 preds = np.asarray(y_means_ + predicted_cooked_new_X)                                                                     
                 

@@ -29,7 +29,7 @@ def center_response(y):
 def cluster_covariates(X, n_clusters, seed, type_clust="kmeans", **kwargs):
 
     if type_clust == "kmeans":
-        kmeans = KMeans(n_clusters=n_clusters, random_state=seed, **kwargs)
+        kmeans = KMeans(n_clusters=n_clusters, random_state=seed, n_init="auto", **kwargs)
         kmeans.fit(X)
 
         return kmeans, kmeans.predict(X)
