@@ -1,7 +1,3 @@
-# cython: wraparound=False
-# cython: boundscheck=False
-# cython: nonecheck=False
-
 # Authors: Thierry Moudiki
 #
 # License: BSD 3
@@ -9,12 +5,7 @@
 import functools
 import pickle
 import numpy as np
-cimport numpy as np
-cimport cython
-import gc
 
-from cython.parallel cimport prange
-from libc.math cimport log, exp, sqrt, fabs
 from numpy.linalg import lstsq
 from numpy.linalg import norm
 from scipy.special import expit
@@ -31,11 +22,7 @@ from ..utils import Progbar
 # 1 main fitting loop -----       
 
 # For classification
-#def rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators, int verbose, int seed):
-def rbagloop(object base_learner, X, y, int n_estimators, int verbose, int seed):
-
-    cdef int m 
-    cdef dict voter
+def rbagloop_classification(base_learner, X, y, n_estimators, verbose, seed):
 
     voter = {}    
 
@@ -83,10 +70,7 @@ def rbagloop(object base_learner, X, y, int n_estimators, int verbose, int seed)
     return voter
 
 # For regression
-def rbagloop2(object base_learner, X, y, int n_estimators, int verbose, int seed):
-
-    cdef int m 
-    cdef dict voter
+def rbagloop_regression(base_learner, X, y, n_estimators, verbose, seed):
 
     voter = {}    
 
