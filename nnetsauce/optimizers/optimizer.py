@@ -1,11 +1,9 @@
-# Authors: Thierry Moudiki
+# Authors: T. Moudiki
 #
-# License: BSD 3 Clear
+# License: BSD 3 Clause Clear
 
-
-import numpy as np
 from sklearn.base import BaseEstimator
-from . import _optimizerc as optimizerc
+from .helpers import scd, sgd, one_hot_encode
 
 
 class Optimizer(BaseEstimator):
@@ -103,7 +101,7 @@ class Optimizer(BaseEstimator):
 
         if self.type_optim == "scd":
 
-            self.results = optimizerc.scd(
+            self.results = scd(
                 loss_func,
                 response=response,
                 x=x0,
@@ -120,7 +118,7 @@ class Optimizer(BaseEstimator):
 
         if self.type_optim == "sgd":
 
-            self.results = optimizerc.sgd(
+            self.results = sgd(
                 loss_func,
                 response=response,
                 x=x0,
@@ -138,4 +136,4 @@ class Optimizer(BaseEstimator):
         return self
 
     def one_hot_encode(self, y, n_classes):
-        return optimizerc.one_hot_encode(y, n_classes)
+        return one_hot_encode(y, n_classes)
