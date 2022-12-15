@@ -1,6 +1,3 @@
-# cython: wraparound=False
-# cython: boundscheck=False
-# cython: nonecheck=False
 
 # Authors: Thierry Moudiki
 #
@@ -80,6 +77,9 @@ def dosubsample(y, row_sample=0.8, seed=123):
             except:
 
                 0
-    
-    return np.asarray(flatten(index))
+
+    try:
+        return np.asarray(flatten(index))
+    except:
+        return np.asarray(index)
     

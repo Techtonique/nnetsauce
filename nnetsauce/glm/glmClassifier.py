@@ -2,15 +2,12 @@
 #
 # License: BSD 3 Clear
 
-
-import pickle
 import numpy as np
 import sklearn.metrics as skm2
 from .glm import GLM
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 from sklearn.base import ClassifierMixin
-from scipy.optimize import minimize
 from ..optimizers import Optimizer
 from scipy.special import logsumexp, expit, erf
 
@@ -268,7 +265,7 @@ class GLMClassifier(GLM, ClassifierMixin):
         #          **kwargs)
         self.optimizer.fit(
             self.loss_func,
-            response=np.asarray(y, dtype=np.float),
+            response=np.asarray(y, dtype=float),
             x0=beta_.flatten(order="F"),
             group_index=self.group_index,
             X=scaled_Z,

@@ -1,19 +1,13 @@
-# Authors: Thierry Moudiki
+# Authors: T. Moudiki
 #
-# License: BSD 3 Clear
+# License: BSD 3 Clause Clear
 
-
-import pickle
 import numpy as np
 import sklearn.metrics as skm2
 from .glm import GLM
 from ..utils import matrixops as mo
-from ..utils import misc as mx
 from sklearn.base import RegressorMixin
-from scipy.optimize import minimize
 from ..optimizers import Optimizer
-from scipy.special import erf, factorial
-
 
 class GLMRegressor(GLM, RegressorMixin):
     """Generalized 'linear' models using quasi-randomized networks (regression)
@@ -219,7 +213,7 @@ class GLMRegressor(GLM, RegressorMixin):
 
         n, self.group_index = X.shape
 
-        centered_y, scaled_Z = self.cook_training_set(y=y, X=X)
+        centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
         n_Z = scaled_Z.shape[0]
 

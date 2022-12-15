@@ -22,8 +22,27 @@ def is_float(x):
 
 # check if the response contains only integers
 def is_factor(y):
-    return not np.mod(y, 1).any()
+    #return not np.mod(y, 1).any()
+    return not np.array([is_float(y[i]) for i in range(len(y))]).all()
 
 
 # flatten list of lists
-flatten = lambda l: [item for sublist in l for item in sublist]
+#flatten = lambda l: [item for sublist in l for item in sublist]
+def flatten(x): 
+            
+    res = []    
+    
+    for elt1 in x:
+                    
+        try:
+            
+            for elt2 in elt1:
+                
+                res.append(elt2)  
+                
+        except:
+            
+            res.append(elt1)  
+                                
+    return res
+

@@ -518,13 +518,13 @@ class Base(BaseEstimator):
                 )
 
         # Returning model inputs -----
-        if mx.is_factor(y) == False:  # regression
+        if mx.is_factor(y) == False:  # regression            
             # center y
-            self.y_mean_, centered_y = (
-                mo.center_response(self.y_)
-                if y is None
-                else mo.center_response(y)
-            )
+            if y is None:
+                self.y_mean_, centered_y = mo.center_response(self.y_)
+            else:
+                self.y_mean_, centered_y = mo.center_response(y)
+
             # y is subsampled
             if self.row_sample < 1:
 
