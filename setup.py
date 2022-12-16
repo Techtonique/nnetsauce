@@ -20,7 +20,11 @@ dependency_links = [
     for x in all_reqs
     if x.startswith("git+")
 ]
-install_jax_requires = ['jax', 'jaxlib'] if platform.system() in ('Linux', 'Darwin') else []
+
+if platform.system() in ('Linux', 'Darwin'):
+    install_jax_requires = ['jax', 'jaxlib']  
+else:
+    install_jax_requires = []
 
 install_requires = [item for sublist in [install_all_requires, install_jax_requires] for item in sublist]
 
