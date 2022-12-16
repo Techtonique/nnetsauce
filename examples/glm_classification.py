@@ -62,14 +62,6 @@ preds = fit_obj.predict(X_test)
 print(time() - start)
 print(metrics.classification_report(preds, y_test))
 
-# dataset no. 5 ----------
-
-digits = load_digits()
-X = digits.data
-y = digits.target
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
-                                                    random_state=123)
-
 print(f"\n method = 'exp' ----------")
 
 # dataset no. 1 ---------- 
@@ -156,8 +148,8 @@ print(metrics.classification_report(preds, y_test))
 
 X, y = make_classification(n_samples=2500, n_features=20, 
                                                random_state=783451)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, 
-                                                    random_state=351452)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y,
+                                                    random_state=35145)
 
 print(f"\n 4 - make_classification dataset ----------")
 fit_obj = ns.GLMClassifier(n_hidden_features=5,
@@ -172,7 +164,17 @@ print(fit_obj.score(X_test, y_test))
 preds = fit_obj.predict(X_test)
 print(metrics.classification_report(preds, y_test))
 
+
+# dataset no. 5 ----------
+
 print(f"\n 5 - digits dataset ----------")
+
+digits = load_digits()
+X = digits.data
+y = digits.target
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y,
+                                                    random_state=123)
+
 fit_obj = ns.GLMClassifier(n_hidden_features=25,
                                   dropout=0.1, n_clusters=3, 
                                   type_clust="gmm")

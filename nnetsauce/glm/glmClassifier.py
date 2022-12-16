@@ -206,10 +206,8 @@ class GLMClassifier(GLM, ClassifierMixin):
         X,
         y,
         learning_rate=0.01,
-        decay=0.1,  # in an object, in constructor
+        decay=0.1, 
         batch_prop=1,
-        tolerance=1e-5,  # in an object, in constructor
-        optimizer=None,  # in an object, in constructor
         verbose=1,
         **kwargs
     ):
@@ -266,13 +264,13 @@ class GLMClassifier(GLM, ClassifierMixin):
         self.optimizer.fit(
             self.loss_func,
             response=np.asarray(y, dtype=float),
+            #response=y,
             x0=beta_.flatten(order="F"),
             group_index=self.group_index,
             X=scaled_Z,
             Y=Y,
             y=y,
             type_loss=self.family,
-            tolerance=tolerance,
             **kwargs
         )
 

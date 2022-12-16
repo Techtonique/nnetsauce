@@ -180,10 +180,8 @@ class GLMRegressor(GLM, RegressorMixin):
         X,
         y,
         learning_rate=0.01,
-        decay=0.1,  # in an object, in constructor
+        decay=0.1, 
         batch_prop=1,
-        tolerance=1e-5,  # in an object, in constructor
-        optimizer=None,  # in an object, in constructor
         verbose=0,
         **kwargs
     ):
@@ -238,7 +236,6 @@ class GLMRegressor(GLM, RegressorMixin):
             X=scaled_Z,
             y=centered_y,
             type_loss=self.family,
-            tolerance=tolerance,
             **kwargs
         )
 
