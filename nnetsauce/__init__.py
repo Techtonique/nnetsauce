@@ -8,8 +8,8 @@ from .glm.glmRegressor import GLMRegressor
 from .mts.mts import MTS
 from .multitask.multitaskClassifier import MultitaskClassifier
 from .optimizers.optimizer import Optimizer
-#from .randombag.randomBagClassifier import RandomBagClassifier
-#from .randombag.randomBagRegressor import RandomBagRegressor
+from .randombag.randomBagClassifier import RandomBagClassifier
+from .randombag.randomBagRegressor import RandomBagRegressor
 from .ridge2.ridge2Classifier import Ridge2Classifier
 from .ridge2.ridge2Regressor import Ridge2Regressor
 from .ridge2.ridge2MultitaskClassifier import Ridge2MultitaskClassifier
@@ -29,8 +29,8 @@ __all__ = [
     "MTS",
     "MultitaskClassifier",
     "Optimizer",
-    #"RandomBagRegressor",
-    #"RandomBagClassifier",
+    "RandomBagRegressor",
+    "RandomBagClassifier",
     "Ridge2Regressor",
     "Ridge2Classifier",
     "Ridge2MultitaskClassifier"
