@@ -24,8 +24,8 @@ def generate_index(response, batch_prop=1.0,
                    randomization="strat", seed=123):
     """Generation of indices for Stochastic gradient descent."""
     
-    n = len(response)
-    
+    n = len(response)    
+
     if batch_prop < 1:
     
         if randomization=="strat":        

@@ -72,7 +72,48 @@ class GLMClassifier(GLM, ClassifierMixin):
             Currently available: standardization ('std') or MinMax scaling ('minmax')
 
         optimizer: object
-            optimizer, from class nnetsauce.utils.Optimizer
+            optimizer, from class nnetsauce.Optimizer
+        
+        opt_type_optim: str
+            type of optimizer, (currently) either 'sgd' (stochastic minibatch gradient descent)
+            or 'scd' (stochastic minibatch coordinate descent)
+
+        opt_num_iters: int
+            number of iterations of the optimizer
+
+        opt_learning_rate: float
+            step size
+
+        opt_batch_prop: float
+            proportion of the initial data used at each optimization step
+
+        opt_learning_method: str
+            "poly" - learning rate decreasing as a polynomial function
+            of # of iterations (default)
+            "exp" - learning rate decreasing as an exponential function
+            of # of iterations
+            "momentum" - gradient descent using momentum
+
+        opt_randomization: str
+            type of randomization applied at each step
+            "strat" - stratified subsampling (default)
+            "shuffle" - random subsampling
+
+        opt_mass: float
+            mass on velocity, for `method` == "momentum"
+
+        opt_decay: float
+            coefficient of decrease of the learning rate for
+            `method` == "poly" and `method` == "exp"
+
+        opt_tolerance: float
+            early stopping parameter (convergence of loss function)
+
+        opt_verbose: int
+            controls verbosity of gradient descent
+            0 - nothing is printed
+            1 - a progress bar is printed
+            2 - successive loss function values are printed
 
         seed: int
             reproducibility seed for nodes_sim=='uniform'
@@ -109,7 +150,17 @@ class GLMClassifier(GLM, ClassifierMixin):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         optimizer=Optimizer(),
-        seed=123,
+        opt_type_optim="sgd",
+        opt_num_iters=100,
+        opt_learning_rate=0.01,
+        opt_batch_prop=1.0,
+        opt_learning_method="momentum",
+        opt_randomization="strat",
+        opt_mass=0.9,
+        opt_decay=0.1,
+        opt_tolerance=1e-3,
+        opt_verbose=1,
+        seed=123
     ):
 
         super().__init__(
@@ -131,12 +182,28 @@ class GLMClassifier(GLM, ClassifierMixin):
             optimizer=optimizer,
             seed=seed,
         )
+        # sgd(loss_func, response, x, num_iters=200, 
+        # batch_prop=1.0, learning_rate=0.01, mass=0.9, 
+        # decay=0.1, method="momentum", randomization="strat", 
+        # tolerance=1e-3, verbose=1, 
+        # **kwargs)
+        self.family = family        
+        self.optimizer.learning_rate = opt_learning_rate
+        self.optimizer.decay = opt_decay
+        self.optimizer.batch_prop = opt_batch_prop
+        self.optimizer.type_optim = opt_type_optim
+        self.optimizer.num_iters = opt_num_iters
+        self.optimizer.learning_method = opt_learning_method
+        self.optimizer.randomization = opt_randomization
+        self.optimizer.mass = opt_mass
+        self.optimizer.decay = opt_decay
+        self.optimizer.tolerance = opt_tolerance
+        self.optimizer.verbose = opt_verbose
 
-        self.family = family
 
     def logit_loss(self, Y, row_index, XB):
 
-        self.n_classes = len(np.unique(y))
+        self.n_classes = Y.shape[1] #len(np.unique(y))
         # Y = mo.one_hot_encode2(y, self.n_classes)
         # Y = self.optimizer.one_hot_encode(y, self.n_classes)
 
@@ -205,10 +272,6 @@ class GLMClassifier(GLM, ClassifierMixin):
         self,
         X,
         y,
-        learning_rate=0.01,
-        decay=0.1, 
-        batch_prop=1,
-        verbose=1,
         **kwargs
     ):
         """Fit GLM model to training data (X, y).
@@ -250,12 +313,7 @@ class GLMClassifier(GLM, ClassifierMixin):
 
         # initialization
         beta_ = np.linalg.lstsq(scaled_Z, Y, rcond=None)[0]
-
-        self.optimizer.learning_rate = learning_rate
-        self.optimizer.decay = decay
-        self.optimizer.batch_prop = batch_prop
-        self.optimizer.verbose = verbose
-
+        
         # optimization
         # fit(self, loss_func, response, x0, **kwargs):
         # loss_func(self, beta, group_index, X, y,
@@ -263,15 +321,13 @@ class GLMClassifier(GLM, ClassifierMixin):
         #          **kwargs)
         self.optimizer.fit(
             self.loss_func,
-            response=np.asarray(y, dtype=float),
-            #response=y,
+            response=y,
             x0=beta_.flatten(order="F"),
             group_index=self.group_index,
             X=scaled_Z,
             Y=Y,
             y=y,
-            type_loss=self.family,
-            **kwargs
+            type_loss=self.family
         )
 
         self.beta_ = self.optimizer.results[0]

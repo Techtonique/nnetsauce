@@ -18,7 +18,7 @@ def dosubsample(y, row_sample=0.8, seed=123):
     n_obs_out = np.ceil(n_obs * row_sample)
 
     # preproc -----
-    if is_factor(y):
+    if is_factor(y): # classification
 
         classes, n_elem_classes = np.unique(y, return_counts=True)
         n_classes = len(classes)
@@ -28,7 +28,7 @@ def dosubsample(y, row_sample=0.8, seed=123):
         for i in range(len(n_elem_classes)):
             freqs_hist[i] = float(n_elem_classes[i]) / n_obs
 
-    else:
+    else: # regression
 
         h = np.histogram(y, bins="auto")
         n_elem_classes = np.asarray(h[0], dtype=np.integer)

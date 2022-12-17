@@ -74,6 +74,47 @@ class GLMRegressor(GLM, RegressorMixin):
         optimizer: object
             optimizer, from class nnetsauce.utils.Optimizer
 
+        opt_type_optim: str
+            type of optimizer, (currently) either 'sgd' (stochastic minibatch gradient descent)
+            or 'scd' (stochastic minibatch coordinate descent)
+
+        opt_num_iters: int
+            number of iterations of the optimizer
+
+        opt_learning_rate: float
+            step size
+
+        opt_batch_prop: float
+            proportion of the initial data used at each optimization step
+
+        opt_learning_method: str
+            "poly" - learning rate decreasing as a polynomial function
+            of # of iterations (default)
+            "exp" - learning rate decreasing as an exponential function
+            of # of iterations
+            "momentum" - gradient descent using momentum
+
+        opt_randomization: str
+            type of randomization applied at each step
+            "strat" - stratified subsampling (default)
+            "shuffle" - random subsampling
+
+        opt_mass: float
+            mass on velocity, for `method` == "momentum"
+
+        opt_decay: float
+            coefficient of decrease of the learning rate for
+            `method` == "poly" and `method` == "exp"
+
+        opt_tolerance: float
+            early stopping parameter (convergence of loss function)
+
+        opt_verbose: int
+            controls verbosity of gradient descent
+            0 - nothing is printed
+            1 - a progress bar is printed
+            2 - successive loss function values are printed
+
         seed: int
             reproducibility seed for nodes_sim=='uniform'
 
@@ -109,7 +150,17 @@ class GLMRegressor(GLM, RegressorMixin):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         optimizer=Optimizer(),
-        seed=123,
+        opt_type_optim="sgd",
+        opt_num_iters=100,
+        opt_learning_rate=0.01,
+        opt_batch_prop=1.0,
+        opt_learning_method="momentum",
+        opt_randomization="strat",
+        opt_mass=0.9,
+        opt_decay=0.1,
+        opt_tolerance=1e-3,
+        opt_verbose=1,
+        seed=123
     ):
 
         super().__init__(
@@ -132,7 +183,19 @@ class GLMRegressor(GLM, RegressorMixin):
             seed=seed,
         )
 
-        self.family = family
+        self.family = family        
+        self.optimizer.learning_rate = opt_learning_rate
+        self.optimizer.decay = opt_decay
+        self.optimizer.batch_prop = opt_batch_prop        
+        self.optimizer.type_optim = opt_type_optim
+        self.optimizer.num_iters = opt_num_iters
+        self.optimizer.learning_method = opt_learning_method
+        self.optimizer.randomization = opt_randomization
+        self.optimizer.mass = opt_mass
+        self.optimizer.decay = opt_decay
+        self.optimizer.tolerance = opt_tolerance
+        self.optimizer.verbose = opt_verbose
+        
 
     def gaussian_loss(self, y, row_index, XB):
         return 0.5 * np.mean(np.square(y[row_index] - XB))
@@ -179,10 +242,6 @@ class GLMRegressor(GLM, RegressorMixin):
         self,
         X,
         y,
-        learning_rate=0.01,
-        decay=0.1, 
-        batch_prop=1,
-        verbose=0,
         **kwargs
     ):
         """Fit GLM model to training data (X, y).
@@ -216,12 +275,7 @@ class GLMRegressor(GLM, RegressorMixin):
         n_Z = scaled_Z.shape[0]
 
         # initialization
-        beta_ = np.linalg.lstsq(scaled_Z, centered_y, rcond=None)[0]
-
-        self.optimizer.learning_rate = learning_rate
-        self.optimizer.decay = decay
-        self.optimizer.batch_prop = batch_prop
-        self.optimizer.verbose = verbose
+        beta_ = np.linalg.lstsq(scaled_Z, centered_y, rcond=None)[0]        
 
         # optimization
         # fit(self, loss_func, response, x0, **kwargs):

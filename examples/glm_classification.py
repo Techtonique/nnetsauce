@@ -73,13 +73,17 @@ X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2, random_
 
 print(f"\n 1 - breast_cancer dataset ----------")
 opt = ns.Optimizer()
-opt.set_params(learning_method = "exp")
+opt.learning_method = "exp"
 fit_obj = ns.GLMClassifier(optimizer=opt)
-fit_obj.set_params(lambda1=1e-5, lambda2=100)
+fit_obj.lambda1=1e-5 
+fit_obj.lambda2=100
 fit_obj.optimizer.type_optim = "scd"
+fit_obj.optimizer.verbose=0
+fit_obj.optimizer.learning_rate=0.01 
+fit_obj.optimizer.batch_prop=0.5
 
 start = time()
-fit_obj.fit(X_train, y_train, verbose=0, learning_rate=0.01, batch_prop=0.5)
+fit_obj.fit(X_train, y_train)
 print(time() - start)
 
 # plt.plot(fit_obj.optimizer.results[2])
@@ -99,13 +103,17 @@ print(f"\n method = 'poly' ----------")
 
 print(f"\n 1 - breast_cancer dataset ----------")
 opt = ns.Optimizer()
-opt.set_params(learning_method = "poly")
+opt.learning_method = "poly"
 fit_obj = ns.GLMClassifier(optimizer=opt)
-fit_obj.set_params(lambda1=1, lambda2=1)
+fit_obj.lambda1=1 
+fit_obj.lambda2=1
 fit_obj.optimizer.type_optim = "scd"
+fit_obj.optimizer.verbose=0
+fit_obj.optimizer.learning_rate=0.001 
+fit_obj.optimizer.batch_prop=0.5
 
 start = time()
-fit_obj.fit(X_train, y_train, verbose=0, learning_rate=0.001, batch_prop=0.5)
+fit_obj.fit(X_train, y_train)
 print(time() - start)
 
 # plt.plot(fit_obj.optimizer.results[2])
@@ -132,7 +140,7 @@ fit_obj = ns.GLMClassifier(n_hidden_features=3,
                            n_clusters=3, type_clust="gmm")
 
 start = time()
-fit_obj.fit(X_train, y_train, verbose=0)
+fit_obj.fit(X_train, y_train)
 print(time() - start)
 
 # plt.plot(fit_obj.optimizer.results[2])
@@ -156,7 +164,7 @@ fit_obj = ns.GLMClassifier(n_hidden_features=5,
                                   dropout=0.1, n_clusters=0)
 
 start = time()
-fit_obj.fit(X_train, y_train, verbose=0)
+fit_obj.fit(X_train, y_train)
 print(time() - start)
 
 print(fit_obj.score(X_test, y_test))
@@ -180,7 +188,7 @@ fit_obj = ns.GLMClassifier(n_hidden_features=25,
                                   type_clust="gmm")
 
 start = time()
-fit_obj.fit(X_train, y_train, verbose=0)
+fit_obj.fit(X_train, y_train)
 print(time() - start)
 print(fit_obj.score(X_test, y_test))
 
