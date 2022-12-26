@@ -13,27 +13,33 @@ y = diabetes.target
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=2020)
 
 print(f"\n Example 1 -----")
-obj2 = ns.GLMRegressor(n_hidden_features=3, 
+opt = ns.Optimizer(type_optim="sgd", 
+                    learning_rate=0.1, 
+                    batch_prop=0.25, 
+                    verbose=0)
+obj = ns.GLMRegressor(n_hidden_features=3, 
                        lambda1=1e-2, alpha1=0.5,
-                       lambda2=1e-2, alpha2=0.5,
-                       opt_type_optim="sgd", 
-                       opt_learning_rate=0.1, 
-                       opt_batch_prop=0.25, opt_verbose=0)
-start = time()
+                       lambda2=1e-2, alpha2=0.5, 
+                       optimizer=opt)
 
-obj2.fit(X_train, y_train)
+start = time()
+obj.fit(X_train, y_train)
 print(f"\n Elapsed: {time() - start}")
-plt.plot(obj2.optimizer.results[2])
-print(obj2.beta_)
+plt.plot(obj.optimizer.results[2])
+print(obj.beta_)
 print("RMSE: ")
-print(np.sqrt(obj2.score(X_test, y_test))) # RMSE
+print(np.sqrt(obj.score(X_test, y_test))) # RMSE
 
 
 print(f"\n Example 2 -----")
-obj2.opt_type_optim = "scd"
-obj2.opt_learning_rate=0.01
-obj2.opt_batch_prop=0.8
-obj2.opt_verbose=1
+opt2 = ns.Optimizer(type_optim="scd", 
+                    learning_rate=0.01, 
+                    batch_prop=0.8, 
+                    verbose=1)
+obj2 = ns.GLMRegressor(n_hidden_features=5, 
+                       lambda1=1e-2, alpha1=0.5,
+                       lambda2=1e-2, alpha2=0.5, 
+                       optimizer=opt2)
 
 start = time()
 obj2.fit(X_train, y_train)
@@ -44,59 +50,54 @@ print("RMSE: ")
 print(np.sqrt(obj2.score(X_test, y_test))) # RMSE
 
 print(f"\n Example 3 -----")
-obj2.lambda1=1e-2
-obj2.alpha1=0.1
-obj2.lambda2=1e-1 
-obj2.alpha2=0.9
-obj2.optimizer.type_optim = "sgd"
-obj2.optimizer.batch_prop=0.25
-obj2.optimizer.verbose=1             
+
+opt3 = ns.Optimizer(type_optim="scd",                     
+                    batch_prop=0.25, 
+                    verbose=1)
+obj3 = ns.GLMRegressor(n_hidden_features=5, 
+                       lambda1=1e-2, alpha1=0.1,
+                       lambda2=1e-1, alpha2=0.9, 
+                       optimizer=opt3)
 start = time()
-obj2.fit(X_train, y_train)
+obj3.fit(X_train, y_train)
 print(f"\n Elapsed: {time() - start}")
-plt.plot(obj2.optimizer.results[2])
-print(obj2.beta_)
+plt.plot(obj3.optimizer.results[2])
+print(obj3.beta_)
 print("RMSE: ")
 print(np.sqrt(obj2.score(X_test, y_test))) # RMSE
 
 print(f"\n Example 4 -----")
-obj2.optimizer.type_optim = "scd"
-obj2.optimizer.learning_rate=0.01 
-obj2.optimizer.batch_prop=0.8 
-obj2.optimizer.verbose=0
+
+opt4 = ns.Optimizer(type_optim="scd", 
+                    learning_rate=0.01,
+                    batch_prop=0.8, 
+                    verbose=0)
+obj4 = ns.GLMRegressor(optimizer=opt4)
 
 start = time()
-obj2.fit(X_train, y_train)
+obj4.fit(X_train, y_train)
 print(f"\n Elapsed: {time() - start}")
-plt.plot(obj2.optimizer.results[2])
-print(obj2.beta_)
+plt.plot(obj4.optimizer.results[2])
+print(obj4.beta_)
 print("RMSE: ")
-print(np.sqrt(obj2.score(X_test, y_test))) # RMSE 
+print(np.sqrt(obj4.score(X_test, y_test))) # RMSE 
 
 print(f"\n Example 5 -----")
-obj2.lambda1=1
-obj2.alpha1=0.5
-obj2.lambda2=1e-2 
-obj2.alpha2=0.1             
-obj2.optimizer.type_optim = "sgd"   
-obj2.optimizer.learning_rate=0.1
-obj2.optimizer.batch_prop=0.5
-obj2.optimizer.verbose=0
-start = time()
-obj2.fit(X_train, y_train)
-print(f"\n Elapsed: {time() - start}")
-plt.plot(obj2.optimizer.results[2])
-print(obj2.beta_)
-print("RMSE: ")
-print(np.sqrt(obj2.score(X_test, y_test))) # RMSE
 
-print(f"\n Example 6 -----")
-obj2.optimizer.type_optim = "scd"
-start = time()
-obj2.fit(X_train, y_train)
-print(f"\n Elapsed: {time() - start}")
-plt.plot(obj2.optimizer.results[2])
-print(obj2.beta_)
-print("RMSE: ")
-print(np.sqrt(obj2.score(X_test, y_test))) # RMSE
+opt5 = ns.Optimizer(type_optim="scd", 
+                    learning_rate=0.1,
+                    batch_prop=0.5, 
+                    verbose=0)
+obj5 = ns.GLMRegressor(optimizer=opt5, 
+                       lambda1=1, 
+                       alpha1=0.5, 
+                       lambda2=1e-2, 
+                       alpha2=0.1)
 
+start = time()
+obj5.fit(X_train, y_train)
+print(f"\n Elapsed: {time() - start}")
+plt.plot(obj5.optimizer.results[2])
+print(obj5.beta_)
+print("RMSE: ")
+print(np.sqrt(obj5.score(X_test, y_test))) # RMSE
