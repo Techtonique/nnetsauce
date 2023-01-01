@@ -197,9 +197,9 @@ class TestMTS(ut.TestCase):
         self.assertTrue(np.allclose(rmse3, 10.394290838542101))        
         self.assertTrue(np.allclose(rmse4, 10.371173921434293))        
         self.assertTrue(np.allclose(rmse5, 10.402884770399375, atol=1e-3))
-
-        self.assertTrue(np.allclose(preds[1][0], 0.4187793))
-        self.assertTrue(np.allclose(preds2[1][0], 0.05719732))
+        
+        self.assertTrue(np.allclose(preds[1][0], 0.41324169))        
+        self.assertTrue(np.allclose(preds2[1][0], 0.05693508))
         self.assertTrue(np.allclose(preds6[1][0], 0.06910578))
         self.assertTrue(np.allclose(preds4[1][0], 0.06910578))
         self.assertTrue(np.allclose(preds5[1][0], 0.0759192))

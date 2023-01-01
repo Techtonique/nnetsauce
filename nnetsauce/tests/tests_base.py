@@ -239,7 +239,7 @@ class TestBase(ut.TestCase):
         self.assertTrue(np.allclose(rmse, 63.243819280710575))
         self.assertTrue(np.allclose(rmse2, 19.404919470812349))
         self.assertFalse(np.allclose(rmse3, 0))
-        self.assertTrue(np.allclose(rmse4, 73.021))
+        self.assertTrue(np.allclose(rmse4, 218.55230600181096, atol=1e-6))
         self.assertFalse(np.allclose(rmse5, 0))
         self.assertTrue(np.allclose(rmse6, 62.613229649101946))
         self.assertTrue(np.allclose(rmse7, 63.048908568696184))

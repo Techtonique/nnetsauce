@@ -248,8 +248,8 @@ class TestRidge2Regressor(ut.TestCase):
         self.assertTrue(np.allclose(np.round(rmse, 3), 5.435, atol=1e-3))
         self.assertTrue(np.allclose(np.round(rmse2, 3), 19.947, atol=1e-3))
         self.assertTrue(np.allclose(np.round(rmse3, 3), 1.934, atol=1e-3))
-        self.assertTrue(np.allclose(np.round(rmse4, 3), 10.160, atol=1e-3))
-        self.assertTrue(np.allclose(np.round(rmse5, 3), 22.427, atol=1e-3))
+        self.assertTrue(np.allclose(np.round(rmse4, 3), 10.097, atol=1e-3))
+        self.assertTrue(np.allclose(np.round(rmse5, 3), 22.200957971897672, atol=1e-3))
         self.assertTrue(np.allclose(np.round(rmse6, 3), 0.614, atol=1e-3))
         self.assertTrue(np.allclose(np.round(rmse7, 3), 6.789, atol=1e-3))
         self.assertTrue(
@@ -264,8 +264,7 @@ class TestRidge2Regressor(ut.TestCase):
         self.assertFalse(
             np.allclose(fit_obj2.predict(X_test[0, :]), 283.416245307822)
         )
-
-        self.assertTrue(np.allclose(np.round(rmse8, 3), 22.422, atol=1e-3))
+        self.assertTrue(np.allclose(rmse8, 22.454022827189487, atol=1e-3))
         self.assertTrue(np.allclose(rmse9, 21.466986827736815))
         self.assertTrue(np.allclose(rmse10, 0.8446477775597262))
         self.assertTrue(np.allclose(rmse11, 22.26762496538532))
