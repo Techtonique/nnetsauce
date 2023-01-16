@@ -104,3 +104,6 @@ site/
 
 # Apple files
 .DS_Store
+
+# R files
+*.Rhistory
