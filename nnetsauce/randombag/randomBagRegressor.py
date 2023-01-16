@@ -7,12 +7,11 @@ import sklearn.metrics as skm
 from .bag import RandomBag
 from ..custom import CustomRegressor
 from ..utils import misc as mx
-from ..utils import Progbar
 from sklearn.base import RegressorMixin
 import pickle
 from joblib import Parallel, delayed
 from tqdm import tqdm
-from . import _randombagc as randombagc
+from .helpers import rbagloop_regression
 
 
 class RandomBagRegressor(RandomBag, RegressorMixin):
@@ -209,8 +208,7 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
 
         if self.n_jobs is None:
 
-            # rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators, int verbose, int seed):
-            self.voter_ = randombagc.rbagloop2(
+            self.voter_ = rbagloop_regression(
                 base_learner, X, y, self.n_estimators, self.verbose, self.seed
             )
 

@@ -1,6 +1,5 @@
 import nnetsauce as ns
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn import datasets, metrics
 from sklearn import linear_model

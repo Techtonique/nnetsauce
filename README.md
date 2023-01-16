@@ -83,7 +83,7 @@ There are multiple [examples here on GitHub](https://github.com/Techtonique/nnet
 
 You can also read these [blog posts](https://thierrymoudiki.github.io/blog/#QuasiRandomizedNN).
 
-_A deep network example_
+_Deep (quasi-randomized neural) networks example_
 
 ```python
 import nnetsauce as ns
@@ -153,7 +153,6 @@ black --line-length=80 file_submitted_for_pr.py
 A few things that we could explore are:
 
 - Enrich the [tests](#Tests)
-- Continue to make `nnetsauce` available to `R` users --> [here](./R-package)
 - Any benchmarking of `nnetsauce` models can be stored in [demo](/nnetsauce/demo) (notebooks) or [examples](./examples) (flat files), with the following naming convention:  `yourgithubname_ddmmyy_shortdescriptionofdemo.[py|ipynb|R|Rmd]`
 
 
@@ -173,7 +172,6 @@ pip install coverage
 ```bash
 git clone https://github.com/Techtonique/nnetsauce.git
 cd nnetsauce
-python setup.py build_ext --inplace
 nose2 --with-coverage
 ```
 
@@ -204,7 +202,7 @@ author={Moudiki, Thierry},
 title={\code{nnetsauce}, {A} package for {S}tatistical/{M}achine {L}earning using {R}andomized and {Q}uasi-{R}andomized (neural) networks.,
 howpublished={\url{https://github.com/thierrymoudiki/nnetsauce}},
 note={BSD 3-Clause Clear License. Version 0.x.x.},
-year={2019--2020}
+year={2019--2023}
 }
 ```
 

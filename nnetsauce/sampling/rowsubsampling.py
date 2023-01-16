@@ -1,5 +1,4 @@
-from . import _rowsubsamplingc as rowsubsamplingc
-
+from .helpers import dosubsample
 
 class SubSampler:
     """Subsampling class.
@@ -23,4 +22,4 @@ class SubSampler:
         self.seed = seed
 
     def subsample(self):
-        return rowsubsamplingc.subsamplec(self.y, self.row_sample, self.seed)
+        return dosubsample(self.y, self.row_sample, self.seed)

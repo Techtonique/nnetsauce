@@ -1,3 +1,3 @@
-from ._optimizer import Optimizer
+from .optimizer import Optimizer
 
 __all__ = ["Optimizer"]

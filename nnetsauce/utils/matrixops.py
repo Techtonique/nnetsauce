@@ -1,6 +1,5 @@
 import numpy as np
 import platform
-from .memoize import memoize
 from jax import device_put
 from scipy import sparse
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
@@ -21,7 +20,6 @@ def cbind(x, y, backend="cpu"):
 
 
 # center... response
-@memoize
 def center_response(y):
     y_mean = np.mean(y)
     return y_mean, (y - y_mean)
@@ -31,7 +29,7 @@ def center_response(y):
 def cluster_covariates(X, n_clusters, seed, type_clust="kmeans", **kwargs):
 
     if type_clust == "kmeans":
-        kmeans = KMeans(n_clusters=n_clusters, random_state=seed, **kwargs)
+        kmeans = KMeans(n_clusters=n_clusters, random_state=seed, n_init=10, **kwargs)
         kmeans.fit(X)
 
         return kmeans, kmeans.predict(X)
@@ -192,13 +190,6 @@ def scale_covariates(X, choice="std", training=True, scaler=None):
     }
 
     if training == True:
-
-        if choice == "std":
-            assert (0 not in np.std(X, axis=0)), "\nRemove columns having standard deviation equal to 0"
-    
-        if choice == "minmax":
-            assert (0 not in (np.max(X, axis=0) - np.min(X, axis=0))), "\nRemove columns having 0s in max-min"
-
         # scaler must be not None
         scaler = scaling_options[choice]
         scaled_X = scaler.fit_transform(X)

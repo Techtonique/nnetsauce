@@ -1,19 +1,13 @@
-# Authors: Thierry Moudiki
+# Authors: T. Moudiki
 #
-# License: BSD 3 Clear
+# License: BSD 3 Clause Clear
 
-
-import pickle
 import numpy as np
 import sklearn.metrics as skm2
 from .glm import GLM
 from ..utils import matrixops as mo
-from ..utils import misc as mx
 from sklearn.base import RegressorMixin
-from scipy.optimize import minimize
 from ..optimizers import Optimizer
-from scipy.special import erf, factorial
-
 
 class GLMRegressor(GLM, RegressorMixin):
     """Generalized 'linear' models using quasi-randomized networks (regression)
@@ -115,7 +109,7 @@ class GLMRegressor(GLM, RegressorMixin):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         optimizer=Optimizer(),
-        seed=123,
+        seed=123
     ):
 
         super().__init__(
@@ -138,7 +132,7 @@ class GLMRegressor(GLM, RegressorMixin):
             seed=seed,
         )
 
-        self.family = family
+        self.family = family                
 
     def gaussian_loss(self, y, row_index, XB):
         return 0.5 * np.mean(np.square(y[row_index] - XB))
@@ -185,12 +179,6 @@ class GLMRegressor(GLM, RegressorMixin):
         self,
         X,
         y,
-        learning_rate=0.01,
-        decay=0.1,  # in an object, in constructor
-        batch_prop=1,
-        tolerance=1e-5,  # in an object, in constructor
-        optimizer=None,  # in an object, in constructor
-        verbose=0,
         **kwargs
     ):
         """Fit GLM model to training data (X, y).
@@ -219,17 +207,12 @@ class GLMRegressor(GLM, RegressorMixin):
 
         n, self.group_index = X.shape
 
-        centered_y, scaled_Z = self.cook_training_set(y=y, X=X)
+        centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
         n_Z = scaled_Z.shape[0]
 
         # initialization
-        beta_ = np.linalg.lstsq(scaled_Z, centered_y, rcond=None)[0]
-
-        self.optimizer.learning_rate = learning_rate
-        self.optimizer.decay = decay
-        self.optimizer.batch_prop = batch_prop
-        self.optimizer.verbose = verbose
+        beta_ = np.linalg.lstsq(scaled_Z, centered_y, rcond=None)[0]        
 
         # optimization
         # fit(self, loss_func, response, x0, **kwargs):
@@ -244,7 +227,6 @@ class GLMRegressor(GLM, RegressorMixin):
             X=scaled_Z,
             y=centered_y,
             type_loss=self.family,
-            tolerance=tolerance,
             **kwargs
         )
 

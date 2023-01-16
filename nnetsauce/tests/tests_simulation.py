@@ -7,7 +7,7 @@ import unittest as ut
 
 class TestSimul(ut.TestCase):
     def test_sobol(self):
-        res = nsim.generate_sobol2(n_dims=3, n_points=4)
+        res = nsim.generate_sobol(n_dims=3, n_points=4)
         self.assertAlmostEqual(res[2, 2], 0.25)
 
     def test_hammersley(self):

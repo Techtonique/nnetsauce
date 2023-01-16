@@ -1,6 +1,5 @@
 from .lmfuncs import beta_hat, inv_penalized_cov
 from .matrixops import cbind, rbind, crossprod, tcrossprod, to_np_array
-from .memoize import memoize
 from .misc import merge_two_dicts, is_factor
 from .model_selection import TimeSeriesSplit
 from .progress_bar import Progbar
@@ -24,7 +23,6 @@ __all__ = [
     "merge_two_dicts",
     "is_factor",
     "isPD",
-    "memoize",
     "nearestPD",
     "compute_output_dates",
     "create_lags",

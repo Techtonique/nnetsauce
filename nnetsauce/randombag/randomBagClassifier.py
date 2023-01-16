@@ -7,12 +7,11 @@ import sklearn.metrics as skm2
 from .bag import RandomBag
 from ..custom import CustomClassifier
 from ..utils import misc as mx
-from ..utils import Progbar
 from sklearn.base import ClassifierMixin
 import pickle
 from joblib import Parallel, delayed
 from tqdm import tqdm
-from . import _randombagc as randombagc
+from .helpers import rbagloop_classification
 
 
 class RandomBagClassifier(RandomBag, ClassifierMixin):
@@ -225,9 +224,8 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         # 1 - Sequential training -----
 
         if self.n_jobs is None:
-
-            # rbagloop(object base_learner, double[:,:] X, long int[:] y, int n_estimators, int verbose, int seed):
-            self.voter_ = randombagc.rbagloop(
+            
+            self.voter_ = rbagloop_classification(
                 base_learner, X, y, self.n_estimators, self.verbose, self.seed
             )
 

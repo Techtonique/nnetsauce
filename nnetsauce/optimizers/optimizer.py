@@ -1,14 +1,10 @@
-# Authors: Thierry Moudiki
+# Authors: T. Moudiki
 #
-# License: BSD 3 Clear
+# License: BSD 3 Clause Clear
 
+from .helpers import scd, sgd, one_hot_encode
 
-import numpy as np
-from sklearn.base import BaseEstimator
-from . import _optimizerc as optimizerc
-
-
-class Optimizer(BaseEstimator):
+class Optimizer():
     """Optimizer class
 
     Attributes:
@@ -45,11 +41,14 @@ class Optimizer(BaseEstimator):
             coefficient of decrease of the learning rate for
             `method` == "poly" and `method` == "exp"
 
+        tolerance: float
+            early stopping parameter (convergence of loss function)
+
         verbose: int
             controls verbosity of gradient descent
             0 - nothing is printed
             1 - a progress bar is printed
-            2 - succesive loss function values are printed
+            2 - successive loss function values are printed
 
     """
 
@@ -65,6 +64,7 @@ class Optimizer(BaseEstimator):
         randomization="strat",
         mass=0.9,
         decay=0.1,
+        tolerance=1e-3,
         verbose=1,
     ):
 
@@ -76,6 +76,7 @@ class Optimizer(BaseEstimator):
         self.randomization = randomization
         self.mass = mass
         self.decay = decay
+        self.tolerance = tolerance
         self.verbose = verbose
         self.opt = None
 
@@ -103,7 +104,7 @@ class Optimizer(BaseEstimator):
 
         if self.type_optim == "scd":
 
-            self.results = optimizerc.scd(
+            self.results = scd(
                 loss_func,
                 response=response,
                 x=x0,
@@ -114,13 +115,14 @@ class Optimizer(BaseEstimator):
                 mass=self.mass,
                 decay=self.decay,
                 randomization=self.randomization,
+                tolerance=self.tolerance,
                 verbose=self.verbose,
                 **kwargs
             )
 
         if self.type_optim == "sgd":
 
-            self.results = optimizerc.sgd(
+            self.results = sgd(
                 loss_func,
                 response=response,
                 x=x0,
@@ -131,6 +133,7 @@ class Optimizer(BaseEstimator):
                 mass=self.mass,
                 decay=self.decay,
                 randomization=self.randomization,
+                tolerance=self.tolerance,
                 verbose=self.verbose,
                 **kwargs
             )
@@ -138,4 +141,4 @@ class Optimizer(BaseEstimator):
         return self
 
     def one_hot_encode(self, y, n_classes):
-        return optimizerc.one_hot_encode(y, n_classes)
+        return one_hot_encode(y, n_classes)

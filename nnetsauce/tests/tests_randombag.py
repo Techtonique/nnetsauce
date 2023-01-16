@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.datasets import (
     load_breast_cancer,
     load_wine,
-    fetch_california_housing,
+    load_diabetes,
 )
 from sklearn.linear_model import LogisticRegression
 
@@ -29,7 +29,9 @@ class TestRandomBag(ut.TestCase):
             Z, t, test_size=0.2, random_state=12736
         )
 
-        X2, y2 = fetch_california_housing(return_X_y=True, as_frame=False)
+        diabetes = load_diabetes()
+        X2 = diabetes.data
+        y2 = diabetes.target
         # split data into training test and test set
         X_train2, X_test2, y_train2, y_test2 = train_test_split(
             X2, y2, test_size=0.2, random_state=13
@@ -134,9 +136,8 @@ class TestRandomBag(ut.TestCase):
         self.assertTrue(
             np.allclose(fit_obj.predict(X_test)[0], 1)
             & np.allclose(fit_obj2.predict(X_test)[0], 0)
-        )
-
-        self.assertTrue(np.allclose(preds4[0], 1.6404241349742967))
+        )        
+        self.assertTrue(np.allclose(preds4[0], 125.74435958332731))
 
     def test_score(self):
 
