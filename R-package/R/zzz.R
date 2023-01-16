@@ -48,7 +48,7 @@ install_packages <- function(pip=TRUE) {
     reticulate::py_install("numpy", pip = pip)
     reticulate::py_install("pandas", pip = pip)
     reticulate::py_install("scipy", pip = pip)
-    reticulate::py_install("sklearn", pip = pip)
+    reticulate::py_install("scikit-learn", pip = pip)
     reticulate::py_install("threadpoolctl", pip = pip)
     reticulate::py_install("tqdm", pip = pip)
 
@@ -77,7 +77,7 @@ install_packages <- function(pip=TRUE) {
   numpy <<- reticulate::import("numpy", delay_load = TRUE)
   pandas <<- reticulate::import("pandas", delay_load = TRUE)
   scipy <<- reticulate::import("scipy", delay_load = TRUE)
-  sklearn <<- reticulate::import("sklearn", delay_load = TRUE)
+  sklearn <<- reticulate::import("scikit-learn", delay_load = TRUE)
   threadpoolctl <<- reticulate::import("threadpoolctl", delay_load = TRUE)
   tqdm <<- reticulate::import("tqdm", delay_load = TRUE)
   ns <<- reticulate::import("nnetsauce", delay_load = TRUE)
