@@ -28,9 +28,6 @@ AdaBoostClassifier(
   backend = c("cpu", "gpu", "tpu")
 )
 }
-\value{
-
-}
 \description{
 Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 }
@@ -41,10 +38,22 @@ library(datasets)
 X <- as.matrix(iris[, 1:4])
 y <- as.integer(iris[, 5]) - 1L
 
+n <- dim(X)[1]
+p <- dim(X)[2]
+
+set.seed(213)
+train_index <- sample(x = 1:n, size = floor(0.8*n), replace = TRUE)
+test_index <- -train_index
+
+X_train <- as.matrix(iris[train_index, 1:4])
+y_train <- as.integer(iris[train_index, 5]) - 1L
+X_test <- as.matrix(iris[test_index, 1:4])
+y_test <- as.integer(iris[test_index, 5]) - 1L
+
 obj <- sklearn$tree$DecisionTreeClassifier()
 obj2 <- AdaBoostClassifier(obj)
-# obj2$fit(X, y)
-# print(obj2$score(X, y))
-# print(obj2$predict_proba(X))
+obj2$fit(X_train, y_train)
+print(obj2$score(X_test, y_test))
+print(obj2$predict_proba(X_test))
 
 }

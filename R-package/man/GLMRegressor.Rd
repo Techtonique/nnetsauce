@@ -25,9 +25,6 @@ GLMRegressor(
   seed = 123L
 )
 }
-\value{
-
-}
 \description{
 Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 }

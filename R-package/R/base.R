@@ -18,9 +18,21 @@
 #' X <- matrix(rnorm(n * p), n, p) # no intercept!
 #' y <- rnorm(n)
 #'
-#' obj <- nnetsauce::BaseRegressor(n_hidden_features=10L, dropout=0.9)
-#' print(obj$fit(X, y))
-#' print(obj$score(X, y))
+#' n <- dim(X)[1]
+#' p <- dim(X)[2]
+#'
+#' set.seed(213)
+#' train_index <- sample(x = 1:n, size = floor(0.8*n), replace = TRUE)
+#' test_index <- -train_index
+#'
+#' X_train <- as.matrix(X[train_index, ])
+#' y_train <- y[train_index]
+#' X_test <- as.matrix(X[test_index, ])
+#' y_test <- y[test_index]
+#'
+#' obj <- BaseRegressor(n_hidden_features=10L, dropout=0.9)
+#' print(obj$fit(X_train, y_train))
+#' print(obj$score(X_test, y_test))
 #'
 BaseRegressor <- function(n_hidden_features=5L,
                           activation_name="relu",
