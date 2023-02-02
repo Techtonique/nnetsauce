@@ -55,7 +55,7 @@ install_packages <- function(pip=TRUE) {
   try(do.call("uninstall_nnetsauce", list(foo=NULL)),
       silent = TRUE)
 
-  #do.call("install_miniconda_", list(silent=TRUE))
+  do.call("install_miniconda_", list(silent=TRUE))
 
   do.call("install_packages", list(pip=TRUE))
 
