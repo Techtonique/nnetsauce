@@ -6,8 +6,6 @@ six <- NULL
 sklearn <- NULL
 tqdm <- NULL
 ns <- NULL
-rpy2 <- NULL
-
 
 
 install_miniconda_ <- function(silent = TRUE)
@@ -32,7 +30,6 @@ uninstall_nnetsauce <- function(foo = NULL) {
 install_packages <- function(pip=TRUE) {
 
   reticulate::py_install("numpy", pip = pip)
-  reticulate::py_install("rpy2", pip = pip)
   reticulate::py_install("scipy", pip = pip)
   reticulate::py_install("six", pip = pip)
   reticulate::py_install("tqdm", pip = pip)
@@ -55,13 +52,12 @@ install_packages <- function(pip=TRUE) {
   try(do.call("uninstall_nnetsauce", list(foo=NULL)),
       silent = TRUE)
 
-  do.call("install_miniconda_", list(silent=TRUE))
+  # do.call("install_miniconda_", list(silent=TRUE))
 
   do.call("install_packages", list(pip=TRUE))
 
 
   numpy <<- reticulate::import("numpy", delay_load = TRUE)
-  rpy2 <<- reticulate::import("rpy2", delay_load = TRUE)
   scipy <<- reticulate::import("scipy", delay_load = TRUE)
   six <<- reticulate::import("six", delay_load = TRUE)
   sklearn <<- reticulate::import("sklearn", delay_load = TRUE)
