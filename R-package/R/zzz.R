@@ -27,35 +27,24 @@ uninstall_nnetsauce <- function(foo = NULL) {
   packages
 }
 
-install_packages <- function(pip=TRUE) {
+install_packages <- function() {
 
-  reticulate::py_install("numpy", pip = pip)
-  reticulate::py_install("scipy", pip = pip)
-  reticulate::py_install("six", pip = pip)
-  reticulate::py_install("tqdm", pip = pip)
-  reticulate::py_install("sklearn", pip = pip)
-
-  foo <- try(reticulate::py_install("nnetsauce", pip = pip,
-                                    pip_ignore_installed = TRUE),
-             silent=TRUE)
-  if (class(foo) == "try-error")
-  {
-    reticulate::py_install("git+https://github.com/Techtonique/nnetsauce.git",
-                           pip = pip, pip_ignore_installed = TRUE)
-  }
+  reticulate::py_install(packages = c("numpy", "scipy", "six",
+                                      "tqdm", "scikit-learn",
+                                      "nnetsauce"),
+  method = "auto", conda = "auto")
 
 }
 
 
 .onLoad <- function(libname, pkgname) {
 
-  try(do.call("uninstall_nnetsauce", list(foo=NULL)),
-      silent = TRUE)
+  #try(do.call("uninstall_nnetsauce", list(foo=NULL)),
+  #    silent = TRUE)
 
   # do.call("install_miniconda_", list(silent=TRUE))
 
-  do.call("install_packages", list(pip=TRUE))
-
+  do.call("install_packages")
 
   numpy <<- reticulate::import("numpy", delay_load = TRUE)
   scipy <<- reticulate::import("scipy", delay_load = TRUE)
