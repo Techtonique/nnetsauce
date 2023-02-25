@@ -27,12 +27,12 @@ uninstall_nnetsauce <- function(foo = NULL) {
   packages
 }
 
-install_packages <- function() {
+install_packages <- function(method = "auto", conda = "auto") {
 
   reticulate::py_install(packages = c("numpy", "scipy", "six",
                                       "tqdm", "scikit-learn",
                                       "nnetsauce"),
-  method = "auto", conda = "auto")
+  method = method, conda = conda)
 
 }
 
@@ -44,7 +44,7 @@ install_packages <- function() {
 
   # do.call("install_miniconda_", list(silent=TRUE))
 
-  do.call("install_packages")
+  do.call("install_packages", list(method = "auto", conda = "auto"))
 
   numpy <<- reticulate::import("numpy", delay_load = TRUE)
   scipy <<- reticulate::import("scipy", delay_load = TRUE)
