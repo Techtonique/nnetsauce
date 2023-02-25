@@ -49,7 +49,8 @@ install_packages <- function(method = "auto", conda = "auto") {
   numpy <<- reticulate::import("numpy", delay_load = TRUE)
   scipy <<- reticulate::import("scipy", delay_load = TRUE)
   six <<- reticulate::import("six", delay_load = TRUE)
-  sklearn <<- reticulate::import("scikit-", delay_load = TRUE)
+  sklearn <<- reticulate::import("scikit-learn", as="sklearn",
+                                 delay_load = TRUE)
   tqdm <<- reticulate::import("tqdm", delay_load = TRUE)
   ns <<- reticulate::import("nnetsauce", delay_load = TRUE)
 }
