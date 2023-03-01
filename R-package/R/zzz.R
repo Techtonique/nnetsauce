@@ -7,30 +7,30 @@ sklearn <- NULL
 tqdm <- NULL
 ns <- NULL
 
-# https://rstudio.github.io/reticulate/articles/package.html#installing-python-dependencies
-install_packages <- function(conda = "auto") {
-
-  reticulate::conda_install(envname = "r-reticulate",
-                            packages = c("numpy", "scipy", "six",
-                                         "tqdm", "scikit-learn",
-                                         "nnetsauce"),
-                            conda = conda)
-}
-
+# # https://rstudio.github.io/reticulate/articles/package.html#installing-python-dependencies
+# install_packages <- function(conda = "auto", method = "auto") {
+#
+#   reticulate::py_install(packages = c("numpy", "scipy", "six",
+#                                       "tqdm", "scikit-learn",
+#                                       "nnetsauce"),
+#                          envname = "r-reticulate",
+#                          method = method,
+#                          conda = conda,
+#                          ignore_installed = TRUE)
+# }
 
 .onLoad <- function(libname, pkgname) {
 
-  foo <- try(expr = reticulate::use_condaenv("r-reticulate"),
-             silent = FALSE)
-  if (class(foo) == "try-error"){
-    foo <- reticulate::conda_create(envname = "r-reticulate",
-                                    packages = c("numpy", "scipy", "six",
-                                                 "tqdm", "scikit-learn",
-                                                 "nnetsauce"))
-  }
+  reticulate::virtualenv_create(envname = "r-reticulate",
+                                python = Sys.which("python"))
 
-  do.call(what = "install_packages",
-          args = list(conda = "auto"))
+  reticulate::virtualenv_install(envname = "r-reticulate",
+                                 packages = c("numpy", "scipy", "six",
+                                              "tqdm", "scikit-learn",
+                                              "nnetsauce"))
+
+  # do.call(what = "install_packages",
+  #         args = list(conda = "auto"))
 
   numpy <<- reticulate::import("numpy", delay_load = TRUE)
   scipy <<- reticulate::import("scipy", delay_load = TRUE)
