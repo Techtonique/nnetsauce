@@ -12,7 +12,7 @@ ns <- NULL
 
   foo <- try(reticulate::install_miniconda(force = FALSE),
              silent=FALSE)
-  if (foo == "try-error")
+  if (class(foo) == "try-error")
   {
     message("Not reinstalling miniconda...")
   }
@@ -22,7 +22,7 @@ ns <- NULL
                             packages = c("numpy", "scipy", "six",
                                          "tqdm", "scikit-learn",
                                          "nnetsauce")), silent = FALSE)
-  if (foo2 == "try-error")
+  if (class(foo2) == "try-error")
   {
     message("Not re-creating r-reticulate ...")
   }
