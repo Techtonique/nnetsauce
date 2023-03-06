@@ -33,8 +33,7 @@ ns <- NULL
     message("Using r-reticulate as codaenv failed...")
   }
 
-  foo4 <- try(reticulate::conda_install(envname = "r-reticulate",
-                            packages = c("numpy", "scipy", "six",
+  foo4 <- try(reticulate::conda_install(packages = c("numpy", "scipy", "six",
                                         "tqdm", "scikit-learn",
                                           "nnetsauce")),
               silent = FALSE)
