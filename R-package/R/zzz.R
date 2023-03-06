@@ -10,15 +10,17 @@ ns <- NULL
 
 .onLoad <- function(libname, pkgname) {
 
-  reticulate::virtualenv_create(envname = "r-reticulate",
-                                python = Sys.which("python"))
-
-  reticulate::conda_install(envname = "r-reticulate",
-                            packages = c("numpy", "scipy", "six",
-                                         "tqdm", "scikit-learn",
-                                         "nnetsauce"))
+  reticulate::conda_create(envname = "r-reticulate",
+                           packages = c("numpy", "scipy", "six",
+                                        "tqdm", "scikit-learn",
+                                        "nnetsauce"))
 
   reticulate::use_condaenv(condaenv = "r-reticulate")
+
+  reticulate::conda_install(envname = "r-reticulate",
+                             packages = c("numpy", "scipy", "six",
+                                        "tqdm", "scikit-learn",
+                                          "nnetsauce"))
 
   numpy <<- reticulate::import("numpy", delay_load = TRUE)
   scipy <<- reticulate::import("scipy", delay_load = TRUE)
