@@ -18,7 +18,6 @@ ns <- NULL
   }
 
   foo2 <- try(reticulate::conda_create(envname = "r-reticulate",
-                            pip = TRUE,
                             packages = c("numpy", "scipy", "six",
                                          "tqdm", "scikit-learn",
                                          "nnetsauce")), silent = FALSE)
@@ -35,7 +34,6 @@ ns <- NULL
   }
 
   foo4 <- try(reticulate::conda_install(envname = "r-reticulate",
-                            pip = TRUE,
                             packages = c("numpy", "scipy", "six",
                                         "tqdm", "scikit-learn",
                                           "nnetsauce")),
