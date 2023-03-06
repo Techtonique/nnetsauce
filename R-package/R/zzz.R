@@ -17,10 +17,21 @@ ns <- NULL
     message("Not reinstalling miniconda...")
   }
 
+  foo2 <- try(reticulate::conda_create(envname = "r-reticulate",
+                            pip = TRUE,
+                            packages = c("numpy", "scipy", "six",
+                                         "tqdm", "scikit-learn",
+                                         "nnetsauce")), silent = FALSE)
+  if (foo2 == "try-error")
+  {
+    message("Not re-creating r-reticulate ...")
+  }
+
   reticulate::use_condaenv(condaenv = "r-reticulate")
 
   reticulate::conda_install(envname = "r-reticulate",
-                             packages = c("numpy", "scipy", "six",
+                            pip = TRUE,
+                            packages = c("numpy", "scipy", "six",
                                         "tqdm", "scikit-learn",
                                           "nnetsauce"))
 
