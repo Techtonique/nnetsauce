@@ -10,13 +10,12 @@ ns <- NULL
 
 .onLoad <- function(libname, pkgname) {
 
-  foo <- try(reticulate::install_miniconda(),
+  foo <- try(reticulate::install_miniconda(force = FALSE),
              silent=FALSE)
-
-  reticulate::conda_create(envname = "r-reticulate",
-                           packages = c("numpy", "scipy", "six",
-                                        "tqdm", "scikit-learn",
-                                        "nnetsauce"))
+  if (foo == "try-error")
+  {
+    message("Not reinstalling miniconda...")
+  }
 
   reticulate::use_condaenv(condaenv = "r-reticulate")
 
