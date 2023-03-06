@@ -10,6 +10,9 @@ ns <- NULL
 
 .onLoad <- function(libname, pkgname) {
 
+  foo <- try(reticulate::install_miniconda(),
+             silent=FALSE)
+
   reticulate::conda_create(envname = "r-reticulate",
                            packages = c("numpy", "scipy", "six",
                                         "tqdm", "scikit-learn",
