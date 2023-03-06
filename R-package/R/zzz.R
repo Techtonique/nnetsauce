@@ -27,13 +27,24 @@ ns <- NULL
     message("Not re-creating r-reticulate ...")
   }
 
-  reticulate::use_condaenv(condaenv = "r-reticulate")
+  foo3 <- try(reticulate::use_condaenv(condaenv = "r-reticulate"),
+              silent = FALSE)
+  if (class(foo3) == "try-error")
+  {
+    message("Using r-reticulate as codaenv failed...")
+  }
 
-  reticulate::conda_install(envname = "r-reticulate",
+  foo4 <- try(reticulate::conda_install(envname = "r-reticulate",
                             pip = TRUE,
                             packages = c("numpy", "scipy", "six",
                                         "tqdm", "scikit-learn",
-                                          "nnetsauce"))
+                                          "nnetsauce")),
+              silent = FALSE)
+  if (class(foo4) == "try-error")
+  {
+    message("Using conda_install for installing packages failed...")
+  }
+
 
   numpy <<- reticulate::import("numpy", delay_load = TRUE)
   scipy <<- reticulate::import("scipy", delay_load = TRUE)
