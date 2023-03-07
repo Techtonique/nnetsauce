@@ -19,7 +19,8 @@ ns <- NULL
 
   reticulate::use_python(Sys.which("python"))
 
-  #reticulate::use_virtualenv("~/myenv")
+  reticulate::use_virtualenv("~/myenv")
+
   reticulate::conda_create(envname = "myenv")
 
   #reticulate::use_condaenv("myenv")
