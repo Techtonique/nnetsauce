@@ -21,8 +21,6 @@ ns <- NULL
 
   reticulate::use_virtualenv("~/myenv")
 
-  reticulate::conda_create(envname = "myenv")
-
   reticulate::use_condaenv("myenv")
 
   reticulate::conda_install(envname = "myenv",
