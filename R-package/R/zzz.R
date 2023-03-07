@@ -26,7 +26,8 @@ ns <- NULL
   reticulate::conda_install(envname = "myenv",
                             packages = c("numpy", "scipy",
                                          "six", "scikit-learn",
-                                         "tqdm", "nnetsauce"))
+                                         "tqdm", "nnetsauce"),
+                            pip = TRUE)
 
   numpy <<- reticulate::import("numpy", delay_load = TRUE)
   scipy <<- reticulate::import("scipy", delay_load = TRUE)
