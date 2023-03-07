@@ -10,38 +10,12 @@ ns <- NULL
 
 .onLoad <- function(libname, pkgname) {
 
-  foo <- try(reticulate::install_miniconda(force = FALSE),
-             silent=FALSE)
-  if (class(foo) == "try-error")
-  {
-    message("Not reinstalling miniconda...")
-  }
+  reticulate::conda_create(envname = "r-reticulate")
 
-  foo2 <- try(reticulate::conda_create(envname = "r-reticulate",
-                            packages = c("numpy", "scipy", "six",
-                                         "tqdm", "scikit-learn",
-                                         "nnetsauce")), silent = FALSE)
-  if (class(foo2) == "try-error")
-  {
-    message("Not re-creating r-reticulate ...")
-  }
-
-  foo3 <- try(reticulate::use_condaenv(condaenv = "r-reticulate"),
-              silent = FALSE)
-  if (class(foo3) == "try-error")
-  {
-    message("Using r-reticulate as codaenv failed...")
-  }
-
-  foo4 <- try(reticulate::conda_install(packages = c("numpy", "scipy", "six",
-                                        "tqdm", "scikit-learn",
-                                          "nnetsauce")),
-              silent = FALSE)
-  if (class(foo4) == "try-error")
-  {
-    message("Using conda_install for installing packages failed...")
-  }
-
+  reticulate::conda_install(envname = "r-reticulate",
+                            packages = c("numpy", "scipy",
+                                         "six", "scikit-learn",
+                                         "tqdm", "nnetsauce"))
 
   numpy <<- reticulate::import("numpy", delay_load = TRUE)
   scipy <<- reticulate::import("scipy", delay_load = TRUE)
