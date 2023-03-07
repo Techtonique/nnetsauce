@@ -16,8 +16,6 @@ ns <- NULL
 
   reticulate::use_condaenv("myenv")
 
-  reticulate::conda_create(envname = "myenv")
-
   reticulate::conda_install(envname = "myenv",
                             packages = c("numpy", "scipy",
                                          "six", "scikit-learn",
