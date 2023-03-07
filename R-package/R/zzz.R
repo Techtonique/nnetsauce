@@ -10,6 +10,13 @@ ns <- NULL
 
 .onLoad <- function(libname, pkgname) {
 
+  foo <- try(reticulate::install_miniconda(),
+             silent = FALSE)
+
+  if (class(foo) == "try-error"){
+    message("miniconda already installed")
+  }
+
   reticulate::use_python(Sys.which("python"))
 
   reticulate::use_virtualenv("~/myenv")
