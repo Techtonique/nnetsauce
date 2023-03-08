@@ -17,7 +17,7 @@ ns <- NULL
     message("Skipping use_python...")
   }
 
-  foo1 <- try(reticulate::install_miniconda(), silent = FALSE)
+  foo1 <- try(reticulate::install_miniconda(force = TRUE), silent = FALSE)
   if (class(foo1) == "try-error")
   {
     message("Skipping install_miniconda...")
@@ -38,7 +38,7 @@ ns <- NULL
     message("Skipping use_condaenv...")
   }
 
-  foo4 <- try(reticulate::conda_install(envname = "r-reticulate",
+  foo4 <- try(reticulate::conda_install(
                             packages = c("numpy", "scipy",
                                          "six", "scikit-learn",
                                          "tqdm", "nnetsauce"),
