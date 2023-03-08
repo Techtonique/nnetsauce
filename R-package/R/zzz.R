@@ -25,7 +25,7 @@ ns <- NULL
     message("Skipping virtualenv_create")
   }
 
-  foo3 <- try(reticulate::use_condaenv(),
+  foo3 <- try(reticulate::use_condaenv(condaenv = "r-reticulate"),
               silent = FALSE)
   if (class(foo3) == "try-error")
   {
