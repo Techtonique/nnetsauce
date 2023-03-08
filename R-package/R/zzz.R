@@ -10,19 +10,41 @@ ns <- NULL
 
 .onLoad <- function(libname, pkgname) {
 
-  foo <- try(reticulate::conda_install(envname = "r-reticulate",
+  foo <- try(reticulate::use_python(python = Sys.which("python3"),
+                         required = TRUE), silent = FALSE)
+  if (class(foo) == "try-error")
+  {
+    message("Skipping use_python")
+  }
+
+  foo2 <- try(reticulate::virtualenv_create("r-reticulate",
+                                python = Sys.which("python3")),
+              silent = FALSE)
+  if (class(foo2) == "try-error")
+  {
+    message("Skipping virtualenv_create")
+  }
+
+  foo3 <- try(reticulate::use_condaenv(),
+              silent = FALSE)
+  if (class(foo3) == "try-error")
+  {
+    message("Skipping use_condaenv")
+  }
+
+  foo4 <- try(reticulate::conda_install(envname = "r-reticulate",
                             packages = c("numpy", "scipy",
                                          "six", "scikit-learn",
                                          "tqdm", "nnetsauce"),
                             pip = TRUE), silent = FALSE)
-  if (class(foo) == "try-error")
+  if (class(foo4) == "try-error")
   {
     message("Skipping conda_install")
   }
 
-  foo2 <- try(reticulate::use_condaenv("r-reticulate"),
+  foo5 <- try(reticulate::use_condaenv("r-reticulate"),
               silent = FALSE)
-  if (class(foo2) == "try-error")
+  if (class(foo5) == "try-error")
   {
     message("Skipping use_condaenv")
   }
