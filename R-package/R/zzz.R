@@ -14,7 +14,13 @@ ns <- NULL
                          required = TRUE), silent = FALSE)
   if (class(foo) == "try-error")
   {
-    message("Skipping use_python")
+    message("Skipping use_python...")
+  }
+
+  foo1 <- try(reticulate::install_miniconda(), silent = FALSE)
+  if (class(foo1) == "try-error")
+  {
+    message("Skipping install_miniconda...")
   }
 
   foo2 <- try(reticulate::virtualenv_create("r-reticulate",
@@ -22,14 +28,14 @@ ns <- NULL
               silent = FALSE)
   if (class(foo2) == "try-error")
   {
-    message("Skipping virtualenv_create")
+    message("Skipping virtualenv_create...")
   }
 
   foo3 <- try(reticulate::use_condaenv(condaenv = "r-reticulate"),
               silent = FALSE)
   if (class(foo3) == "try-error")
   {
-    message("Skipping use_condaenv")
+    message("Skipping use_condaenv...")
   }
 
   foo4 <- try(reticulate::conda_install(envname = "r-reticulate",
@@ -39,14 +45,14 @@ ns <- NULL
                             pip = TRUE), silent = FALSE)
   if (class(foo4) == "try-error")
   {
-    message("Skipping conda_install")
+    message("Skipping conda_install...")
   }
 
   foo5 <- try(reticulate::use_condaenv("r-reticulate"),
               silent = FALSE)
   if (class(foo5) == "try-error")
   {
-    message("Skipping use_condaenv")
+    message("Skipping use_condaenv...")
   }
 
   numpy <<- reticulate::import("numpy", delay_load = TRUE)
