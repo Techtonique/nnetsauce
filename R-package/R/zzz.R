@@ -41,33 +41,33 @@ install_packages <- function(pip = TRUE) {
   has_tqdm <- reticulate::py_module_available("tqdm")
 
   if (has_numpy == FALSE)
-    reticulate::py_install("numpy", pip = pip)
+    reticulate::conda_install(packages="numpy", pip = pip)
 
   if (has_scipy == FALSE)
-    reticulate::py_install("scipy", pip = pip)
+    reticulate::conda_install(packages="scipy", pip = pip)
 
   if (has_six == FALSE)
-    reticulate::py_install("six", pip = pip)
+    reticulate::conda_install(packages="six", pip = pip)
 
   if (has_sklearn == FALSE)
   {
-    foo <- try(reticulate::py_install("scikit-learn", pip = pip),
+    foo <- try(reticulate::conda_install(packages="scikit-learn", pip = pip),
                silent = TRUE)
     if (class(foo) == "try-error")
     {
-      reticulate::py_install("sklearn", pip = pip)
+      reticulate::conda_install(packages="sklearn", pip = pip)
     }
   }
 
   if (has_tqdm == FALSE)
-    reticulate::py_install("tqdm", pip = pip)
+    reticulate::conda_install("tqdm", pip = pip)
 
-  foo <- try(reticulate::py_install("nnetsauce", pip = pip,
+  foo <- try(reticulate::conda_install(packages="nnetsauce", pip = pip,
                                     pip_ignore_installed = TRUE),
              silent=TRUE)
   if (class(foo) == "try-error")
   {
-    reticulate::py_install("git+https://github.com/Techtonique/nnetsauce.git",
+    reticulate::conda_install(packages="git+https://github.com/Techtonique/nnetsauce.git",
                            pip = pip, pip_ignore_installed = TRUE)
   }
 }
@@ -83,9 +83,9 @@ install_packages <- function(pip = TRUE) {
   do.call("install_packages", list(pip=TRUE))
 
   # use superassignment to update global reference to packages
-  # numpy <<- reticulate::import("numpy", delay_load = TRUE)
-  # scipy <<- reticulate::import("scipy", delay_load = TRUE)
-  # six <<- reticulate::import("six", delay_load = TRUE)
+  numpy <<- reticulate::import("numpy", delay_load = TRUE)
+  scipy <<- reticulate::import("scipy", delay_load = TRUE)
+  six <<- reticulate::import("six", delay_load = TRUE)
   sklearn <<- try(reticulate::import("sklearn", delay_load = TRUE),
                   silent = TRUE)
   if (class(sklearn) == "try-error")
@@ -93,6 +93,6 @@ install_packages <- function(pip = TRUE) {
     sklearn <<- try(reticulate::import("scikit-learn", delay_load = TRUE),
                     silent = TRUE)
   }
-  # tqdm <<- reticulate::import("tqdm", delay_load = TRUE)
+  tqdm <<- reticulate::import("tqdm", delay_load = TRUE)
   ns <<- reticulate::import("nnetsauce", delay_load = TRUE)
 }
