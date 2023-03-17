@@ -8,46 +8,81 @@ tqdm <- NULL
 ns <- NULL
 
 
-.onLoad <- function(libname, pkgname) {
+install_miniconda_ <- function(silent = TRUE)
+{
+  try(reticulate::install_miniconda(),
+      silent = silent)
+}
 
-  foo <- try(reticulate::use_python(python = Sys.which("python3"),
-                         required = TRUE), silent = FALSE)
+uninstall_nnetsauce <- function(foo = NULL) {
+  python <- reticulate:::.globals$py_config$python
+  packages <- "nnetsauce"
+  args <- c("pip", "uninstall", "--yes", packages)
+  result <- system2(python, args)
+  if (result != 0L) {
+    pkglist <- paste(shQuote(packages), collapse = ", ")
+    msg <- paste("Error removing package(s):", pkglist)
+    stop(msg, call. = FALSE)
+  }
+  packages
+}
+
+install_packages <- function(pip = TRUE) {
+
+  has_numpy <- reticulate::py_module_available("numpy")
+  has_scipy <- reticulate::py_module_available("scipy")
+  has_six <- reticulate::py_module_available("six")
+  has_sklearn <- try(reticulate::py_module_available("scikit-learn"),
+                     silent = TRUE)
+  if (class(has_sklearn) == "try-error")
+  {
+    has_sklearn <- reticulate::py_module_available("sklearn")
+  }
+  has_tqdm <- reticulate::py_module_available("tqdm")
+
+  if (has_numpy == FALSE)
+    reticulate::py_install("numpy", pip = pip)
+
+  if (has_scipy == FALSE)
+    reticulate::py_install("scipy", pip = pip)
+
+  if (has_six == FALSE)
+    reticulate::py_install("six", pip = pip)
+
+  if (has_sklearn == FALSE)
+  {
+    foo <- try(reticulate::py_install("scikit-learn", pip = pip),
+               silent = TRUE)
+    if (class(foo) = "try-error")
+    {
+      reticulate::py_install("sklearn", pip = pip)
+    }
+  }
+
+  if (has_tqdm == FALSE)
+    reticulate::py_install("tqdm", pip = pip)
+
+  foo <- try(reticulate::py_install("nnetsauce", pip = pip,
+                                    pip_ignore_installed = TRUE),
+             silent=TRUE)
   if (class(foo) == "try-error")
   {
-    message("Skipping use_python...")
+    reticulate::py_install("git+https://github.com/Techtonique/nnetsauce.git",
+                           pip = pip, pip_ignore_installed = TRUE)
   }
+}
 
-  foo1 <- try(reticulate::install_miniconda(force = TRUE), silent = FALSE)
-  if (class(foo1) == "try-error")
-  {
-    message("Skipping install_miniconda...")
-  }
 
-  foo2 <- try(reticulate::virtualenv_create("r-reticulate",
-                                python = Sys.which("python3"),
-                                packages = c("numpy", "scipy", "six",
-                                             "scikit-learn", "tqdm",
-                                             "nnetsauce")),
-              silent = FALSE)
-  if (class(foo2) == "try-error")
-  {
-    message("Skipping virtualenv_create...")
-  }
+.onLoad <- function(libname, pkgname) {
 
-  foo3 <- try(reticulate::use_condaenv(condaenv = "r-reticulate"),
-              silent = FALSE)
-  if (class(foo3) == "try-error")
-  {
-    message("Skipping use_condaenv...")
-  }
+  try(do.call("uninstall_nnetsauce", list(foo=NULL)),
+      silent = TRUE)
 
-  foo5 <- try(reticulate::use_condaenv("r-reticulate"),
-              silent = FALSE)
-  if (class(foo5) == "try-error")
-  {
-    message("Skipping use_condaenv...")
-  }
+  do.call("install_miniconda_", list(silent=TRUE))
 
+  do.call("install_packages", list(pip=TRUE))
+
+  # use superassignment to update global reference to packages
   numpy <<- reticulate::import("numpy", delay_load = TRUE)
   scipy <<- reticulate::import("scipy", delay_load = TRUE)
   six <<- reticulate::import("six", delay_load = TRUE)
