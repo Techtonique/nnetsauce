@@ -10,7 +10,7 @@ ns <- NULL
 
 install_miniconda_ <- function(silent = TRUE)
 {
-  try(reticulate::install_miniconda(),
+  try(reticulate::install_miniconda(force=TRUE, update=FALSE),
       silent = silent)
 }
 
