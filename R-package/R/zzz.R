@@ -64,7 +64,7 @@ install_packages <- function(pip = TRUE) {
 
   foo <- try(reticulate::conda_install(packages="nnetsauce", pip = pip,
                                     pip_ignore_installed = TRUE),
-             silent=TRUE)
+             silent=FALSE)
   if (class(foo) == "try-error")
   {
     reticulate::conda_install(packages="git+https://github.com/Techtonique/nnetsauce.git",
