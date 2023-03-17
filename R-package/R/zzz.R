@@ -53,7 +53,7 @@ install_packages <- function(pip = TRUE) {
   {
     foo <- try(reticulate::py_install("scikit-learn", pip = pip),
                silent = TRUE)
-    if (class(foo) = "try-error")
+    if (class(foo) == "try-error")
     {
       reticulate::py_install("sklearn", pip = pip)
     }
