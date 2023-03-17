@@ -86,7 +86,13 @@ install_packages <- function(pip = TRUE) {
   # numpy <<- reticulate::import("numpy", delay_load = TRUE)
   # scipy <<- reticulate::import("scipy", delay_load = TRUE)
   # six <<- reticulate::import("six", delay_load = TRUE)
-  sklearn <<- reticulate::import("sklearn", delay_load = TRUE)
+  sklearn <<- try(reticulate::import("sklearn", delay_load = TRUE),
+                  silent = TRUE)
+  if (class(sklearn) == "try-error")
+  {
+    sklearn <<- try(reticulate::import("scikit-learn", delay_load = TRUE),
+                    silent = TRUE)
+  }
   # tqdm <<- reticulate::import("tqdm", delay_load = TRUE)
   ns <<- reticulate::import("nnetsauce", delay_load = TRUE)
 }
