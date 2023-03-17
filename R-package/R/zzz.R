@@ -12,6 +12,8 @@ install_miniconda_ <- function(silent = TRUE)
 {
   try(reticulate::install_miniconda(force=TRUE, update=FALSE),
       silent = silent)
+
+  reticulate::use_condaenv("r-reticulate")
 }
 
 uninstall_nnetsauce <- function(foo = NULL) {
