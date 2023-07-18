@@ -19,6 +19,7 @@ regr4 = linear_model.BayesianRidge()
 obj_MTS = ns.MTS(regr4, lags = 1, n_hidden_features=5)
 obj_MTS.fit(M)
 print(obj_MTS.df_)
+print(obj_MTS.residuals_)
 print(obj_MTS.predict(return_std=True))
 
 # with credible intervals

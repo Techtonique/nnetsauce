@@ -207,6 +207,8 @@ class MTS(Base):
         self.preds_std_ = []
         self.return_std_ = None
         self.df_ = None
+        self.residuals_ = [] 
+        self.sims_ = None
 
     def fit(self, X, xreg=None):
         """Fit MTS model to training data X, with optional regressors xreg
@@ -249,6 +251,9 @@ class MTS(Base):
         self.n_series = p
         self.fit_objs_.clear()
         self.y_means_.clear()
+        residuals_ = []
+        self.residuals_ = None
+        self.sims_ = None
 
         if p > 1:
             # multivariate time series
@@ -290,8 +295,22 @@ class MTS(Base):
         for i in range(p):
             y_mean = np.mean(self.y_[:, i])
             self.y_means_[i] = y_mean
-            self.obj.fit(scaled_Z, self.y_[:, i] - y_mean)
+            centered_y_i = self.y_[:, i] - y_mean
+            self.obj.fit(scaled_Z, centered_y_i)
             self.fit_objs_[i] = pickle.loads(pickle.dumps(self.obj, -1))
+
+            # print(centered_y_i)            
+            # print(self.fit_objs_[i].predict(scaled_Z))
+
+            residuals_.append((centered_y_i - self.fit_objs_[i].predict(scaled_Z)).tolist())
+
+        print(residuals_)
+
+        self.residuals_ = np.asarray(residuals_).T
+
+        print(f" self.residuals_: {self.residuals_} ")
+        print(f" self.residuals_.shape: {self.residuals_.shape} ")
+        print(f" np.mean(self.residuals_, axis=0) {np.mean(self.residuals_, axis=0)} ")
 
         return self
 
