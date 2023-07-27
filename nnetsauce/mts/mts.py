@@ -4,13 +4,16 @@
 
 import numpy as np
 import pandas as pd
-from ..base import Base
+import pickle
+import sklearn.metrics as skm2
+from collections import namedtuple
 from scipy.stats import norm
+from sklearn.neighbors import KernelDensity
+from sklearn.model_selection import GridSearchCV
+from tqdm import tqdm
+from ..base import Base
 from ..utils import matrixops as mo
 from ..utils import timeseries as ts
-import sklearn.metrics as skm2
-import pickle
-from functools import partial
 
 
 class MTS(Base):
@@ -64,9 +67,15 @@ class MTS(Base):
 
         lags: int.
             number of lags used for each time series.
+        
+        replications: int.
+            number of replications (if needed, for predictive simulation). Default is 'None'.
+
+        kernel: str.
+            the kernel to use for residuals density estimation (used for predictive simulation). Currently, either 'gaussian' or 'tophat'.
 
         seed: int.
-            reproducibility seed for nodes_sim=='uniform'.
+            reproducibility seed for nodes_sim=='uniform' or predictive simulation.
 
         backend: str.
             "cpu" or "gpu" or "tpu".
@@ -173,6 +182,8 @@ class MTS(Base):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         lags=1,
+        replications=None,
+        kernel=None,
         seed=123,
         backend="cpu",
     ):
@@ -198,6 +209,8 @@ class MTS(Base):
         self.obj = obj
         self.n_series = None
         self.lags = lags
+        self.replications = replications
+        self.kernel = kernel 
         self.fit_objs_ = {}
         self.y_ = None  # MTS responses (most recent observations first)
         self.X_ = None  # MTS lags
@@ -208,9 +221,11 @@ class MTS(Base):
         self.return_std_ = None
         self.df_ = None
         self.residuals_ = [] 
+        self.residuals_sims_ = None
+        self.kde_ = None
         self.sims_ = None
 
-    def fit(self, X, xreg=None):
+    def fit(self, X, xreg=None, **kwargs):
         """Fit MTS model to training data X, with optional regressors xreg
 
         Parameters:
@@ -224,8 +239,7 @@ class MTS(Base):
                 Additional regressors to be passed to obj
                 xreg must be in increasing order (most recent observations last)
 
-            **kwargs: additional parameters to be passed to
-                    self.cook_training_set
+            **kwargs: for now, additional parameters to be passed to for kernel density estimation, when needed (see sklearn.neighbors.KernelDensity)
 
         Returns:
 
@@ -253,6 +267,8 @@ class MTS(Base):
         self.y_means_.clear()
         residuals_ = []
         self.residuals_ = None
+        self.residuals_sims_ = None
+        self.kde_ = None 
         self.sims_ = None
 
         if p > 1:
@@ -296,22 +312,20 @@ class MTS(Base):
             y_mean = np.mean(self.y_[:, i])
             self.y_means_[i] = y_mean
             centered_y_i = self.y_[:, i] - y_mean
-            self.obj.fit(scaled_Z, centered_y_i)
+            self.obj.fit(X = scaled_Z, y = centered_y_i)
             self.fit_objs_[i] = pickle.loads(pickle.dumps(self.obj, -1))
-
-            # print(centered_y_i)            
-            # print(self.fit_objs_[i].predict(scaled_Z))
-
             residuals_.append((centered_y_i - self.fit_objs_[i].predict(scaled_Z)).tolist())
 
-        print(residuals_)
-
         self.residuals_ = np.asarray(residuals_).T
-
-        print(f" self.residuals_: {self.residuals_} ")
-        print(f" self.residuals_.shape: {self.residuals_.shape} ")
-        print(f" np.mean(self.residuals_, axis=0) {np.mean(self.residuals_, axis=0)} ")
-
+        
+        if self.replications is not None:
+            assert self.kernel in ('gaussian', 'tophat'), "currently, 'kernel' must be either 'gaussian' or 'tophat'"
+            kernel_bandwidths = {"bandwidth": np.logspace(-1, 1, 20)}
+            grid = GridSearchCV(KernelDensity(kernel = self.kernel, **kwargs), 
+                                param_grid=kernel_bandwidths)  
+            grid.fit(self.residuals_) 
+            self.kde_ = grid.best_estimator_
+                
         return self
 
     def predict(self, h=5, level=95, new_xreg=None, **kwargs):
@@ -341,25 +355,31 @@ class MTS(Base):
         """
 
         if self.df_ is not None:  # `fit` takes a data frame input
-                output_dates, frequency = ts.compute_output_dates(self.df_, h)
+            output_dates, frequency = ts.compute_output_dates(self.df_, h)
 
         self.return_std_ = False
 
-        self.preds_ = None  # do not remove (!)
+        self.preds_ = None  # do not remove (/!\)
 
         self.preds_ = pickle.loads(pickle.dumps(self.y_, -1))
 
         y_means_ = np.asarray([self.y_means_[i] for i in range(self.n_series)])
 
-        n_features = self.n_series * self.lags # check that /!\
+        n_features = self.n_series * self.lags        
 
         if "return_std" in kwargs:
             self.return_std_ = True 
             self.preds_std_ = []
+            alpha = 100 - level
+            pi_multiplier = norm.ppf(1-alpha/200)
+            DescribeResult = namedtuple('DescribeResult', ('mean', 'lower', 'upper')) # to be updated
 
-        if self.xreg_ is None: # no external regressors
+        if self.xreg_ is None: # no external regressors 
 
-            for i in range(h):
+            if self.kde_ is not None: 
+                self.residuals_sims_ = tuple(self.kde_.sample(n_samples = h, random_state=self.seed + 100*i) for i in tqdm(range(self.replications)))
+
+            for _ in range(h):
 
                 new_obs = ts.reformat_response(self.preds_, self.lags)
 
@@ -384,6 +404,9 @@ class MTS(Base):
             if isinstance(new_xreg, pd.DataFrame):
                 new_xreg = new_xreg.values
 
+            if self.kde_ is not None: 
+                self.residuals_sims_ = tuple(self.kde_.sample(n_samples = h, random_state=self.seed + 100*i) for i in tqdm(range(self.replications)))
+
             try:
                 n_obs_xreg, n_features_xreg = new_xreg.shape
                 assert (
@@ -400,7 +423,7 @@ class MTS(Base):
 
             inv_new_xreg = mo.rbind(self.xreg_, new_xreg)[::-1]   
 
-            for i in range(h):
+            for _ in range(h):
 
                 new_obs = ts.reformat_response(self.preds_, self.lags)
 
@@ -429,7 +452,8 @@ class MTS(Base):
             if "return_std" not in kwargs:
                 return self.preds_                          
             self.preds_std_ = np.asarray(self.preds_std_)
-            return self.preds_, self.preds_std_
+            return DescribeResult(self.preds_, self.preds_-pi_multiplier*self.preds_std_,
+                                  self.preds_+pi_multiplier*self.preds_std_)
 
         # if self.df_ is not None (return data frames)
         self.preds_ = pd.DataFrame(
