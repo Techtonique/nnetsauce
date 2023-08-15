@@ -377,7 +377,8 @@ class MTS(Base):
         if self.xreg_ is None: # no external regressors 
 
             if self.kde_ is not None: 
-                self.residuals_sims_ = tuple(self.kde_.sample(n_samples = h, random_state=self.seed + 100*i) for i in tqdm(range(self.replications)))
+                self.residuals_sims_ = tuple(self.kde_.sample(n_samples = h, 
+                                                              random_state=self.seed + 100*i) for i in tqdm(range(self.replications)))
 
             for _ in range(h):
 

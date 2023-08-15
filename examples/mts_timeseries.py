@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn import datasets, metrics
 from sklearn import linear_model
 from sklearn.ensemble import RandomForestRegressor
-np.random.seed(123)
+np.random.seed(1235)
 
 
 M = np.random.rand(10, 3)

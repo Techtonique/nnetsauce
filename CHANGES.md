@@ -1,3 +1,7 @@
+# version 0.12.1
+
+- Begin residuals simulation
+
 # version 0.11.5
 
 - Avoid division by zero in scaling
