@@ -1,3 +1,7 @@
+# version 0.12.2
+
+- Fix error in simulation (base.py)
+
 # version 0.12.1
 
 - Begin residuals simulation
