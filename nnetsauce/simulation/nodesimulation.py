@@ -151,7 +151,7 @@ def generate_uniform(n_dims=2, n_points=10, seed=123):
 
 
 # hammersley numbers' generation (python)
-def generate_hammersley(n_dims=2, n_points=100, primes=None):
+def generate_hammersley(n_dims=2, n_points=100, primes=None, seed=None): # seed, just for 'compatibility'
     def func_hammersley(n_dims=n_dims, n_points=(n_points + 1), primes=primes):
         primes = primes if primes is not None else saved_primes
         for k in moves.range(n_points):
@@ -163,7 +163,7 @@ def generate_hammersley(n_dims=2, n_points=100, primes=None):
 
 
 # halton numbers' generation (python)
-def generate_halton(n_dims=2, n_points=10, primes=None):
+def generate_halton(n_dims=2, n_points=10, primes=None, seed=None): # seed, just for 'compatibility'
     def func_halton(n_dims=n_dims, n_points=(n_points + 1), primes=primes):
         primes = primes if primes is not None else saved_primes
         for k in moves.range(n_points):
@@ -173,5 +173,5 @@ def generate_halton(n_dims=2, n_points=10, primes=None):
 
 
 # sobol numbers' generation (python)
-def generate_sobol(n_dims=2, n_points=10):
+def generate_sobol(n_dims=2, n_points=10, seed=None): # seed, just for 'compatibility'
     return np.array(i4_sobol_generate(m=n_dims, n=n_points, skip=2))
