@@ -305,20 +305,18 @@ class Base(BaseEstimator):
                     self.W_ = generate_sobol(
                             n_dims=n_features, n_points=self.n_hidden_features
                         ) 
-
-                if self.nodes_sim == "hammersley":
+                elif self.nodes_sim == "hammersley":
                     self.W_ = generate_hammersley(
                             n_dims=n_features, n_points=self.n_hidden_features
                         )
-
-                if self.nodes_sim == "uniform":
+                elif self.nodes_sim == "uniform":
                     self.W_ = generate_uniform(
                             n_dims=n_features,
                             n_points=self.n_hidden_features,
                             seed=self.seed,
                         )
-
-                if self.nodes_sim == "halton":
+                # if self.nodes_sim == "halton":
+                else: 
                     self.W_ = generate_halton(
                             n_dims=n_features, n_points=self.n_hidden_features
                         ) 
@@ -375,26 +373,24 @@ class Base(BaseEstimator):
 
             n_features_1 = n_features + 1
 
-            # /!\ use a switch case
+            # /!\ use a switch case (Python 3.10)
 
             if self.nodes_sim == "sobol":
                 self.W_ = generate_sobol(
                         n_dims=n_features_1, n_points=self.n_hidden_features
                     ) 
-
-            if self.nodes_sim == "hammersley":
+            elif self.nodes_sim == "hammersley":
                 self.W_ = generate_hammersley(
                         n_dims=n_features, n_points=self.n_hidden_features
                     )
-
-            if self.nodes_sim == "uniform":
+            elif self.nodes_sim == "uniform":
                 self.W_ = generate_uniform(
                         n_dims=n_features_1,
                         n_points=self.n_hidden_features,
                         seed=self.seed,
                     )
-
-            if self.nodes_sim == "halton":
+            #elif self.nodes_sim == "halton":
+            else:
                 self.W_ = generate_halton(
                         n_dims=n_features_1, n_points=self.n_hidden_features
                     ) 
