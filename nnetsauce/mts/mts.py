@@ -308,7 +308,7 @@ class MTS(Base):
             dummy_y, scaled_Z = self.cook_training_set(y=rep_1_n, X=self.X_)
 
         # loop on all the time series and adjust self.obj.fit
-        for i in range(p):
+        for i in tqdm(range(p)):
             y_mean = np.mean(self.y_[:, i])
             self.y_means_[i] = y_mean
             centered_y_i = self.y_[:, i] - y_mean
