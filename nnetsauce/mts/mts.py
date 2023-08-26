@@ -7,7 +7,7 @@ import pandas as pd
 import pickle
 import sklearn.metrics as skm2
 from collections import namedtuple
-from scipy.stats import norm
+from scipy.stats import norm, describe
 from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
 from tqdm import tqdm
@@ -79,6 +79,9 @@ class MTS(Base):
 
         backend: str.
             "cpu" or "gpu" or "tpu".
+        
+        verbose: int.
+            0: not printing; 1: printing
 
     Attributes:
 
@@ -186,6 +189,7 @@ class MTS(Base):
         kernel=None,
         seed=123,
         backend="cpu",
+        verbose=0
     ):
 
         assert int(lags) == lags, "parameter 'lags' should be an integer"
@@ -203,7 +207,7 @@ class MTS(Base):
             type_clust=type_clust,
             type_scaling=type_scaling,
             seed=seed,
-            backend=backend,
+            backend=backend
         )
 
         self.obj = obj
@@ -211,6 +215,7 @@ class MTS(Base):
         self.lags = lags
         self.replications = replications
         self.kernel = kernel 
+        self.verbose = verbose
         self.fit_objs_ = {}
         self.y_ = None  # MTS responses (most recent observations first)
         self.X_ = None  # MTS lags
@@ -308,6 +313,9 @@ class MTS(Base):
             dummy_y, scaled_Z = self.cook_training_set(y=rep_1_n, X=self.X_)
 
         # loop on all the time series and adjust self.obj.fit
+        if self.verbose > 0:
+            print(f"\n Adjusting {type(self.obj).__name__} to multivariate time series... \n ")
+
         for i in tqdm(range(p)):
             y_mean = np.mean(self.y_[:, i])
             self.y_means_[i] = y_mean
@@ -317,13 +325,21 @@ class MTS(Base):
             residuals_.append((centered_y_i - self.fit_objs_[i].predict(scaled_Z)).tolist())
 
         self.residuals_ = np.asarray(residuals_).T
-        
+                
         if self.replications is not None:
+            if self.verbose > 0:
+                print(f"\n Simulate residuals using {self.kernel} kernel... \n")
             assert self.kernel in ('gaussian', 'tophat'), "currently, 'kernel' must be either 'gaussian' or 'tophat'"
             kernel_bandwidths = {"bandwidth": np.logspace(-1, 1, 20)}
+            
             grid = GridSearchCV(KernelDensity(kernel = self.kernel, **kwargs), 
                                 param_grid=kernel_bandwidths)  
+            
             grid.fit(self.residuals_) 
+            
+            if self.verbose > 0:
+                print(f"\n Best parameters for {self.kernel} kernel: {grid.best_params_} \n")
+
             self.kde_ = grid.best_estimator_
                 
         return self
@@ -406,6 +422,8 @@ class MTS(Base):
                 new_xreg = new_xreg.values
 
             if self.kde_ is not None: 
+                if self.verbose > 0:
+                    print(f"\n Obtain simulations for adjusted residuals... \n")
                 self.residuals_sims_ = tuple(self.kde_.sample(n_samples = h, random_state=self.seed + 100*i) for i in tqdm(range(self.replications)))
 
             try:
@@ -449,12 +467,32 @@ class MTS(Base):
         
         # function's return
         if self.df_ is None:
+
             self.preds_ = self.preds_[0:h, :][::-1]
+
             if "return_std" not in kwargs:
-                return self.preds_                          
+
+                if self.kde_ is None: 
+                    return self.preds_    
+                
+                if self.verbose > 0:
+                    print(f"Obtain {self.replications} predictive simulations...")
+                    
+                self.sims_ = tuple((self.preds_ + self.residuals_sims_[i] for i in tqdm(range(self.replications))))                                 
+
+                DescribeResult = namedtuple('DescribeResult', 
+                                        ('preds', 'sims'))
+            
+                return DescribeResult(self.preds_, self.sims_)
+
+
             self.preds_std_ = np.asarray(self.preds_std_)
+
+            DescribeResult = namedtuple('DescribeResult', 
+                                        ('preds', 'lower', 'upper'))
+            
             return DescribeResult(self.preds_, self.preds_-pi_multiplier*self.preds_std_,
-                                  self.preds_+pi_multiplier*self.preds_std_)
+                                  self.preds_+pi_multiplier*self.preds_std_)            
 
         # if self.df_ is not None (return data frames)
         self.preds_ = pd.DataFrame(
@@ -464,6 +502,19 @@ class MTS(Base):
         )
         if "return_std" not in kwargs:
             return self.preds_
+
+
+            # HERE: use self.residuals_sims_ (a tuple) 
+            # (comprehension, add to self.preds_.values(?) then obtain dfs)
+            # HERE: use self.residuals_sims_ (a tuple) 
+            # (comprehension, add to self.preds_.values(?))                                        
+            # HERE: use self.residuals_sims_ (a tuple) 
+            # (comprehension, add to self.preds_.values(?))                    
+            # HERE: use self.residuals_sims_ (a tuple) 
+            # (comprehension, add to self.preds_.values(?))                    
+            # HERE: use self.residuals_sims_ (a tuple) 
+            # (comprehension, add to self.preds_.values(?))                    
+        
         self.preds_std_ = pd.DataFrame(
             np.asarray(self.preds_std_),
             columns=self.df_.columns,

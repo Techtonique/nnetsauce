@@ -27,7 +27,7 @@ print(df_test.head())
 # print(df_test.tail())
 
 regr = linear_model.BayesianRidge()
-obj_MTS = ns.MTS(regr, lags = 1, n_hidden_features=5)
+obj_MTS = ns.MTS(regr, lags = 1, n_hidden_features=5, verbose = 1)
 obj_MTS.fit(df_train.values)
 print("\n")
 print(obj_MTS.predict(h=5, return_std=True))
@@ -35,7 +35,9 @@ print(obj_MTS.predict(h=5, return_std=True))
 # print([acorr_ljungbox(obj_MTS.residuals_[:,i], boxpierce=True, auto_lag=True, return_df=True) for i in range(obj_MTS.residuals_.shape[1])])
 
 regr2 = linear_model.ARDRegression()
-obj_MTS2 = ns.MTS(regr2, lags = 1, n_hidden_features=5, replications=10, kernel='gaussian', seed=2324)
+obj_MTS2 = ns.MTS(regr2, lags = 1, n_hidden_features=5, 
+                  replications=10, kernel='gaussian', 
+                  seed=2324, verbose = 1)
 start = time()
 obj_MTS2.fit(df_train.values)
 print(f"Elapsed {time()-start} s")
@@ -55,6 +57,22 @@ print("\n\n")
 print(f"------- obj_MTS2.residuals_sims_[0]: {obj_MTS2.residuals_sims_[0].shape}")
 print("\n\n")
 print(f" stats.describe(obj_MTS2.residuals_, axis=0, bias=False) \n {stats.describe(obj_MTS.residuals_, axis=0, bias=False)} ")
+print("\n\n")
+
+
+
+regr3 = linear_model.ElasticNet()
+obj_MTS3 = ns.MTS(regr3, lags = 1, n_hidden_features=5, 
+                  replications=5, kernel='gaussian', 
+                  seed=24, verbose = 1)
+start = time()
+obj_MTS3.fit(df_train.values)
+print(f"Elapsed {time()-start} s")
+print("\n\n")
+print(obj_MTS3.predict(h=5))
+print(f" Predictive simulations #1 {obj_MTS3.sims_[0]}") 
+print(f" Predictive simulations #2 {obj_MTS3.sims_[1]}") 
+print(f" Predictive simulations #3 {obj_MTS3.sims_[2]}") 
 print("\n\n")
 
 # print(obj_MTS2.residuals_sims_.shape)

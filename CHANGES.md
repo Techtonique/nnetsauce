@@ -1,6 +1,7 @@
 # version 0.12.2
 
 - Fix error in simulation (base.py)
+- Use residuals and KDE for predictive simulations
 
 # version 0.12.1
 

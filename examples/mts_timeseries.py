@@ -16,7 +16,7 @@ print("\n")
 
 # Adjust Bayesian Ridge
 regr4 = linear_model.BayesianRidge()
-obj_MTS = ns.MTS(regr4, lags = 1, n_hidden_features=5)
+obj_MTS = ns.MTS(regr4, lags = 1, n_hidden_features=5, verbose = 1)
 obj_MTS.fit(M)
 print(obj_MTS.df_)
 print(obj_MTS.residuals_)
@@ -45,7 +45,7 @@ print(df.values)
 print(df)
 
 regr5 = linear_model.BayesianRidge()
-obj_MTS = ns.MTS(regr5, lags = 1, n_hidden_features=5)
+obj_MTS = ns.MTS(regr5, lags = 1, n_hidden_features=5, verbose = 1)
 obj_MTS.fit(df)
 print(obj_MTS.predict())
 print("\n")
@@ -67,7 +67,7 @@ print(df.values)
 print(df)
 
 regr6 = linear_model.BayesianRidge()
-obj_MTS = ns.MTS(regr6, lags = 1, n_hidden_features=5)
+obj_MTS = ns.MTS(regr6, lags = 1, n_hidden_features=5, verbose = 1)
 obj_MTS.fit(df)
 print(obj_MTS.predict())
 print("\n")
@@ -92,7 +92,7 @@ print(df.columns)
 
 # Adjust Bayesian Ridge
 regr5 = linear_model.BayesianRidge()
-obj_MTS = ns.MTS(regr5, lags = 2, n_hidden_features=5, n_clusters=3)
+obj_MTS = ns.MTS(regr5, lags = 2, n_hidden_features=5, n_clusters=3, verbose = 1)
 obj_MTS.fit(df)
 print(obj_MTS.predict()) 
 # with credible intervals
@@ -155,7 +155,7 @@ print(Xreg_test)
 
 # Adjust Bayesian Ridge with external regressors
 regr5 = linear_model.BayesianRidge()
-obj_MTS = ns.MTS(regr5, lags = 2, n_hidden_features=5, n_clusters=2)
+obj_MTS = ns.MTS(regr5, lags = 2, n_hidden_features=5, n_clusters=2, verbose = 1)
 
 #obj_MTS.fit(df)
 #print(obj_MTS.predict()) 
