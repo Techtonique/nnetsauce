@@ -477,13 +477,13 @@ class MTS(Base):
                 
                 if self.verbose > 0:
                     print(f"Obtain {self.replications} predictive simulations...")
-                    
+
                 self.sims_ = tuple((self.preds_ + self.residuals_sims_[i] for i in tqdm(range(self.replications))))                                 
 
                 DescribeResult = namedtuple('DescribeResult', 
-                                        ('preds', 'sims'))
+                                        ('preds', 'sims')) # temporary
             
-                return DescribeResult(self.preds_, self.sims_)
+                return DescribeResult(self.preds_, self.sims_) # temporary
 
 
             self.preds_std_ = np.asarray(self.preds_std_)
