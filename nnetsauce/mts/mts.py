@@ -488,12 +488,20 @@ class MTS(Base):
 
                 self.sims_ = tuple((self.preds_ + self.residuals_sims_[i] for i in tqdm(range(self.replications))))                                 
 
-                meanf = [np.mean(getsims(self.sims_, ix), axis=0) for ix in range(self.n_series)] if self.agg is "mean" else [np.median(getsims(self.sims_, ix), axis=0) for ix in range(self.n_series)]
-                lower =  [np.quantile(getsims(self.sims_, ix), q = self.alpha_/200, axis=0) for ix in range(self.n_series)]
-                upper = [np.quantile(getsims(self.sims_, ix), q = 1 - self.alpha_/200, axis=0) for ix in range(self.n_series)]                                           
+                print(f"\n self.sims_: {self.sims_} \n")
+
+                print(f"\n getsims(self.sims_, ix): {getsims(self.sims_, 0)} \n")
+
+                meanf = [np.mean(getsims(self.sims_, ix), axis=1) for ix in range(self.n_series)] if self.agg == "mean" else [np.median(getsims(self.sims_, ix), axis=0) for ix in range(self.n_series)]
+                lower =  [np.quantile(getsims(self.sims_, ix), q = self.alpha_/200, axis=1) for ix in range(self.n_series)]
+                upper = [np.quantile(getsims(self.sims_, ix), q = 1 - self.alpha_/200, axis=1) for ix in range(self.n_series)]                                           
 
                 DescribeResult = namedtuple('DescribeResult', 
                                         ('preds', 'sims', 'lower', 'upper')) 
+
+                print(np.asarray(meanf).shape)                      
+                print(np.asarray(lower).shape)                       
+                print(np.asarray(upper).shape)                       
             
                 return DescribeResult(np.asarray(meanf).T, 
                                       self.sims_, 
