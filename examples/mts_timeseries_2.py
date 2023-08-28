@@ -12,19 +12,26 @@ from time import time
 np.random.seed(1235)
 
 # url = "https://raw.githubusercontent.com/selva86/datasets/master/Raotbl6.csv"
-url = "/Users/t/Documents/datasets/time_series/multivariate/Raotbl6.csv"
+# url = "/Users/t/Documents/datasets/time_series/multivariate/Raotbl6.csv"
+url = "https://github.com/ritvikmath/Time-Series-Analysis/raw/master/ice_cream_vs_heater.csv"
 
 df = pd.read_csv(url)
 
-df.set_index('date', inplace=True)
+#df.set_index('date', inplace=True)
+df.set_index('Month', inplace=True)
+df.index.rename('date')
 
 print(df.shape)
-df_train = df.iloc[0:97,]
-df_test = df.iloc[97:123,]
-# print(df_train.head())
+print(198*0.8)
+# df_train = df.iloc[0:97,]
+# df_test = df.iloc[97:123,]
+df_train = df.iloc[0:158,]
+df_test = df.iloc[158:198,]
+
+print(df_train.head())
 print(df_train.tail())
 print(df_test.head())
-# print(df_test.tail())
+print(df_test.tail())
 
 regr = linear_model.BayesianRidge()
 obj_MTS = ns.MTS(regr, lags = 1, n_hidden_features=5, verbose = 1)
@@ -62,8 +69,10 @@ print("\n\n")
 
 
 regr3 = linear_model.ElasticNet()
-obj_MTS3 = ns.MTS(regr3, lags = 1, n_hidden_features=5, 
-                  replications=5, kernel='gaussian', 
+# regr3 = linear_model.Ridge()
+# regr3 = RandomForestRegressor()
+obj_MTS3 = ns.MTS(regr3, lags = 3, n_hidden_features=7, 
+                  replications=10, kernel='gaussian', 
                   seed=24, verbose = 1)
 start = time()
 obj_MTS3.fit(df_train.values)

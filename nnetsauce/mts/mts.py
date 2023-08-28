@@ -12,6 +12,7 @@ from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
 from tqdm import tqdm
 from ..base import Base
+from ..simulation import getsims
 from ..utils import matrixops as mo
 from ..utils import timeseries as ts
 
@@ -73,7 +74,10 @@ class MTS(Base):
 
         kernel: str.
             the kernel to use for residuals density estimation (used for predictive simulation). Currently, either 'gaussian' or 'tophat'.
-
+        
+        agg: str.
+            either "mean" or "median" for simulation of bootstrap aggregating
+        
         seed: int.
             reproducibility seed for nodes_sim=='uniform' or predictive simulation.
 
@@ -187,6 +191,7 @@ class MTS(Base):
         lags=1,
         replications=None,
         kernel=None,
+        agg="mean",
         seed=123,
         backend="cpu",
         verbose=0
@@ -215,6 +220,7 @@ class MTS(Base):
         self.lags = lags
         self.replications = replications
         self.kernel = kernel 
+        self.agg = agg
         self.verbose = verbose
         self.fit_objs_ = {}
         self.y_ = None  # MTS responses (most recent observations first)
@@ -223,6 +229,7 @@ class MTS(Base):
         self.y_means_ = {}
         self.preds_ = None
         self.preds_std_ = []
+        self.alpha_ = None
         self.return_std_ = None
         self.df_ = None
         self.residuals_ = [] 
@@ -325,12 +332,12 @@ class MTS(Base):
             residuals_.append((centered_y_i - self.fit_objs_[i].predict(scaled_Z)).tolist())
 
         self.residuals_ = np.asarray(residuals_).T
-                
+                        
         if self.replications is not None:
             if self.verbose > 0:
                 print(f"\n Simulate residuals using {self.kernel} kernel... \n")
             assert self.kernel in ('gaussian', 'tophat'), "currently, 'kernel' must be either 'gaussian' or 'tophat'"
-            kernel_bandwidths = {"bandwidth": np.logspace(-1, 1, 20)}
+            kernel_bandwidths = {"bandwidth": np.logspace(-6, 6, 100)}
             
             grid = GridSearchCV(KernelDensity(kernel = self.kernel, **kwargs), 
                                 param_grid=kernel_bandwidths)  
@@ -383,11 +390,12 @@ class MTS(Base):
 
         n_features = self.n_series * self.lags        
 
+        self.alpha_ = 100 - level
+
         if "return_std" in kwargs:
             self.return_std_ = True 
-            self.preds_std_ = []
-            alpha = 100 - level
-            pi_multiplier = norm.ppf(1-alpha/200)
+            self.preds_std_ = []            
+            pi_multiplier = norm.ppf(1 - self.alpha_/200)
             DescribeResult = namedtuple('DescribeResult', ('mean', 'lower', 'upper')) # to be updated
 
         if self.xreg_ is None: # no external regressors 
@@ -423,7 +431,7 @@ class MTS(Base):
 
             if self.kde_ is not None: 
                 if self.verbose > 0:
-                    print(f"\n Obtain simulations for adjusted residuals... \n")
+                    print("\n Obtain simulations for adjusted residuals... \n")
                 self.residuals_sims_ = tuple(self.kde_.sample(n_samples = h, random_state=self.seed + 100*i) for i in tqdm(range(self.replications)))
 
             try:
@@ -480,10 +488,17 @@ class MTS(Base):
 
                 self.sims_ = tuple((self.preds_ + self.residuals_sims_[i] for i in tqdm(range(self.replications))))                                 
 
+                meanf = [np.mean(getsims(self.sims_, ix), axis=0) for ix in range(self.n_series)] if self.agg is "mean" else [np.median(getsims(self.sims_, ix), axis=0) for ix in range(self.n_series)]
+                lower =  [np.quantile(getsims(self.sims_, ix), q = self.alpha_/200, axis=0) for ix in range(self.n_series)]
+                upper = [np.quantile(getsims(self.sims_, ix), q = 1 - self.alpha_/200, axis=0) for ix in range(self.n_series)]                                           
+
                 DescribeResult = namedtuple('DescribeResult', 
-                                        ('preds', 'sims')) # temporary
+                                        ('preds', 'sims', 'lower', 'upper')) 
             
-                return DescribeResult(self.preds_, self.sims_) # temporary
+                return DescribeResult(np.asarray(meanf).T, 
+                                      self.sims_, 
+                                      np.asarray(lower).T, 
+                                      np.asarray(upper).T) 
 
 
             self.preds_std_ = np.asarray(self.preds_std_)
