@@ -228,7 +228,7 @@ class MTS(Base):
         self.X_ = None  # MTS lags
         self.xreg_ = None
         self.y_means_ = {}
-        self.preds_ = None
+        self.mean_ = None
         self.upper_ = None
         self.lower_ = None
         self.preds_std_ = []
@@ -385,9 +385,9 @@ class MTS(Base):
 
         self.return_std_ = False
 
-        self.preds_ = None  # do not remove (/!\)
+        self.mean_ = None  # do not remove (/!\)
 
-        self.preds_ = pickle.loads(pickle.dumps(self.y_, -1))
+        self.mean_ = pickle.loads(pickle.dumps(self.y_, -1))
 
         y_means_ = np.asarray([self.y_means_[i] for i in range(self.n_series)])
 
@@ -409,7 +409,7 @@ class MTS(Base):
 
             for _ in range(h):
 
-                new_obs = ts.reformat_response(self.preds_, self.lags)
+                new_obs = ts.reformat_response(self.mean_, self.lags)
 
                 new_X = new_obs.reshape(1, n_features)
 
@@ -423,7 +423,7 @@ class MTS(Base):
 
                 preds = np.asarray(y_means_ + predicted_cooked_new_X)                                                                     
                 
-                self.preds_ = mo.rbind(preds, self.preds_)
+                self.mean_ = mo.rbind(preds, self.mean_)
         
         else: # if self.xreg_ is not None: # with external regressors
             
@@ -455,7 +455,7 @@ class MTS(Base):
 
             for _ in range(h):
 
-                new_obs = ts.reformat_response(self.preds_, self.lags)
+                new_obs = ts.reformat_response(self.mean_, self.lags)
 
                 new_obs_xreg = ts.reformat_response(inv_new_xreg, self.lags)
 
@@ -474,22 +474,22 @@ class MTS(Base):
 
                 preds = np.asarray(y_means_ + predicted_cooked_new_X)                                                                     
                 
-                self.preds_ = mo.rbind(preds, self.preds_)        
+                self.mean_ = mo.rbind(preds, self.mean_)        
         
         # function's return ----------------------------------------------------------------------
         if self.df_ is None:
 
-            self.preds_ = self.preds_[0:h, :][::-1]
+            self.mean_ = self.mean_[0:h, :][::-1]
 
             if "return_std" not in kwargs:
 
                 if self.kde_ is None: 
-                    return self.preds_    
+                    return self.mean_    
                 
                 if self.verbose > 0:
                     print(f"Obtain {self.replications} predictive simulations...")
 
-                self.sims_ = tuple((self.preds_ + self.residuals_sims_[i] for i in tqdm(range(self.replications))))                                 
+                self.sims_ = tuple((self.mean_ + self.residuals_sims_[i] for i in tqdm(range(self.replications))))                                 
 
                 # refactor this (a loop, external)
                 meanf = [np.mean(getsims(self.sims_, ix), axis=1) for ix in range(self.n_series)] if self.agg == "mean" else [np.median(getsims(self.sims_, ix), axis=0) for ix in range(self.n_series)]
@@ -497,7 +497,7 @@ class MTS(Base):
                 upper = [np.quantile(getsims(self.sims_, ix), q = 1 - self.alpha_/200, axis=1) for ix in range(self.n_series)]                                           
 
                 DescribeResult = namedtuple('DescribeResult', 
-                                            ('preds', 'sims', 'lower', 'upper')) 
+                                            ('mean', 'sims', 'lower', 'upper')) 
 
                 return DescribeResult(np.asarray(meanf).T, 
                                       self.sims_, 
@@ -508,31 +508,31 @@ class MTS(Base):
             self.preds_std_ = np.asarray(self.preds_std_)
 
             DescribeResult = namedtuple('DescribeResult', 
-                                        ('preds', 'lower', 'upper'))
+                                        ('mean', 'lower', 'upper'))
             
-            return DescribeResult(self.preds_, self.preds_-pi_multiplier*self.preds_std_,
-                                  self.preds_+pi_multiplier*self.preds_std_)            
+            return DescribeResult(self.mean_, self.mean_-pi_multiplier*self.preds_std_,
+                                  self.mean_+pi_multiplier*self.preds_std_)            
 
         # if self.df_ is not None (return data frames)
-        self.preds_ = pd.DataFrame(
-            self.preds_[0:h, :][::-1],
+        self.mean_ = pd.DataFrame(
+            self.mean_[0:h, :][::-1],
             columns=self.df_.columns,
             index=output_dates,
         )
         if "return_std" not in kwargs:
             if self.kde_ is None: 
-                return self.preds_  
+                return self.mean_  
 
             # if "return_std" not in kwargs and self.kde_ is not None
             DescribeResult = namedtuple('DescribeResult', 
-                                        ('preds', 'sims', 'lower', 'upper')) 
+                                        ('mean', 'sims', 'lower', 'upper')) 
             
             # refactor this (a loop, external)
             meanf = [np.mean(getsims(self.sims_, ix), axis=1) for ix in range(self.n_series)] if self.agg == "mean" else [np.median(getsims(self.sims_, ix), axis=0) for ix in range(self.n_series)]
             lower =  [np.quantile(getsims(self.sims_, ix), q = self.alpha_/200, axis=1) for ix in range(self.n_series)]
             upper = [np.quantile(getsims(self.sims_, ix), q = 1 - self.alpha_/200, axis=1) for ix in range(self.n_series)]                                           
             
-            self.preds_ = pd.DataFrame(np.asarray(meanf).T,
+            self.mean_ = pd.DataFrame(np.asarray(meanf).T,
                                  columns=self.df_.columns,
                                  index=output_dates)
 
@@ -544,30 +544,32 @@ class MTS(Base):
                                  columns=self.df_.columns,
                                  index=output_dates)
 
-            return DescribeResult(self.preds_, 
+            return DescribeResult(self.mean_, 
                                   self.sims_, 
                                   self.lower_, 
                                   self.upper_)       
             
         # if "return_std" in kwargs
         DescribeResult = namedtuple('DescribeResult', 
-                                    ('preds', 'lower', 'upper')) 
+                                    ('mean', 'lower', 'upper')) 
         
-        self.preds_ = pd.DataFrame(
-            np.asarray(self.preds_),
+        self.mean_ = pd.DataFrame(
+            np.asarray(self.mean_),
             columns=self.df_.columns,
             index=output_dates,
         )
 
-        self.lower_ = pd.DataFrame(self.preds_.values-pi_multiplier*self.preds_std_,
+        self.preds_std_ = np.asarray(self.preds_std_)
+
+        self.lower_ = pd.DataFrame(self.mean_.values-pi_multiplier*self.preds_std_,
                              columns=self.df_.columns,
                              index=output_dates)
 
-        self.upper_ = pd.DataFrame(self.preds_.values+pi_multiplier*self.preds_std_,
+        self.upper_ = pd.DataFrame(self.mean_.values+pi_multiplier*self.preds_std_,
                              columns=self.df_.columns,
                              index=output_dates)
 
-        return DescribeResult(self.preds_, 
+        return DescribeResult(self.mean_, 
                               self.lower_, 
                               self.upper_)       
 
@@ -649,8 +651,8 @@ class MTS(Base):
 
     def plot(self, series_idx):
         if self.df_ is not None:
-            assert all([self.preds_ is not None, self.lower_ is not None, self.upper_ is not None])
-            y_all = list(self.df_.iloc[:, series_idx])+list(self.preds_[:, series_idx])
+            assert all([self.mean_ is not None, self.lower_ is not None, self.upper_ is not None])
+            y_all = list(self.df_.iloc[:, series_idx])+list(self.mean_[:, series_idx])
             n_points_all = len(y_all)
             n_points_train = self.df_.shape[0]
             x_all = [i for i in range(n_points_all)]
