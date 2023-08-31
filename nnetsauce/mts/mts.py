@@ -262,9 +262,12 @@ class MTS(Base):
             self: object
         """
 
-        if isinstance(X, pd.DataFrame):
-            self.df_ = X
-            X = X.values
+        if isinstance(X, pd.DataFrame) is False:
+            col_names = ["series" + str(i) for i in range(X.shape[1])]
+            X = pd.DataFrame(X, columns=col_names)
+        
+        self.df_ = X
+        X = X.values        
 
         try:
             # multivariate time series
@@ -381,11 +384,9 @@ class MTS(Base):
             `obj.predict` can return standard deviation
         """
 
-        if self.df_ is not None:  # `fit` takes a data frame input
-            output_dates, frequency = ts.compute_output_dates(self.df_, h)
-            self.output_dates_ = output_dates
+        self.output_dates_, frequency = ts.compute_output_dates(self.df_, h)        
 
-        self.return_std_ = False
+        self.return_std_ = False # do not remove (/!\)
 
         self.mean_ = None  # do not remove (/!\)
 
@@ -479,72 +480,78 @@ class MTS(Base):
                 self.mean_ = mo.rbind(preds, self.mean_)        
         
         # function's return ----------------------------------------------------------------------
-        if self.df_ is None:
+        # if self.df_ is None:
 
-            self.mean_ = self.mean_[0:h, :][::-1]
+        #     self.mean_ = self.mean_[0:h, :][::-1]
 
-            if "return_std" not in kwargs:
+        #     if "return_std" not in kwargs:
 
-                if self.kde_ is None: 
-                    return self.mean_    
+        #         if self.kde_ is None: 
+        #             return self.mean_    
                 
-                if self.verbose > 0:
-                    print(f"Obtain {self.replications} predictive simulations...")
+        #         if self.verbose > 0:
+        #             print(f"Obtain {self.replications} predictive simulations...")
 
-                self.sims_ = tuple((self.mean_ + self.residuals_sims_[i] for i in tqdm(range(self.replications))))                                 
+        #         self.sims_ = tuple((self.mean_ + self.residuals_sims_[i] for i in tqdm(range(self.replications))))                                 
 
-                # refactor this (a loop, external)
-                meanf = [np.mean(getsims(self.sims_, ix), axis=1) for ix in range(self.n_series)] if self.agg == "mean" else [np.median(getsims(self.sims_, ix), axis=0) for ix in range(self.n_series)]
-                lower =  [np.quantile(getsims(self.sims_, ix), q = self.alpha_/200, axis=1) for ix in range(self.n_series)]
-                upper = [np.quantile(getsims(self.sims_, ix), q = 1 - self.alpha_/200, axis=1) for ix in range(self.n_series)]                                           
+        #         # refactor this (a loop, external)
+        #         meanf = [np.mean(getsims(self.sims_, ix), axis=1) for ix in range(self.n_series)] if self.agg == "mean" else [np.median(getsims(self.sims_, ix), axis=0) for ix in range(self.n_series)]
+        #         lower =  [np.quantile(getsims(self.sims_, ix), q = self.alpha_/200, axis=1) for ix in range(self.n_series)]
+        #         upper = [np.quantile(getsims(self.sims_, ix), q = 1 - self.alpha_/200, axis=1) for ix in range(self.n_series)]                                           
 
-                DescribeResult = namedtuple('DescribeResult', 
-                                            ('mean', 'sims', 'lower', 'upper')) 
+        #         DescribeResult = namedtuple('DescribeResult', 
+        #                                     ('mean', 'sims', 'lower', 'upper')) 
 
-                return DescribeResult(np.asarray(meanf).T, 
-                                      self.sims_, 
-                                      np.asarray(lower).T, 
-                                      np.asarray(upper).T) 
+        #         return DescribeResult(np.asarray(meanf).T, 
+        #                               self.sims_, 
+        #                               np.asarray(lower).T, 
+        #                               np.asarray(upper).T) 
 
-            # if "return_std" in kwargs:
-            self.preds_std_ = np.asarray(self.preds_std_)
+        #     # if "return_std" in kwargs:
+        #     self.preds_std_ = np.asarray(self.preds_std_)
 
-            DescribeResult = namedtuple('DescribeResult', 
-                                        ('mean', 'lower', 'upper'))
+        #     DescribeResult = namedtuple('DescribeResult', 
+        #                                 ('mean', 'lower', 'upper'))
             
-            return DescribeResult(self.mean_, self.mean_-pi_multiplier*self.preds_std_,
-                                  self.mean_+pi_multiplier*self.preds_std_)            
+        #     return DescribeResult(self.mean_, self.mean_-pi_multiplier*self.preds_std_,
+        #                           self.mean_+pi_multiplier*self.preds_std_)            
 
-        # if self.df_ is not None (return data frames)
         self.mean_ = pd.DataFrame(
             self.mean_[0:h, :][::-1],
             columns=self.df_.columns,
-            index=output_dates,
+            index=self.output_dates_
         )
         if "return_std" not in kwargs:
             if self.kde_ is None: 
                 return self.mean_  
 
-            # if "return_std" not in kwargs and self.kde_ is not None
+            # if "return_std" not in kwargs and self.kde_ is not None  
+            meanf = []
+            lower = []
+            upper = []
+            self.sims_ = tuple((self.mean_ + self.residuals_sims_[i] for i in tqdm(range(self.replications))))                                           
             DescribeResult = namedtuple('DescribeResult', 
-                                        ('mean', 'sims', 'lower', 'upper')) 
-            
-            # refactor this (a loop, external)
-            meanf = [np.mean(getsims(self.sims_, ix), axis=1) for ix in range(self.n_series)] if self.agg == "mean" else [np.median(getsims(self.sims_, ix), axis=0) for ix in range(self.n_series)]
-            lower =  [np.quantile(getsims(self.sims_, ix), q = self.alpha_/200, axis=1) for ix in range(self.n_series)]
-            upper = [np.quantile(getsims(self.sims_, ix), q = 1 - self.alpha_/200, axis=1) for ix in range(self.n_series)]                                           
+                                        ('mean', 'sims', 'lower', 'upper'))                         
+            for ix in range(self.n_series):
+                sims_ix = getsims(self.sims_, ix)
+                if self.agg == "mean":
+                    meanf.append(np.mean(sims_ix, axis=1))
+                else:
+                    meanf.append(np.median(sims_ix, axis=1))
+                lower.append(np.quantile(sims_ix, q = self.alpha_/200, axis=1))
+                upper.append(np.quantile(sims_ix, q = 1 - self.alpha_/200, axis=1))
             
             self.mean_ = pd.DataFrame(np.asarray(meanf).T,
-                                 columns=self.df_.columns,
-                                 index=output_dates)
+                                      columns=self.df_.columns,
+                                      index=self.output_dates_)
 
             self.lower_ = pd.DataFrame(np.asarray(lower).T,
                                  columns=self.df_.columns,
-                                 index=output_dates)
+                                 index=self.output_dates_)
 
             self.upper_ = pd.DataFrame(np.asarray(upper).T,
                                  columns=self.df_.columns,
-                                 index=output_dates)
+                                 index=self.output_dates_)
 
             return DescribeResult(self.mean_, 
                                   self.sims_, 
@@ -558,18 +565,18 @@ class MTS(Base):
         self.mean_ = pd.DataFrame(
             np.asarray(self.mean_),
             columns=self.df_.columns,
-            index=output_dates,
+            index=self.output_dates_,
         )
 
         self.preds_std_ = np.asarray(self.preds_std_)
 
         self.lower_ = pd.DataFrame(self.mean_.values-pi_multiplier*self.preds_std_,
-                             columns=self.df_.columns,
-                             index=output_dates)
+                                   columns=self.df_.columns,
+                                   index=self.output_dates_)
 
         self.upper_ = pd.DataFrame(self.mean_.values+pi_multiplier*self.preds_std_,
-                             columns=self.df_.columns,
-                             index=output_dates)
+                                   columns=self.df_.columns,
+                                   index=self.output_dates_)
 
         return DescribeResult(self.mean_, 
                               self.lower_, 
@@ -659,24 +666,21 @@ class MTS(Base):
             series_idx: {integer}
                 series index
         """
-
-        if self.df_ is not None:
-            assert all([self.mean_ is not None, self.lower_ is not None, 
-                        self.upper_ is not None, self.output_dates_ is not None])
-            y_all = list(self.df_.iloc[:, series_idx])+list(self.mean_.iloc[:, series_idx])
-            n_points_all = len(y_all)
-            n_points_train = self.df_.shape[0]
-            x_all = [i for i in range(n_points_all)]
-            x_test = [i for i in range(n_points_train, n_points_all)]
-            # x_all = list(self.df_.index) + list(self.output_dates_)
-            fig, ax = plt.subplots()
-            ax.plot(x_all, y_all, '-')
-            # ax.fill_between(self.output_dates_, self.lower_[:, series_idx], 
-            #                 self.upper_[:, series_idx], 
-            #                 alpha=0.2)
-            ax.fill_between(x_test, self.lower_.iloc[:, series_idx], 
-                            self.upper_.iloc[:, series_idx], 
-                            alpha=0.2)
-            plt.show()
-        # if self.df_ is None:
-        # 
+        assert all([self.mean_ is not None, self.lower_ is not None, 
+                    self.upper_ is not None, self.output_dates_ is not None])
+        y_all = list(self.df_.iloc[:, series_idx])+list(self.mean_.iloc[:, series_idx])
+        n_points_all = len(y_all)
+        n_points_train = self.df_.shape[0]
+        x_all = [i for i in range(n_points_all)]
+        x_test = [i for i in range(n_points_train, n_points_all)]
+        # x_all = list(self.df_.index) + list(self.output_dates_)
+        fig, ax = plt.subplots()
+        ax.plot(x_all, y_all, '-')
+        # ax.fill_between(self.output_dates_, self.lower_[:, series_idx], 
+        #                 self.upper_[:, series_idx], 
+        #                 alpha=0.2)
+        ax.fill_between(x_test, self.lower_.iloc[:, series_idx], 
+                        self.upper_.iloc[:, series_idx], 
+                        alpha=0.2)
+        plt.show()        
+         
