@@ -674,8 +674,8 @@ class MTS(Base):
             # ax.fill_between(self.output_dates_, self.lower_[:, series_idx], 
             #                 self.upper_[:, series_idx], 
             #                 alpha=0.2)
-            ax.fill_between(x_test, self.lower_[:, series_idx], 
-                            self.upper_[:, series_idx], 
+            ax.fill_between(x_test, self.lower_.iloc[:, series_idx], 
+                            self.upper_.iloc[:, series_idx], 
                             alpha=0.2)
             plt.show()
         # if self.df_ is None:
