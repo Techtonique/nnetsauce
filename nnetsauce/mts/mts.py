@@ -231,6 +231,7 @@ class MTS(Base):
         self.mean_ = None
         self.upper_ = None
         self.lower_ = None
+        self.output_dates_ = None
         self.preds_std_ = []
         self.alpha_ = None
         self.return_std_ = None
@@ -382,6 +383,7 @@ class MTS(Base):
 
         if self.df_ is not None:  # `fit` takes a data frame input
             output_dates, frequency = ts.compute_output_dates(self.df_, h)
+            self.output_dates_ = output_dates
 
         self.return_std_ = False
 
@@ -650,16 +652,26 @@ class MTS(Base):
 
 
     def plot(self, series_idx):
+        """Plot time series forecast 
+
+        Parameters:
+
+            series_idx: {integer}
+                series index
+        """
+
         if self.df_ is not None:
-            assert all([self.mean_ is not None, self.lower_ is not None, self.upper_ is not None])
+            assert all([self.mean_ is not None, self.lower_ is not None, 
+                        self.upper_ is not None, self.output_dates_ is not None])
             y_all = list(self.df_.iloc[:, series_idx])+list(self.mean_[:, series_idx])
-            n_points_all = len(y_all)
-            n_points_train = self.df_.shape[0]
-            x_all = [i for i in range(n_points_all)]
-            x_test = [i for i in range(n_points_train, n_points_all)]
+            # n_points_all = len(y_all)
+            # n_points_train = self.df_.shape[0]
+            # x_all = [i for i in range(n_points_all)]
+            # x_test = [i for i in range(n_points_train, n_points_all)]
+            x_all = list(self.df_.index) + list(self.output_dates_)
             fig, ax = plt.subplots()
             ax.plot(x_all, y_all, '-')
-            ax.fill_between(x_test, self.lower_[:, series_idx], 
+            ax.fill_between(self.output_dates_, self.lower_[:, series_idx], 
                             self.upper_[:, series_idx], 
                             alpha=0.2)
         # if self.df_ is None:
