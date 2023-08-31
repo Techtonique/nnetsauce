@@ -663,7 +663,7 @@ class MTS(Base):
         if self.df_ is not None:
             assert all([self.mean_ is not None, self.lower_ is not None, 
                         self.upper_ is not None, self.output_dates_ is not None])
-            y_all = list(self.df_.iloc[:, series_idx])+list(self.mean_[:, series_idx])
+            y_all = list(self.df_.iloc[:, series_idx])+list(self.mean_.iloc[:, series_idx])
             n_points_all = len(y_all)
             n_points_train = self.df_.shape[0]
             x_all = [i for i in range(n_points_all)]
