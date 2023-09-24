@@ -645,7 +645,8 @@ class MTS(Base):
                     "model forecasting must be obtained first (with predict)"
 
         if isinstance(series, str):
-            assert series in self.series_names, f"series {series} doesn't exist in the input dataset"
+            print(self.series_names)
+            assert series in tuple(self.series_names), f"series {series} doesn't exist in the input dataset"
             series_idx = self.df_.columns.get_loc(series)
         else:
             assert isinstance(series, int) and (0 <= series < self.n_series),\
@@ -660,7 +661,7 @@ class MTS(Base):
             x_all = [i for i in range(n_points_all)]
             x_test = [i for i in range(n_points_train, n_points_all)]              
         else: # use dates       
-            input_dates = pd.to_datetime(self.df_.index).dt.date
+            input_dates = self.df_.index.to_pydatetime()
             x_all = np.concatenate((input_dates, self.output_dates_.values), axis=None)
             print(f"x_all: {x_all}") 
             x_test = self.output_dates_.values
