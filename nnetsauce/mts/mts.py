@@ -268,7 +268,7 @@ class MTS(Base):
             self.series_names = ["series" + str(i) for i in range(X.shape[1])]
             X = pd.DataFrame(X, columns=self.series_names)
         else:
-            self.series_names = X.columns.values
+            self.series_names = list(X.columns.values)
         
         self.df_ = X
         X = X.values        
@@ -647,7 +647,7 @@ class MTS(Base):
                     "model forecasting must be obtained first (with predict)"
 
         if isinstance(series, str):
-            assert series in tuple(self.series_names), f"series {series} doesn't exist in the input dataset"
+            assert series in self.series_names, f"series {series} doesn't exist in the input dataset"
             series_idx = self.df_.columns.get_loc(series)
         else:
             assert isinstance(series, int) and (0 <= series < self.n_series),\

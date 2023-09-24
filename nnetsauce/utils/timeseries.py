@@ -16,7 +16,7 @@ def compute_output_dates(df, horizon):
         input_dates = pd.date_range(start = pd.Timestamp.today().strftime("%Y-%m-%d"), 
                                     periods=horizon)
 
-    print(f"\n in nnetsauce.utils.timeseries 1: {input_dates} \n")
+    #print(f"\n in nnetsauce.utils.timeseries 1: {input_dates} \n")
 
     frequency = pd.infer_freq(pd.DatetimeIndex(input_dates))
 
