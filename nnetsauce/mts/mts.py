@@ -662,8 +662,8 @@ class MTS(Base):
             x_all = [i for i in range(n_points_all)]
             x_test = [i for i in range(n_points_train, n_points_all)]              
         else: # use dates       
-            input_dates = pd.to_datetime(self.df_.index)
-            x_all = np.concatenate((input_dates, self.output_dates_.values), axis=None)
+            input_dates = pd.to_datetime(self.df_.index).dt.date
+            x_all = np.concatenate((input_dates.values, self.output_dates_.values), axis=None)
             print(f"x_all: {x_all}") 
             x_test = self.output_dates_.values
             print(f"x_test: {x_test}") 
