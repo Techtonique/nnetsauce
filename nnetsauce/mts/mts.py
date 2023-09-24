@@ -281,10 +281,9 @@ class MTS(Base):
         print(f"input_dates 1: {input_dates}")
         frequency = pd.infer_freq(pd.DatetimeIndex(input_dates))
         print(f"frequency: {frequency}")
-        input_dates = np.delete(
-        pd.date_range(
+        input_dates = pd.date_range(
             start=input_dates[0], periods=len(input_dates), freq=frequency
-        ).values, 0).tolist()
+        ).values.tolist()
         print(f"input_dates 2: {input_dates}")
         df_input_dates = pd.DataFrame({"date": input_dates})
         print(f"input_dates 3: {df_input_dates}")
