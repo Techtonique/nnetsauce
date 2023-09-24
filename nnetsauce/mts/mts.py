@@ -225,6 +225,7 @@ class MTS(Base):
         self.agg = agg
         self.verbose = verbose
         self.series_names = None
+        self.input_dates = None
         self.fit_objs_ = {}
         self.y_ = None  # MTS responses (most recent observations first)
         self.X_ = None  # MTS lags
@@ -271,7 +272,27 @@ class MTS(Base):
             self.series_names = list(X.columns.values)
         
         self.df_ = X
-        X = X.values        
+        X = X.values 
+
+
+        ##########################################################################################
+        
+        input_dates = self.df_.index.values
+        print(f"input_dates 1: {input_dates}")
+        frequency = pd.infer_freq(pd.DatetimeIndex(input_dates))
+        print(f"frequency: {frequency}")
+        input_dates = np.delete(
+        pd.date_range(
+            start=input_dates[0], periods=len(input_dates), freq=frequency
+        ).values, 0).tolist()
+        print(f"input_dates 2: {input_dates}")
+        df_input_dates = pd.DataFrame({"date": input_dates})
+        print(f"input_dates 3: {df_input_dates}")
+        self.input_dates = pd.to_datetime(df_input_dates["date"]).dt.date
+        print(f"input_dates 4: {self.input_dates}")
+ 
+        ##########################################################################################       
+         
 
         try:
             # multivariate time series
@@ -662,12 +683,11 @@ class MTS(Base):
             x_all = [i for i in range(n_points_all)]
             x_test = [i for i in range(n_points_train, n_points_all)]              
         else: # use dates       
-            input_dates = self.df_.index.values
-            print(f"input_dates: {input_dates}") 
-            x_all = np.concatenate((input_dates, self.output_dates_.values), axis=None)
-            print(f"x_all: {x_all}") 
+            print(f"\n self.input_dates: {self.input_dates} \n") 
+            x_all = np.concatenate((self.input_dates.values, self.output_dates_.values), axis=None)
+            print(f"\n x_all: {x_all} \n") 
             x_test = self.output_dates_.values
-            print(f"x_test: {x_test}") 
+            print(f"\n x_test: {x_test} \n") 
 
         fig, ax = plt.subplots()
         ax.plot(x_all, y_all, '-')
