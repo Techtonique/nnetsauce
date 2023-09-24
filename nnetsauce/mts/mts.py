@@ -8,6 +8,7 @@ import pickle
 import sklearn.metrics as skm2
 import matplotlib.pyplot as plt 
 from collections import namedtuple
+from datetime import datetime
 from scipy.stats import norm, describe
 from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
@@ -223,6 +224,7 @@ class MTS(Base):
         self.kernel = kernel 
         self.agg = agg
         self.verbose = verbose
+        self.series_names = None
         self.fit_objs_ = {}
         self.y_ = None  # MTS responses (most recent observations first)
         self.X_ = None  # MTS lags
@@ -263,8 +265,8 @@ class MTS(Base):
         """
 
         if isinstance(X, pd.DataFrame) is False:
-            col_names = ["series" + str(i) for i in range(X.shape[1])]
-            X = pd.DataFrame(X, columns=col_names)
+            self.series_names = ["series" + str(i) for i in range(X.shape[1])]
+            X = pd.DataFrame(X, columns=self.series_names)
         
         self.df_ = X
         X = X.values        
@@ -386,11 +388,19 @@ class MTS(Base):
 
         self.output_dates_, frequency = ts.compute_output_dates(self.df_, h)        
 
+        print(f" \n self.output_dates_: {self.output_dates_} \n ")
+
         self.return_std_ = False # do not remove (/!\)
 
         self.mean_ = None  # do not remove (/!\)
 
         self.mean_ = pickle.loads(pickle.dumps(self.y_, -1))
+
+        self.lower_ = None
+
+        self.upper_ = None
+
+        self.sims_ = None
 
         y_means_ = np.asarray([self.y_means_[i] for i in range(self.n_series)])
 
@@ -480,42 +490,6 @@ class MTS(Base):
                 self.mean_ = mo.rbind(preds, self.mean_)        
         
         # function's return ----------------------------------------------------------------------
-        # if self.df_ is None:
-
-        #     self.mean_ = self.mean_[0:h, :][::-1]
-
-        #     if "return_std" not in kwargs:
-
-        #         if self.kde_ is None: 
-        #             return self.mean_    
-                
-        #         if self.verbose > 0:
-        #             print(f"Obtain {self.replications} predictive simulations...")
-
-        #         self.sims_ = tuple((self.mean_ + self.residuals_sims_[i] for i in tqdm(range(self.replications))))                                 
-
-        #         # refactor this (a loop, external)
-        #         meanf = [np.mean(getsims(self.sims_, ix), axis=1) for ix in range(self.n_series)] if self.agg == "mean" else [np.median(getsims(self.sims_, ix), axis=0) for ix in range(self.n_series)]
-        #         lower =  [np.quantile(getsims(self.sims_, ix), q = self.alpha_/200, axis=1) for ix in range(self.n_series)]
-        #         upper = [np.quantile(getsims(self.sims_, ix), q = 1 - self.alpha_/200, axis=1) for ix in range(self.n_series)]                                           
-
-        #         DescribeResult = namedtuple('DescribeResult', 
-        #                                     ('mean', 'sims', 'lower', 'upper')) 
-
-        #         return DescribeResult(np.asarray(meanf).T, 
-        #                               self.sims_, 
-        #                               np.asarray(lower).T, 
-        #                               np.asarray(upper).T) 
-
-        #     # if "return_std" in kwargs:
-        #     self.preds_std_ = np.asarray(self.preds_std_)
-
-        #     DescribeResult = namedtuple('DescribeResult', 
-        #                                 ('mean', 'lower', 'upper'))
-            
-        #     return DescribeResult(self.mean_, self.mean_-pi_multiplier*self.preds_std_,
-        #                           self.mean_+pi_multiplier*self.preds_std_)            
-
         self.mean_ = pd.DataFrame(
             self.mean_[0:h, :][::-1],
             columns=self.df_.columns,
@@ -658,29 +632,43 @@ class MTS(Base):
             return scoring_options[scoring](X_test, preds)
 
 
-    def plot(self, series_idx):
+    def plot(self, series, type_graph = "dates"):
         """Plot time series forecast 
 
         Parameters:
 
-            series_idx: {integer}
-                series index
+            series: {integer} or {string}
+                series index or name 
         """
         assert all([self.mean_ is not None, self.lower_ is not None, 
-                    self.upper_ is not None, self.output_dates_ is not None])
+                    self.upper_ is not None, self.output_dates_ is not None]),\
+                    "model forecasting must be obtained first (with predict)"
+
+        if isinstance(series, str):
+            assert series in self.series_names, f"series {series} doesn't exist in the input dataset"
+            series_idx = self.df_.columns.get_loc(series)
+        else:
+            assert isinstance(series, int) and (0 <= series < self.n_series),\
+                  f"check series index (< {self.n_series})"
+            series_idx = series
+
         y_all = list(self.df_.iloc[:, series_idx])+list(self.mean_.iloc[:, series_idx])
         n_points_all = len(y_all)
         n_points_train = self.df_.shape[0]
-        x_all = [i for i in range(n_points_all)]
-        x_test = [i for i in range(n_points_train, n_points_all)]
-        # x_all = list(self.df_.index) + list(self.output_dates_)
+
+        if type_graph is "numeric":
+            x_all = [i for i in range(n_points_all)]
+            x_test = [i for i in range(n_points_train, n_points_all)]              
+        else: # use dates       
+            input_dates = pd.to_datetime(self.df_.index).dt.date
+            x_all = np.concatenate((input_dates, self.output_dates_.values), axis=None)
+            print(f"x_all: {x_all}") 
+            x_test = self.output_dates_.values
+            print(f"x_test: {x_test}") 
+
         fig, ax = plt.subplots()
         ax.plot(x_all, y_all, '-')
-        # ax.fill_between(self.output_dates_, self.lower_[:, series_idx], 
-        #                 self.upper_[:, series_idx], 
-        #                 alpha=0.2)
         ax.fill_between(x_test, self.lower_.iloc[:, series_idx], 
                         self.upper_.iloc[:, series_idx], 
                         alpha=0.2)
-        plt.show()        
-         
+        plt.show()

@@ -1,7 +1,8 @@
-# version 0.12.2
+# version 0.13.0
 
-- Fix error in simulation (base.py)
+- Fix error in nodes' simulation (base.py)
 - Use residuals and KDE for predictive simulations
+- `plot` method for MTS objects 
 
 # version 0.12.1
 

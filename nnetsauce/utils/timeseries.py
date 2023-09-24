@@ -12,13 +12,24 @@ def compute_output_dates(df, horizon):
 
     input_dates = df.index.values
 
+    if input_dates[0] == 0:
+        input_dates = pd.date_range(start = pd.Timestamp.today().strftime("%Y-%m-%d"), 
+                                    periods=horizon)
+
+    print(f"\n in nnetsauce.utils.timeseries 1: {input_dates} \n")
+
     frequency = pd.infer_freq(pd.DatetimeIndex(input_dates))
+
+    #print(f"\n in nnetsauce.utils.timeseries 2: {frequency} \n")
+
     output_dates = np.delete(
         pd.date_range(
             start=input_dates[-1], periods=horizon + 1, freq=frequency
         ).values,
         0,
     ).tolist()
+
+    #print(f"\n in nnetsauce.utils.timeseries 3: {output_dates} \n")
 
     df_output_dates = pd.DataFrame({"date": output_dates})
     output_dates = pd.to_datetime(df_output_dates["date"]).dt.date
