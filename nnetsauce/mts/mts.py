@@ -267,6 +267,8 @@ class MTS(Base):
         if isinstance(X, pd.DataFrame) is False:
             self.series_names = ["series" + str(i) for i in range(X.shape[1])]
             X = pd.DataFrame(X, columns=self.series_names)
+        else:
+            self.series_names = X.columns.values
         
         self.df_ = X
         X = X.values        
@@ -388,7 +390,7 @@ class MTS(Base):
 
         self.output_dates_, frequency = ts.compute_output_dates(self.df_, h)        
 
-        print(f" \n self.output_dates_: {self.output_dates_} \n ")
+       # print(f" \n self.output_dates_: {self.output_dates_} \n ")
 
         self.return_std_ = False # do not remove (/!\)
 
@@ -645,7 +647,6 @@ class MTS(Base):
                     "model forecasting must be obtained first (with predict)"
 
         if isinstance(series, str):
-            print(self.series_names)
             assert series in tuple(self.series_names), f"series {series} doesn't exist in the input dataset"
             series_idx = self.df_.columns.get_loc(series)
         else:
