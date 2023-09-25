@@ -6,12 +6,15 @@ import numpy as np
 import pandas as pd
 import pickle
 import sklearn.metrics as skm2
+import matplotlib.pyplot as plt 
 from collections import namedtuple
-from scipy.stats import norm
+from datetime import datetime
+from scipy.stats import norm, describe
 from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
 from tqdm import tqdm
 from ..base import Base
+from ..simulation import getsims
 from ..utils import matrixops as mo
 from ..utils import timeseries as ts
 
@@ -73,12 +76,18 @@ class MTS(Base):
 
         kernel: str.
             the kernel to use for residuals density estimation (used for predictive simulation). Currently, either 'gaussian' or 'tophat'.
-
+        
+        agg: str.
+            either "mean" or "median" for simulation of bootstrap aggregating
+        
         seed: int.
             reproducibility seed for nodes_sim=='uniform' or predictive simulation.
 
         backend: str.
             "cpu" or "gpu" or "tpu".
+        
+        verbose: int.
+            0: not printing; 1: printing
 
     Attributes:
 
@@ -184,8 +193,10 @@ class MTS(Base):
         lags=1,
         replications=None,
         kernel=None,
+        agg="mean",
         seed=123,
         backend="cpu",
+        verbose=0
     ):
 
         assert int(lags) == lags, "parameter 'lags' should be an integer"
@@ -203,7 +214,7 @@ class MTS(Base):
             type_clust=type_clust,
             type_scaling=type_scaling,
             seed=seed,
-            backend=backend,
+            backend=backend
         )
 
         self.obj = obj
@@ -211,13 +222,21 @@ class MTS(Base):
         self.lags = lags
         self.replications = replications
         self.kernel = kernel 
+        self.agg = agg
+        self.verbose = verbose
+        self.series_names = None
+        self.input_dates = None
         self.fit_objs_ = {}
         self.y_ = None  # MTS responses (most recent observations first)
         self.X_ = None  # MTS lags
         self.xreg_ = None
         self.y_means_ = {}
-        self.preds_ = None
+        self.mean_ = None
+        self.upper_ = None
+        self.lower_ = None
+        self.output_dates_ = None
         self.preds_std_ = []
+        self.alpha_ = None
         self.return_std_ = None
         self.df_ = None
         self.residuals_ = [] 
@@ -246,9 +265,31 @@ class MTS(Base):
             self: object
         """
 
-        if isinstance(X, pd.DataFrame):
-            self.df_ = X
-            X = X.values
+        if isinstance(X, pd.DataFrame) is False:
+            self.series_names = ["series" + str(i) for i in range(X.shape[1])]
+            X = pd.DataFrame(X, columns=self.series_names)
+        else:
+            self.series_names = list(X.columns.values)
+        
+        self.df_ = X
+        X = X.values 
+        self.input_dates = ts.compute_input_dates(self.df_)
+
+        # Backup input dates --> ts.compute_input_dates(self.df_)
+        """
+        input_dates = self.df_.index.values
+        print(f"input_dates 1: {input_dates}")
+        frequency = pd.infer_freq(pd.DatetimeIndex(input_dates))
+        print(f"frequency: {frequency}")
+        input_dates = pd.date_range(
+            start=input_dates[0], periods=len(input_dates), freq=frequency
+        ).values.tolist()
+        print(f"input_dates 2: {input_dates}")
+        df_input_dates = pd.DataFrame({"date": input_dates})
+        print(f"input_dates 3: {df_input_dates}")
+        self.input_dates = pd.to_datetime(df_input_dates["date"]).dt.date
+        print(f"input_dates 4: {self.input_dates}")
+        """              
 
         try:
             # multivariate time series
@@ -308,7 +349,10 @@ class MTS(Base):
             dummy_y, scaled_Z = self.cook_training_set(y=rep_1_n, X=self.X_)
 
         # loop on all the time series and adjust self.obj.fit
-        for i in range(p):
+        if self.verbose > 0:
+            print(f"\n Adjusting {type(self.obj).__name__} to multivariate time series... \n ")
+
+        for i in tqdm(range(p)):
             y_mean = np.mean(self.y_[:, i])
             self.y_means_[i] = y_mean
             centered_y_i = self.y_[:, i] - y_mean
@@ -317,13 +361,21 @@ class MTS(Base):
             residuals_.append((centered_y_i - self.fit_objs_[i].predict(scaled_Z)).tolist())
 
         self.residuals_ = np.asarray(residuals_).T
-        
+                        
         if self.replications is not None:
+            if self.verbose > 0:
+                print(f"\n Simulate residuals using {self.kernel} kernel... \n")
             assert self.kernel in ('gaussian', 'tophat'), "currently, 'kernel' must be either 'gaussian' or 'tophat'"
-            kernel_bandwidths = {"bandwidth": np.logspace(-1, 1, 20)}
+            kernel_bandwidths = {"bandwidth": np.logspace(-6, 6, 100)}
+            
             grid = GridSearchCV(KernelDensity(kernel = self.kernel, **kwargs), 
                                 param_grid=kernel_bandwidths)  
+            
             grid.fit(self.residuals_) 
+            
+            if self.verbose > 0:
+                print(f"\n Best parameters for {self.kernel} kernel: {grid.best_params_} \n")
+
             self.kde_ = grid.best_estimator_
                 
         return self
@@ -354,24 +406,32 @@ class MTS(Base):
             `obj.predict` can return standard deviation
         """
 
-        if self.df_ is not None:  # `fit` takes a data frame input
-            output_dates, frequency = ts.compute_output_dates(self.df_, h)
+        self.output_dates_, frequency = ts.compute_output_dates(self.df_, h)        
 
-        self.return_std_ = False
+       # print(f" \n self.output_dates_: {self.output_dates_} \n ")
 
-        self.preds_ = None  # do not remove (/!\)
+        self.return_std_ = False # do not remove (/!\)
 
-        self.preds_ = pickle.loads(pickle.dumps(self.y_, -1))
+        self.mean_ = None  # do not remove (/!\)
+
+        self.mean_ = pickle.loads(pickle.dumps(self.y_, -1))
+
+        self.lower_ = None
+
+        self.upper_ = None
+
+        self.sims_ = None
 
         y_means_ = np.asarray([self.y_means_[i] for i in range(self.n_series)])
 
         n_features = self.n_series * self.lags        
 
+        self.alpha_ = 100 - level
+
         if "return_std" in kwargs:
             self.return_std_ = True 
-            self.preds_std_ = []
-            alpha = 100 - level
-            pi_multiplier = norm.ppf(1-alpha/200)
+            self.preds_std_ = []            
+            pi_multiplier = norm.ppf(1 - self.alpha_/200)
             DescribeResult = namedtuple('DescribeResult', ('mean', 'lower', 'upper')) # to be updated
 
         if self.xreg_ is None: # no external regressors 
@@ -382,7 +442,7 @@ class MTS(Base):
 
             for _ in range(h):
 
-                new_obs = ts.reformat_response(self.preds_, self.lags)
+                new_obs = ts.reformat_response(self.mean_, self.lags)
 
                 new_X = new_obs.reshape(1, n_features)
 
@@ -396,7 +456,7 @@ class MTS(Base):
 
                 preds = np.asarray(y_means_ + predicted_cooked_new_X)                                                                     
                 
-                self.preds_ = mo.rbind(preds, self.preds_)
+                self.mean_ = mo.rbind(preds, self.mean_)
         
         else: # if self.xreg_ is not None: # with external regressors
             
@@ -406,6 +466,8 @@ class MTS(Base):
                 new_xreg = new_xreg.values
 
             if self.kde_ is not None: 
+                if self.verbose > 0:
+                    print("\n Obtain simulations for adjusted residuals... \n")
                 self.residuals_sims_ = tuple(self.kde_.sample(n_samples = h, random_state=self.seed + 100*i) for i in tqdm(range(self.replications)))
 
             try:
@@ -426,7 +488,7 @@ class MTS(Base):
 
             for _ in range(h):
 
-                new_obs = ts.reformat_response(self.preds_, self.lags)
+                new_obs = ts.reformat_response(self.mean_, self.lags)
 
                 new_obs_xreg = ts.reformat_response(inv_new_xreg, self.lags)
 
@@ -445,32 +507,74 @@ class MTS(Base):
 
                 preds = np.asarray(y_means_ + predicted_cooked_new_X)                                                                     
                 
-                self.preds_ = mo.rbind(preds, self.preds_)        
+                self.mean_ = mo.rbind(preds, self.mean_)        
         
-        # function's return
-        if self.df_ is None:
-            self.preds_ = self.preds_[0:h, :][::-1]
-            if "return_std" not in kwargs:
-                return self.preds_                          
-            self.preds_std_ = np.asarray(self.preds_std_)
-            return DescribeResult(self.preds_, self.preds_-pi_multiplier*self.preds_std_,
-                                  self.preds_+pi_multiplier*self.preds_std_)
-
-        # if self.df_ is not None (return data frames)
-        self.preds_ = pd.DataFrame(
-            self.preds_[0:h, :][::-1],
+        # function's return ----------------------------------------------------------------------
+        self.mean_ = pd.DataFrame(
+            self.mean_[0:h, :][::-1],
             columns=self.df_.columns,
-            index=output_dates,
+            index=self.output_dates_
         )
         if "return_std" not in kwargs:
-            return self.preds_
-        self.preds_std_ = pd.DataFrame(
-            np.asarray(self.preds_std_),
-            columns=self.df_.columns,
-            index=output_dates,
-        )
-        return self.preds_, self.preds_std_
+            if self.kde_ is None: 
+                return self.mean_  
 
+            # if "return_std" not in kwargs and self.kde_ is not None  
+            meanf = []
+            lower = []
+            upper = []
+            self.sims_ = tuple((self.mean_ + self.residuals_sims_[i] for i in tqdm(range(self.replications))))                                           
+            DescribeResult = namedtuple('DescribeResult', 
+                                        ('mean', 'sims', 'lower', 'upper'))                         
+            for ix in range(self.n_series):
+                sims_ix = getsims(self.sims_, ix)
+                if self.agg == "mean":
+                    meanf.append(np.mean(sims_ix, axis=1))
+                else:
+                    meanf.append(np.median(sims_ix, axis=1))
+                lower.append(np.quantile(sims_ix, q = self.alpha_/200, axis=1))
+                upper.append(np.quantile(sims_ix, q = 1 - self.alpha_/200, axis=1))
+            
+            self.mean_ = pd.DataFrame(np.asarray(meanf).T,
+                                      columns=self.df_.columns,
+                                      index=self.output_dates_)
+
+            self.lower_ = pd.DataFrame(np.asarray(lower).T,
+                                 columns=self.df_.columns,
+                                 index=self.output_dates_)
+
+            self.upper_ = pd.DataFrame(np.asarray(upper).T,
+                                 columns=self.df_.columns,
+                                 index=self.output_dates_)
+
+            return DescribeResult(self.mean_, 
+                                  self.sims_, 
+                                  self.lower_, 
+                                  self.upper_)       
+            
+        # if "return_std" in kwargs
+        DescribeResult = namedtuple('DescribeResult', 
+                                    ('mean', 'lower', 'upper')) 
+        
+        self.mean_ = pd.DataFrame(
+            np.asarray(self.mean_),
+            columns=self.df_.columns,
+            index=self.output_dates_,
+        )
+
+        self.preds_std_ = np.asarray(self.preds_std_)
+
+        self.lower_ = pd.DataFrame(self.mean_.values-pi_multiplier*self.preds_std_,
+                                   columns=self.df_.columns,
+                                   index=self.output_dates_)
+
+        self.upper_ = pd.DataFrame(self.mean_.values+pi_multiplier*self.preds_std_,
+                                   columns=self.df_.columns,
+                                   index=self.output_dates_)
+
+        return DescribeResult(self.mean_, 
+                              self.lower_, 
+                              self.upper_)       
 
 
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):
@@ -546,3 +650,45 @@ class MTS(Base):
             )
         else:
             return scoring_options[scoring](X_test, preds)
+
+
+    def plot(self, series):
+        """Plot time series forecast 
+
+        Parameters:
+
+            series: {integer} or {string}
+                series index or name 
+        """
+
+        type_graph = "dates" # not clean, stabilize this in future releases
+
+        assert all([self.mean_ is not None, self.lower_ is not None, 
+                    self.upper_ is not None, self.output_dates_ is not None]),\
+                    "model forecasting must be obtained first (with predict)"
+
+        if isinstance(series, str):
+            assert series in self.series_names, f"series {series} doesn't exist in the input dataset"
+            series_idx = self.df_.columns.get_loc(series)
+        else:
+            assert isinstance(series, int) and (0 <= series < self.n_series),\
+                  f"check series index (< {self.n_series})"
+            series_idx = series
+
+        y_all = list(self.df_.iloc[:, series_idx])+list(self.mean_.iloc[:, series_idx])
+        n_points_all = len(y_all)
+        n_points_train = self.df_.shape[0]
+
+        if type_graph is "numeric":
+            x_all = [i for i in range(n_points_all)]
+            x_test = [i for i in range(n_points_train, n_points_all)]              
+        else: # use dates       
+            x_all = np.concatenate((self.input_dates.values, self.output_dates_.values), axis=None)
+            x_test = self.output_dates_.values        
+
+        fig, ax = plt.subplots()
+        ax.plot(x_all, y_all, '-')
+        ax.fill_between(x_test, self.lower_.iloc[:, series_idx], 
+                        self.upper_.iloc[:, series_idx], 
+                        alpha=0.2)
+        plt.show()

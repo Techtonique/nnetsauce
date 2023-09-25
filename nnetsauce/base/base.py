@@ -295,28 +295,47 @@ class Base(BaseEstimator):
 
         n_features = scaled_X.shape[1]
 
+        # hash_sim = {
+        #         "sobol": generate_sobol,
+        #         "hammersley": generate_hammersley,
+        #         "uniform": generate_uniform,
+        #         "halton": generate_halton
+        #     }
+
         if self.bias is False:  # no bias term in the hidden layer
 
             if W is None:
-
-                h_sim = {
-                        "sobol": generate_sobol(
-                            n_dims=n_features, n_points=self.n_hidden_features
-                        ),
-                        "hammersley": generate_hammersley(
-                            n_dims=n_features, n_points=self.n_hidden_features
-                        ),
-                        "uniform": generate_uniform(
+                
+                if self.nodes_sim == "sobol":
+                    self.W_ = generate_sobol(
+                            n_dims=n_features, 
+                            n_points=self.n_hidden_features,
+                            seed=self.seed
+                        ) 
+                elif self.nodes_sim == "hammersley":
+                    self.W_ = generate_hammersley(
+                            n_dims=n_features, 
+                            n_points=self.n_hidden_features,
+                            seed=self.seed
+                        )
+                elif self.nodes_sim == "uniform":
+                    self.W_ = generate_uniform(
                             n_dims=n_features,
                             n_points=self.n_hidden_features,
-                            seed=self.seed,
-                        ),
-                        "halton": generate_halton(
-                            n_dims=n_features, n_points=self.n_hidden_features
-                        ),
-                    }
+                            seed=self.seed
+                        )
+                else: 
+                    self.W_ = generate_halton(
+                            n_dims=n_features, 
+                            n_points=self.n_hidden_features,
+                            seed=self.seed
+                        ) 
 
-                self.W_ = h_sim[self.nodes_sim]
+                # self.W_ = hash_sim[self.nodes_sim](
+                #             n_dims=n_features,
+                #             n_points=self.n_hidden_features,
+                #             seed=self.seed,
+                #         )
 
                 assert (
                     scaled_X.shape[1] == self.W_.shape[0]
@@ -351,24 +370,36 @@ class Base(BaseEstimator):
 
             n_features_1 = n_features + 1
 
-            h_sim = {
-                "sobol": generate_sobol(
-                    n_dims=n_features_1, n_points=self.n_hidden_features
-                ),
-                "hammersley": generate_hammersley(
-                    n_dims=n_features_1, n_points=self.n_hidden_features
-                ),
-                "uniform": generate_uniform(
-                    n_dims=n_features_1,
-                    n_points=self.n_hidden_features,
-                    seed=self.seed,
-                ),
-                "halton": generate_halton(
-                    n_dims=n_features_1, n_points=self.n_hidden_features
-                ),
-            }
+            if self.nodes_sim == "sobol":
+                self.W_ = generate_sobol(
+                        n_dims=n_features_1, 
+                        n_points=self.n_hidden_features,
+                        seed=self.seed
+                    ) 
+            elif self.nodes_sim == "hammersley":
+                self.W_ = generate_hammersley(
+                        n_dims=n_features_1, 
+                        n_points=self.n_hidden_features,
+                        seed=self.seed
+                    )
+            elif self.nodes_sim == "uniform":
+                self.W_ = generate_uniform(
+                        n_dims=n_features_1,
+                        n_points=self.n_hidden_features,
+                        seed=self.seed,
+                    )
+            else:
+                self.W_ = generate_halton(
+                        n_dims=n_features_1, 
+                        n_points=self.n_hidden_features,
+                        seed=self.seed
+                    ) 
 
-            self.W_ = h_sim[self.nodes_sim]
+            # self.W_ = hash_sim[self.nodes_sim](
+            #         n_dims=n_features_1,
+            #         n_points=self.n_hidden_features,
+            #         seed=self.seed,
+            #     )
 
             return mo.dropout(
                 x=self.activation_func(

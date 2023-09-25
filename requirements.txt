@@ -1,4 +1,5 @@
 joblib
+matplotlib
 numpy
 pandas
 scipy

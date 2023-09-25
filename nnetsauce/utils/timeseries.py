@@ -2,23 +2,50 @@
 
 # Authors: Thierry Moudiki <thierry.moudiki@gmail.com>
 #
-# License: BSD 3
+# License: BSD 3 Clear
 
 import numpy as np
 import pandas as pd
+
+# compute output dates from data frame's index
+def compute_input_dates(df):
+
+    input_dates = df.index.values
+        
+    frequency = pd.infer_freq(pd.DatetimeIndex(input_dates))
+        
+    input_dates = pd.date_range(start=input_dates[0], 
+                                periods=len(input_dates), 
+                                freq=frequency).values.tolist()
+        
+    df_input_dates = pd.DataFrame({"date": input_dates})                    
+
+    return pd.to_datetime(df_input_dates["date"]).dt.date
+
 
 # compute output dates from data frame's index
 def compute_output_dates(df, horizon):
 
     input_dates = df.index.values
 
+    if input_dates[0] == 0:
+        input_dates = pd.date_range(start = pd.Timestamp.today().strftime("%Y-%m-%d"), 
+                                    periods=horizon)
+
+    #print(f"\n in nnetsauce.utils.timeseries 1: {input_dates} \n")
+
     frequency = pd.infer_freq(pd.DatetimeIndex(input_dates))
+
+    #print(f"\n in nnetsauce.utils.timeseries 2: {frequency} \n")
+
     output_dates = np.delete(
         pd.date_range(
             start=input_dates[-1], periods=horizon + 1, freq=frequency
         ).values,
         0,
     ).tolist()
+
+    #print(f"\n in nnetsauce.utils.timeseries 3: {output_dates} \n")
 
     df_output_dates = pd.DataFrame({"date": output_dates})
     output_dates = pd.to_datetime(df_output_dates["date"]).dt.date
