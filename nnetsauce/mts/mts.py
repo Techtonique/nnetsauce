@@ -273,10 +273,10 @@ class MTS(Base):
         
         self.df_ = X
         X = X.values 
+        self.input_dates = ts.compute_input_dates(self.df_)
 
-
-        ##########################################################################################
-        
+        # Backup input dates --> ts.compute_input_dates(self.df_)
+        """
         input_dates = self.df_.index.values
         print(f"input_dates 1: {input_dates}")
         frequency = pd.infer_freq(pd.DatetimeIndex(input_dates))
@@ -289,9 +289,7 @@ class MTS(Base):
         print(f"input_dates 3: {df_input_dates}")
         self.input_dates = pd.to_datetime(df_input_dates["date"]).dt.date
         print(f"input_dates 4: {self.input_dates}")
- 
-        ##########################################################################################       
-         
+        """              
 
         try:
             # multivariate time series
@@ -654,7 +652,7 @@ class MTS(Base):
             return scoring_options[scoring](X_test, preds)
 
 
-    def plot(self, series, type_graph = "dates"):
+    def plot(self, series):
         """Plot time series forecast 
 
         Parameters:
@@ -662,6 +660,9 @@ class MTS(Base):
             series: {integer} or {string}
                 series index or name 
         """
+
+        type_graph = "dates" # not clean, stabilize this in future releases
+
         assert all([self.mean_ is not None, self.lower_ is not None, 
                     self.upper_ is not None, self.output_dates_ is not None]),\
                     "model forecasting must be obtained first (with predict)"
@@ -682,11 +683,8 @@ class MTS(Base):
             x_all = [i for i in range(n_points_all)]
             x_test = [i for i in range(n_points_train, n_points_all)]              
         else: # use dates       
-            print(f"\n self.input_dates: {self.input_dates} \n") 
             x_all = np.concatenate((self.input_dates.values, self.output_dates_.values), axis=None)
-            print(f"\n x_all: {x_all} \n") 
-            x_test = self.output_dates_.values
-            print(f"\n x_test: {x_test} \n") 
+            x_test = self.output_dates_.values        
 
         fig, ax = plt.subplots()
         ax.plot(x_all, y_all, '-')

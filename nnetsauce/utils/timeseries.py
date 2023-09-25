@@ -2,10 +2,26 @@
 
 # Authors: Thierry Moudiki <thierry.moudiki@gmail.com>
 #
-# License: BSD 3
+# License: BSD 3 Clear
 
 import numpy as np
 import pandas as pd
+
+# compute output dates from data frame's index
+def compute_input_dates(df):
+
+    input_dates = df.index.values
+        
+    frequency = pd.infer_freq(pd.DatetimeIndex(input_dates))
+        
+    input_dates = pd.date_range(start=input_dates[0], 
+                                periods=len(input_dates), 
+                                freq=frequency).values.tolist()
+        
+    df_input_dates = pd.DataFrame({"date": input_dates})                    
+
+    return pd.to_datetime(df_input_dates["date"]).dt.date
+
 
 # compute output dates from data frame's index
 def compute_output_dates(df, horizon):
