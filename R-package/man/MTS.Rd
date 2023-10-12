@@ -41,12 +41,12 @@ obj2$predict()
 # Example 2 -----
 
 set.seed(123)
-X <- matrix(rnorm(300), 100, 2)
+X <- matrix(rnorm(300), 100, 3)
 
 obj <- sklearn$linear_model$BayesianRidge()
 obj2 <- MTS(obj)
 
 obj2$fit(X)
-obj2$predict()
+obj2$predict(return_std = TRUE)
 
 }

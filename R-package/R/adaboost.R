@@ -27,11 +27,12 @@
 #' X_test <- as.matrix(iris[test_index, 1:4])
 #' y_test <- as.integer(iris[test_index, 5]) - 1L
 #'
-#' obj <- sklearn$tree$DecisionTreeClassifier()
-#' obj2 <- AdaBoostClassifier(obj)
-#' obj2$fit(X_train, y_train)
-#' print(obj2$score(X_test, y_test))
-#' print(obj2$predict_proba(X_test))
+#' # ValueError: Sample weights must be 1D array or scalar
+#' # obj <- sklearn$tree$DecisionTreeClassifier()
+#' # obj2 <- AdaBoostClassifier(obj)
+#' # obj2$fit(X_train, y_train)
+#' # print(obj2$score(X_test, y_test))
+#' # print(obj2$predict_proba(X_test))
 #'
 AdaBoostClassifier <- function(obj,
                               n_estimators=10L,

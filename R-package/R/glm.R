@@ -6,6 +6,25 @@
 #' @export
 #'
 #' @examples
+#'
+#' library(datasets)
+#'
+#' set.seed(123)
+#' X <- as.matrix(iris[, 1:4])
+#' y <- as.integer(iris$Species) - 1L
+#'
+#' (index_train <- base::sample.int(n = nrow(X),
+#'                                  size = floor(0.8*nrow(X)),
+#'                                  replace = FALSE))
+#' X_train <- X[index_train, ]
+#' y_train <- y[index_train]
+#' X_test <- X[-index_train, ]
+#' y_test <- y[-index_train]
+#'
+#' obj <- GLMClassifier()
+#' obj$fit(X_train, y_train)
+#' print(obj$score(X_test, y_test))
+#'
 GLMClassifier <- function(n_hidden_features=5L,
                           lambda1=0.01,
                           alpha1=0.5,
@@ -55,6 +74,24 @@ GLMClassifier <- function(n_hidden_features=5L,
 #' @export
 #'
 #' @examples
+#'
+#' set.seed(123)
+#' n <- 50 ; p <- 3
+#' X <- matrix(rnorm(n * p), n, p) # no intercept!
+#' y <- rnorm(n)
+#'
+#' (index_train <- base::sample.int(n = nrow(X),
+#'                                  size = floor(0.8*nrow(X)),
+#'                                  replace = FALSE))
+#' X_train <- X[index_train, ]
+#' y_train <- y[index_train]
+#' X_test <- X[-index_train, ]
+#' y_test <- y[-index_train]
+#'
+#' obj <- GLMRegressor()
+#' obj$fit(X_train, y_train)
+#' print(obj$score(X_test, y_test))
+#'
 GLMRegressor <- function(n_hidden_features=5L,
                           lambda1=0.01,
                           alpha1=0.5,

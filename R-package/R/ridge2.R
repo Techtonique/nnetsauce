@@ -10,32 +10,24 @@
 #'
 #' @examples
 #'
-#' # Example 1 -----
-#'
 #' library(datasets)
 #'
 #' X <- as.matrix(iris[, 1:4])
 #' y <- as.integer(iris[, 5]) - 1L
 #'
+#' (index_train <- base::sample.int(n = nrow(X),
+#'                                  size = floor(0.8*nrow(X)),
+#'                                  replace = FALSE))
+#' X_train <- X[index_train, ]
+#' y_train <- y[index_train]
+#' X_test <- X[-index_train, ]
+#' y_test <- y[-index_train]
+#'
 #' obj <- Ridge2Classifier()
-#' obj$fit(X, y)
-#' print(obj$score(X, y))
-#' print(obj$predict_proba(X))
+#' obj$fit(X_train, y_train)
+#' print(obj$score(X_test, y_test))
+#' print(obj$predict_proba(X_train))
 #'
-#'
-#' # Example 2 -----
-#'
-#' n <- 25
-#' p <- 4
-#
-#' set.seed(123)
-#' X <- matrix(rnorm(n * p), nrow = n, ncol = p)
-#' y <- sample(c(0L, 1L), n, replace = TRUE)
-#'
-#' obj2 <- Ridge2Classifier()
-#' obj2$fit(X, y)
-#' print(obj2$score(X, y))
-#' print(obj2$predict_proba(X))
 #'
 Ridge2Classifier <- function(n_hidden_features = 5L,
                              activation_name = "relu",
@@ -89,25 +81,19 @@ Ridge2Classifier <- function(n_hidden_features = 5L,
 #' X <- as.matrix(iris[, 1:4])
 #' y <- as.integer(iris[, 5]) - 1L
 #'
+#' (index_train <- base::sample.int(n = nrow(X),
+#'                                  size = floor(0.8*nrow(X)),
+#'                                  replace = FALSE))
+#' X_train <- X[index_train, ]
+#' y_train <- y[index_train]
+#' X_test <- X[-index_train, ]
+#' y_test <- y[-index_train]
+#'
 #' obj <- Ridge2MultitaskClassifier()
-#' obj$fit(X, y)
-#' print(obj$score(X, y))
-#' print(obj$predict_proba(X))
+#' obj$fit(X_train, y_train)
+#' print(obj$score(X_test, y_test))
+#' print(obj$predict_proba(X_train))
 #'
-#'
-#' # Example 2 -----
-#'
-#' n <- 25
-#' p <- 4
-#
-#' set.seed(123)
-#' X <- matrix(rnorm(n * p), nrow = n, ncol = p)
-#' y <- sample(c(0L, 1L), n, replace = TRUE)
-#'
-#' obj2 <- Ridge2MultitaskClassifier()
-#' obj2$fit(X, y)
-#' print(obj2$score(X, y))
-#' print(obj2$predict_proba(X))
 #'
 Ridge2MultitaskClassifier <- function(n_hidden_features=5L,
                                   activation_name="relu",

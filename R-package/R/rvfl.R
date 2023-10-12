@@ -17,9 +17,17 @@
 #' X <- matrix(rnorm(n * p), n, p) # no intercept!
 #' y <- rnorm(n)
 #'
+#' (index_train <- base::sample.int(n = nrow(X),
+#'                                  size = floor(0.8*nrow(X)),
+#'                                  replace = FALSE))
+#' X_train <- X[index_train, ]
+#' y_train <- y[index_train]
+#' X_test <- X[-index_train, ]
+#' y_test <- y[-index_train]
+#'
 #' obj <- BayesianRVFLRegressor(n_hidden_features = 5L)
-#' print(obj$fit(X, y))
-#' print(obj$score(X, y))
+#' print(obj$fit(X_train, y_train))
+#' print(obj$score(X_test, y_test))
 #'
 BayesianRVFLRegressor <- function(n_hidden_features=5L,
                                   activation_name="relu",
@@ -69,9 +77,17 @@ BayesianRVFLRegressor <- function(n_hidden_features=5L,
 #' X <- matrix(rnorm(n * p), n, p) # no intercept!
 #' y <- rnorm(n)
 #'
+#' (index_train <- base::sample.int(n = nrow(X),
+#'                                  size = floor(0.8*nrow(X)),
+#'                                  replace = FALSE))
+#' X_train <- X[index_train, ]
+#' y_train <- y[index_train]
+#' X_test <- X[-index_train, ]
+#' y_test <- y[-index_train]
+#'
 #' obj <- BayesianRVFL2Regressor(n_hidden_features = 5L, s1=0.01)
-#' print(obj$fit(X, y))
-#' print(obj$score(X, y))
+#' print(obj$fit(X_train, y_train))
+#' print(obj$score(X_test, y_test))
 #'
 BayesianRVFL2Regressor <- function(n_hidden_features=5L,
                                    activation_name="relu",
