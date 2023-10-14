@@ -6,7 +6,7 @@ Maintainer: T. Moudiki <thierry.moudiki@gmail.com>
 Description: Randomized and Quasi-Randomized networks
 Depends: R (>= 3.3.3)
 License: BSD_3_clause Clear + file LICENSE
-Imports: reticulate, R6
+Imports: reticulate
 Collate: 'zzz.R' 'adaboost.R' 'base.R' 'custom.R' 'glm.R' 'mts.R' 'multitask.R' 'randombag.R' 'ridge2.R' 'rvfl.R'
 Encoding: UTF-8
 LazyData: true

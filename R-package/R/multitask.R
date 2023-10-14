@@ -26,8 +26,8 @@
 #' obj <- sklearn$linear_model$LinearRegression()
 #' obj2 <- MultitaskClassifier(obj)
 #' obj2$fit(X_train, y_train)
-#' print(obj2$score(X_train, y_train))
-#' print(obj2$predict_proba(X_train))
+#' print(obj2$score(X_test, y_test))
+#' print(obj2$predict_proba(X_test))
 #'
 #'
 MultitaskClassifier <- function(obj,
