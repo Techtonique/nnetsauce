@@ -6,8 +6,8 @@
 \usage{
 RandomBagClassifier(
   obj,
-  n_estimators = 10L,
-  n_hidden_features = 1L,
+  n_estimators = 50L,
+  n_hidden_features = 5L,
   activation_name = "relu",
   a = 0.01,
   nodes_sim = "sobol",
@@ -35,10 +35,19 @@ library(datasets)
 X <- as.matrix(iris[, 1:4])
 y <- as.integer(iris[, 5]) - 1L
 
+(index_train <- base::sample.int(n = nrow(X),
+                                 size = floor(0.8*nrow(X)),
+                                 replace = FALSE))
+X_train <- X[index_train, ]
+y_train <- y[index_train]
+X_test <- X[-index_train, ]
+y_test <- y[-index_train]
+
 obj <- sklearn$tree$DecisionTreeClassifier()
-obj2 <- RandomBagClassifier(obj)
-obj2$fit(X, y)
-print(obj2$score(X, y))
-print(obj2$predict_proba(X))
+obj2 <- RandomBagClassifier(obj, n_estimators=50L,
+n_hidden_features=5L)
+obj2$fit(X_train, y_train)
+print(obj2$score(X_test, y_test))
+print(obj2$predict_proba(X_train))
 
 }

@@ -28,3 +28,23 @@ GLMRegressor(
 \description{
 Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 }
+\examples{
+
+set.seed(123)
+n <- 50 ; p <- 3
+X <- matrix(rnorm(n * p), n, p) # no intercept!
+y <- rnorm(n)
+
+(index_train <- base::sample.int(n = nrow(X),
+                                 size = floor(0.8*nrow(X)),
+                                 replace = FALSE))
+X_train <- X[index_train, ]
+y_train <- y[index_train]
+X_test <- X[-index_train, ]
+y_test <- y[-index_train]
+
+obj <- GLMRegressor()
+obj$fit(X_train, y_train)
+print(obj$score(X_test, y_test))
+
+}
