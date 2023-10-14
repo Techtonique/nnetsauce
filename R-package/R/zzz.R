@@ -13,9 +13,9 @@ sklearn <- NULL
   # reticulate::py_install("scikit-learn",
   #                        pip = TRUE,
   #                        pip_ignore_installed = TRUE)
-  reticulate::py_install("nnetsauce",
-                         pip = TRUE,
-                         pip_ignore_installed = TRUE)
+  # reticulate::py_install("nnetsauce",
+  #                        pip = TRUE,
+  #                        pip_ignore_installed = TRUE)
   # try(reticulate::py_install("scikit-learn",
   #                        envname = "r-reticulate",
   #                        pip = TRUE,
@@ -30,3 +30,4 @@ sklearn <- NULL
   ns <<- reticulate::import("nnetsauce", delay_load = TRUE)
   sklearn <<- reticulate::import("sklearn", delay_load = TRUE)
 }
+.onLoad <- memoise::memoise(.onLoad)
