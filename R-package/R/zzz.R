@@ -3,19 +3,12 @@ ns <- NULL
 sklearn <- NULL
 
 .onLoad <- function(libname, pkgname) {
+  utils::install.packages("reticulate")
+  utils::update.packages("reticulate")
+  reticulate::py_install("nnetsauce",
+                         pip = TRUE,
+                         pip_ignore_installed = TRUE)
   # use superassignment to update global reference to package
-  ns <<- try(reticulate::import("nnetsauce", delay_load = TRUE),
-             silent = TRUE)
-  if (inherits(ns, "try-error"))
-  {
-    reticulate::py_install("nnetsauce")
-    ns <<- reticulate::import("nnetsauce", delay_load = TRUE)
-  }
-  sklearn <<- try(reticulate::import("sklearn", delay_load = TRUE),
-                  silent = TRUE)
-  if (inherits(sklearn, "try-error"))
-  {
-    reticulate::py_install("scikit-learn")
-    sklearn <<- reticulate::import("sklearn", delay_load = TRUE)
-  }
+  ns <<- reticulate::import("nnetsauce", delay_load = TRUE)
+  sklearn <<- reticulate::import("sklearn", delay_load = TRUE)
 }
