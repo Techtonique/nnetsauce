@@ -41,13 +41,17 @@ MTS <- function(obj,
                 n_clusters=2L,
                 cluster_encode=TRUE,
                 type_clust="kmeans",
-                seed=123L,
                 lags=1L,
-                backend=c("cpu", "gpu", "tpu"))
+                replications=NULL,
+                kernel=NULL,
+                agg="mean",
+                seed=123L,
+                backend=c("cpu", "gpu", "tpu"),
+                verbose=0)
 {
   backend <- match.arg(backend)
 
-  ns$MTS(obj,
+  res <- ns$MTS(obj,
          n_hidden_features=n_hidden_features,
          activation_name=activation_name,
          a=a,
@@ -58,7 +62,40 @@ MTS <- function(obj,
          n_clusters=n_clusters,
          cluster_encode=cluster_encode,
          type_clust=type_clust,
-         seed=seed,
          lags=lags,
-         backend=backend)
+         replications=replications,
+         kernel=kernel,
+         agg=agg,
+         seed=seed,
+         backend=backend,
+         verbose=verbose)
+
+  # out <- list(
+  #   mean = ts(
+  #     data = preds_mean,
+  #     start = start_preds,
+  #     frequency = freq_x
+  #   ),
+  #   lower = ts(
+  #     data = preds_lower,
+  #     start = start_preds,
+  #     frequency = freq_x
+  #   ),
+  #   upper = ts(
+  #     data = preds_upper,
+  #     start = start_preds,
+  #     frequency = freq_x
+  #   ),
+  #   sims = sims,
+  #   x = y,
+  #   level = level,
+  #   method = "ridge2",
+  #   residuals = fit_obj$resids,
+  #   copula = fit_obj$params_distro,
+  #   margins = margins
+  # )
+
+  # return(structure(out, class = "mtsforecast"))
+
+  return(res)
 }
