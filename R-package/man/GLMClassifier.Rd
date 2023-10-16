@@ -28,3 +28,24 @@ GLMClassifier(
 \description{
 Parameters' description can be found at \url{https://techtonique.github.io/nnetsauce/}
 }
+\examples{
+
+library(datasets)
+
+set.seed(123)
+X <- as.matrix(iris[, 1:4])
+y <- as.integer(iris$Species) - 1L
+
+(index_train <- base::sample.int(n = nrow(X),
+                                 size = floor(0.8*nrow(X)),
+                                 replace = FALSE))
+X_train <- X[index_train, ]
+y_train <- y[index_train]
+X_test <- X[-index_train, ]
+y_test <- y[-index_train]
+
+obj <- GLMClassifier()
+obj$fit(X_train, y_train)
+print(obj$score(X_test, y_test))
+
+}

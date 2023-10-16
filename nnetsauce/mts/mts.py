@@ -676,6 +676,7 @@ class MTS(Base):
             series_idx = series
 
         y_all = list(self.df_.iloc[:, series_idx])+list(self.mean_.iloc[:, series_idx])
+        y_test = list(self.mean_.iloc[:, series_idx])
         n_points_all = len(y_all)
         n_points_train = self.df_.shape[0]
 
@@ -688,7 +689,8 @@ class MTS(Base):
 
         fig, ax = plt.subplots()
         ax.plot(x_all, y_all, '-')
+        ax.plot(x_test, y_test, '-', color = "orange")
         ax.fill_between(x_test, self.lower_.iloc[:, series_idx], 
                         self.upper_.iloc[:, series_idx], 
-                        alpha=0.2)
+                        alpha=0.2, color = "orange")
         plt.show()

@@ -32,9 +32,17 @@ n <- 50 ; p <- 3
 X <- matrix(rnorm(n * p), n, p) # no intercept!
 y <- rnorm(n)
 
+(index_train <- base::sample.int(n = nrow(X),
+                                 size = floor(0.8*nrow(X)),
+                                 replace = FALSE))
+X_train <- X[index_train, ]
+y_train <- y[index_train]
+X_test <- X[-index_train, ]
+y_test <- y[-index_train]
+
 obj <- sklearn$linear_model$ElasticNet()
 obj2 <- CustomRegressor(obj)
-obj2$fit(X, y)
-print(obj2$score(X, y))
+obj2$fit(X_train, y_train)
+print(obj2$score(X_test, y_test))
 
 }

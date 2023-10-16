@@ -31,8 +31,16 @@ n <- 50 ; p <- 3
 X <- matrix(rnorm(n * p), n, p) # no intercept!
 y <- rnorm(n)
 
+(index_train <- base::sample.int(n = nrow(X),
+                                 size = floor(0.8*nrow(X)),
+                                 replace = FALSE))
+X_train <- X[index_train, ]
+y_train <- y[index_train]
+X_test <- X[-index_train, ]
+y_test <- y[-index_train]
+
 obj <- BayesianRVFLRegressor(n_hidden_features = 5L)
-print(obj$fit(X, y))
-print(obj$score(X, y))
+print(obj$fit(X_train, y_train))
+print(obj$score(X_test, y_test))
 
 }

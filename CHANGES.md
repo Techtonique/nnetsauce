@@ -1,3 +1,8 @@
+# version 0.14.0
+
+- update and align as much as possible with R version 
+- colored graphics for class MTS 
+
 # version 0.13.0
 
 - Fix error in nodes' simulation (base.py)

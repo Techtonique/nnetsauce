@@ -29,12 +29,21 @@ Parameters' description can be found at \url{https://techtonique.github.io/nnets
 
 library(datasets)
 
+set.seed(123)
 X <- as.matrix(iris[, 1:4])
-y <- as.integer(iris[, 5]) - 1L
+y <- as.integer(iris$Species) - 1L
+
+(index_train <- base::sample.int(n = nrow(X),
+                                 size = floor(0.8*nrow(X)),
+                                 replace = FALSE))
+X_train <- X[index_train, ]
+y_train <- y[index_train]
+X_test <- X[-index_train, ]
+y_test <- y[-index_train]
 
 obj <- sklearn$tree$DecisionTreeClassifier()
 obj2 <- CustomClassifier(obj)
-obj2$fit(X, y)
-print(obj2$score(X, y))
+obj2$fit(X_train, y_train)
+print(obj2$score(X_test, y_test))
 
 }
