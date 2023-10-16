@@ -76,5 +76,5 @@ MTS <- function(obj,
   res$start <- start_input
   res$frequency <- frequency_input
 
-  return(structure(res, class = "MTS"))
+  return(res)
 }
