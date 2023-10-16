@@ -41,6 +41,8 @@ pip install nnetsauce
 conda install -c conda-forge nnetsauce 
 ```
 
+(Note to self or developers: https://github.com/conda-forge/nnetsauce-feedstock)
+
 - __3rd method__: from Github, for the development version
 
 ```bash
