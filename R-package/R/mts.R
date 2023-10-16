@@ -31,6 +31,8 @@
 #' obj2$predict(return_std = TRUE)
 #'
 MTS <- function(obj,
+                start_input = NULL,
+                frequency_input = NULL,
                 n_hidden_features=5L,
                 activation_name="relu",
                 a=0.01,
@@ -70,32 +72,9 @@ MTS <- function(obj,
          backend=backend,
          verbose=verbose)
 
-  # out <- list(
-  #   mean = ts(
-  #     data = preds_mean,
-  #     start = start_preds,
-  #     frequency = freq_x
-  #   ),
-  #   lower = ts(
-  #     data = preds_lower,
-  #     start = start_preds,
-  #     frequency = freq_x
-  #   ),
-  #   upper = ts(
-  #     data = preds_upper,
-  #     start = start_preds,
-  #     frequency = freq_x
-  #   ),
-  #   sims = sims,
-  #   x = y,
-  #   level = level,
-  #   method = "ridge2",
-  #   residuals = fit_obj$resids,
-  #   copula = fit_obj$params_distro,
-  #   margins = margins
-  # )
+  res$method <- "MTS"
+  res$start <- start_input
+  res$frequency <- frequency_input
 
-  # return(structure(out, class = "mtsforecast"))
-
-  return(res)
+  return(structure(res, class = "MTS"))
 }
