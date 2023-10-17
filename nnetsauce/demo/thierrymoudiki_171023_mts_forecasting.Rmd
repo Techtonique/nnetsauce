@@ -1,0 +1,168 @@
+---
+title: "Randomized and Quasi-Randomized 'neural' networks for supervised learning
+  and multivariate time series forecasting"
+author: "T. Moudiki"
+date: "2023-10-17"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Version `v0.14.0` of nnetsauce is now available for R (hopefully a rapid installation) and Python on GitHub (https://github.com/Techtonique/nnetsauce), PyPI (https://pypi.org/project/nnetsauce/) and conda (https://anaconda.org/conda-forge/nnetsauce). It's been mainly tested on Linux and macOS. For Windows users, you can try to install it of course, but if it doesn't work, please use  WSL2 (https://learn.microsoft.com/en-us/windows/wsl/install).
+
+**Contents**
+
+- 1 - R News
+- 1 - 1 - Elastic Net with Kernel Density simulation of residuals (strong hypothesis)
+- 1 - 2 - Bayesian forecasting
+- 2 - colored graphics for `Python` class `MTS` 
+
+# 1 - R News
+
+Update and align as much as possible Python version with `R` version after a long hiatus (new plotting function for multivariate time series (`MTS`), `plot.MTS`, is not [`S3`](https://cran.r-project.org/doc/manuals/R-exts.html#Registering-S3-methods) yet, it’s complicated)
+
+
+```{r "chunk-2-packages", echo=TRUE, results='hide'}
+
+
+utils::install.packages(c("remotes", "fpp", "reticulate"))
+remotes::install_github("Techtonique/nnetsauce/R-package")
+
+
+```
+
+```{r "chunk-3-load-packages", echo=TRUE, results='hide'}
+
+
+library(fpp)
+library(nnetsauce)
+
+
+```
+
+# 1 - 1 - Elastic Net with Kernel Density simulation of residuals (strong hypothesis)
+
+```{r "chunk-4-enet", echo=TRUE, results='hide'}
+
+obj <- nnetsauce::sklearn$linear_model$ElasticNet()
+obj2 <- nnetsauce::MTS(obj, 
+                       start_input = start(fpp::vn), 
+                       frequency_input = frequency(fpp::vn),
+                       kernel = "gaussian", replications = 100L)
+X <- data.frame(fpp::vn)
+obj2$fit(X)
+obj2$predict(h = 10L)
+typeof(obj2)
+```
+
+```{r "chunk-5-plot-enet-simulations"}
+
+
+par(mfrow=c(2, 2))
+plot.MTS(obj2, selected_series = "Sydney")
+plot.MTS(obj2, selected_series = "Melbourne")
+plot.MTS(obj2, selected_series = "NSW")
+plot.MTS(obj2, selected_series = "BrisbaneGC")
+
+
+```
+
+# 1 - 2 - Bayesian forecasting
+
+```{r "chunk-6-bayesian-forecasting", echo=TRUE, results='hide'}
+
+
+obj <- nnetsauce::sklearn$linear_model$BayesianRidge()
+obj2 <- nnetsauce::MTS(obj,
+                       start_input = start(fpp::vn), 
+                       frequency_input = frequency(fpp::vn))
+X <- data.frame(fpp::vn)
+obj2$fit(X)
+obj2$predict(h = 10L, return_std = TRUE)
+
+
+```
+
+```{r "chunk-7-plot-bayesian"}
+
+
+par(mfrow=c(2, 2))
+nnetsauce::plot.MTS(obj2, selected_series = "Sydney")
+nnetsauce::plot.MTS(obj2, selected_series = "Melbourne")
+nnetsauce::plot.MTS(obj2, selected_series = "NSW")
+nnetsauce::plot.MTS(obj2, selected_series = "BrisbaneGC")
+
+
+```
+
+
+# 2 - colored graphics for `Python` class `MTS` 
+
+```{r "chunk-8-install-nnetsauce-py", echo=TRUE, results='hide'}
+
+
+reticulate::py_install("nnetsauce") # or pip install nnetsauce
+
+
+```
+
+```{python "chunk-9-ns-py", echo=TRUE, results='hide'}
+
+
+import nnetsauce as ns
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import Ridge, BayesianRidge
+from sklearn.ensemble import RandomForestRegressor
+from time import time
+
+url = "https://raw.githubusercontent.com/thierrymoudiki/mts-data/master/heater-ice-cream/ice_cream_vs_heater.csv"
+
+df = pd.read_csv(url)
+
+# ice cream vs heater (I don't own the copyright)
+df.set_index('Month', inplace=True)
+df.index.rename('date')
+
+df = df.pct_change().dropna()
+
+idx_train = int(df.shape[0]*0.8)
+idx_end = df.shape[0]
+df_train = df.iloc[0:idx_train,]
+
+regr3 = Ridge()
+obj_MTS3 = ns.MTS(regr3, lags = 5, n_hidden_features=7, #IRL, must be tuned
+                  replications=50, kernel='gaussian',
+                  seed=24, verbose = 1)
+start = time()
+obj_MTS3.fit(df_train)
+print(f"Elapsed {time()-start} s")
+
+obj_MTS3.predict(h = 15)
+
+
+```
+
+```{python "chunk-10-plot-ns-py"}
+
+
+obj_MTS3.plot("heater")
+obj_MTS3.plot("ice cream")
+
+
+```
+
+```{r}
+
+
+sessionInfo()
+
+
+```
+
