@@ -1,6 +1,6 @@
 Package: nnetsauce
 Title: Randomized and Quasi-Randomized networks
-Version: 0.14.0
+Version: 0.15.0
 Author: T. Moudiki
 Maintainer: T. Moudiki <thierry.moudiki@gmail.com>
 Description: Randomized and Quasi-Randomized networks

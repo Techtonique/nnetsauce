@@ -5,6 +5,9 @@ from .custom.customClassifier import CustomClassifier
 from .custom.customRegressor import CustomRegressor
 from .glm.glmClassifier import GLMClassifier
 from .glm.glmRegressor import GLMRegressor
+from .lazypredict.lazyClassifier import LazyClassifier
+# from .lazypredict.lazyRegressor import LazyRegressor
+# from .lazypredict.lazyMTS import 
 from .mts.mts import MTS
 from .multitask.multitaskClassifier import MultitaskClassifier
 from .optimizers.optimizer import Optimizer
@@ -26,6 +29,7 @@ __all__ = [
     "CustomRegressor",
     "GLMRegressor",
     "GLMClassifier",
+    "LazyClassifier",
     "MTS",
     "MultitaskClassifier",
     "Optimizer",
