@@ -13576,25 +13576,25 @@ def i4_sobol(dim_num, seed):
             #
             for j in range(m + 1, maxcol + 1):
                 newv = v[i - 1, j - m - 1]
-                l = 1
+                var_l = 1
                 for k in range(1, m + 1):
-                    l = 2 * l
+                    var_l = 2 * var_l
                     if includ[k - 1]:
                         newv = np.bitwise_xor(
-                            int(newv), int(l * v[i - 1, j - k - 1])
+                            int(newv), int(var_l * v[i - 1, j - k - 1])
                         )
                 v[i - 1, j - 1] = newv
         #
         # 	Multiply columns of V by appropriate power of 2.
         #
-        l = 1
+        var_l = 1
         for j in range(maxcol - 1, 0, -1):
-            l = 2 * l
-            v[0:dim_num, j - 1] = v[0:dim_num, j - 1] * l
+            var_l = 2 * var_l
+            v[0:dim_num, j - 1] = v[0:dim_num, j - 1] * var_l
         #
         # 	RECIPD is 1/(common denominator of the elements in V).
         #
-        recipd = 1.0 / (2 * l)
+        recipd = 1.0 / (2 * var_l)
         lastq = np.zeros(dim_num)
 
     seed = int(math.floor(seed))
@@ -13603,48 +13603,48 @@ def i4_sobol(dim_num, seed):
         seed = 0
 
     if seed == 0:
-        l = 1
+        var_l = 1
         lastq = np.zeros(dim_num)
 
     elif seed == seed_save + 1:
         #
         # 	Find the position of the right-hand zero in SEED.
         #
-        l = i4_bit_lo0(seed)
+        var_l = i4_bit_lo0(seed)
 
     elif seed <= seed_save:
 
         seed_save = 0
-        l = 1
+        var_l = 1
         lastq = np.zeros(dim_num)
 
         for seed_temp in range(int(seed_save), int(seed)):
-            l = i4_bit_lo0(seed_temp)
+            var_l = i4_bit_lo0(seed_temp)
             for i in range(1, dim_num + 1):
                 lastq[i - 1] = np.bitwise_xor(
-                    int(lastq[i - 1]), int(v[i - 1, l - 1])
+                    int(lastq[i - 1]), int(v[i - 1, var_l - 1])
                 )
 
-        l = i4_bit_lo0(seed)
+        var_l = i4_bit_lo0(seed)
 
     elif seed_save + 1 < seed:
 
         for seed_temp in range(int(seed_save + 1), int(seed)):
-            l = i4_bit_lo0(seed_temp)
+            var_l = i4_bit_lo0(seed_temp)
             for i in range(1, dim_num + 1):
                 lastq[i - 1] = np.bitwise_xor(
-                    int(lastq[i - 1]), int(v[i - 1, l - 1])
+                    int(lastq[i - 1]), int(v[i - 1, var_l - 1])
                 )
 
-        l = i4_bit_lo0(seed)
+        var_l = i4_bit_lo0(seed)
     #
     # 	Check that the user is not calling too many times!
     #
-    if maxcol < l:
+    if maxcol < var_l:
         print("I4_SOBOL - Fatal error!")
         print("	Too many calls!")
         print("	MAXCOL = %d\n" % maxcol)
-        print("	L =			%d\n" % l)
+        print("	L =			%d\n" % var_l)
         return
     #
     # 	Calculate the new components of QUASI.
@@ -13652,7 +13652,7 @@ def i4_sobol(dim_num, seed):
     quasi = np.zeros(dim_num)
     for i in range(1, dim_num + 1):
         quasi[i - 1] = lastq[i - 1] * recipd
-        lastq[i - 1] = np.bitwise_xor(int(lastq[i - 1]), int(v[i - 1, l - 1]))
+        lastq[i - 1] = np.bitwise_xor(int(lastq[i - 1]), int(v[i - 1, var_l - 1]))
 
     seed_save = seed
     seed = seed + 1
