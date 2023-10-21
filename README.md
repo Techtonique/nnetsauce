@@ -10,6 +10,7 @@ Randomized and Quasi-Randomized (neural) networks.
 ![PyPI](https://img.shields.io/pypi/v/nnetsauce) [![PyPI - License](https://img.shields.io/pypi/l/nnetsauce)](https://github.com/thierrymoudiki/nnetsauce/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce) 
 [![Downloads](https://anaconda.org/conda-forge/nnetsauce/badges/downloads.svg)](https://anaconda.org/conda-forge/nnetsauce)
 [![HitCount](https://hits.dwyl.com/Techtonique/nnetsauce.svg?style=flat-square)](http://hits.dwyl.com/Techtonique/nnetsauce)
+[![Quality](https://www.codefactor.io/repository/github/techtonique/nnetsauce/badge)](https://www.codefactor.io/repository/github/techtonique/nnetsauce)
 [![Documentation](https://img.shields.io/badge/documentation-is_here-green)](https://techtonique.github.io/nnetsauce/)
 
 
