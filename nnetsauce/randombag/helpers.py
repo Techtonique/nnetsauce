@@ -1,21 +1,10 @@
 # Authors: Thierry Moudiki
 #
-# License: BSD 3
+# License: BSD 3 Clear
 
-import functools
 import pickle
 import numpy as np
-
-from numpy.linalg import lstsq
-from numpy.linalg import norm
-from scipy.special import expit
-from sklearn.cluster import MiniBatchKMeans
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.preprocessing import StandardScaler
-from multiprocessing import Pool
-from tqdm import tqdm
 from ..utils import Progbar
-
 
 # 0 - utils -----
 
@@ -42,7 +31,7 @@ def rbagloop_classification(base_learner, X, y, n_estimators, verbose, seed):
 
                 pbar.update(m)
 
-            except:
+            except Warning:
 
                 pbar.update(m)
 
@@ -63,7 +52,7 @@ def rbagloop_classification(base_learner, X, y, n_estimators, verbose, seed):
 
             voter[m] = pickle.loads(pickle.dumps(base_learner, -1))                
 
-        except:            
+        except Warning:            
 
             continue
 
@@ -90,7 +79,7 @@ def rbagloop_regression(base_learner, X, y, n_estimators, verbose, seed):
 
                 pbar.update(m)
 
-            except:
+            except Warning:
 
                 pbar.update(m)
 
@@ -110,7 +99,7 @@ def rbagloop_regression(base_learner, X, y, n_estimators, verbose, seed):
 
             voter[m] = pickle.loads(pickle.dumps(base_learner, -1))                         
 
-        except:            
+        except Warning:            
 
             continue
 
