@@ -229,7 +229,7 @@ class LazyRegressor(Custom, RegressorMixin):
                 print(exception)
                 print("Invalid Regressor(s)")
 
-        for name, model in tqdm(self.regressors):
+        for name, model in tqdm(self.regressors): # do parallel exec
             start = time.time()
             try:
                 if "random_state" in model().get_params().keys():

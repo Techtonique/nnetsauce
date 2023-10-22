@@ -219,7 +219,7 @@ class LazyClassifier(Custom, ClassifierMixin):
                 print(exception)
                 print("Invalid Classifier(s)")
 
-        for name, model in tqdm(self.classifiers):            
+        for name, model in tqdm(self.classifiers): # do parallel exec           
             start = time.time()
             try:
                 if "random_state" in model().get_params().keys():
