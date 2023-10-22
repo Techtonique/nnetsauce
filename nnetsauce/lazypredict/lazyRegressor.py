@@ -15,7 +15,7 @@ from sklearn.metrics import (
     mean_squared_error,
 )
 from .config import REGRESSORS
-from ..custom import CustomRegressor
+from ..custom import Custom, CustomRegressor
 
 import warnings
 
@@ -37,7 +37,7 @@ categorical_transformer_low = Pipeline(
 categorical_transformer_high = Pipeline(
     steps=[
         ("imputer", SimpleImputer(strategy="constant", fill_value="missing")),
-        # 'OrdianlEncoder' Raise a ValueError when encounters an unknown value. Check https://github.com/scikit-learn/scikit-learn/pull/13423
+        # 'OrdinalEncoder' Raise a ValueError when encounters an unknown value. Check https://github.com/scikit-learn/scikit-learn/pull/13423
         ("encoding", OrdinalEncoder()),
     ]
 )
@@ -73,7 +73,7 @@ def adjusted_rsquared(r2, n, p):
     return 1 - (1 - r2) * ((n - 1) / (n - p - 1))
 
 
-class LazyRegressor(RegressorMixin):
+class LazyRegressor(Custom, RegressorMixin):
     """
     This module helps in fitting regression models that are available in Scikit-learn
     Parameters
@@ -97,8 +97,8 @@ class LazyRegressor(RegressorMixin):
     >>> from sklearn.utils import shuffle
     >>> import numpy as np
 
-    >>> boston = datasets.load_boston()
-    >>> X, y = shuffle(boston.data, boston.target, random_state=13)
+    >>> diabetes = datasets.load_diabetes()
+    >>> X, y = shuffle(diabetes.data, diabetes.target, random_state=13)
     >>> X = X.astype(np.float32)
 
     >>> offset = int(X.shape[0] * 0.9)
@@ -108,51 +108,7 @@ class LazyRegressor(RegressorMixin):
     >>> reg = LazyRegressor(verbose=0, ignore_warnings=False, custom_metric=None)
     >>> models, predictions = reg.fit(X_train, X_test, y_train, y_test)
     >>> model_dictionary = reg.provide_models(X_train, X_test, y_train, y_test)
-    >>> models
-    | Model                         | Adjusted R-Squared | R-Squared |  RMSE | Time Taken |
-    |:------------------------------|-------------------:|----------:|------:|-----------:|
-    | SVR                           |               0.83 |      0.88 |  2.62 |       0.01 |
-    | BaggingRegressor              |               0.83 |      0.88 |  2.63 |       0.03 |
-    | NuSVR                         |               0.82 |      0.86 |  2.76 |       0.03 |
-    | RandomForestRegressor         |               0.81 |      0.86 |  2.78 |       0.21 |
-    | XGBRegressor                  |               0.81 |      0.86 |  2.79 |       0.06 |
-    | GradientBoostingRegressor     |               0.81 |      0.86 |  2.84 |       0.11 |
-    | ExtraTreesRegressor           |               0.79 |      0.84 |  2.98 |       0.12 |
-    | AdaBoostRegressor             |               0.78 |      0.83 |  3.04 |       0.07 |
-    | HistGradientBoostingRegressor |               0.77 |      0.83 |  3.06 |       0.17 |
-    | PoissonRegressor              |               0.77 |      0.83 |  3.11 |       0.01 |
-    | LGBMRegressor                 |               0.77 |      0.83 |  3.11 |       0.07 |
-    | KNeighborsRegressor           |               0.77 |      0.83 |  3.12 |       0.01 |
-    | DecisionTreeRegressor         |               0.65 |      0.74 |  3.79 |       0.01 |
-    | MLPRegressor                  |               0.65 |      0.74 |  3.80 |       1.63 |
-    | HuberRegressor                |               0.64 |      0.74 |  3.84 |       0.01 |
-    | GammaRegressor                |               0.64 |      0.73 |  3.88 |       0.01 |
-    | LinearSVR                     |               0.62 |      0.72 |  3.96 |       0.01 |
-    | RidgeCV                       |               0.62 |      0.72 |  3.97 |       0.01 |
-    | BayesianRidge                 |               0.62 |      0.72 |  3.97 |       0.01 |
-    | Ridge                         |               0.62 |      0.72 |  3.97 |       0.01 |
-    | TransformedTargetRegressor    |               0.62 |      0.72 |  3.97 |       0.01 |
-    | LinearRegression              |               0.62 |      0.72 |  3.97 |       0.01 |
-    | ElasticNetCV                  |               0.62 |      0.72 |  3.98 |       0.04 |
-    | LassoCV                       |               0.62 |      0.72 |  3.98 |       0.06 |
-    | LassoLarsIC                   |               0.62 |      0.72 |  3.98 |       0.01 |
-    | LassoLarsCV                   |               0.62 |      0.72 |  3.98 |       0.02 |
-    | Lars                          |               0.61 |      0.72 |  3.99 |       0.01 |
-    | LarsCV                        |               0.61 |      0.71 |  4.02 |       0.04 |
-    | SGDRegressor                  |               0.60 |      0.70 |  4.07 |       0.01 |
-    | TweedieRegressor              |               0.59 |      0.70 |  4.12 |       0.01 |
-    | GeneralizedLinearRegressor    |               0.59 |      0.70 |  4.12 |       0.01 |
-    | ElasticNet                    |               0.58 |      0.69 |  4.16 |       0.01 |
-    | Lasso                         |               0.54 |      0.66 |  4.35 |       0.02 |
-    | RANSACRegressor               |               0.53 |      0.65 |  4.41 |       0.04 |
-    | OrthogonalMatchingPursuitCV   |               0.45 |      0.59 |  4.78 |       0.02 |
-    | PassiveAggressiveRegressor    |               0.37 |      0.54 |  5.09 |       0.01 |
-    | GaussianProcessRegressor      |               0.23 |      0.43 |  5.65 |       0.03 |
-    | OrthogonalMatchingPursuit     |               0.16 |      0.38 |  5.89 |       0.01 |
-    | ExtraTreeRegressor            |               0.08 |      0.32 |  6.17 |       0.01 |
-    | DummyRegressor                |              -0.38 |     -0.02 |  7.56 |       0.01 |
-    | LassoLars                     |              -0.38 |     -0.02 |  7.56 |       0.01 |
-    | KernelRidge                   |             -11.50 |     -8.25 | 22.74 |       0.01 |
+    >>> print(models)
     """
 
     def __init__(
@@ -163,6 +119,23 @@ class LazyRegressor(RegressorMixin):
         predictions=False,
         random_state=42,
         regressors="all",
+        # CustomRegressor attributes
+        obj = None,
+        n_hidden_features=5,
+        activation_name="relu",
+        a=0.01,
+        nodes_sim="sobol",
+        bias=True,
+        dropout=0,
+        direct_link=True,
+        n_clusters=2,
+        cluster_encode=True,
+        type_clust="kmeans",
+        type_scaling=("std", "std", "std"),
+        col_sample=1,
+        row_sample=1,
+        seed=123,
+        backend="cpu"
     ):
         self.verbose = verbose
         self.ignore_warnings = ignore_warnings
@@ -171,6 +144,24 @@ class LazyRegressor(RegressorMixin):
         self.models = {}
         self.random_state = random_state
         self.regressors = regressors
+        super().__init__(
+            obj=obj,
+            n_hidden_features=n_hidden_features,
+            activation_name=activation_name,
+            a=a,
+            nodes_sim=nodes_sim,
+            bias=bias,
+            dropout=dropout,
+            direct_link=direct_link,
+            n_clusters=n_clusters,
+            cluster_encode=cluster_encode,
+            type_clust=type_clust,
+            type_scaling=type_scaling,
+            col_sample=col_sample,
+            row_sample=row_sample,
+            seed=seed,
+            backend=backend,
+        )
 
     def fit(self, X_train, X_test, y_train, y_test):
         """Fit Regression algorithms to X_train and y_train, predict and score on X_test, y_test.
@@ -245,13 +236,44 @@ class LazyRegressor(RegressorMixin):
                     pipe = Pipeline(
                         steps=[
                             ("preprocessor", preprocessor),
-                            ("regressor", model(random_state=self.random_state)),
+                            ("regressor", CustomRegressor(obj=model(random_state=self.random_state),
+                            n_hidden_features=self.n_hidden_features,
+                            activation_name=self.activation_name,
+                            a=self.a,
+                            nodes_sim=self.nodes_sim,
+                            bias=self.bias,
+                            dropout=self.dropout,
+                            direct_link=self.direct_link,
+                            n_clusters=self.n_clusters,
+                            cluster_encode=self.cluster_encode,
+                            type_clust=self.type_clust,
+                            type_scaling=self.type_scaling,
+                            col_sample=self.col_sample,
+                            row_sample=self.row_sample,
+                            seed=self.seed,
+                            backend=self.backend)),
                         ]
                     )
                 else:
                     pipe = Pipeline(
-                        steps=[("preprocessor", preprocessor), ("regressor", model())]
-                    )
+                        steps=[("preprocessor", preprocessor), 
+                               ("regressor", CustomRegressor(obj=model(),
+                                n_hidden_features=self.n_hidden_features,
+                                activation_name=self.activation_name,
+                                a=self.a,
+                                nodes_sim=self.nodes_sim,
+                                bias=self.bias,
+                                dropout=self.dropout,
+                                direct_link=self.direct_link,
+                                n_clusters=self.n_clusters,
+                                cluster_encode=self.cluster_encode,
+                                type_clust=self.type_clust,
+                                type_scaling=self.type_scaling,
+                                col_sample=self.col_sample,
+                                row_sample=self.row_sample,
+                                seed=self.seed,
+                                backend=self.backend))]
+                        )
 
                 pipe.fit(X_train, y_train)
                 self.models[name] = pipe
@@ -261,7 +283,7 @@ class LazyRegressor(RegressorMixin):
                 adj_rsquared = adjusted_rsquared(
                     r_squared, X_test.shape[0], X_test.shape[1]
                 )
-                rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+                rmse = mean_squared_error(y_test, y_pred, squared=False)
 
                 names.append(name)
                 R2.append(r_squared)
