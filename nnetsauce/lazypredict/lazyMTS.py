@@ -308,7 +308,7 @@ class LazyMTS(MTS):
                         "Model": name,
                         #"R-Squared": r_squared,
                         #"Adjusted R-Squared": adj_rsquared,
-                        "logRMSE": np.log(rmse),
+                        "RMSE": rmse,
                         "MAE": mae,
                         "MPL": mpl,
                         #"MPE": mpe,
@@ -332,7 +332,7 @@ class LazyMTS(MTS):
             "Model": names,
             #"Adjusted R-Squared": ADJR2,
             #"R-Squared": R2,
-            "logRMSE": np.log(RMSE),
+            "RMSE": RMSE,
             "MAE": MAE,
             "MPL": MPL,
             #"MPE": MPE,
@@ -346,7 +346,7 @@ class LazyMTS(MTS):
             scores[self.custom_metric.__name__] = CUSTOM_METRIC
 
         scores = pd.DataFrame(scores)
-        scores = scores.sort_values(by="logRMSE", ascending=True).set_index(
+        scores = scores.sort_values(by="RMSE", ascending=True).set_index(
             "Model"
         )
 
