@@ -71,7 +71,7 @@ def get_card_split(df, cols, n=11):
 
 class LazyClassifier(Custom, ClassifierMixin):
     """
-    This module helps in fitting to all the classification algorithms that are available in Scikit-learn
+    This module helps in fitting to all the classification algorithms that are available in Scikit-learn to nnetsauce's CustomClassifier
     Parameters
     ----------
     verbose : int, optional (default=0)

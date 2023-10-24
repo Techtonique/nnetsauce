@@ -75,7 +75,7 @@ def adjusted_rsquared(r2, n, p):
 
 class LazyRegressor(Custom, RegressorMixin):
     """
-    This module helps in fitting regression models that are available in Scikit-learn
+    This module helps in fitting regression models that are available in Scikit-learn to nnetsauce's CustomRegressor
     Parameters
     ----------
     verbose : int, optional (default=0)
@@ -327,7 +327,7 @@ class LazyRegressor(Custom, RegressorMixin):
             scores[self.custom_metric.__name__] = CUSTOM_METRIC
 
         scores = pd.DataFrame(scores)
-        scores = scores.sort_values(by="Adjusted R-Squared", ascending=False).set_index(
+        scores = scores.sort_values(by="RMSE", ascending=True).set_index(
             "Model"
         )
 
