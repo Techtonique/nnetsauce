@@ -213,7 +213,6 @@ class LazyMTS(MTS):
 
         if self.regressors == "all":
             self.regressors = REGRESSORS
-            print(f"\n\n self.regressors (line 216): {self.regressors} \n\n")
         else:
             try:
                 temp_list = []
@@ -222,7 +221,6 @@ class LazyMTS(MTS):
                     temp_list.append(full_name)
                 self.regressors = temp_list
             except Exception as exception:
-                print(f"\n\n self.regressors (line 225): {self.regressors} \n\n")
                 print(exception)
                 print("Invalid Regressor(s)")
 
@@ -268,35 +266,18 @@ class LazyMTS(MTS):
                                 seed=self.seed,
                                 backend=self.backend)
 
-                print(f"\n\n X_train.dtypes (line 271): {X_train.dtypes} \n\n")
                 pipe.fit(X_train)
-
-                print(f"\n\n pipe (line 274): {pipe} \n\n")
 
                 self.models[name] = pipe
                 X_pred = pipe.predict(h=X_test.shape[0])
-
-                #print(f"\n\n X_pred (line 281): {X_pred} \n\n")
-
-                r_squared = r2_score(X_test, X_pred)
-                #adj_rsquared = adjusted_rsquared(
-                #    r_squared, X_test.shape[0], X_test.shape[1]
-                #)
                 rmse = mean_squared_error(X_test, X_pred, squared=False)
-
                 mae = mean_absolute_error(X_test, X_pred)
                 mpl = mean_pinball_loss(X_test, X_pred)
-                #mpe = mean_percentage_error(X_test, X_pred)
-                #mape = mean_absolute_percentage_error(X_test, X_pred)
 
                 names.append(name)
-                #R2.append(r_squared)
-                #ADJR2.append(adj_rsquared)
                 RMSE.append(rmse)
                 MAE.append(mae)
                 MPL.append(mpl)
-                #MPE.append(mpe)
-                #MAPE.append(mape)
                 TIME.append(time.time() - start)
 
                 if self.custom_metric:
@@ -317,7 +298,6 @@ class LazyMTS(MTS):
                     }
 
                     if self.custom_metric:
-                        print(f"\n\n self.custom_metric (line 309): {self.custom_metric} \n\n")
                         scores_verbose[self.custom_metric.__name__] = custom_metric
 
                     print(scores_verbose)
@@ -339,8 +319,6 @@ class LazyMTS(MTS):
             #"MAPE": MAPE,
             "Time Taken": TIME,
         }
-
-        print(f"\n\n scores (line 307): {scores} \n\n")
 
         if self.custom_metric:
             scores[self.custom_metric.__name__] = CUSTOM_METRIC

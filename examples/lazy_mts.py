@@ -22,7 +22,7 @@ df_test = df.iloc[idx_train:idx_end,]
 print(f"----- df_train: {df_train} -----")
 print(f"----- df_train.dtypes: {df_train.dtypes} -----")
 
-regr_mts = ns.LazyMTS(verbose=0, ignore_warnings=False, custom_metric=None,
+regr_mts = ns.LazyMTS(verbose=0, ignore_warnings=True, custom_metric=None,
                       lags = 4, n_hidden_features=7, n_clusters=0)
 models, predictions = regr_mts.fit(df_train, df_test)
 model_dictionary = regr_mts.provide_models(df_train, df_test)
