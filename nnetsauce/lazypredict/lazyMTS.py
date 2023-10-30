@@ -158,7 +158,7 @@ class LazyMTS(MTS):
             agg=agg,
         )
 
-    def fit(self, X_train, X_test):
+    def fit(self, X_train, X_test, xreg=None, new_xreg=None):
         """Fit Regression algorithms to X_train, predict and score on X_test.
         Parameters
         ----------
@@ -266,10 +266,12 @@ class LazyMTS(MTS):
                                 seed=self.seed,
                                 backend=self.backend)
 
-                pipe.fit(X_train)
+                pipe.fit(X_train, xreg=xreg)
 
                 self.models[name] = pipe
-                X_pred = pipe.predict(h=X_test.shape[0])
+                if xreg is not None:
+                    assert new_xreg is not None, "xreg and new_xreg must be provided"
+                X_pred = pipe.predict(h=X_test.shape[0], newxreg=new_xreg)
                 rmse = mean_squared_error(X_test, X_pred, squared=False)
                 mae = mean_absolute_error(X_test, X_pred)
                 mpl = mean_pinball_loss(X_test, X_pred)
