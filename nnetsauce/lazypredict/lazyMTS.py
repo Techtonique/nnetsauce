@@ -271,7 +271,7 @@ class LazyMTS(MTS):
                 self.models[name] = pipe
                 if xreg is not None:
                     assert new_xreg is not None, "xreg and new_xreg must be provided"
-                X_pred = pipe.predict(h=X_test.shape[0], newxreg=new_xreg)
+                X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg)
                 rmse = mean_squared_error(X_test, X_pred, squared=False)
                 mae = mean_absolute_error(X_test, X_pred)
                 mpl = mean_pinball_loss(X_test, X_pred)
