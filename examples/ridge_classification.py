@@ -6,12 +6,14 @@ Created on Fri Jul 26 14:29:02 2019
 @author: moudiki
 """
 
+import os 
 import nnetsauce as ns
 import numpy as np
 from sklearn.datasets import load_digits, load_breast_cancer, load_wine, load_iris
 from sklearn.model_selection import train_test_split
 from time import time
 
+print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
 # dataset no. 1 ----------
 

@@ -1,6 +1,9 @@
+import os 
 import nnetsauce as ns 
 from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
+
+print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
 data = load_diabetes()
 X = data.data

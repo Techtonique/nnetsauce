@@ -1,6 +1,9 @@
+import os 
 import nnetsauce as ns 
 from sklearn.datasets import load_breast_cancer, load_iris, load_wine, load_digits
 from sklearn.model_selection import train_test_split
+
+print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
 data = load_breast_cancer()
 X = data.data

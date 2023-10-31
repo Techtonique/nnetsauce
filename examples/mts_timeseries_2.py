@@ -1,3 +1,6 @@
+import os
+import subprocess
+import sys 
 import nnetsauce as ns
 import numpy as np
 import pandas as pd
@@ -8,6 +11,10 @@ from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.ensemble import RandomForestRegressor
 from statsmodels.stats.diagnostic import acorr_ljungbox
 from time import time
+
+print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
+
+subprocess.check_call([sys.executable, "-m", "pip", "install", "statsmodels"])
 
 np.random.seed(1235)
 

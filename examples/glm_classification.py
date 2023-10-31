@@ -1,3 +1,4 @@
+import os
 import nnetsauce as ns
 import numpy as np
 from sklearn.datasets import load_breast_cancer, load_wine, load_iris, make_classification
@@ -6,6 +7,7 @@ from sklearn import metrics
 from time import time
 import matplotlib.pyplot as plt
 
+print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
 print(f"\n method = 'momentum' ----------")
 
