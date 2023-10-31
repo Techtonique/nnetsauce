@@ -18,6 +18,7 @@ from sklearn.metrics import (
 )
 from .config import REGRESSORS
 from ..mts import MTS
+from ..utils import convert_df_to_numeric
 
 import warnings
 
@@ -110,6 +111,7 @@ class LazyMTS(MTS):
         predictions=False,
         random_state=42,
         regressors="all",
+        preprocess=False,
         # MTS attributes
         obj = None,
         n_hidden_features=5,
@@ -128,7 +130,8 @@ class LazyMTS(MTS):
         kernel=None,
         agg="mean",
         seed=123,
-        backend="cpu"
+        backend="cpu",
+        show_progress=False
     ):
         self.verbose = verbose
         self.ignore_warnings = ignore_warnings
@@ -137,6 +140,7 @@ class LazyMTS(MTS):
         self.models = {}
         self.random_state = random_state
         self.regressors = regressors
+        self.preprocess = preprocess
         super().__init__(
             obj=obj,
             n_hidden_features=n_hidden_features,
@@ -156,9 +160,10 @@ class LazyMTS(MTS):
             replications=replications,
             kernel=kernel,
             agg=agg,
+            show_progress=show_progress
         )
 
-    def fit(self, X_train, X_test, xreg=None, new_xreg=None):
+    def fit(self, X_train, X_test, xreg=None, new_xreg=None, **kwargs):
         """Fit Regression algorithms to X_train, predict and score on X_test.
         Parameters
         ----------
@@ -195,6 +200,9 @@ class LazyMTS(MTS):
         if isinstance(X_train, np.ndarray):
             X_train = pd.DataFrame(X_train)
             X_test = pd.DataFrame(X_test)
+        
+        X_train = convert_df_to_numeric(X_train)
+        X_test = convert_df_to_numeric(X_test)
 
         numeric_features = X_train.select_dtypes(include=[np.number]).columns
         categorical_features = X_train.select_dtypes(include=["object"]).columns
@@ -203,13 +211,14 @@ class LazyMTS(MTS):
             X_train, categorical_features
         )
 
-        preprocessor = ColumnTransformer(
-            transformers=[
-                ("numeric", numeric_transformer, numeric_features),
-                ("categorical_low", categorical_transformer_low, categorical_low),
-                ("categorical_high", categorical_transformer_high, categorical_high),
-            ]
-        )
+        if self.preprocess:
+            preprocessor = ColumnTransformer(
+                transformers=[
+                    ("numeric", numeric_transformer, numeric_features),
+                    ("categorical_low", categorical_transformer_low, categorical_low),
+                    ("categorical_high", categorical_transformer_high, categorical_high),
+                ]
+            )
 
         if self.regressors == "all":
             self.regressors = REGRESSORS
@@ -224,91 +233,200 @@ class LazyMTS(MTS):
                 print(exception)
                 print("Invalid Regressor(s)")
 
-        for name, model in tqdm(self.regressors): # do parallel exec
-            start = time.time()
-            try:
-                if "random_state" in model().get_params().keys():
-                    pipe = MTS(obj=model(random_state=self.random_state),
-                                        n_hidden_features=self.n_hidden_features,
-                                        activation_name=self.activation_name,
-                                        a=self.a,
-                                        nodes_sim=self.nodes_sim,
-                                        bias=self.bias,
-                                        dropout=self.dropout,
-                                        direct_link=self.direct_link,
-                                        n_clusters=self.n_clusters,
-                                        cluster_encode=self.cluster_encode,
-                                        type_clust=self.type_clust,
-                                        type_scaling=self.type_scaling,
-                                        lags=self.lags,
-                                        replications=self.replications,
-                                        kernel=self.kernel,
-                                        agg=self.agg,
-                                        seed=self.agg,
-                                        backend=self.backend)
-                else:
-                    pipe = MTS(obj=model(),
-                                n_hidden_features=self.n_hidden_features,
-                                activation_name=self.activation_name,
-                                a=self.a,
-                                nodes_sim=self.nodes_sim,
-                                bias=self.bias,
-                                dropout=self.dropout,
-                                direct_link=self.direct_link,
-                                n_clusters=self.n_clusters,
-                                cluster_encode=self.cluster_encode,
-                                type_clust=self.type_clust,
-                                type_scaling=self.type_scaling,
-                                lags=self.lags,
-                                replications=self.replications,
-                                kernel=self.kernel,
-                                agg=self.agg,
-                                seed=self.seed,
-                                backend=self.backend)
+        if self.preprocess is True:
+            for name, model in tqdm(self.regressors): # do parallel exec
+                start = time.time()
+                try:
+                    if "random_state" in model().get_params().keys():
+                        pipe = Pipeline(
+                            steps=[
+                                ("preprocessor", preprocessor),
+                                ("regressor", MTS(obj=model(random_state=self.random_state, **kwargs),
+                                            n_hidden_features=self.n_hidden_features,
+                                            activation_name=self.activation_name,
+                                            a=self.a,
+                                            nodes_sim=self.nodes_sim,
+                                            bias=self.bias,
+                                            dropout=self.dropout,
+                                            direct_link=self.direct_link,
+                                            n_clusters=self.n_clusters,
+                                            cluster_encode=self.cluster_encode,
+                                            type_clust=self.type_clust,
+                                            type_scaling=self.type_scaling,
+                                            lags=self.lags,
+                                            replications=self.replications,
+                                            kernel=self.kernel,
+                                            agg=self.agg,
+                                            seed=self.seed,
+                                            backend=self.backend,
+                                            show_progress=self.show_progress))])
+                    else:
+                        pipe = Pipeline(
+                            steps=[
+                                ("preprocessor", preprocessor),
+                                ("regressor", MTS(obj=model(**kwargs),
+                                    n_hidden_features=self.n_hidden_features,
+                                    activation_name=self.activation_name,
+                                    a=self.a,
+                                    nodes_sim=self.nodes_sim,
+                                    bias=self.bias,
+                                    dropout=self.dropout,
+                                    direct_link=self.direct_link,
+                                    n_clusters=self.n_clusters,
+                                    cluster_encode=self.cluster_encode,
+                                    type_clust=self.type_clust,
+                                    type_scaling=self.type_scaling,
+                                    lags=self.lags,
+                                    replications=self.replications,
+                                    kernel=self.kernel,
+                                    agg=self.agg,
+                                    seed=self.seed,
+                                    backend=self.backend,
+                                    show_progress=self.show_progress))])
 
-                pipe.fit(X_train, xreg=xreg)
+                    pipe.fit(X_train, **kwargs)                                                   
+                    #pipe.fit(X_train, xreg=xreg)                
 
-                self.models[name] = pipe
-                if xreg is not None:
-                    assert new_xreg is not None, "xreg and new_xreg must be provided"
-                X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg)
-                rmse = mean_squared_error(X_test, X_pred, squared=False)
-                mae = mean_absolute_error(X_test, X_pred)
-                mpl = mean_pinball_loss(X_test, X_pred)
+                    self.models[name] = pipe
+                    if xreg is not None:
+                        assert new_xreg is not None, "xreg and new_xreg must be provided"
+                    #X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg)
+                    X_pred = pipe["regressor"].predict(h=X_test.shape[0], **kwargs)
+                    rmse = mean_squared_error(X_test, X_pred, squared=False)
+                    mae = mean_absolute_error(X_test, X_pred)
+                    mpl = mean_pinball_loss(X_test, X_pred)
 
-                names.append(name)
-                RMSE.append(rmse)
-                MAE.append(mae)
-                MPL.append(mpl)
-                TIME.append(time.time() - start)
-
-                if self.custom_metric:
-                    custom_metric = self.custom_metric(X_test, X_pred)
-                    CUSTOM_METRIC.append(custom_metric)
-
-                if self.verbose > 0:
-                    scores_verbose = {
-                        "Model": name,
-                        #"R-Squared": r_squared,
-                        #"Adjusted R-Squared": adj_rsquared,
-                        "RMSE": rmse,
-                        "MAE": mae,
-                        "MPL": mpl,
-                        #"MPE": mpe,
-                        #"MAPE": mape,
-                        "Time taken": time.time() - start,
-                    }
+                    names.append(name)
+                    RMSE.append(rmse)
+                    MAE.append(mae)
+                    MPL.append(mpl)
+                    TIME.append(time.time() - start)
 
                     if self.custom_metric:
-                        scores_verbose[self.custom_metric.__name__] = custom_metric
+                        custom_metric = self.custom_metric(X_test, X_pred)
+                        CUSTOM_METRIC.append(custom_metric)
 
-                    print(scores_verbose)
-                if self.predictions:
-                    predictions[name] = X_pred
-            except Exception as exception:
-                if self.ignore_warnings is False:
-                    print(name + " model failed to execute")
-                    print(exception)
+                    if self.verbose > 0:
+                        scores_verbose = {
+                            "Model": name,
+                            #"R-Squared": r_squared,
+                            #"Adjusted R-Squared": adj_rsquared,
+                            "RMSE": rmse,
+                            "MAE": mae,
+                            "MPL": mpl,
+                            #"MPE": mpe,
+                            #"MAPE": mape,
+                            "Time taken": time.time() - start,
+                        }
+
+                        if self.custom_metric:
+                            scores_verbose[self.custom_metric.__name__] = custom_metric
+
+                        print(scores_verbose)
+                    if self.predictions:
+                        predictions[name] = X_pred
+                except Exception as exception:
+                    if self.ignore_warnings is False:
+                        print(name + " model failed to execute")
+                        print(exception)
+
+        else: # no preprocessing
+
+            for name, model in tqdm(self.regressors): # do parallel exec
+                start = time.time()
+                try:
+                    if "random_state" in model().get_params().keys():
+                        pipe = MTS(obj=model(random_state=self.random_state, **kwargs),
+                                            n_hidden_features=self.n_hidden_features,
+                                            activation_name=self.activation_name,
+                                            a=self.a,
+                                            nodes_sim=self.nodes_sim,
+                                            bias=self.bias,
+                                            dropout=self.dropout,
+                                            direct_link=self.direct_link,
+                                            n_clusters=self.n_clusters,
+                                            cluster_encode=self.cluster_encode,
+                                            type_clust=self.type_clust,
+                                            type_scaling=self.type_scaling,
+                                            lags=self.lags,
+                                            replications=self.replications,
+                                            kernel=self.kernel,
+                                            agg=self.agg,
+                                            seed=self.seed,
+                                            backend=self.backend,
+                                            show_progress=self.show_progress)                        
+                    else:
+                        pipe = MTS(obj=model(**kwargs),
+                                    n_hidden_features=self.n_hidden_features,
+                                    activation_name=self.activation_name,
+                                    a=self.a,
+                                    nodes_sim=self.nodes_sim,
+                                    bias=self.bias,
+                                    dropout=self.dropout,
+                                    direct_link=self.direct_link,
+                                    n_clusters=self.n_clusters,
+                                    cluster_encode=self.cluster_encode,
+                                    type_clust=self.type_clust,
+                                    type_scaling=self.type_scaling,
+                                    lags=self.lags,
+                                    replications=self.replications,
+                                    kernel=self.kernel,
+                                    agg=self.agg,
+                                    seed=self.seed,
+                                    backend=self.backend,
+                                    show_progress=self.show_progress)
+
+                    pipe.fit(X_train, **kwargs)                                                   
+                    #pipe.fit(X_train, xreg=xreg) # DO xreg like in `ahead`
+
+                    self.models[name] = pipe
+                    if xreg is not None:
+                        assert new_xreg is not None, "xreg and new_xreg must be provided"
+
+                    if self.preprocess is True: 
+                        X_pred = pipe["regressor"].predict(h=X_test.shape[0], **kwargs)
+                    else:
+                        X_pred = pipe.predict(h=X_test.shape[0], **kwargs) #X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg) ## DO xreg like in `ahead`
+                    
+                    rmse = mean_squared_error(X_test, X_pred, squared=False)
+                    mae = mean_absolute_error(X_test, X_pred)
+                    mpl = mean_pinball_loss(X_test, X_pred)
+
+                    names.append(name)
+                    RMSE.append(rmse)
+                    MAE.append(mae)
+                    MPL.append(mpl)
+                    TIME.append(time.time() - start)
+
+                    if self.custom_metric:
+                        custom_metric = self.custom_metric(X_test, X_pred)
+                        CUSTOM_METRIC.append(custom_metric)
+
+                    if self.verbose > 0:
+                        scores_verbose = {
+                            "Model": name,
+                            #"R-Squared": r_squared,
+                            #"Adjusted R-Squared": adj_rsquared,
+                            "RMSE": rmse,
+                            "MAE": mae,
+                            "MPL": mpl,
+                            #"MPE": mpe,
+                            #"MAPE": mape,
+                            "Time taken": time.time() - start,
+                        }
+
+                        if self.custom_metric:
+                            scores_verbose[self.custom_metric.__name__] = custom_metric
+
+                        print(scores_verbose)
+                    if self.predictions:
+                        predictions[name] = X_pred
+                except Exception as exception:
+                    if self.ignore_warnings is False:
+                        print(name + " model failed to execute")
+                        print(exception)
+            
+            
 
         scores = {
             "Model": names,

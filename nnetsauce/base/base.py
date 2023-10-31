@@ -2,7 +2,9 @@
 #
 # License: BSD 3 Clear
 
+import copy 
 import numpy as np
+import pandas as pd
 import platform
 import warnings
 
@@ -236,14 +238,17 @@ class Base(BaseEstimator):
 
             Clusters' matrix, one-hot encoded: {array-like}
 
-        """
+        """        
 
         np.random.seed(self.seed)
 
         if X is None:
             X = self.X_
+        
+        if isinstance(X, pd.DataFrame):
+            X = copy.deepcopy(X.values.astype(float))
 
-        if predict == False:  # encode training set
+        if predict is False:  # encode training set
 
             # scale input data before clustering
             self.clustering_scaler_, scaled_X = mo.scale_covariates(
@@ -260,9 +265,9 @@ class Base(BaseEstimator):
 
             if self.cluster_encode == True:
 
-                return mo.one_hot_encode(X_clustered, self.n_clusters)
+                return mo.one_hot_encode(X_clustered, self.n_clusters).astype(np.float16)
 
-            return X_clustered
+            return X_clustered.astype(np.float16)
 
         # if predict == True, encode test set
         X_clustered = self.clustering_obj_.predict(
@@ -271,9 +276,9 @@ class Base(BaseEstimator):
 
         if self.cluster_encode == True:
 
-            return mo.one_hot_encode(X_clustered, self.n_clusters)
+            return mo.one_hot_encode(X_clustered, self.n_clusters).astype(np.float16)
 
-        return X_clustered
+        return X_clustered.astype(np.float16)
 
     def create_layer(self, scaled_X, W=None):
         """Create hidden layer.
@@ -464,6 +469,7 @@ class Base(BaseEstimator):
             ), "must have len(self.type_scaling) >= 2 when self.n_hidden_features > 0"
 
         if X is None:
+                        
             if self.col_sample == 1:
                 input_X = self.X_
             else:
@@ -478,7 +484,12 @@ class Base(BaseEstimator):
                 )
                 self.index_col_ = index_col
                 input_X = self.X_[:, self.index_col_]
+
         else:  # X is not None # keep X vs self.X_
+
+            if isinstance(X, pd.DataFrame):
+                X = copy.deepcopy(X.values.astype(float))
+
             if self.col_sample == 1:
                 input_X = X
             else:
@@ -508,7 +519,7 @@ class Base(BaseEstimator):
                 )
                 Z = (
                     mo.cbind(input_X, Phi_X, backend=self.backend)
-                    if self.direct_link == True
+                    if self.direct_link is True
                     else Phi_X
                 )
                 self.scaler_, scaled_Z = mo.scale_covariates(
@@ -525,6 +536,7 @@ class Base(BaseEstimator):
                 self.encode_clusters(input_X, **kwargs),
                 backend=self.backend,
             )
+
             if self.n_hidden_features > 0:  # with hidden layer
                 self.nn_scaler_, scaled_X = mo.scale_covariates(
                     augmented_X, choice=self.type_scaling[1]
@@ -536,7 +548,7 @@ class Base(BaseEstimator):
                 )
                 Z = (
                     mo.cbind(augmented_X, Phi_X, backend=self.backend)
-                    if self.direct_link == True
+                    if self.direct_link is True
                     else Phi_X
                 )
                 self.scaler_, scaled_Z = mo.scale_covariates(
@@ -549,7 +561,7 @@ class Base(BaseEstimator):
                 )
 
         # Returning model inputs -----
-        if mx.is_factor(y) == False:  # regression            
+        if mx.is_factor(y) is False:  # regression            
             # center y
             if y is None:
                 self.y_mean_, centered_y = mo.center_response(self.y_)
@@ -628,6 +640,9 @@ class Base(BaseEstimator):
 
             Transformed test set : {array-like}
         """
+
+        if isinstance(X, pd.DataFrame):
+            X = copy.deepcopy(X.values.astype(float))
 
         if (
             self.n_clusters == 0

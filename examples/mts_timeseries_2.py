@@ -9,12 +9,12 @@ from sklearn import datasets, metrics
 from sklearn import linear_model
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.ensemble import RandomForestRegressor
-from statsmodels.stats.diagnostic import acorr_ljungbox
 from time import time
 
 print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
 subprocess.check_call([sys.executable, "-m", "pip", "install", "statsmodels"])
+from statsmodels.stats.diagnostic import acorr_ljungbox
 
 np.random.seed(1235)
 

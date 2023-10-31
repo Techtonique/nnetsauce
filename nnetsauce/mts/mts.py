@@ -2,6 +2,7 @@
 #
 # License: BSD 3 Clear Clause
 
+import copy
 import numpy as np
 import pandas as pd
 import pickle
@@ -88,6 +89,9 @@ class MTS(Base):
         
         verbose: int.
             0: not printing; 1: printing
+        
+        show_progress: bool.
+            True: progress bar when fitting each series; False: no progress bar when fitting each series
 
     Attributes:
 
@@ -196,7 +200,8 @@ class MTS(Base):
         agg="mean",
         seed=123,
         backend="cpu",
-        verbose=0
+        verbose=0,
+        show_progress=True
     ):
 
         assert int(lags) == lags, "parameter 'lags' should be an integer"
@@ -224,6 +229,7 @@ class MTS(Base):
         self.kernel = kernel 
         self.agg = agg
         self.verbose = verbose
+        self.show_progress = show_progress
         self.series_names = None
         self.input_dates = None
         self.fit_objs_ = {}
@@ -269,27 +275,12 @@ class MTS(Base):
             self.series_names = ["series" + str(i) for i in range(X.shape[1])]
             X = pd.DataFrame(X, columns=self.series_names)
         else:
+            X = copy.deepcopy(mo.convert_df_to_numeric(X))
             self.series_names = list(X.columns.values)
         
         self.df_ = X
         X = X.values 
         self.input_dates = ts.compute_input_dates(self.df_)
-
-        # Backup input dates --> ts.compute_input_dates(self.df_)
-        """
-        input_dates = self.df_.index.values
-        print(f"input_dates 1: {input_dates}")
-        frequency = pd.infer_freq(pd.DatetimeIndex(input_dates))
-        print(f"frequency: {frequency}")
-        input_dates = pd.date_range(
-            start=input_dates[0], periods=len(input_dates), freq=frequency
-        ).values.tolist()
-        print(f"input_dates 2: {input_dates}")
-        df_input_dates = pd.DataFrame({"date": input_dates})
-        print(f"input_dates 3: {df_input_dates}")
-        self.input_dates = pd.to_datetime(df_input_dates["date"]).dt.date
-        print(f"input_dates 4: {self.input_dates}")
-        """              
 
         try:
             # multivariate time series
@@ -351,8 +342,13 @@ class MTS(Base):
         # loop on all the time series and adjust self.obj.fit
         if self.verbose > 0:
             print(f"\n Adjusting {type(self.obj).__name__} to multivariate time series... \n ")
+        
+        if self.show_progress is True:
+            iterator = tqdm(range(p))
+        else:
+            iterator = range(p)
 
-        for i in tqdm(range(p)):
+        for i in iterator:
             y_mean = np.mean(self.y_[:, i])
             self.y_means_[i] = y_mean
             centered_y_i = self.y_[:, i] - y_mean
