@@ -119,6 +119,7 @@ class LazyRegressor(Custom, RegressorMixin):
         predictions=False,
         random_state=42,
         regressors="all",
+        preprocess=False,
         # CustomRegressor attributes
         obj = None,
         n_hidden_features=5,
@@ -135,7 +136,7 @@ class LazyRegressor(Custom, RegressorMixin):
         col_sample=1,
         row_sample=1,
         seed=123,
-        backend="cpu"
+        backend="cpu"        
     ):
         self.verbose = verbose
         self.ignore_warnings = ignore_warnings
@@ -144,6 +145,7 @@ class LazyRegressor(Custom, RegressorMixin):
         self.models = {}
         self.random_state = random_state
         self.regressors = regressors
+        self.preprocess = preprocess
         super().__init__(
             obj=obj,
             n_hidden_features=n_hidden_features,
@@ -208,13 +210,14 @@ class LazyRegressor(Custom, RegressorMixin):
             X_train, categorical_features
         )
 
-        preprocessor = ColumnTransformer(
-            transformers=[
-                ("numeric", numeric_transformer, numeric_features),
-                ("categorical_low", categorical_transformer_low, categorical_low),
-                ("categorical_high", categorical_transformer_high, categorical_high),
-            ]
-        )
+        if self.preprocess is True: 
+            preprocessor = ColumnTransformer(
+                transformers=[
+                    ("numeric", numeric_transformer, numeric_features),
+                    ("categorical_low", categorical_transformer_low, categorical_low),
+                    ("categorical_high", categorical_transformer_high, categorical_high),
+                ]
+            )
 
         if self.regressors == "all":
             self.regressors = REGRESSORS
@@ -229,35 +232,16 @@ class LazyRegressor(Custom, RegressorMixin):
                 print(exception)
                 print("Invalid Regressor(s)")
 
-        for name, model in tqdm(self.regressors): # do parallel exec
-            start = time.time()
-            try:
-                if "random_state" in model().get_params().keys():
-                    pipe = Pipeline(
-                        steps=[
-                            ("preprocessor", preprocessor),
-                            ("regressor", CustomRegressor(obj=model(random_state=self.random_state),
-                            n_hidden_features=self.n_hidden_features,
-                            activation_name=self.activation_name,
-                            a=self.a,
-                            nodes_sim=self.nodes_sim,
-                            bias=self.bias,
-                            dropout=self.dropout,
-                            direct_link=self.direct_link,
-                            n_clusters=self.n_clusters,
-                            cluster_encode=self.cluster_encode,
-                            type_clust=self.type_clust,
-                            type_scaling=self.type_scaling,
-                            col_sample=self.col_sample,
-                            row_sample=self.row_sample,
-                            seed=self.seed,
-                            backend=self.backend)),
-                        ]
-                    )
-                else:
-                    pipe = Pipeline(
-                        steps=[("preprocessor", preprocessor), 
-                               ("regressor", CustomRegressor(obj=model(),
+        if self.preprocess is True: 
+
+            for name, model in tqdm(self.regressors): # do parallel exec
+                start = time.time()
+                try:
+                    if "random_state" in model().get_params().keys():
+                        pipe = Pipeline(
+                            steps=[
+                                ("preprocessor", preprocessor),
+                                ("regressor", CustomRegressor(obj=model(random_state=self.random_state),
                                 n_hidden_features=self.n_hidden_features,
                                 activation_name=self.activation_name,
                                 a=self.a,
@@ -272,48 +256,149 @@ class LazyRegressor(Custom, RegressorMixin):
                                 col_sample=self.col_sample,
                                 row_sample=self.row_sample,
                                 seed=self.seed,
-                                backend=self.backend))]
+                                backend=self.backend)),
+                            ]
                         )
+                    else:
+                        pipe = Pipeline(
+                            steps=[("preprocessor", preprocessor), 
+                                ("regressor", CustomRegressor(obj=model(),
+                                    n_hidden_features=self.n_hidden_features,
+                                    activation_name=self.activation_name,
+                                    a=self.a,
+                                    nodes_sim=self.nodes_sim,
+                                    bias=self.bias,
+                                    dropout=self.dropout,
+                                    direct_link=self.direct_link,
+                                    n_clusters=self.n_clusters,
+                                    cluster_encode=self.cluster_encode,
+                                    type_clust=self.type_clust,
+                                    type_scaling=self.type_scaling,
+                                    col_sample=self.col_sample,
+                                    row_sample=self.row_sample,
+                                    seed=self.seed,
+                                    backend=self.backend))]
+                            )
 
-                pipe.fit(X_train, y_train)
-                self.models[name] = pipe
-                y_pred = pipe.predict(X_test)
+                    pipe.fit(X_train, y_train)
+                    self.models[name] = pipe
+                    y_pred = pipe.predict(X_test)
 
-                r_squared = r2_score(y_test, y_pred)
-                adj_rsquared = adjusted_rsquared(
-                    r_squared, X_test.shape[0], X_test.shape[1]
-                )
-                rmse = mean_squared_error(y_test, y_pred, squared=False)
+                    r_squared = r2_score(y_test, y_pred)
+                    adj_rsquared = adjusted_rsquared(
+                        r_squared, X_test.shape[0], X_test.shape[1]
+                    )
+                    rmse = mean_squared_error(y_test, y_pred, squared=False)
 
-                names.append(name)
-                R2.append(r_squared)
-                ADJR2.append(adj_rsquared)
-                RMSE.append(rmse)
-                TIME.append(time.time() - start)
-
-                if self.custom_metric:
-                    custom_metric = self.custom_metric(y_test, y_pred)
-                    CUSTOM_METRIC.append(custom_metric)
-
-                if self.verbose > 0:
-                    scores_verbose = {
-                        "Model": name,
-                        "R-Squared": r_squared,
-                        "Adjusted R-Squared": adj_rsquared,
-                        "RMSE": rmse,
-                        "Time taken": time.time() - start,
-                    }
+                    names.append(name)
+                    R2.append(r_squared)
+                    ADJR2.append(adj_rsquared)
+                    RMSE.append(rmse)
+                    TIME.append(time.time() - start)
 
                     if self.custom_metric:
-                        scores_verbose[self.custom_metric.__name__] = custom_metric
+                        custom_metric = self.custom_metric(y_test, y_pred)
+                        CUSTOM_METRIC.append(custom_metric)
 
-                    print(scores_verbose)
-                if self.predictions:
-                    predictions[name] = y_pred
-            except Exception as exception:
-                if self.ignore_warnings is False:
-                    print(name + " model failed to execute")
-                    print(exception)
+                    if self.verbose > 0:
+                        scores_verbose = {
+                            "Model": name,
+                            "R-Squared": r_squared,
+                            "Adjusted R-Squared": adj_rsquared,
+                            "RMSE": rmse,
+                            "Time taken": time.time() - start,
+                        }
+
+                        if self.custom_metric:
+                            scores_verbose[self.custom_metric.__name__] = custom_metric
+
+                        print(scores_verbose)
+                    if self.predictions:
+                        predictions[name] = y_pred
+                except Exception as exception:
+                    if self.ignore_warnings is False:
+                        print(name + " model failed to execute")
+                        print(exception)
+
+        else:
+
+            for name, model in tqdm(self.regressors): # do parallel exec
+                start = time.time()
+                try:
+                    if "random_state" in model().get_params().keys():
+                        pipe = CustomRegressor(obj=model(random_state=self.random_state),
+                                n_hidden_features=self.n_hidden_features,
+                                activation_name=self.activation_name,
+                                a=self.a,
+                                nodes_sim=self.nodes_sim,
+                                bias=self.bias,
+                                dropout=self.dropout,
+                                direct_link=self.direct_link,
+                                n_clusters=self.n_clusters,
+                                cluster_encode=self.cluster_encode,
+                                type_clust=self.type_clust,
+                                type_scaling=self.type_scaling,
+                                col_sample=self.col_sample,
+                                row_sample=self.row_sample,
+                                seed=self.seed,
+                                backend=self.backend)
+                    else:
+                        pipe = CustomRegressor(obj=model(),
+                                    n_hidden_features=self.n_hidden_features,
+                                    activation_name=self.activation_name,
+                                    a=self.a,
+                                    nodes_sim=self.nodes_sim,
+                                    bias=self.bias,
+                                    dropout=self.dropout,
+                                    direct_link=self.direct_link,
+                                    n_clusters=self.n_clusters,
+                                    cluster_encode=self.cluster_encode,
+                                    type_clust=self.type_clust,
+                                    type_scaling=self.type_scaling,
+                                    col_sample=self.col_sample,
+                                    row_sample=self.row_sample,
+                                    seed=self.seed,
+                                    backend=self.backend)
+                        
+                    pipe.fit(X_train, y_train)
+                    self.models[name] = pipe
+                    y_pred = pipe.predict(X_test)
+
+                    r_squared = r2_score(y_test, y_pred)
+                    adj_rsquared = adjusted_rsquared(
+                        r_squared, X_test.shape[0], X_test.shape[1]
+                    )
+                    rmse = mean_squared_error(y_test, y_pred, squared=False)
+
+                    names.append(name)
+                    R2.append(r_squared)
+                    ADJR2.append(adj_rsquared)
+                    RMSE.append(rmse)
+                    TIME.append(time.time() - start)
+
+                    if self.custom_metric:
+                        custom_metric = self.custom_metric(y_test, y_pred)
+                        CUSTOM_METRIC.append(custom_metric)
+
+                    if self.verbose > 0:
+                        scores_verbose = {
+                            "Model": name,
+                            "R-Squared": r_squared,
+                            "Adjusted R-Squared": adj_rsquared,
+                            "RMSE": rmse,
+                            "Time taken": time.time() - start,
+                        }
+
+                        if self.custom_metric:
+                            scores_verbose[self.custom_metric.__name__] = custom_metric
+
+                        print(scores_verbose)
+                    if self.predictions:
+                        predictions[name] = y_pred
+                except Exception as exception:
+                    if self.ignore_warnings is False:
+                        print(name + " model failed to execute")
+                        print(exception)
 
         scores = {
             "Model": names,

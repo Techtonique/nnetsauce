@@ -26,7 +26,10 @@ pd.set_option("display.precision", 2)
 pd.set_option("display.float_format", lambda x: "%.2f" % x)
 
 numeric_transformer = Pipeline(
-    steps=[("imputer", SimpleImputer(strategy="mean")), ("scaler", StandardScaler())]
+    steps=[
+        ("imputer", SimpleImputer(strategy="mean")),
+        ("scaler", StandardScaler()),
+    ]
 )
 
 categorical_transformer_low = Pipeline(
@@ -109,8 +112,9 @@ class LazyClassifier(Custom, ClassifierMixin):
         predictions=False,
         random_state=42,
         classifiers="all",
+        preprocess=False,
         # CustomClassifier attributes
-        obj = None,
+        obj=None,
         n_hidden_features=5,
         activation_name="relu",
         a=0.01,
@@ -125,7 +129,7 @@ class LazyClassifier(Custom, ClassifierMixin):
         col_sample=1,
         row_sample=1,
         seed=123,
-        backend="cpu"
+        backend="cpu",
     ):
         self.verbose = verbose
         self.ignore_warnings = ignore_warnings
@@ -134,6 +138,7 @@ class LazyClassifier(Custom, ClassifierMixin):
         self.models = {}
         self.random_state = random_state
         self.classifiers = classifiers
+        self.preprocess = preprocess
         super().__init__(
             obj=obj,
             n_hidden_features=n_hidden_features,
@@ -198,13 +203,22 @@ class LazyClassifier(Custom, ClassifierMixin):
             X_train, categorical_features
         )
 
-        preprocessor = ColumnTransformer(
-            transformers=[
-                ("numeric", numeric_transformer, numeric_features),
-                ("categorical_low", categorical_transformer_low, categorical_low),
-                ("categorical_high", categorical_transformer_high, categorical_high),
-            ]
-        )
+        if self.preprocess is True:
+            preprocessor = ColumnTransformer(
+                transformers=[
+                    ("numeric", numeric_transformer, numeric_features),
+                    (
+                        "categorical_low",
+                        categorical_transformer_low,
+                        categorical_low,
+                    ),
+                    (
+                        "categorical_high",
+                        categorical_transformer_high,
+                        categorical_high,
+                    ),
+                ]
+            )
 
         if self.classifiers == "all":
             self.classifiers = CLASSIFIERS
@@ -219,100 +233,218 @@ class LazyClassifier(Custom, ClassifierMixin):
                 print(exception)
                 print("Invalid Classifier(s)")
 
-        for name, model in tqdm(self.classifiers): # do parallel exec           
-            start = time.time()
-            try:
-                if "random_state" in model().get_params().keys():
-                    pipe = Pipeline([
-                            ("preprocessor", preprocessor),
-                            ("classifier", CustomClassifier(obj=model(random_state=self.random_state),
-                            n_hidden_features=self.n_hidden_features,
-                            activation_name=self.activation_name,
-                            a=self.a,
-                            nodes_sim=self.nodes_sim,
-                            bias=self.bias,
-                            dropout=self.dropout,
-                            direct_link=self.direct_link,
-                            n_clusters=self.n_clusters,
-                            cluster_encode=self.cluster_encode,
-                            type_clust=self.type_clust,
-                            type_scaling=self.type_scaling,
-                            col_sample=self.col_sample,
-                            row_sample=self.row_sample,
-                            seed=self.seed,
-                            backend=self.backend))])
-                else:
-                    pipe = Pipeline([
-                            ("preprocessor", preprocessor),
-                            ("classifier", CustomClassifier(obj=model(),
-                            n_hidden_features=self.n_hidden_features,
-                            activation_name=self.activation_name,
-                            a=self.a,
-                            nodes_sim=self.nodes_sim,
-                            bias=self.bias,
-                            dropout=self.dropout,
-                            direct_link=self.direct_link,
-                            n_clusters=self.n_clusters,
-                            cluster_encode=self.cluster_encode,
-                            type_clust=self.type_clust,
-                            type_scaling=self.type_scaling,
-                            col_sample=self.col_sample,
-                            row_sample=self.row_sample,
-                            seed=self.seed,
-                            backend=self.backend))])
-                
-                pipe.fit(X_train, y_train)
-                self.models[name] = pipe
-                y_pred = pipe.predict(X_test)
-                accuracy = accuracy_score(y_test, y_pred, normalize=True)
-                b_accuracy = balanced_accuracy_score(y_test, y_pred)
-                f1 = f1_score(y_test, y_pred, average="weighted")
+        if self.preprocess is True:
+
+            for name, model in tqdm(self.classifiers):  # do parallel exec
+                start = time.time()
                 try:
-                    roc_auc = roc_auc_score(y_test, y_pred)
-                except Exception as exception:
-                    roc_auc = None
-                    if self.ignore_warnings is False:
-                        print("ROC AUC couldn't be calculated for " + name)
-                        print(exception)
-                names.append(name)
-                Accuracy.append(accuracy)
-                B_Accuracy.append(b_accuracy)
-                ROC_AUC.append(roc_auc)
-                F1.append(f1)
-                TIME.append(time.time() - start)
-                if self.custom_metric is not None:
-                    custom_metric = self.custom_metric(y_test, y_pred)
-                    CUSTOM_METRIC.append(custom_metric)
-                if self.verbose > 0:
-                    if self.custom_metric is not None:
-                        print(
-                            {
-                                "Model": name,
-                                "Accuracy": accuracy,
-                                "Balanced Accuracy": b_accuracy,
-                                "ROC AUC": roc_auc,
-                                "F1 Score": f1,
-                                self.custom_metric.__name__: custom_metric,
-                                "Time taken": time.time() - start,
-                            }
+                    if "random_state" in model().get_params().keys():
+                        pipe = Pipeline(
+                            [
+                                ("preprocessor", preprocessor),
+                                (
+                                    "classifier",
+                                    CustomClassifier(
+                                        obj=model(
+                                            random_state=self.random_state
+                                        ),
+                                        n_hidden_features=self.n_hidden_features,
+                                        activation_name=self.activation_name,
+                                        a=self.a,
+                                        nodes_sim=self.nodes_sim,
+                                        bias=self.bias,
+                                        dropout=self.dropout,
+                                        direct_link=self.direct_link,
+                                        n_clusters=self.n_clusters,
+                                        cluster_encode=self.cluster_encode,
+                                        type_clust=self.type_clust,
+                                        type_scaling=self.type_scaling,
+                                        col_sample=self.col_sample,
+                                        row_sample=self.row_sample,
+                                        seed=self.seed,
+                                        backend=self.backend,
+                                    ),
+                                ),
+                            ]
                         )
                     else:
-                        print(
-                            {
-                                "Model": name,
-                                "Accuracy": accuracy,
-                                "Balanced Accuracy": b_accuracy,
-                                "ROC AUC": roc_auc,
-                                "F1 Score": f1,
-                                "Time taken": time.time() - start,
-                            }
+                        pipe = Pipeline(
+                            [
+                                ("preprocessor", preprocessor),
+                                (
+                                    "classifier",
+                                    CustomClassifier(
+                                        obj=model(),
+                                        n_hidden_features=self.n_hidden_features,
+                                        activation_name=self.activation_name,
+                                        a=self.a,
+                                        nodes_sim=self.nodes_sim,
+                                        bias=self.bias,
+                                        dropout=self.dropout,
+                                        direct_link=self.direct_link,
+                                        n_clusters=self.n_clusters,
+                                        cluster_encode=self.cluster_encode,
+                                        type_clust=self.type_clust,
+                                        type_scaling=self.type_scaling,
+                                        col_sample=self.col_sample,
+                                        row_sample=self.row_sample,
+                                        seed=self.seed,
+                                        backend=self.backend,
+                                    ),
+                                ),
+                            ]
                         )
-                if self.predictions:
-                    predictions[name] = y_pred
-            except Exception as exception:
-                if self.ignore_warnings is False:
-                    print(name + " model failed to execute")
-                    print(exception)
+
+                    pipe.fit(X_train, y_train)
+                    self.models[name] = pipe
+                    y_pred = pipe.predict(X_test)
+                    accuracy = accuracy_score(y_test, y_pred, normalize=True)
+                    b_accuracy = balanced_accuracy_score(y_test, y_pred)
+                    f1 = f1_score(y_test, y_pred, average="weighted")
+                    try:
+                        roc_auc = roc_auc_score(y_test, y_pred)
+                    except Exception as exception:
+                        roc_auc = None
+                        if self.ignore_warnings is False:
+                            print("ROC AUC couldn't be calculated for " + name)
+                            print(exception)
+                    names.append(name)
+                    Accuracy.append(accuracy)
+                    B_Accuracy.append(b_accuracy)
+                    ROC_AUC.append(roc_auc)
+                    F1.append(f1)
+                    TIME.append(time.time() - start)
+                    if self.custom_metric is not None:
+                        custom_metric = self.custom_metric(y_test, y_pred)
+                        CUSTOM_METRIC.append(custom_metric)
+                    if self.verbose > 0:
+                        if self.custom_metric is not None:
+                            print(
+                                {
+                                    "Model": name,
+                                    "Accuracy": accuracy,
+                                    "Balanced Accuracy": b_accuracy,
+                                    "ROC AUC": roc_auc,
+                                    "F1 Score": f1,
+                                    self.custom_metric.__name__: custom_metric,
+                                    "Time taken": time.time() - start,
+                                }
+                            )
+                        else:
+                            print(
+                                {
+                                    "Model": name,
+                                    "Accuracy": accuracy,
+                                    "Balanced Accuracy": b_accuracy,
+                                    "ROC AUC": roc_auc,
+                                    "F1 Score": f1,
+                                    "Time taken": time.time() - start,
+                                }
+                            )
+                    if self.predictions:
+                        predictions[name] = y_pred
+                except Exception as exception:
+                    if self.ignore_warnings is False:
+                        print(name + " model failed to execute")
+                        print(exception)
+
+        else:
+
+            for name, model in tqdm(self.classifiers):  # do parallel exec
+                start = time.time()
+                try:
+                    if "random_state" in model().get_params().keys():
+                        pipe = CustomClassifier(
+                            obj=model(random_state=self.random_state),
+                            n_hidden_features=self.n_hidden_features,
+                            activation_name=self.activation_name,
+                            a=self.a,
+                            nodes_sim=self.nodes_sim,
+                            bias=self.bias,
+                            dropout=self.dropout,
+                            direct_link=self.direct_link,
+                            n_clusters=self.n_clusters,
+                            cluster_encode=self.cluster_encode,
+                            type_clust=self.type_clust,
+                            type_scaling=self.type_scaling,
+                            col_sample=self.col_sample,
+                            row_sample=self.row_sample,
+                            seed=self.seed,
+                            backend=self.backend,
+                        )
+                    else:
+                        pipe = CustomClassifier(
+                            obj=model(),
+                            n_hidden_features=self.n_hidden_features,
+                            activation_name=self.activation_name,
+                            a=self.a,
+                            nodes_sim=self.nodes_sim,
+                            bias=self.bias,
+                            dropout=self.dropout,
+                            direct_link=self.direct_link,
+                            n_clusters=self.n_clusters,
+                            cluster_encode=self.cluster_encode,
+                            type_clust=self.type_clust,
+                            type_scaling=self.type_scaling,
+                            col_sample=self.col_sample,
+                            row_sample=self.row_sample,
+                            seed=self.seed,
+                            backend=self.backend,
+                        )
+
+                    pipe.fit(X_train, y_train)
+                    self.models[name] = pipe
+                    y_pred = pipe.predict(X_test)
+                    accuracy = accuracy_score(y_test, y_pred, normalize=True)
+                    b_accuracy = balanced_accuracy_score(y_test, y_pred)
+                    f1 = f1_score(y_test, y_pred, average="weighted")
+                    try:
+                        roc_auc = roc_auc_score(y_test, y_pred)
+                    except Exception as exception:
+                        roc_auc = None
+                        if self.ignore_warnings is False:
+                            print("ROC AUC couldn't be calculated for " + name)
+                            print(exception)
+                    names.append(name)
+                    Accuracy.append(accuracy)
+                    B_Accuracy.append(b_accuracy)
+                    ROC_AUC.append(roc_auc)
+                    F1.append(f1)
+                    TIME.append(time.time() - start)
+                    if self.custom_metric is not None:
+                        custom_metric = self.custom_metric(y_test, y_pred)
+                        CUSTOM_METRIC.append(custom_metric)
+                    if self.verbose > 0:
+                        if self.custom_metric is not None:
+                            print(
+                                {
+                                    "Model": name,
+                                    "Accuracy": accuracy,
+                                    "Balanced Accuracy": b_accuracy,
+                                    "ROC AUC": roc_auc,
+                                    "F1 Score": f1,
+                                    self.custom_metric.__name__: custom_metric,
+                                    "Time taken": time.time() - start,
+                                }
+                            )
+                        else:
+                            print(
+                                {
+                                    "Model": name,
+                                    "Accuracy": accuracy,
+                                    "Balanced Accuracy": b_accuracy,
+                                    "ROC AUC": roc_auc,
+                                    "F1 Score": f1,
+                                    "Time taken": time.time() - start,
+                                }
+                            )
+                    if self.predictions:
+                        predictions[name] = y_pred
+                except Exception as exception:
+                    if self.ignore_warnings is False:
+                        print(name + " model failed to execute")
+                        print(exception)
+
         if self.custom_metric is None:
             scores = pd.DataFrame(
                 {
@@ -336,9 +468,9 @@ class LazyClassifier(Custom, ClassifierMixin):
                     "Time Taken": TIME,
                 }
             )
-        scores = scores.sort_values(by="Balanced Accuracy", ascending=False).set_index(
-            "Model"
-        )
+        scores = scores.sort_values(
+            by="Balanced Accuracy", ascending=False
+        ).set_index("Model")
 
         if self.predictions:
             predictions_df = pd.DataFrame.from_dict(predictions)
