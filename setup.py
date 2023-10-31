@@ -34,7 +34,7 @@ setup(
     description='Quasi-randomized (neural) networks',
     long_description='Quasi-randomized (neural) networks for regression, classification and time series forecasting',
     url='https://techtonique.github.io/nnetsauce/',
-    alias='nnetsauce',
+    #alias='nnetsauce',
     download_url='https://github.com/Techtonique/nnetsauce',
     license='BSD Clause Clear',
     classifiers=[

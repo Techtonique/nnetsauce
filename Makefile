@@ -86,3 +86,6 @@ build-site: docs ## export mkdocs website to a folder
 	cd docs&&mkdocs build
 	cp -rf docs/site/* ../../Pro_Website/Techtonique.github.io/nnetsauce
 	cd ..
+
+run-examples: ## run all examples with one command
+	find examples -maxdepth 2 -name "*.py" -exec  python3 {} \;
