@@ -63,13 +63,10 @@ coverage: ## check code coverage quickly with the default Python
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate mkdocs
-	 rm -rf docs/sources
-	 make install	 
-	 python3 docs/autogen.py	 
+	cd nnetsauce-docs&&mkdocs build&&cd ..
 
-servedocs: docs ## compile the docs watching for changes
-	cd docs&&mkdocs serve
-	cd ..
+servedocs: docs## compile the docs watching for changes
+	cd nnetsauce-docs&&mkdocs serve&&cd ..
 
 release: dist ## package and upload a release
 	twine upload dist/*
