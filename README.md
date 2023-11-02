@@ -43,7 +43,7 @@ pip install nnetsauce
 conda install -c conda-forge nnetsauce 
 ```
 
-(Note to self or developers: https://github.com/conda-forge/nnetsauce-feedstock)
+(Note to self or developers: https://github.com/conda-forge/nnetsauce-feedstock and https://conda-forge.org/docs/maintainer/adding_pkgs.html#step-by-step-instructions)
 
 - __3rd method__: from Github, for the development version
 
