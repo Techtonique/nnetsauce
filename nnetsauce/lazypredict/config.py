@@ -5,11 +5,6 @@ from sklearn.utils import all_estimators
 removed_classifiers = [
     "ClassifierChain",
     "ComplementNB",
-    #"GradientBoostingClassifier",
-    #"GaussianProcessClassifier",
-    #"HistGradientBoostingClassifier",
-    #"MLPClassifier",
-    #"LogisticRegressionCV", 
     "MultiOutputClassifier", 
     "MultinomialNB", 
     "OneVsOneClassifier",

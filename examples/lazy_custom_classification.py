@@ -10,14 +10,14 @@ X = data.data
 y= data.target
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = .2, random_state = 123)
 
-clf = ns.LazyClassifier(verbose=0, ignore_warnings=True, custom_metric=None, 
+clf = ns.LazyClassifier(verbose=0, ignore_warnings=True,
                         preprocess=True)
 models, predictions = clf.fit(X_train, X_test, y_train, y_test)
 model_dictionary = clf.provide_models(X_train, X_test, y_train, y_test)
 print(models)
 #print(model_dictionary["LogisticRegression"])
 
-clf2 = ns.LazyClassifier(verbose=0, ignore_warnings=True, custom_metric=None, 
+clf2 = ns.LazyClassifier(verbose=0, ignore_warnings=False, 
                         preprocess=False)
 models, predictions = clf2.fit(X_train, X_test, y_train, y_test)
 model_dictionary = clf2.provide_models(X_train, X_test, y_train, y_test)
