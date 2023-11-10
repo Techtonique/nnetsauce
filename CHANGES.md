@@ -1,3 +1,9 @@
+# version 0.15.0
+
+- lazy predict for classification and regression (see https://thierrymoudiki.github.io/blog/2023/10/22/python/quasirandomizednn/nnetsauce-lazy-predict-preview)
+- lazy predict for multivariate time series (see https://thierrymoudiki.github.io/blog/2023/10/29/python/quasirandomizednn/MTS-LazyPredict)
+- lazy predict for deep classifiers and regressors (see [this example for classification](./examples/lazy_custom_deep_classification.py) and [this example for regression](./examples/lazy_custom_deep_regression.py)) 
+
 # version 0.14.0
 
 - update and align as much as possible with R version 
