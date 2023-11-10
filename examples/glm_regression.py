@@ -1,3 +1,4 @@
+import os 
 import numpy as np 
 import nnetsauce as ns
 from sklearn.datasets import load_diabetes
@@ -5,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from time import time
 import matplotlib.pyplot as plt
 
+print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
 diabetes = load_diabetes()
 X = diabetes.data

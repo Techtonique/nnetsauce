@@ -1,4 +1,6 @@
+import copy
 import numpy as np
+import pandas as pd
 import platform
 from jax import device_put
 from scipy import sparse
@@ -28,6 +30,9 @@ def center_response(y):
 # cluster the covariates
 def cluster_covariates(X, n_clusters, seed, type_clust="kmeans", **kwargs):
 
+    if isinstance(X, pd.DataFrame):
+        X = copy.deepcopy(X.values.astype(float))        
+
     if type_clust == "kmeans":
         kmeans = KMeans(n_clusters=n_clusters, random_state=seed, n_init=10, **kwargs)
         kmeans.fit(X)
@@ -42,6 +47,23 @@ def cluster_covariates(X, n_clusters, seed, type_clust="kmeans", **kwargs):
 
         return gmm, gmm.predict(X)
 
+def convert_df_to_numeric(df):
+    """
+    Convert all columns of DataFrame to numeric type using astype with loop.
+    
+    Parameters:
+        df (pd.DataFrame): Input DataFrame with mixed data types.
+        
+    Returns:
+        pd.DataFrame: DataFrame with all columns converted to numeric type.
+    """
+    for column in df.columns:
+        # Attempt to convert the column to numeric type using astype
+        try:
+            df[column] = df[column].astype(float)
+        except ValueError:
+            print(f"Column '{column}' contains non-numeric values.")
+    return df
 
 # computes t(x)%*%y
 def crossprod(x, y=None, backend="cpu"):

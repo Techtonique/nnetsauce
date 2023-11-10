@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
-__version__ = '0.14.0'
+__version__ = '0.15.0'
 
 # get the dependencies and installs
 here = path.abspath(path.dirname(__file__))
@@ -34,7 +34,7 @@ setup(
     description='Quasi-randomized (neural) networks',
     long_description='Quasi-randomized (neural) networks for regression, classification and time series forecasting',
     url='https://techtonique.github.io/nnetsauce/',
-    alias='nnetsauce',
+    #alias='nnetsauce',
     download_url='https://github.com/Techtonique/nnetsauce',
     license='BSD Clause Clear',
     classifiers=[

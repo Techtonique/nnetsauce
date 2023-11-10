@@ -1,6 +1,8 @@
+import os 
 import nnetsauce as ns
 import numpy as np
 
+print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
 tscv = ns.utils.model_selection.TimeSeriesSplit()
 

@@ -1,11 +1,12 @@
 
+import os
 import nnetsauce as ns
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_digits
 from time import time
 
-
+print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
 digits = load_digits()
 X = digits.data

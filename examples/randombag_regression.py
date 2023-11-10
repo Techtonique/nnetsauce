@@ -1,3 +1,4 @@
+import os 
 import numpy as np 
 import nnetsauce as ns
 from sklearn.datasets import fetch_california_housing
@@ -6,6 +7,7 @@ from sklearn.model_selection import train_test_split
 from time import time
 import matplotlib.pyplot as plt
 
+print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
 X, y = fetch_california_housing(return_X_y=True, as_frame=False)
 

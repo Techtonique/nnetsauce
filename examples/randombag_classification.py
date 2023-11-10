@@ -1,3 +1,4 @@
+import os 
 import nnetsauce as ns
 import numpy as np
 from sklearn.datasets import load_breast_cancer, load_wine, load_iris, make_classification
@@ -7,6 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn import metrics
 from time import time
 
+print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
 # dataset no. 1 ---------- 
 

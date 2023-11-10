@@ -63,13 +63,10 @@ coverage: ## check code coverage quickly with the default Python
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate mkdocs
-	 rm -rf docs/sources
-	 make install	 
-	 python3 docs/autogen.py	 
+	cd nnetsauce-docs&&mkdocs build&&cd ..
 
-servedocs: docs ## compile the docs watching for changes
-	cd docs&&mkdocs serve
-	cd ..
+servedocs: docs## compile the docs watching for changes
+	cd nnetsauce-docs&&mkdocs serve&&cd ..
 
 release: dist ## package and upload a release
 	twine upload dist/*
@@ -86,3 +83,6 @@ build-site: docs ## export mkdocs website to a folder
 	cd docs&&mkdocs build
 	cp -rf docs/site/* ../../Pro_Website/Techtonique.github.io/nnetsauce
 	cd ..
+
+run-examples: ## run all examples with one command
+	find examples -maxdepth 2 -name "*.py" -exec  python3 {} \;
