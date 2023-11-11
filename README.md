@@ -62,18 +62,25 @@ make install
 
 ### R 
 
-- __1st method__: From Github, in R console:
+**From GitHub**
 
-```r
-library(devtools)
-devtools::install_github("Techtonique/nnetsauce/R-package")
-library(nnetsauce)
+```bash
+remotes::install_github("Techtonique/nnetsauce_r") # the repo is in this organization
+```
+
+**From R-universe**
+
+```bash
+install.packages('nnetsauce', repos = c('https://techtonique.r-universe.dev',
+'https://cloud.r-project.org'))
 ```
 
 __General rule for using the package in R__:  object accesses with `.`'s are replaced by `$`'s. R Examples can be found in the package, once installed, by typing (in R console):
+
 ```R
 ?nnetsauce::MultitaskClassifier
 ```
+
 For a list of available models, visit [https://techtonique.github.io/nnetsauce/](https://techtonique.github.io/nnetsauce/).
 
 
