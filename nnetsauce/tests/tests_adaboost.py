@@ -28,7 +28,7 @@ class TestAdaBoost(ut.TestCase):
         clf = DecisionTreeClassifier(max_depth=1, random_state=123)
         fit_obj = ns.AdaBoostClassifier(
             clf,
-            n_hidden_features=np.int(11.22338867),
+            n_hidden_features=np.int32(11.22338867),
             direct_link=True,
             n_estimators=5,
             learning_rate=0.01126343,
@@ -46,7 +46,7 @@ class TestAdaBoost(ut.TestCase):
         clf2 = DecisionTreeClassifier(max_depth=1, random_state=123)
         fit_obj2 = ns.AdaBoostClassifier(
             clf2,
-            n_hidden_features=np.int(8.21154785e01),
+            n_hidden_features=np.int32(8.21154785e01),
             direct_link=True,
             n_estimators=5,
             learning_rate=2.96252441e-02,
@@ -64,7 +64,7 @@ class TestAdaBoost(ut.TestCase):
         clf3 = DecisionTreeClassifier(max_depth=1, random_state=123)
         fit_obj3 = ns.AdaBoostClassifier(
             clf3,
-            n_hidden_features=np.int(11.22338867),
+            n_hidden_features=np.int32(11.22338867),
             direct_link=True,
             n_estimators=5,
             learning_rate=0.01126343,
@@ -82,7 +82,7 @@ class TestAdaBoost(ut.TestCase):
         clf4 = DecisionTreeClassifier(max_depth=1, random_state=123)
         fit_obj4 = ns.AdaBoostClassifier(
             clf4,
-            n_hidden_features=np.int(11.22338867),
+            n_hidden_features=np.int32(11.22338867),
             direct_link=True,
             n_estimators=5,
             learning_rate=0.01126343,
@@ -138,7 +138,7 @@ class TestAdaBoost(ut.TestCase):
         clf = LogisticRegression(solver="liblinear", multi_class="ovr")
         fit_obj = ns.AdaBoostClassifier(
             clf,
-            n_hidden_features=np.int(11.22338867),
+            n_hidden_features=np.int32(11.22338867),
             direct_link=True,
             n_estimators=5,
             learning_rate=0.01126343,
@@ -156,7 +156,7 @@ class TestAdaBoost(ut.TestCase):
         clf2 = LogisticRegression(solver="liblinear", multi_class="ovr")
         fit_obj2 = ns.AdaBoostClassifier(
             clf2,
-            n_hidden_features=np.int(8.21154785e01),
+            n_hidden_features=np.int32(8.21154785e01),
             direct_link=True,
             n_estimators=5,
             learning_rate=2.96252441e-02,
@@ -173,7 +173,7 @@ class TestAdaBoost(ut.TestCase):
 
         fit_obj3 = ns.AdaBoostClassifier(
             clf,
-            n_hidden_features=np.int(11.22338867),
+            n_hidden_features=np.int32(11.22338867),
             direct_link=True,
             n_estimators=5,
             learning_rate=0.01126343,

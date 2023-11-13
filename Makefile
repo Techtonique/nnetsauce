@@ -41,20 +41,11 @@ clean-pyc: ## remove Python file artifacts
 	find . -name '*~' -exec rm -f {} +
 	find . -name '__pycache__' -exec rm -fr {} +
 
-clean-test: ## remove test and coverage artifacts
-	rm -fr .tox/
-	rm -f .coverage
-	rm -fr htmlcov/
-	rm -fr .pytest_cache
+clean-test: ## remove test and coverage artifacts	
+	rm -fr htmlcov
 
 lint: ## check style with flake8
 	flake8 nnetsauce tests
-
-test: ## run tests quickly with the default Python
-	python setup.py test
-
-test-all: ## run tests on every Python version with tox
-	tox
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source nnetsauce setup.py test
@@ -86,3 +77,10 @@ build-site: docs ## export mkdocs website to a folder
 
 run-examples: ## run all examples with one command
 	find examples -maxdepth 2 -name "*.py" -exec  python3 {} \;
+
+run-tests: ## run all the tests with one command
+	pip install nose2 coverage	
+	nose2 -v --with-coverage
+	coverage report -m
+	coverage html
+	$(BROWSER) htmlcov/index.html

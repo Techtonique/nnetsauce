@@ -184,7 +184,7 @@ pip install coverage
 ```bash
 git clone https://github.com/Techtonique/nnetsauce.git
 cd nnetsauce
-nose2 --with-coverage
+nose2 -v --with-coverage
 ```
 
 - Obtain coverage reports:

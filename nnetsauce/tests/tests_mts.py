@@ -31,6 +31,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("std", "minmax", "std"),
             activation_name="relu",
             n_clusters=0,
+            show_progress=False
         )
 
         fit_obj2 = ns.MTS(
@@ -42,6 +43,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("std", "minmax", "minmax"),
             activation_name="sigmoid",
             n_clusters=2,
+            show_progress=False
         )
 
         fit_obj3 = ns.MTS(
@@ -53,6 +55,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("minmax", "minmax", "std"),
             activation_name="tanh",
             n_clusters=3,
+            show_progress=False
         )
 
         fit_obj4 = ns.MTS(
@@ -64,6 +67,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("minmax", "minmax", "minmax"),
             activation_name="elu",
             n_clusters=4,
+            show_progress=False
         )
 
         fit_obj5 = ns.MTS(
@@ -76,6 +80,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("minmax", "minmax", "minmax"),
             activation_name="elu",
             n_clusters=4,
+            show_progress=False
         )
 
         fit_obj6 = ns.MTS(
@@ -88,6 +93,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("minmax", "minmax", "minmax"),
             activation_name="elu",
             n_clusters=4,
+            show_progress=False
         )
 
         fit_obj7 = ns.MTS(
@@ -100,6 +106,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("minmax", "minmax", "minmax"),
             activation_name="elu",
             n_clusters=4,
+            show_progress=False
         )
 
         fit_obj8 = ns.MTS(
@@ -112,6 +119,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("minmax", "minmax", "minmax"),
             activation_name="elu",
             n_clusters=4,
+            show_progress=False
         )
 
         fit_obj9 = ns.MTS(
@@ -125,6 +133,7 @@ class TestMTS(ut.TestCase):
             activation_name="elu",
             n_clusters=4,
             cluster_encode=False,
+            show_progress=False
         )
 
         fit_obj10 = ns.MTS(
@@ -138,6 +147,7 @@ class TestMTS(ut.TestCase):
             activation_name="elu",
             n_clusters=4,
             cluster_encode=False,
+            show_progress=False
         )
 
         index_train = range(20)
@@ -184,7 +194,7 @@ class TestMTS(ut.TestCase):
         fit_obj9.fit(X_train)
         preds4 = fit_obj9.predict(return_std=True)
 
-        fit_obj9.fit(X_train[:, 0])
+        fit_obj9.fit(X_train[:, range(0, 1)])
         preds5 = fit_obj9.predict(return_std=True)
 
         fit_obj10.fit(X_train)
@@ -223,6 +233,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("std", "minmax", "std"),
             activation_name="relu",
             n_clusters=0,
+            show_progress=False
         )
 
         fit_obj.set_params(
@@ -249,6 +260,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("std", "minmax", "std"),
             activation_name="relu",
             n_clusters=0,
+            show_progress=False
         )
 
         self.assertTrue(
@@ -264,7 +276,7 @@ class TestMTS(ut.TestCase):
         X[:, 0] = 100 * X[:, 0]
         X[:, 2] = 25 * X[:, 2]
 
-        regr = linear_model.BayesianRidge()
+        regr = linear_model.LinearRegression()
 
         fit_obj = ns.MTS(
             regr,
@@ -275,6 +287,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("std", "minmax", "std"),
             activation_name="relu",
             n_clusters=0,
+            show_progress=False
         )
 
         scores = fit_obj.score(
@@ -288,12 +301,16 @@ class TestMTS(ut.TestCase):
             X, training_index=range(20), testing_index=range(20, 25)
         )
 
-        # self.assertTrue(
-        #     np.allclose([np.round(x) for x in scores], [239.0, 0.0, 85.0])
-        #     & np.allclose(
-        #         [np.round(x, 3) for x in scores2], [15.464, 0.284, 9.22]
-        #     )
-        # )
+        scores3 = fit_obj.score(
+            X, training_index=range(20), testing_index=range(20, 25),
+            scoring="r2",
+        )
+
+        self.assertTrue(
+            np.allclose(np.round(scores), 0)
+            & np.allclose(np.round(scores2), 0)
+            & np.allclose(np.round(scores3), 0)
+        )
 
 
 if __name__ == "__main__":

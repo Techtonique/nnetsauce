@@ -368,7 +368,7 @@ class MTS(Base):
 
         self.residuals_ = np.asarray(residuals_).T
 
-        if self.replications is not None and self.type_pi is "kde":
+        if self.replications != None and self.type_pi == "kde":
             if self.verbose > 0:
                 print(f"\n Simulate residuals using {self.kernel} kernel... \n")
             assert self.kernel in (
@@ -447,7 +447,7 @@ class MTS(Base):
 
         if self.xreg_ is None:  # no external regressors
 
-            if self.kde_ is not None and self.type_pi is "kde":
+            if self.kde_ != None and self.type_pi == "kde":
                 self.residuals_sims_ = tuple(
                     self.kde_.sample(
                         n_samples=h, random_state=self.seed + 100 * i
@@ -705,17 +705,17 @@ class MTS(Base):
             "r2": skm2.r2_score,
         }
 
-        if p > 1:
-            return tuple(
-                [
-                    scoring_options[scoring](
-                        X_test[:, i], preds[:, i], **kwargs
-                    )
-                    for i in range(p)
-                ]
-            )
-        else:
-            return scoring_options[scoring](X_test, preds)
+        # if p > 1:
+        #     return tuple(
+        #         [
+        #             scoring_options[scoring](
+        #                 X_test[:, i], preds[:, i]#, **kwargs
+        #             )
+        #             for i in range(p)
+        #         ]
+        #     )
+        # else:
+        return scoring_options[scoring](X_test, preds)
 
     def plot(self, series):
         """Plot time series forecast 
@@ -755,7 +755,7 @@ class MTS(Base):
         n_points_all = len(y_all)
         n_points_train = self.df_.shape[0]
 
-        if type_graph is "numeric":
+        if type_graph == "numeric":
             x_all = [i for i in range(n_points_all)]
             x_test = [i for i in range(n_points_train, n_points_all)]
         else:  # use dates
