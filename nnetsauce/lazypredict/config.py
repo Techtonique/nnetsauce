@@ -45,7 +45,6 @@ CLASSIFIERS = [
     if (issubclass(est[1], ClassifierMixin) and (est[0] not in removed_classifiers))
 ]
 
-
 MULTITASKCLASSIFIERS = [
     ("Multitask" + est[0], partial(MultitaskClassifier, obj=est[1]()))
     for est in all_estimators()

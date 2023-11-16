@@ -14,7 +14,7 @@ from sklearn.metrics import (
     roc_auc_score,
     f1_score,
 )
-from .config import CLASSIFIERS
+from .config import CLASSIFIERS, MULTITASKCLASSIFIERS
 from ..custom import Custom, CustomClassifier
 
 import warnings
@@ -203,7 +203,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         )
 
         if self.classifiers == "all":
-            self.classifiers = CLASSIFIERS
+            self.classifiers = [item for sublist in [CLASSIFIERS, MULTITASKCLASSIFIERS] for item in sublist]            
         else:
             try:
                 temp_list = []
