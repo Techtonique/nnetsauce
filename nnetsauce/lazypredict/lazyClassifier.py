@@ -16,8 +16,9 @@ from sklearn.metrics import (
     roc_auc_score,
     f1_score,
 )
-from .config import CLASSIFIERS
+from .config import CLASSIFIERS, MULTITASKCLASSIFIERS
 from ..custom import Custom, CustomClassifier
+from ..utils.misc import flatten
 
 import warnings
 
@@ -221,8 +222,11 @@ class LazyClassifier(Custom, ClassifierMixin):
             )
 
         if self.classifiers == "all":
-            self.classifiers = CLASSIFIERS
+
+            self.classifiers = [item for sublist in [CLASSIFIERS, MULTITASKCLASSIFIERS] for item in sublist]            
+
         else:
+
             try:
                 temp_list = []
                 for classifier in self.classifiers:
@@ -236,7 +240,9 @@ class LazyClassifier(Custom, ClassifierMixin):
         if self.preprocess is True:
 
             for name, model in tqdm(self.classifiers):  # do parallel exec
+
                 start = time.time()
+
                 try:
                     if "random_state" in model().get_params().keys():
                         pipe = Pipeline(
@@ -267,7 +273,9 @@ class LazyClassifier(Custom, ClassifierMixin):
                                 ),
                             ]
                         )
+
                     else:
+
                         pipe = Pipeline(
                             [
                                 ("preprocessor", preprocessor),
