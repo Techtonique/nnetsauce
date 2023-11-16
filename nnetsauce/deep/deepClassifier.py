@@ -98,8 +98,6 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         if isinstance(X, np.ndarray):
             X = pd.DataFrame(X)    
 
-        print(f"\nself.stacked_obj: {self.stacked_obj}\n")
-
         # init layer
         self.stacked_obj = CustomClassifier(
             obj=self.stacked_obj,
