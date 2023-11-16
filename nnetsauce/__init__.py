@@ -3,6 +3,7 @@ from .base.baseRegressor import BaseRegressor
 from .boosting.adaBoostClassifier import AdaBoostClassifier
 from .custom.customClassifier import CustomClassifier
 from .custom.customRegressor import CustomRegressor
+from .deep.deepClassifier import DeepClassifier
 from .glm.glmClassifier import GLMClassifier
 from .glm.glmRegressor import GLMRegressor
 from .lazypredict.lazyClassifier import LazyClassifier
@@ -29,6 +30,7 @@ __all__ = [
     "BayesianRVFL2Regressor",
     "CustomClassifier",
     "CustomRegressor",
+    "DeepClassifier",
     "GLMClassifier",
     "GLMRegressor",    
     "LazyClassifier",
