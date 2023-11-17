@@ -14,6 +14,7 @@ from .lazypredict.lazydeepClassifier import LazyDeepClassifier
 from .lazypredict.lazydeepRegressor import LazyDeepRegressor
 from .mts.mts import MTS
 from .multitask.multitaskClassifier import MultitaskClassifier
+from .multitask.simplemultitaskClassifier import SimpleMultitaskClassifier
 from .optimizers.optimizer import Optimizer
 from .randombag.randomBagClassifier import RandomBagClassifier
 from .randombag.randomBagRegressor import RandomBagRegressor
@@ -42,6 +43,7 @@ __all__ = [
     "LazyDeepRegressor",
     "MTS",
     "MultitaskClassifier",
+    "SimpleMultitaskClassifier",
     "Optimizer",
     "RandomBagRegressor",
     "RandomBagClassifier",
