@@ -7,6 +7,7 @@ import sklearn.metrics as skm2
 from .custom import Custom
 from ..utils import matrixops as mo
 from sklearn.base import RegressorMixin
+from functools import partial
 
 
 class CustomRegressor(Custom, RegressorMixin):
@@ -238,7 +239,7 @@ class CustomRegressor(Custom, RegressorMixin):
             preds = preds[0]
 
         if scoring is None:
-            scoring = "neg_mean_squared_error"
+            scoring = "neg_root_mean_squared_error"
 
         # check inputs
         assert scoring in (
@@ -248,9 +249,10 @@ class CustomRegressor(Custom, RegressorMixin):
             "neg_mean_squared_log_error",
             "neg_median_absolute_error",
             "r2",
+            "neg_root_mean_squared_error"
         ), "'scoring' should be in ('explained_variance', 'neg_mean_absolute_error', \
                            'neg_mean_squared_error', 'neg_mean_squared_log_error', \
-                           'neg_median_absolute_error', 'r2')"
+                           'neg_median_absolute_error', 'r2', 'neg_root_mean_squared_error')"
 
         scoring_options = {
             "explained_variance": skm2.explained_variance_score,
@@ -259,6 +261,7 @@ class CustomRegressor(Custom, RegressorMixin):
             "neg_mean_squared_log_error": skm2.mean_squared_log_error,
             "neg_median_absolute_error": skm2.median_absolute_error,
             "r2": skm2.r2_score,
+            "neg_root_mean_squared_error": partial(skm2.mean_squared_error, squared=False)
         }
 
         return scoring_options[scoring](y, preds, **kwargs)
