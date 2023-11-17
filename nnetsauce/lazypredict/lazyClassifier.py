@@ -16,7 +16,7 @@ from sklearn.metrics import (
     roc_auc_score,
     f1_score,
 )
-from .config import CLASSIFIERS, MULTITASKCLASSIFIERS
+from .config import CLASSIFIERS, MULTITASKCLASSIFIERS, SIMPLEMULTITASKCLASSIFIERS
 from ..custom import Custom, CustomClassifier
 from ..utils.misc import flatten
 
@@ -223,7 +223,7 @@ class LazyClassifier(Custom, ClassifierMixin):
 
         if self.classifiers == "all":
 
-            self.classifiers = [item for sublist in [CLASSIFIERS, MULTITASKCLASSIFIERS] for item in sublist]            
+            self.classifiers = [item for sublist in [CLASSIFIERS, MULTITASKCLASSIFIERS, SIMPLEMULTITASKCLASSIFIERS] for item in sublist]            
 
         else:
 
