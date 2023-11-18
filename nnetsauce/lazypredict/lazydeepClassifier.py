@@ -86,6 +86,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         When set to True, the predictions of all the models models are returned as dataframe.
     classifiers : list, optional (default="all")
         When function is provided, trains the chosen classifier(s).
+    n_jobs : int, when possible, run in parallel
 
     Examples
     --------
@@ -110,6 +111,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         predictions=False,
         random_state=42,
         classifiers="all",
+        n_jobs=None,
         # Defining depth
         n_layers=3,
         # CustomClassifier attributes
@@ -138,6 +140,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         self.random_state = random_state
         self.classifiers = classifiers
         self.n_layers = n_layers - 1
+        self.n_jobs = n_jobs
         super().__init__(
             obj=obj,
             n_hidden_features=n_hidden_features,
@@ -282,7 +285,9 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                         seed=self.seed,
                         backend=self.backend))
                     
-                    layer_clf.fit(X_train, y_train)
+                    #layer_clf.fit(X_train, y_train)
+                
+                layer_clf.fit(X_train, y_train)
 
                 self.models[name] = layer_clf
                 y_pred = layer_clf.predict(X_test)

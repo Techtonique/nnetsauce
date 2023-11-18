@@ -144,7 +144,9 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
                 seed=self.seed,
                 backend=self.backend))
             
-            self.stacked_obj.fit(X, y)              
+            #self.stacked_obj.fit(X, y)              
+
+        self.stacked_obj.fit(X, y)              
 
         self.obj = deepcopy(self.stacked_obj)
         

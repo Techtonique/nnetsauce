@@ -89,6 +89,7 @@ class LazyRegressor(Custom, RegressorMixin):
         When set to True, the predictions of all the models models are returned as dataframe.
     regressors : list, optional (default="all")
         When function is provided, trains the chosen regressor(s).
+    n_jobs : int, when possible, run in parallel
 
     Examples
     --------
@@ -120,6 +121,7 @@ class LazyRegressor(Custom, RegressorMixin):
         random_state=42,
         regressors="all",
         preprocess=False,
+        n_jobs=None,
         # CustomRegressor attributes
         obj = None,
         n_hidden_features=5,
@@ -146,6 +148,7 @@ class LazyRegressor(Custom, RegressorMixin):
         self.random_state = random_state
         self.regressors = regressors
         self.preprocess = preprocess
+        self.n_jobs = n_jobs
         super().__init__(
             obj=obj,
             n_hidden_features=n_hidden_features,

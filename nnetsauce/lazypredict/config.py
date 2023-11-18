@@ -10,12 +10,15 @@ removed_classifiers = [
     "ComplementNB",
     "GradientBoostingClassifier",
     "HistGradientBoostingClassifier",
+    #"LogisticRegression", 
+    #"LogisticRegressionCV",
     "MultiOutputClassifier", 
     "MultinomialNB", 
     "OneVsOneClassifier",
     "OneVsRestClassifier",
     "OutputCodeClassifier",
     "RadiusNeighborsClassifier",
+    "StackingClassifier",
     "VotingClassifier",
 ]
 
@@ -36,29 +39,30 @@ removed_regressors = [
     "PLSRegression", 
     "RadiusNeighborsRegressor", 
     "RegressorChain", 
+    "StackingRegressor",
     "VotingRegressor", 
 ]
 
 CLASSIFIERS = [
-    ("Custom" + est[0], est[1])
+    ("CustomClassifier(" + est[0] + ")", est[1])
     for est in all_estimators()
     if (issubclass(est[1], ClassifierMixin) and (est[0] not in removed_classifiers))
 ]
 
 MULTITASKCLASSIFIERS = [
-    ("Multitask" + est[0], partial(MultitaskClassifier, obj=est[1]()))
+    ("MultitaskClassifier(" + est[0] + ")", partial(MultitaskClassifier, obj=est[1]()))
     for est in all_estimators()
     if (issubclass(est[1], RegressorMixin) and (est[0] not in removed_regressors))
 ]
 
 SIMPLEMULTITASKCLASSIFIERS = [
-    ("SimpleMultitask" + est[0], partial(SimpleMultitaskClassifier, obj=est[1]()))
+    ("SimpleMultitaskClassifier(" + est[0] + ")", partial(SimpleMultitaskClassifier, obj=est[1]()))
     for est in all_estimators()
     if (issubclass(est[1], RegressorMixin) and (est[0] not in removed_regressors))
 ]
 
 REGRESSORS = [
-    ("Custom" + est[0], est[1])
+    ("CustomRegressor(" + est[0] + ")", est[1])
     for est in all_estimators()
     if (issubclass(est[1], RegressorMixin) and (est[0] not in removed_regressors))
 ]

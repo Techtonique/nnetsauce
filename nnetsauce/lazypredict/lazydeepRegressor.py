@@ -90,6 +90,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         When set to True, the predictions of all the models models are returned as dataframe.
     regressors : list, optional (default="all")
         When function is provided, trains the chosen regressor(s).
+    n_jobs : int, when possible, run in parallel        
 
     Examples
     --------
@@ -120,6 +121,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         predictions=False,
         random_state=42,
         regressors="all",
+        n_jobs=None,
         # Defining depth
         n_layers=3,        
         # CustomRegressor attributes
@@ -148,6 +150,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         self.random_state = random_state
         self.regressors = regressors
         self.n_layers = n_layers - 1
+        self.n_jobs = n_jobs
         super().__init__(
             obj=obj,
             n_hidden_features=n_hidden_features,
@@ -285,7 +288,9 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                         seed=self.seed,
                         backend=self.backend))
                     
-                    layer_regr.fit(X_train, y_train)
+                    #layer_regr.fit(X_train, y_train)
+                
+                layer_regr.fit(X_train, y_train)
 
                 self.models[name] = layer_regr
                 y_pred = layer_regr.predict(X_test)
