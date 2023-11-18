@@ -1,3 +1,9 @@
+# version 0.16.0
+
+- actually implement _deep_ `Estimator`s in [`/deep`](./nnetsauce/deep/) (in addition to [`/lazypredict`](./nnetsauce/lazypredict/))
+- include new multi-output regression-based classifiers (see [https://thierrymoudiki.github.io/blog/2021/09/26/python/quasirandomizednn/classification-using-regression](https://thierrymoudiki.github.io/blog/2021/09/26/python/quasirandomizednn/classification-using-regression))
+- use proper names for `Estimator`s in [`/lazypredict`](./nnetsauce/lazypredict/)) and [`/deep`](./nnetsauce/deep/)
+
 # version 0.15.0
 
 - lazy predict for classification and regression (see https://thierrymoudiki.github.io/blog/2023/10/22/python/quasirandomizednn/nnetsauce-lazy-predict-preview)

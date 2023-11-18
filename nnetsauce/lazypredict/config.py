@@ -40,7 +40,7 @@ removed_regressors = [
 ]
 
 CLASSIFIERS = [
-    est
+    ("Custom" + est[0], est[1])
     for est in all_estimators()
     if (issubclass(est[1], ClassifierMixin) and (est[0] not in removed_classifiers))
 ]
@@ -58,7 +58,7 @@ SIMPLEMULTITASKCLASSIFIERS = [
 ]
 
 REGRESSORS = [
-    est
+    ("Custom" + est[0], est[1])
     for est in all_estimators()
     if (issubclass(est[1], RegressorMixin) and (est[0] not in removed_regressors))
 ]
