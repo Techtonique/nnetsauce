@@ -29,8 +29,6 @@ obj_MTS = ns.DeepMTS(regr4,
                      kernel='gaussian', 
                      verbose = 1)
 obj_MTS.fit(df)
-
-# with credible intervals
 res1 = obj_MTS.predict() 
 print(res1)
 print("\n")
@@ -61,8 +59,4 @@ print(f" Predictive simulations #1 {obj_MTS2.sims_[0]}")
 print(f" Predictive simulations #2 {obj_MTS2.sims_[1]}") 
 print(f" Predictive simulations #3 {obj_MTS2.sims_[2]}") 
 print("\n\n")
-
-
-
-
 

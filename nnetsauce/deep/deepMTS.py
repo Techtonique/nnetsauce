@@ -415,7 +415,7 @@ class DeepMTS(MTS):
 
         return self
 
-    def predict(self, h=5, level=95, new_xreg=None, **kwargs):
+    def predict(self, h=5, level=95, new_xreg=None):
         """Forecast all the time series, h steps ahead
 
         Parameters:
@@ -461,14 +461,6 @@ class DeepMTS(MTS):
 
         self.alpha_ = 100 - level
 
-        if "return_std" in kwargs:
-            self.return_std_ = True
-            self.preds_std_ = []
-            pi_multiplier = norm.ppf(1 - self.alpha_ / 200)
-            DescribeResult = namedtuple(
-                "DescribeResult", ("mean", "lower", "upper")
-            )  # to be updated
-
         if self.xreg_ is None:  # no external regressors
 
             if self.kde_ != None and self.type_pi == "kde":
@@ -485,24 +477,12 @@ class DeepMTS(MTS):
 
                 new_X = new_obs.reshape(1, n_features)
 
-                cooked_new_X = self.cook_test_set(new_X, **kwargs)
-
-                if "return_std" in kwargs:
-                    self.preds_std_.append(
-                        [
-                            np.asarray(
-                                self.fit_objs_[i].obj.predict(
-                                    cooked_new_X, return_std=True
-                                )[1]
-                            ).item()
-                            for i in range(self.n_series)
-                        ]
-                    )
+                cooked_new_X = self.cook_test_set(new_X)
 
                 predicted_cooked_new_X = np.asarray(
                     [
                         np.asarray(
-                            self.fit_objs_[i].obj.predict(cooked_new_X)
+                            self.fit_objs_[i].predict(cooked_new_X)
                         ).item()
                         for i in range(self.n_series)
                     ]
@@ -557,24 +537,12 @@ class DeepMTS(MTS):
                     (new_obs, new_obs_xreg), axis=None
                 ).reshape(1, -1)
 
-                cooked_new_X = self.cook_test_set(new_X, **kwargs)
-
-                if "return_std" in kwargs:
-                    self.preds_std_.append(
-                        [
-                            np.asarray(
-                                self.fit_objs_[i].obj.predict(
-                                    cooked_new_X, return_std=True
-                                )[1]
-                            ).item()
-                            for i in range(self.n_series)
-                        ]
-                    )
+                cooked_new_X = self.cook_test_set(new_X)
 
                 predicted_cooked_new_X = np.asarray(
                     [
                         np.asarray(
-                            self.fit_objs_[i].obj.predict(cooked_new_X)
+                            self.fit_objs_[i].predict(cooked_new_X)
                         ).item()
                         for i in range(self.n_series)
                     ]
@@ -590,83 +558,56 @@ class DeepMTS(MTS):
             columns=self.df_.columns,
             index=self.output_dates_,
         )
-        if "return_std" not in kwargs:
-            if self.kde_ is None:
-                return self.mean_
+        
+        if self.kde_ is None:
+            return self.mean_
 
-            # if "return_std" not in kwargs and self.kde_ is not None
-            meanf = []
-            lower = []
-            upper = []
-            self.sims_ = tuple(
-                (
-                    self.mean_ + self.residuals_sims_[i]
-                    for i in tqdm(range(self.replications))
-                )
+        # if "return_std" not in kwargs and self.kde_ is not None
+        meanf = []
+        lower = []
+        upper = []
+        self.sims_ = tuple(
+            (
+                self.mean_ + self.residuals_sims_[i]
+                for i in tqdm(range(self.replications))
             )
-            DescribeResult = namedtuple(
-                "DescribeResult", ("mean", "sims", "lower", "upper")
-            )
-            for ix in range(self.n_series):
-                sims_ix = getsims(self.sims_, ix)
-                if self.agg == "mean":
-                    meanf.append(np.mean(sims_ix, axis=1))
-                else:
-                    meanf.append(np.median(sims_ix, axis=1))
-                lower.append(np.quantile(sims_ix, q=self.alpha_ / 200, axis=1))
-                upper.append(
-                    np.quantile(sims_ix, q=1 - self.alpha_ / 200, axis=1)
-                )
-
-            self.mean_ = pd.DataFrame(
-                np.asarray(meanf).T,
-                columns=self.df_.columns,
-                index=self.output_dates_,
-            )
-
-            self.lower_ = pd.DataFrame(
-                np.asarray(lower).T,
-                columns=self.df_.columns,
-                index=self.output_dates_,
-            )
-
-            self.upper_ = pd.DataFrame(
-                np.asarray(upper).T,
-                columns=self.df_.columns,
-                index=self.output_dates_,
-            )
-
-            return DescribeResult(
-                self.mean_, self.sims_, self.lower_, self.upper_
-            )
-
-        # if "return_std" in kwargs
-        DescribeResult = namedtuple(
-            "DescribeResult", ("mean", "lower", "upper")
         )
+        DescribeResult = namedtuple(
+            "DescribeResult", ("mean", "sims", "lower", "upper")
+        )
+        for ix in range(self.n_series):
+            sims_ix = getsims(self.sims_, ix)
+            if self.agg == "mean":
+                meanf.append(np.mean(sims_ix, axis=1))
+            else:
+                meanf.append(np.median(sims_ix, axis=1))
+            lower.append(np.quantile(sims_ix, q=self.alpha_ / 200, axis=1))
+            upper.append(
+                np.quantile(sims_ix, q=1 - self.alpha_ / 200, axis=1)
+            )
 
         self.mean_ = pd.DataFrame(
-            np.asarray(self.mean_),
+            np.asarray(meanf).T,
             columns=self.df_.columns,
             index=self.output_dates_,
         )
 
-        self.preds_std_ = np.asarray(self.preds_std_)
-
         self.lower_ = pd.DataFrame(
-            self.mean_.values - pi_multiplier * self.preds_std_,
+            np.asarray(lower).T,
             columns=self.df_.columns,
             index=self.output_dates_,
         )
 
         self.upper_ = pd.DataFrame(
-            self.mean_.values + pi_multiplier * self.preds_std_,
+            np.asarray(upper).T,
             columns=self.df_.columns,
             index=self.output_dates_,
         )
 
-        return DescribeResult(self.mean_, self.lower_, self.upper_)
-
+        return DescribeResult(
+            self.mean_, self.sims_, self.lower_, self.upper_
+        )
+        
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):
         """ Train on training_index, score on testing_index. """
 
