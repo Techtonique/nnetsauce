@@ -5,6 +5,7 @@ from .custom.customClassifier import CustomClassifier
 from .custom.customRegressor import CustomRegressor
 from .deep.deepClassifier import DeepClassifier
 from .deep.deepRegressor import DeepRegressor
+from .deep.deepMTS import DeepMTS
 from .glm.glmClassifier import GLMClassifier
 from .glm.glmRegressor import GLMRegressor
 from .lazypredict.lazyClassifier import LazyClassifier
@@ -34,6 +35,7 @@ __all__ = [
     "CustomRegressor",
     "DeepClassifier",
     "DeepRegressor",
+    "DeepMTS",
     "GLMClassifier",
     "GLMRegressor",    
     "LazyClassifier",
