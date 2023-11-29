@@ -31,7 +31,7 @@ removed_regressors = [
     "GradientBoostingRegressor",
     "HistGradientBoostingRegressor",
     "IsotonicRegression", 
-    "StackingRegressor",
+    "KernelRidge",    
     "MultiOutputRegressor", 
     "MultiTaskElasticNet", 
     "MultiTaskElasticNetCV", 
@@ -42,6 +42,7 @@ removed_regressors = [
     "RadiusNeighborsRegressor", 
     "RegressorChain", 
     "StackingRegressor",
+    "SVR",
     "VotingRegressor", 
 ]
 
