@@ -37,6 +37,8 @@ removed_regressors = [
     "MultiTaskElasticNetCV", 
     "MultiTaskLasso", 
     "MultiTaskLassoCV", 
+    "OrthogonalMatchingPursuit",
+    "OrthogonalMatchingPursuitCV",
     "PLSCanonical", 
     "PLSRegression", 
     "RadiusNeighborsRegressor", 
