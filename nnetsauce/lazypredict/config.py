@@ -8,6 +8,7 @@ from ..multitask import MultitaskClassifier, SimpleMultitaskClassifier
 removed_classifiers = [
     "ClassifierChain",
     "ComplementNB",
+    "GaussianProcessClassifier",
     "GradientBoostingClassifier",
     "HistGradientBoostingClassifier",
     #"LogisticRegression", 
@@ -26,6 +27,7 @@ removed_regressors = [
     "TheilSenRegressor",
     "ARDRegression", 
     "CCA", 
+    "GaussianProcessRegressor",
     "GradientBoostingRegressor",
     "HistGradientBoostingRegressor",
     "IsotonicRegression", 
