@@ -500,7 +500,7 @@ class LazyClassifier(Custom, ClassifierMixin):
                 }
             )
         scores = scores.sort_values(
-            by="Balanced Accuracy", ascending=False
+            by="Accuracy", ascending=False
         ).set_index("Model")
 
         if self.predictions:
