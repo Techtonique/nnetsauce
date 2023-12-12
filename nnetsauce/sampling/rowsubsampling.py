@@ -13,13 +13,18 @@ class SubSampler:
 
        seed: int
            reproductibility seed
+    
+    Returns:
+
+        indices of subsampled y
 
     """
-
     def __init__(self, y, row_sample=0.8, seed=123):
         self.y = y
         self.row_sample = row_sample
         self.seed = seed
+        self.indices = None 
 
     def subsample(self):
-        return dosubsample(self.y, self.row_sample, self.seed)
+        self.indices = dosubsample(self.y, self.row_sample, self.seed)
+        return self.indices

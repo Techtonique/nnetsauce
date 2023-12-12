@@ -3,6 +3,7 @@
 - actually implement _deep_ `Estimator`s in [`/deep`](./nnetsauce/deep/) (in addition to [`/lazypredict`](./nnetsauce/lazypredict/))
 - include new multi-output regression-based classifiers (see [https://thierrymoudiki.github.io/blog/2021/09/26/python/quasirandomizednn/classification-using-regression](https://thierrymoudiki.github.io/blog/2021/09/26/python/quasirandomizednn/classification-using-regression) for more details)
 - use proper names for `Estimator`s in [`/lazypredict`](./nnetsauce/lazypredict/)) and [`/deep`](./nnetsauce/deep/)
+- expose `SubSampler` (stratified subsampling) to the external API 
 
 # version 0.15.0
 

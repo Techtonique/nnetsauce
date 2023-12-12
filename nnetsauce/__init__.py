@@ -24,6 +24,7 @@ from .ridge2.ridge2Regressor import Ridge2Regressor
 from .ridge2.ridge2MultitaskClassifier import Ridge2MultitaskClassifier
 from .rvfl.bayesianrvflRegressor import BayesianRVFLRegressor
 from .rvfl.bayesianrvfl2Regressor import BayesianRVFL2Regressor
+from .sampling import SubSampler
 
 __all__ = [
     "AdaBoostClassifier",
@@ -51,5 +52,6 @@ __all__ = [
     "RandomBagClassifier",
     "Ridge2Regressor",
     "Ridge2Classifier",
-    "Ridge2MultitaskClassifier"
+    "Ridge2MultitaskClassifier",
+    "SubSampler"
 ]
