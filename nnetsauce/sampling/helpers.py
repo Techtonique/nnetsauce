@@ -5,6 +5,7 @@
 
 import numpy as np
 from ..utils.misc import flatten, is_factor
+from tqdm import tqdm 
 
 def dosubsample(y, row_sample=0.8, seed=123):
         
@@ -25,7 +26,8 @@ def dosubsample(y, row_sample=0.8, seed=123):
         y_as_classes = y.copy()
         freqs_hist = np.zeros_like(n_elem_classes, dtype=float)
         
-        for i in range(len(n_elem_classes)):
+        print(f"creating breaks...")
+        for i in tqdm(range(len(n_elem_classes))):
             freqs_hist[i] = float(n_elem_classes[i]) / n_obs
 
     else: # regression
@@ -34,7 +36,8 @@ def dosubsample(y, row_sample=0.8, seed=123):
         n_elem_classes = np.asarray(h[0], dtype=np.integer)
         freqs_hist = np.zeros_like(n_elem_classes, dtype=float)
         
-        for i in range(len(n_elem_classes)):
+        print(f"creating breaks...")
+        for i in tqdm(range(len(n_elem_classes))):
             freqs_hist[i] = float(n_elem_classes[i]) / n_obs
         
         breaks = h[1]
@@ -44,14 +47,15 @@ def dosubsample(y, row_sample=0.8, seed=123):
         n_classes = n_breaks_1
         y_as_classes = np.zeros_like(y, dtype=int)
 
-        for i in classes:
+        for i in tqdm(classes):
             y_as_classes[(y > breaks[i]) * (y <= breaks[i + 1])] = int(i)
 
     # main loop ----
 
     np.random.seed(seed)
 
-    for i in range(n_classes):
+    print(f"main loop...")
+    for i in tqdm(range(n_classes)):
 
         bool_class_i = (y_as_classes == classes[i])               
 
