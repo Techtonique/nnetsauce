@@ -27,7 +27,7 @@ def dosubsample(y, row_sample=0.8, seed=123):
         freqs_hist = np.zeros_like(n_elem_classes, dtype=float)
         
         print(f"creating breaks...")
-        for i in tqdm(range(len(n_elem_classes))):
+        for i in range(len(n_elem_classes)):
             freqs_hist[i] = float(n_elem_classes[i]) / n_obs
 
     else: # regression
@@ -37,7 +37,7 @@ def dosubsample(y, row_sample=0.8, seed=123):
         freqs_hist = np.zeros_like(n_elem_classes, dtype=float)
         
         print(f"creating breaks...")
-        for i in tqdm(range(len(n_elem_classes))):
+        for i in range(len(n_elem_classes)):
             freqs_hist[i] = float(n_elem_classes[i]) / n_obs
         
         breaks = h[1]
@@ -47,7 +47,7 @@ def dosubsample(y, row_sample=0.8, seed=123):
         n_classes = n_breaks_1
         y_as_classes = np.zeros_like(y, dtype=int)
 
-        for i in tqdm(classes):
+        for i in classes:
             y_as_classes[(y > breaks[i]) * (y <= breaks[i + 1])] = int(i)
 
     # main loop ----
