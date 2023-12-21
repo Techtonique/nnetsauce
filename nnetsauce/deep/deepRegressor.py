@@ -76,7 +76,7 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
             backend=backend,
         )
 
-        assert n_layers >= 2, "must n_layers >= 2"
+        assert n_layers >= 2, "must have n_layers >= 2"
 
         self.stacked_obj = obj 
         self.verbose = verbose                
