@@ -76,9 +76,11 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
             backend=backend,
         )
 
+        assert n_layers >= 2, "must n_layers >= 2"
+
         self.stacked_obj = obj 
         self.verbose = verbose                
-        self.n_layers = n_layers - 1                       
+        self.n_layers = n_layers                       
 
     def fit(self, X, y):
         """Fit Regression algorithms to X and y.
@@ -121,9 +123,9 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
         self.stacked_obj.fit(X, y)
 
         if self.verbose > 0:
-            iterator = tqdm(range(self.n_layers))
+            iterator = tqdm(range(self.n_layers - 1))
         else: 
-            iterator = range(self.n_layers)
+            iterator = range(self.n_layers - 1)
 
         for _ in iterator:
 
