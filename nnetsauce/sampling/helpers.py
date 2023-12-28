@@ -7,7 +7,7 @@ import numpy as np
 from ..utils.misc import flatten, is_factor
 from tqdm import tqdm 
 
-def dosubsample(y, row_sample=0.8, seed=123):
+def dosubsample(y, row_sample=0.8, seed=123, n_jobs=None):
         
     index = []
 
@@ -27,8 +27,11 @@ def dosubsample(y, row_sample=0.8, seed=123):
         freqs_hist = np.zeros_like(n_elem_classes, dtype=float)
         
         print(f"creating breaks...")
-        for i in range(len(n_elem_classes)):
-            freqs_hist[i] = float(n_elem_classes[i]) / n_obs
+        if n_jobs is None: 
+            for i in range(len(n_elem_classes)):
+                freqs_hist[i] = float(n_elem_classes[i]) / n_obs
+        else:
+            pass 
 
     else: # regression
 
@@ -37,8 +40,11 @@ def dosubsample(y, row_sample=0.8, seed=123):
         freqs_hist = np.zeros_like(n_elem_classes, dtype=float)
         
         print(f"creating breaks...")
-        for i in range(len(n_elem_classes)):
-            freqs_hist[i] = float(n_elem_classes[i]) / n_obs
+        if n_jobs is None:
+            for i in range(len(n_elem_classes)):
+                freqs_hist[i] = float(n_elem_classes[i]) / n_obs
+        else:
+            pass 
         
         breaks = h[1]
 
@@ -47,41 +53,47 @@ def dosubsample(y, row_sample=0.8, seed=123):
         n_classes = n_breaks_1
         y_as_classes = np.zeros_like(y, dtype=int)
 
-        for i in classes:
-            y_as_classes[(y > breaks[i]) * (y <= breaks[i + 1])] = int(i)
+        if n_jobs is None:
+            for i in classes:
+                y_as_classes[(y > breaks[i]) * (y <= breaks[i + 1])] = int(i)
+        else:
+            pass 
 
     # main loop ----
 
     np.random.seed(seed)
 
     print(f"main loop...")
-    for i in tqdm(range(n_classes)):
+    if n_jobs is None:
+        for i in tqdm(range(n_classes)):
 
-        bool_class_i = (y_as_classes == classes[i])               
+            bool_class_i = (y_as_classes == classes[i])               
 
-        # index_class_i = [i for i, e in enumerate(bool_class_i) if e == True]
-        index_class_i = np.asarray(np.where(bool_class_i == True)[0], dtype=np.integer)
+            # index_class_i = [i for i, e in enumerate(bool_class_i) if e == True]
+            index_class_i = np.asarray(np.where(bool_class_i == True)[0], dtype=np.integer)
 
-        if np.sum(bool_class_i) > 1:  # at least 2 elements in class  #i
+            if np.sum(bool_class_i) > 1:  # at least 2 elements in class  #i
 
-            index.append(
-                np.random.choice(
-                    index_class_i,
-                    size=int(n_obs_out * freqs_hist[i]),  # output size
-                    replace=True,
-                ).tolist()
-            )
+                index.append(
+                    np.random.choice(
+                        index_class_i,
+                        size=int(n_obs_out * freqs_hist[i]),  # output size
+                        replace=True,
+                    ).tolist()
+                )
 
-        else:  # only one element in class
+            else:  # only one element in class
 
-            try:
+                try:
 
-                index.append(index_class_i[0])
+                    index.append(index_class_i[0])
 
-            except:
+                except:
 
-                0
-
+                    0
+    else:
+        pass 
+    
     try:
         return np.asarray(flatten(index))
     except:
