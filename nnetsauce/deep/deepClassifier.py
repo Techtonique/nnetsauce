@@ -19,7 +19,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
 
     Examples
     --------
-    >>> import nnetsauce as ns 
+    >>> import nnetsauce as ns
     >>> from sklearn.datasets import load_breast_cancer
     >>> from sklearn.model_selection import train_test_split
     >>> from sklearn.linear_model import LogisticRegressionCV
@@ -36,10 +36,10 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
     def __init__(
         self,
         obj,
-        verbose=0,        
+        verbose=0,
         # Defining depth
         n_layers=3,
-        # CustomClassifier attributes        
+        # CustomClassifier attributes
         n_hidden_features=5,
         activation_name="relu",
         a=0.01,
@@ -55,8 +55,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         row_sample=1,
         seed=123,
         backend="cpu",
-    ):        
-
+    ):
         super().__init__(
             obj=obj,
             n_hidden_features=n_hidden_features,
@@ -78,9 +77,9 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
 
         assert n_layers >= 2, "must have n_layers >= 2"
 
-        self.stacked_obj = obj 
-        self.verbose = verbose                
-        self.n_layers = n_layers                     
+        self.stacked_obj = obj
+        self.verbose = verbose
+        self.n_layers = n_layers
 
     def fit(self, X, y):
         """Fit Classification algorithms to X and y.
@@ -98,7 +97,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         """
 
         if isinstance(X, np.ndarray):
-            X = pd.DataFrame(X)    
+            X = pd.DataFrame(X)
 
         # init layer
         self.stacked_obj = CustomClassifier(
@@ -124,41 +123,44 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
 
         if self.verbose > 0:
             iterator = tqdm(range(self.n_layers - 1))
-        else: 
+        else:
             iterator = range(self.n_layers - 1)
 
         for _ in iterator:
+            self.stacked_obj = deepcopy(
+                CustomClassifier(
+                    obj=self.stacked_obj,
+                    n_hidden_features=self.n_hidden_features,
+                    activation_name=self.activation_name,
+                    a=self.a,
+                    nodes_sim=self.nodes_sim,
+                    bias=self.bias,
+                    dropout=self.dropout,
+                    direct_link=self.direct_link,
+                    n_clusters=self.n_clusters,
+                    cluster_encode=self.cluster_encode,
+                    type_clust=self.type_clust,
+                    type_scaling=self.type_scaling,
+                    col_sample=self.col_sample,
+                    row_sample=self.row_sample,
+                    seed=self.seed,
+                    backend=self.backend,
+                )
+            )
 
-            self.stacked_obj = deepcopy(CustomClassifier(obj=self.stacked_obj,
-                n_hidden_features=self.n_hidden_features,
-                activation_name=self.activation_name,
-                a=self.a,
-                nodes_sim=self.nodes_sim,
-                bias=self.bias,
-                dropout=self.dropout,
-                direct_link=self.direct_link,
-                n_clusters=self.n_clusters,
-                cluster_encode=self.cluster_encode,
-                type_clust=self.type_clust,
-                type_scaling=self.type_scaling,
-                col_sample=self.col_sample,
-                row_sample=self.row_sample,
-                seed=self.seed,
-                backend=self.backend))
-            
-            #self.stacked_obj.fit(X, y)              
-        
-        self.stacked_obj.fit(X, y)              
+            # self.stacked_obj.fit(X, y)
+
+        self.stacked_obj.fit(X, y)
 
         self.obj = deepcopy(self.stacked_obj)
-        
+
         return self.obj
 
     def predict(self, X):
-        return(self.obj.predict(X))
+        return self.obj.predict(X)
 
     def predict_proba(self, X):
-        return(self.obj.predict_proba(X))
+        return self.obj.predict_proba(X)
 
     def score(self, X, y, scoring=None):
-        return(self.obj.score(X, y, scoring))
+        return self.obj.score(X, y, scoring)

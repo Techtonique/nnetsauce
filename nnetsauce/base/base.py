@@ -2,7 +2,7 @@
 #
 # License: BSD 3 Clear
 
-import copy 
+import copy
 import numpy as np
 import pandas as pd
 import platform
@@ -110,7 +110,6 @@ class Base(BaseEstimator):
         seed=123,
         backend="cpu",
     ):
-
         # input checks -----
 
         sys_platform = platform.system()
@@ -238,18 +237,17 @@ class Base(BaseEstimator):
 
             Clusters' matrix, one-hot encoded: {array-like}
 
-        """        
+        """
 
         np.random.seed(self.seed)
 
         if X is None:
             X = self.X_
-        
+
         if isinstance(X, pd.DataFrame):
             X = copy.deepcopy(X.values.astype(float))
 
         if predict is False:  # encode training set
-
             # scale input data before clustering
             self.clustering_scaler_, scaled_X = mo.scale_covariates(
                 X, choice=self.type_scaling[2]
@@ -264,8 +262,9 @@ class Base(BaseEstimator):
             )
 
             if self.cluster_encode == True:
-
-                return mo.one_hot_encode(X_clustered, self.n_clusters).astype(np.float16)
+                return mo.one_hot_encode(X_clustered, self.n_clusters).astype(
+                    np.float16
+                )
 
             return X_clustered.astype(np.float16)
 
@@ -275,8 +274,9 @@ class Base(BaseEstimator):
         )
 
         if self.cluster_encode == True:
-
-            return mo.one_hot_encode(X_clustered, self.n_clusters).astype(np.float16)
+            return mo.one_hot_encode(X_clustered, self.n_clusters).astype(
+                np.float16
+            )
 
         return X_clustered.astype(np.float16)
 
@@ -308,33 +308,31 @@ class Base(BaseEstimator):
         #     }
 
         if self.bias is False:  # no bias term in the hidden layer
-
             if W is None:
-                
                 if self.nodes_sim == "sobol":
                     self.W_ = generate_sobol(
-                            n_dims=n_features, 
-                            n_points=self.n_hidden_features,
-                            seed=self.seed
-                        ) 
+                        n_dims=n_features,
+                        n_points=self.n_hidden_features,
+                        seed=self.seed,
+                    )
                 elif self.nodes_sim == "hammersley":
                     self.W_ = generate_hammersley(
-                            n_dims=n_features, 
-                            n_points=self.n_hidden_features,
-                            seed=self.seed
-                        )
+                        n_dims=n_features,
+                        n_points=self.n_hidden_features,
+                        seed=self.seed,
+                    )
                 elif self.nodes_sim == "uniform":
                     self.W_ = generate_uniform(
-                            n_dims=n_features,
-                            n_points=self.n_hidden_features,
-                            seed=self.seed
-                        )
-                else: 
+                        n_dims=n_features,
+                        n_points=self.n_hidden_features,
+                        seed=self.seed,
+                    )
+                else:
                     self.W_ = generate_halton(
-                            n_dims=n_features, 
-                            n_points=self.n_hidden_features,
-                            seed=self.seed
-                        ) 
+                        n_dims=n_features,
+                        n_points=self.n_hidden_features,
+                        seed=self.seed,
+                    )
 
                 # self.W_ = hash_sim[self.nodes_sim](
                 #             n_dims=n_features,
@@ -372,33 +370,32 @@ class Base(BaseEstimator):
 
         # with bias term in the hidden layer
         if W is None:
-
             n_features_1 = n_features + 1
 
             if self.nodes_sim == "sobol":
                 self.W_ = generate_sobol(
-                        n_dims=n_features_1, 
-                        n_points=self.n_hidden_features,
-                        seed=self.seed
-                    ) 
+                    n_dims=n_features_1,
+                    n_points=self.n_hidden_features,
+                    seed=self.seed,
+                )
             elif self.nodes_sim == "hammersley":
                 self.W_ = generate_hammersley(
-                        n_dims=n_features_1, 
-                        n_points=self.n_hidden_features,
-                        seed=self.seed
-                    )
+                    n_dims=n_features_1,
+                    n_points=self.n_hidden_features,
+                    seed=self.seed,
+                )
             elif self.nodes_sim == "uniform":
                 self.W_ = generate_uniform(
-                        n_dims=n_features_1,
-                        n_points=self.n_hidden_features,
-                        seed=self.seed,
-                    )
+                    n_dims=n_features_1,
+                    n_points=self.n_hidden_features,
+                    seed=self.seed,
+                )
             else:
                 self.W_ = generate_halton(
-                        n_dims=n_features_1, 
-                        n_points=self.n_hidden_features,
-                        seed=self.seed
-                    ) 
+                    n_dims=n_features_1,
+                    n_points=self.n_hidden_features,
+                    seed=self.seed,
+                )
 
             # self.W_ = hash_sim[self.nodes_sim](
             #         n_dims=n_features_1,
@@ -469,7 +466,6 @@ class Base(BaseEstimator):
             ), "must have len(self.type_scaling) >= 2 when self.n_hidden_features > 0"
 
         if X is None:
-                        
             if self.col_sample == 1:
                 input_X = self.X_
             else:
@@ -486,7 +482,6 @@ class Base(BaseEstimator):
                 input_X = self.X_[:, self.index_col_]
 
         else:  # X is not None # keep X vs self.X_
-
             if isinstance(X, pd.DataFrame):
                 X = copy.deepcopy(X.values.astype(float))
 
@@ -561,7 +556,7 @@ class Base(BaseEstimator):
                 )
 
         # Returning model inputs -----
-        if mx.is_factor(y) is False:  # regression            
+        if mx.is_factor(y) is False:  # regression
             # center y
             if y is None:
                 self.y_mean_, centered_y = mo.center_response(self.y_)
@@ -570,7 +565,6 @@ class Base(BaseEstimator):
 
             # y is subsampled
             if self.row_sample < 1:
-
                 n, p = Z.shape
 
                 self.subsampler_ = (
@@ -600,7 +594,6 @@ class Base(BaseEstimator):
         # classification
         # y is subsampled
         if self.row_sample < 1:
-
             n, p = Z.shape
 
             self.subsampler_ = (

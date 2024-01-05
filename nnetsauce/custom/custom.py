@@ -95,7 +95,6 @@ class Custom(Base):
         seed=123,
         backend="cpu",
     ):
-
         super().__init__(
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,

@@ -71,25 +71,25 @@ class MTS(Base):
 
         lags: int.
             number of lags used for each time series.
-        
+
         replications: int.
             number of replications (if needed, for predictive simulation). Default is 'None'.
 
         kernel: str.
             the kernel to use for residuals density estimation (used for predictive simulation). Currently, either 'gaussian' or 'tophat'.
-        
+
         agg: str.
             either "mean" or "median" for simulation of bootstrap aggregating
-        
+
         seed: int.
             reproducibility seed for nodes_sim=='uniform' or predictive simulation.
 
         backend: str.
             "cpu" or "gpu" or "tpu".
-        
+
         verbose: int.
             0: not printing; 1: printing
-        
+
         show_progress: bool.
             True: progress bar when fitting each series; False: no progress bar when fitting each series
 
@@ -203,7 +203,6 @@ class MTS(Base):
         verbose=0,
         show_progress=True,
     ):
-
         assert int(lags) == lags, "parameter 'lags' should be an integer"
 
         super().__init__(
@@ -320,7 +319,6 @@ class MTS(Base):
         self.X_ = mts_input[1]
 
         if xreg is not None:
-
             if isinstance(xreg, pd.DataFrame):
                 xreg = xreg.values
 
@@ -338,7 +336,6 @@ class MTS(Base):
             )
 
         else:  # xreg is None
-
             # avoids scaling X p times in the loop
             dummy_y, scaled_Z = self.cook_training_set(y=rep_1_n, X=self.X_)
 
@@ -446,7 +443,6 @@ class MTS(Base):
             )  # to be updated
 
         if self.xreg_ is None:  # no external regressors
-
             if self.kde_ != None and self.type_pi == "kde":
                 self.residuals_sims_ = tuple(
                     self.kde_.sample(
@@ -456,7 +452,6 @@ class MTS(Base):
                 )
 
             for _ in range(h):
-
                 new_obs = ts.reformat_response(self.mean_, self.lags)
 
                 new_X = new_obs.reshape(1, n_features)
@@ -489,7 +484,6 @@ class MTS(Base):
                 self.mean_ = mo.rbind(preds, self.mean_)
 
         else:  # if self.xreg_ is not None: # with external regressors
-
             assert (
                 new_xreg is not None
             ), "'new_xreg' must be provided to predict()"
@@ -524,7 +518,6 @@ class MTS(Base):
             inv_new_xreg = mo.rbind(self.xreg_, new_xreg)[::-1]
 
             for _ in range(h):
-
                 new_obs = ts.reformat_response(self.mean_, self.lags)
 
                 new_obs_xreg = ts.reformat_response(inv_new_xreg, self.lags)
@@ -644,7 +637,7 @@ class MTS(Base):
         return DescribeResult(self.mean_, self.lower_, self.upper_)
 
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):
-        """ Train on training_index, score on testing_index. """
+        """Train on training_index, score on testing_index."""
 
         assert (
             bool(set(training_index).intersection(set(testing_index))) == False
@@ -718,12 +711,12 @@ class MTS(Base):
         return scoring_options[scoring](X_test, preds)
 
     def plot(self, series):
-        """Plot time series forecast 
+        """Plot time series forecast
 
         Parameters:
 
             series: {integer} or {string}
-                series index or name 
+                series index or name
         """
 
         type_graph = "dates"  # not clean, stabilize this in future releases

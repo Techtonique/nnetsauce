@@ -14,7 +14,7 @@ from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
 from tqdm import tqdm
 from ..base import Base
-from ..mts import MTS 
+from ..mts import MTS
 from ..conformal import SPCI_and_EnbPI
 from ..simulation import getsims
 from ..utils import matrixops as mo
@@ -73,25 +73,25 @@ class DeepMTS(MTS):
 
         lags: int.
             number of lags used for each time series.
-        
+
         replications: int.
             number of replications (if needed, for predictive simulation). Default is 'None'.
 
         kernel: str.
             the kernel to use for residuals density estimation (used for predictive simulation). Currently, either 'gaussian' or 'tophat'.
-        
+
         agg: str.
             either "mean" or "median" for simulation of bootstrap aggregating
-        
+
         seed: int.
             reproducibility seed for nodes_sim=='uniform' or predictive simulation.
 
         backend: str.
             "cpu" or "gpu" or "tpu".
-        
+
         verbose: int.
             0: not printing; 1: printing
-        
+
         show_progress: bool.
             True: progress bar when fitting each series; False: no progress bar when fitting each series
 
@@ -184,7 +184,7 @@ class DeepMTS(MTS):
     def __init__(
         self,
         obj,
-        verbose=0,        
+        verbose=0,
         # Defining depth
         n_layers=3,
         n_hidden_features=5,
@@ -207,7 +207,6 @@ class DeepMTS(MTS):
         backend="cpu",
         show_progress=True,
     ):
-
         assert int(lags) == lags, "parameter 'lags' should be an integer"
 
         super().__init__(
@@ -228,7 +227,7 @@ class DeepMTS(MTS):
         )
 
         self.n_layers = n_layers
-        self.obj = obj        
+        self.obj = obj
         self.n_series = None
         self.lags = lags
         self.type_pi = type_pi
@@ -239,24 +238,26 @@ class DeepMTS(MTS):
         self.show_progress = show_progress
         self.series_names = None
         self.input_dates = None
-        self.deepobj = DeepRegressor(obj=self.obj, 
-                                     verbose=0,        
-                                    # Defining depth
-                                    n_layers=self.n_layers,
-                                    # CustomRegressor attributes        
-                                    n_hidden_features=self.n_hidden_features,
-                                    activation_name=self.activation_name,
-                                    a=self.a,
-                                    nodes_sim=self.nodes_sim,
-                                    bias=self.bias,
-                                    dropout=self.dropout,
-                                    direct_link=self.direct_link,
-                                    n_clusters=self.n_clusters,
-                                    cluster_encode=self.cluster_encode,
-                                    type_clust=self.type_clust,
-                                    type_scaling=self.type_scaling,
-                                    seed=self.seed,
-                                    backend=self.backend)
+        self.deepobj = DeepRegressor(
+            obj=self.obj,
+            verbose=0,
+            # Defining depth
+            n_layers=self.n_layers,
+            # CustomRegressor attributes
+            n_hidden_features=self.n_hidden_features,
+            activation_name=self.activation_name,
+            a=self.a,
+            nodes_sim=self.nodes_sim,
+            bias=self.bias,
+            dropout=self.dropout,
+            direct_link=self.direct_link,
+            n_clusters=self.n_clusters,
+            cluster_encode=self.cluster_encode,
+            type_clust=self.type_clust,
+            type_scaling=self.type_scaling,
+            seed=self.seed,
+            backend=self.backend,
+        )
         self.fit_objs_ = {}
         self.y_ = None  # MTS responses (most recent observations first)
         self.X_ = None  # MTS lags
@@ -344,7 +345,6 @@ class DeepMTS(MTS):
         self.X_ = mts_input[1]
 
         if xreg is not None:
-
             if isinstance(xreg, pd.DataFrame):
                 xreg = xreg.values
 
@@ -362,7 +362,6 @@ class DeepMTS(MTS):
             )
 
         else:  # xreg is None
-
             # avoids scaling X p times in the loop
             dummy_y, scaled_Z = self.cook_training_set(y=rep_1_n, X=self.X_)
 
@@ -462,7 +461,6 @@ class DeepMTS(MTS):
         self.alpha_ = 100 - level
 
         if self.xreg_ is None:  # no external regressors
-
             if self.kde_ != None and self.type_pi == "kde":
                 self.residuals_sims_ = tuple(
                     self.kde_.sample(
@@ -472,7 +470,6 @@ class DeepMTS(MTS):
                 )
 
             for _ in range(h):
-
                 new_obs = ts.reformat_response(self.mean_, self.lags)
 
                 new_X = new_obs.reshape(1, n_features)
@@ -493,7 +490,6 @@ class DeepMTS(MTS):
                 self.mean_ = mo.rbind(preds, self.mean_)
 
         else:  # if self.xreg_ is not None: # with external regressors
-
             assert (
                 new_xreg is not None
             ), "'new_xreg' must be provided to predict()"
@@ -528,7 +524,6 @@ class DeepMTS(MTS):
             inv_new_xreg = mo.rbind(self.xreg_, new_xreg)[::-1]
 
             for _ in range(h):
-
                 new_obs = ts.reformat_response(self.mean_, self.lags)
 
                 new_obs_xreg = ts.reformat_response(inv_new_xreg, self.lags)
@@ -558,7 +553,7 @@ class DeepMTS(MTS):
             columns=self.df_.columns,
             index=self.output_dates_,
         )
-        
+
         if self.kde_ is None:
             return self.mean_
 
@@ -582,9 +577,7 @@ class DeepMTS(MTS):
             else:
                 meanf.append(np.median(sims_ix, axis=1))
             lower.append(np.quantile(sims_ix, q=self.alpha_ / 200, axis=1))
-            upper.append(
-                np.quantile(sims_ix, q=1 - self.alpha_ / 200, axis=1)
-            )
+            upper.append(np.quantile(sims_ix, q=1 - self.alpha_ / 200, axis=1))
 
         self.mean_ = pd.DataFrame(
             np.asarray(meanf).T,
@@ -604,12 +597,10 @@ class DeepMTS(MTS):
             index=self.output_dates_,
         )
 
-        return DescribeResult(
-            self.mean_, self.sims_, self.lower_, self.upper_
-        )
-        
+        return DescribeResult(self.mean_, self.sims_, self.lower_, self.upper_)
+
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):
-        """ Train on training_index, score on testing_index. """
+        """Train on training_index, score on testing_index."""
 
         assert (
             bool(set(training_index).intersection(set(testing_index))) == False
@@ -683,12 +674,12 @@ class DeepMTS(MTS):
         return scoring_options[scoring](X_test, preds)
 
     def plot(self, series):
-        """Plot time series forecast 
+        """Plot time series forecast
 
         Parameters:
 
             series: {integer} or {string}
-                series index or name 
+                series index or name
         """
 
         type_graph = "dates"  # not clean, stabilize this in future releases

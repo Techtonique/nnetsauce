@@ -107,7 +107,6 @@ class CustomRegressor(Custom, RegressorMixin):
         seed=123,
         backend="cpu",
     ):
-
         super().__init__(
             obj=obj,
             n_hidden_features=n_hidden_features,
@@ -154,7 +153,6 @@ class CustomRegressor(Custom, RegressorMixin):
 
         # if sample_weights, else: (must use self.row_index)
         if sample_weight is not None:
-
             self.obj.fit(
                 scaled_Z,
                 centered_y,
@@ -189,7 +187,6 @@ class CustomRegressor(Custom, RegressorMixin):
         """
 
         if len(X.shape) == 1:
-
             n_features = X.shape[0]
             new_X = mo.rbind(
                 X.reshape(1, n_features),
@@ -249,7 +246,7 @@ class CustomRegressor(Custom, RegressorMixin):
             "neg_mean_squared_log_error",
             "neg_median_absolute_error",
             "r2",
-            "neg_root_mean_squared_error"
+            "neg_root_mean_squared_error",
         ), "'scoring' should be in ('explained_variance', 'neg_mean_absolute_error', \
                            'neg_mean_squared_error', 'neg_mean_squared_log_error', \
                            'neg_median_absolute_error', 'r2', 'neg_root_mean_squared_error')"
@@ -261,7 +258,9 @@ class CustomRegressor(Custom, RegressorMixin):
             "neg_mean_squared_log_error": skm2.mean_squared_log_error,
             "neg_median_absolute_error": skm2.median_absolute_error,
             "r2": skm2.r2_score,
-            "neg_root_mean_squared_error": partial(skm2.mean_squared_error, squared=False)
+            "neg_root_mean_squared_error": partial(
+                skm2.mean_squared_error, squared=False
+            ),
         }
 
         return scoring_options[scoring](y, preds, **kwargs)

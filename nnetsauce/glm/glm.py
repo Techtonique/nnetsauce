@@ -103,7 +103,6 @@ class GLM(Base):
         optimizer=Optimizer(),
         seed=123,
     ):
-
         super().__init__(
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,
@@ -127,18 +126,14 @@ class GLM(Base):
         self.beta_ = None
 
     def compute_XB(self, X, beta=None, row_index=None):
-
         if beta is not None:
-
             if row_index is None:
-
                 return np.dot(X, beta)
 
             return np.dot(X[row_index, :], beta)
 
         # self.beta_ is None in this case
         if row_index is None:
-
             return np.dot(X, self.beta_)
 
         return np.dot(X[row_index, :], self.beta_)
@@ -164,7 +159,6 @@ class GLM(Base):
         return h_result[result_code](X)
 
     def penalty(self, beta1, beta2, lambda1, lambda2, alpha1, alpha2):
-
         res = lambda1 * (
             0.5 * (1 - alpha1) * np.sum(np.square(beta1))
             + alpha1 * np.sum(np.abs(beta1))
@@ -177,7 +171,6 @@ class GLM(Base):
         return res
 
     def compute_penalty(self, group_index, beta):
-
         return self.penalty(
             beta1=beta[0:group_index],
             beta2=beta[group_index : len(beta)],

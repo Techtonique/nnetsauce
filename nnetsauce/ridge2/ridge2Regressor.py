@@ -101,7 +101,6 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
         seed=123,
         backend="cpu",
     ):
-
         super().__init__(
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,
@@ -219,7 +218,6 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
         """
 
         if len(X.shape) == 1:
-
             n_features = X.shape[0]
             new_X = mo.rbind(
                 x=X.reshape(1, n_features),

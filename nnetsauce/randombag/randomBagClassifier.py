@@ -152,7 +152,6 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         verbose=1,
         backend="cpu",
     ):
-
         super().__init__(
             obj=obj,
             n_estimators=n_estimators,
@@ -224,7 +223,6 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         # 1 - Sequential training -----
 
         if self.n_jobs is None:
-            
             self.voter_ = rbagloop_classification(
                 base_learner, X, y, self.n_estimators, self.verbose, self.seed
             )
@@ -243,18 +241,16 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             return base_learner__
 
         if self.verbose == 1:
-
             voters_list = Parallel(n_jobs=self.n_jobs, prefer="threads")(
                 delayed(fit_estimators)(m)
                 for m in tqdm(range(self.n_estimators))
             )
         else:
-
             voters_list = Parallel(n_jobs=self.n_jobs, prefer="threads")(
                 delayed(fit_estimators)(m) for m in range(self.n_estimators)
             )
 
-        self.voter_ = {idx: elt for idx, elt in enumerate(voters_list)}    
+        self.voter_ = {idx: elt for idx, elt in enumerate(voters_list)}
 
         self.n_estimators = len(self.voter_)
 
@@ -298,7 +294,6 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         """
 
         def calculate_probas(voter, weights=None, verbose=None):
-
             ensemble_proba = 0
 
             n_iter = len(voter)
@@ -306,18 +301,14 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             assert n_iter > 0, "no estimator found in `RandomBag` ensemble"
 
             if weights is None:
-
                 for idx, elt in voter.items():
-
                     try:
-
                         ensemble_proba += elt.predict_proba(X)
 
                         # if verbose == 1:
                         #    pbar.update(idx)
 
                     except:
-
                         continue
 
                 # if verbose == 1:
@@ -327,7 +318,6 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
             # if weights is not None:
             for idx, elt in voter.items():
-
                 ensemble_proba += weights[idx] * elt.predict_proba(X)
 
                 # if verbose == 1:
@@ -341,12 +331,10 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         # end calculate_probas ----
 
         if self.n_jobs is None:
-
             # if self.verbose == 1:
             #    pbar = Progbar(self.n_estimators)
 
             if weights is None:
-
                 return calculate_probas(self.voter_, verbose=self.verbose)
 
             # if weights is not None:
@@ -362,14 +350,12 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
                 pass
 
         if self.verbose == 1:
-
             preds = Parallel(n_jobs=self.n_jobs, prefer="threads")(
                 delayed(predict_estimator)(m)
                 for m in tqdm(range(self.n_estimators))
             )
 
         else:
-
             preds = Parallel(n_jobs=self.n_jobs, prefer="threads")(
                 delayed(predict_estimator)(m) for m in range(self.n_estimators)
             )
@@ -377,15 +363,12 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         ensemble_proba = 0
 
         if weights is None:
-
             for i in range(self.n_estimators):
-
                 ensemble_proba += preds[i]
 
             return ensemble_proba / self.n_estimators
 
         for i in range(self.n_estimators):
-
             ensemble_proba += weights[i] * preds[i]
 
         return ensemble_proba

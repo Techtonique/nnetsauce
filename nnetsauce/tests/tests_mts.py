@@ -11,7 +11,6 @@ np.random.seed(123)
 
 class TestMTS(ut.TestCase):
     def test_MTS(self):
-
         np.random.seed(123)
         X = np.random.rand(25, 3)
         X[:, 0] = 100 * X[:, 0]
@@ -31,7 +30,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("std", "minmax", "std"),
             activation_name="relu",
             n_clusters=0,
-            show_progress=False
+            show_progress=False,
         )
 
         fit_obj2 = ns.MTS(
@@ -43,7 +42,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("std", "minmax", "minmax"),
             activation_name="sigmoid",
             n_clusters=2,
-            show_progress=False
+            show_progress=False,
         )
 
         fit_obj3 = ns.MTS(
@@ -55,7 +54,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("minmax", "minmax", "std"),
             activation_name="tanh",
             n_clusters=3,
-            show_progress=False
+            show_progress=False,
         )
 
         fit_obj4 = ns.MTS(
@@ -67,7 +66,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("minmax", "minmax", "minmax"),
             activation_name="elu",
             n_clusters=4,
-            show_progress=False
+            show_progress=False,
         )
 
         fit_obj5 = ns.MTS(
@@ -80,7 +79,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("minmax", "minmax", "minmax"),
             activation_name="elu",
             n_clusters=4,
-            show_progress=False
+            show_progress=False,
         )
 
         fit_obj6 = ns.MTS(
@@ -93,7 +92,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("minmax", "minmax", "minmax"),
             activation_name="elu",
             n_clusters=4,
-            show_progress=False
+            show_progress=False,
         )
 
         fit_obj7 = ns.MTS(
@@ -106,7 +105,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("minmax", "minmax", "minmax"),
             activation_name="elu",
             n_clusters=4,
-            show_progress=False
+            show_progress=False,
         )
 
         fit_obj8 = ns.MTS(
@@ -119,7 +118,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("minmax", "minmax", "minmax"),
             activation_name="elu",
             n_clusters=4,
-            show_progress=False
+            show_progress=False,
         )
 
         fit_obj9 = ns.MTS(
@@ -133,7 +132,7 @@ class TestMTS(ut.TestCase):
             activation_name="elu",
             n_clusters=4,
             cluster_encode=False,
-            show_progress=False
+            show_progress=False,
         )
 
         fit_obj10 = ns.MTS(
@@ -147,7 +146,7 @@ class TestMTS(ut.TestCase):
             activation_name="elu",
             n_clusters=4,
             cluster_encode=False,
-            show_progress=False
+            show_progress=False,
         )
 
         index_train = range(20)
@@ -160,27 +159,27 @@ class TestMTS(ut.TestCase):
 
         fit_obj.fit(X=X_train)
         err = fit_obj.predict() - X_test
-        rmse = np.sqrt(np.mean(err ** 2))
+        rmse = np.sqrt(np.mean(err**2))
 
         fit_obj.fit(X_train, xreg=Xreg_train)
         err_xreg = fit_obj.predict(new_xreg=Xreg_test) - X_test
-        rmse_xreg = np.sqrt(np.mean(err_xreg ** 2))
+        rmse_xreg = np.sqrt(np.mean(err_xreg**2))
 
         fit_obj2.fit(X_train)
         err2 = fit_obj2.predict() - X_test
-        rmse2 = np.sqrt(np.mean(err2 ** 2))
+        rmse2 = np.sqrt(np.mean(err2**2))
 
         fit_obj3.fit(X_train)
         err3 = fit_obj3.predict() - X_test
-        rmse3 = np.sqrt(np.mean(err3 ** 2))
+        rmse3 = np.sqrt(np.mean(err3**2))
 
         fit_obj4.fit(X_train)
         err4 = fit_obj4.predict() - X_test
-        rmse4 = np.sqrt(np.mean(err4 ** 2))
+        rmse4 = np.sqrt(np.mean(err4**2))
 
         fit_obj5.fit(X_train)
         err5 = fit_obj5.predict() - X_test
-        rmse5 = np.sqrt(np.mean(err5 ** 2))
+        rmse5 = np.sqrt(np.mean(err5**2))
 
         fit_obj6.fit(X_train)
         preds = fit_obj6.predict(return_std=True)
@@ -200,15 +199,14 @@ class TestMTS(ut.TestCase):
         fit_obj10.fit(X_train)
         preds6 = fit_obj10.predict(return_std=True)
 
-        
         self.assertTrue(np.allclose(rmse, 10.395403649098926))
         self.assertTrue(np.allclose(rmse_xreg, 10.401634671488587))
-        self.assertTrue(np.allclose(rmse2, 10.395285391773202))        
-        self.assertTrue(np.allclose(rmse3, 10.394290838542101))        
-        self.assertTrue(np.allclose(rmse4, 10.371173921434293))        
+        self.assertTrue(np.allclose(rmse2, 10.395285391773202))
+        self.assertTrue(np.allclose(rmse3, 10.394290838542101))
+        self.assertTrue(np.allclose(rmse4, 10.371173921434293))
         self.assertTrue(np.allclose(rmse5, 10.402884770399375, atol=1e-3))
-        
-        self.assertTrue(np.allclose(preds[1][0], 0.41324169))        
+
+        self.assertTrue(np.allclose(preds[1][0], 0.41324169))
         self.assertTrue(np.allclose(preds2[1][0], 0.05693508))
         self.assertTrue(np.allclose(preds6[1][0], 0.06910578))
         self.assertTrue(np.allclose(preds4[1][0], 0.06910578))
@@ -216,7 +214,6 @@ class TestMTS(ut.TestCase):
         self.assertTrue(np.allclose(preds3[1][0], 0.07400078))
 
     def test_get_set(self):
-
         np.random.seed(123)
         X = np.random.rand(25, 3)
         X[:, 0] = 100 * X[:, 0]
@@ -233,7 +230,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("std", "minmax", "std"),
             activation_name="relu",
             n_clusters=0,
-            show_progress=False
+            show_progress=False,
         )
 
         fit_obj.set_params(
@@ -260,7 +257,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("std", "minmax", "std"),
             activation_name="relu",
             n_clusters=0,
-            show_progress=False
+            show_progress=False,
         )
 
         self.assertTrue(
@@ -270,7 +267,6 @@ class TestMTS(ut.TestCase):
         )
 
     def test_score(self):
-
         np.random.seed(123)
         X = np.random.rand(25, 3)
         X[:, 0] = 100 * X[:, 0]
@@ -287,7 +283,7 @@ class TestMTS(ut.TestCase):
             type_scaling=("std", "minmax", "std"),
             activation_name="relu",
             n_clusters=0,
-            show_progress=False
+            show_progress=False,
         )
 
         scores = fit_obj.score(
@@ -302,7 +298,9 @@ class TestMTS(ut.TestCase):
         )
 
         scores3 = fit_obj.score(
-            X, training_index=range(20), testing_index=range(20, 25),
+            X,
+            training_index=range(20),
+            testing_index=range(20, 25),
             scoring="r2",
         )
 

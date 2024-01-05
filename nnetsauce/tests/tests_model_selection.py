@@ -13,7 +13,6 @@ import unittest as ut
 
 class TS_Split(ut.TestCase):
     def test_tsplit(self):
-
         X = np.array(
             [
                 [4, 5, 6, 1, 0, 2, 7, 9, 3, 8],

@@ -75,13 +75,12 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
     def __init__(
         self,
         obj,
-    ):        
-
+    ):
         self.type_fit = "classification"
         self.obj = obj
         self.fit_objs_ = {}
         self.X_scaler_ = StandardScaler()
-        self.scaled_X_ = None 
+        self.scaled_X_ = None
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit SimpleMultitaskClassifier to training data (X, y).
@@ -105,7 +104,7 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
         """
 
         assert mx.is_factor(y), "y must contain only integers"
-    
+
         self.scaled_X_ = self.X_scaler_.fit_transform(X)
 
         self.n_classes_ = len(np.unique(y))
@@ -115,8 +114,9 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
 
         # if sample_weight is None:
         for i in range(self.n_classes_):
-
-            self.fit_objs_[i] = deepcopy(self.obj.fit(self.scaled_X_, Y[:, i], **kwargs))            
+            self.fit_objs_[i] = deepcopy(
+                self.obj.fit(self.scaled_X_, Y[:, i], **kwargs)
+            )
 
         return self
 
@@ -161,7 +161,6 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
         probs = np.zeros((shape_X[0], self.n_classes_))
 
         if len(shape_X) == 1:
-
             n_features = shape_X[0]
 
             new_X = mo.rbind(
@@ -173,16 +172,13 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
 
             # loop on all the classes
             for i in range(self.n_classes_):
-
                 probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)[0]
 
         else:
-
             Z = self.X_scaler_.transform(X, **kwargs)
 
             # loop on all the classes
             for i in range(self.n_classes_):
-
                 probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)
 
         expit_raw_probs = expit(probs)

@@ -10,7 +10,6 @@ def sigmoid(x):
 
 
 def prelu(x, a=None):
-
     if a is not None:
         y = x.copy()
         index = x < 0
@@ -21,7 +20,6 @@ def prelu(x, a=None):
 
 
 def elu(x, a=None):
-
     if a is not None:
         y = x.copy()
         index = x < 0

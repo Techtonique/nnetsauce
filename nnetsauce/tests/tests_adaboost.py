@@ -9,7 +9,6 @@ from sklearn.datasets import load_breast_cancer, load_wine
 
 class TestAdaBoost(ut.TestCase):
     def test_AdaBoost(self):
-
         breast_cancer = load_breast_cancer()
         X = breast_cancer.data
         y = breast_cancer.target
@@ -126,7 +125,6 @@ class TestAdaBoost(ut.TestCase):
         )
 
     def test_score(self):
-
         breast_cancer = load_breast_cancer()
         X = breast_cancer.data
         y = breast_cancer.target

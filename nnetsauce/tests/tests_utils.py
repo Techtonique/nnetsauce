@@ -12,7 +12,6 @@ import unittest as ut
 
 
 class TestUtils(ut.TestCase):
-
     # 1 - tests matrixops
 
     def test_crossprod(self):
@@ -115,7 +114,6 @@ class TestUtils(ut.TestCase):
     # 6 - lm_funcs
 
     def test_beta_Sigma_hat_rvfl(self):
-
         sigma = 0.3
         s = 4
         np.random.seed(123)
@@ -189,7 +187,6 @@ class TestUtils(ut.TestCase):
         )
 
     def test_beta_Sigma_hat_rvfl2(self):
-
         sigma = 0.3
         np.random.seed(123)
         X, y = datasets.make_regression(n_samples=10, n_features=3)

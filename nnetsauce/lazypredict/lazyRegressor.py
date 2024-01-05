@@ -24,7 +24,10 @@ pd.set_option("display.precision", 2)
 pd.set_option("display.float_format", lambda x: "%.2f" % x)
 
 numeric_transformer = Pipeline(
-    steps=[("imputer", SimpleImputer(strategy="mean")), ("scaler", StandardScaler())]
+    steps=[
+        ("imputer", SimpleImputer(strategy="mean")),
+        ("scaler", StandardScaler()),
+    ]
 )
 
 categorical_transformer_low = Pipeline(
@@ -68,6 +71,7 @@ def get_card_split(df, cols, n=11):
     card_high = cols[cond]
     card_low = cols[~cond]
     return card_low, card_high
+
 
 def adjusted_rsquared(r2, n, p):
     return 1 - (1 - r2) * ((n - 1) / (n - p - 1))
@@ -123,7 +127,7 @@ class LazyRegressor(Custom, RegressorMixin):
         preprocess=False,
         n_jobs=None,
         # CustomRegressor attributes
-        obj = None,
+        obj=None,
         n_hidden_features=5,
         activation_name="relu",
         a=0.01,
@@ -138,7 +142,7 @@ class LazyRegressor(Custom, RegressorMixin):
         col_sample=1,
         row_sample=1,
         seed=123,
-        backend="cpu"        
+        backend="cpu",
     ):
         self.verbose = verbose
         self.ignore_warnings = ignore_warnings
@@ -213,12 +217,20 @@ class LazyRegressor(Custom, RegressorMixin):
             X_train, categorical_features
         )
 
-        if self.preprocess is True: 
+        if self.preprocess is True:
             preprocessor = ColumnTransformer(
                 transformers=[
                     ("numeric", numeric_transformer, numeric_features),
-                    ("categorical_low", categorical_transformer_low, categorical_low),
-                    ("categorical_high", categorical_transformer_high, categorical_high),
+                    (
+                        "categorical_low",
+                        categorical_transformer_low,
+                        categorical_low,
+                    ),
+                    (
+                        "categorical_high",
+                        categorical_transformer_high,
+                        categorical_high,
+                    ),
                 ]
             )
 
@@ -235,53 +247,66 @@ class LazyRegressor(Custom, RegressorMixin):
                 print(exception)
                 print("Invalid Regressor(s)")
 
-        if self.preprocess is True: 
-
-            for name, model in tqdm(self.regressors): # do parallel exec
+        if self.preprocess is True:
+            for name, model in tqdm(self.regressors):  # do parallel exec
                 start = time.time()
                 try:
                     if "random_state" in model().get_params().keys():
                         pipe = Pipeline(
                             steps=[
                                 ("preprocessor", preprocessor),
-                                ("regressor", CustomRegressor(obj=model(random_state=self.random_state),
-                                n_hidden_features=self.n_hidden_features,
-                                activation_name=self.activation_name,
-                                a=self.a,
-                                nodes_sim=self.nodes_sim,
-                                bias=self.bias,
-                                dropout=self.dropout,
-                                direct_link=self.direct_link,
-                                n_clusters=self.n_clusters,
-                                cluster_encode=self.cluster_encode,
-                                type_clust=self.type_clust,
-                                type_scaling=self.type_scaling,
-                                col_sample=self.col_sample,
-                                row_sample=self.row_sample,
-                                seed=self.seed,
-                                backend=self.backend)),
+                                (
+                                    "regressor",
+                                    CustomRegressor(
+                                        obj=model(
+                                            random_state=self.random_state
+                                        ),
+                                        n_hidden_features=self.n_hidden_features,
+                                        activation_name=self.activation_name,
+                                        a=self.a,
+                                        nodes_sim=self.nodes_sim,
+                                        bias=self.bias,
+                                        dropout=self.dropout,
+                                        direct_link=self.direct_link,
+                                        n_clusters=self.n_clusters,
+                                        cluster_encode=self.cluster_encode,
+                                        type_clust=self.type_clust,
+                                        type_scaling=self.type_scaling,
+                                        col_sample=self.col_sample,
+                                        row_sample=self.row_sample,
+                                        seed=self.seed,
+                                        backend=self.backend,
+                                    ),
+                                ),
                             ]
                         )
                     else:
                         pipe = Pipeline(
-                            steps=[("preprocessor", preprocessor), 
-                                ("regressor", CustomRegressor(obj=model(),
-                                    n_hidden_features=self.n_hidden_features,
-                                    activation_name=self.activation_name,
-                                    a=self.a,
-                                    nodes_sim=self.nodes_sim,
-                                    bias=self.bias,
-                                    dropout=self.dropout,
-                                    direct_link=self.direct_link,
-                                    n_clusters=self.n_clusters,
-                                    cluster_encode=self.cluster_encode,
-                                    type_clust=self.type_clust,
-                                    type_scaling=self.type_scaling,
-                                    col_sample=self.col_sample,
-                                    row_sample=self.row_sample,
-                                    seed=self.seed,
-                                    backend=self.backend))]
-                            )
+                            steps=[
+                                ("preprocessor", preprocessor),
+                                (
+                                    "regressor",
+                                    CustomRegressor(
+                                        obj=model(),
+                                        n_hidden_features=self.n_hidden_features,
+                                        activation_name=self.activation_name,
+                                        a=self.a,
+                                        nodes_sim=self.nodes_sim,
+                                        bias=self.bias,
+                                        dropout=self.dropout,
+                                        direct_link=self.direct_link,
+                                        n_clusters=self.n_clusters,
+                                        cluster_encode=self.cluster_encode,
+                                        type_clust=self.type_clust,
+                                        type_scaling=self.type_scaling,
+                                        col_sample=self.col_sample,
+                                        row_sample=self.row_sample,
+                                        seed=self.seed,
+                                        backend=self.backend,
+                                    ),
+                                ),
+                            ]
+                        )
 
                     pipe.fit(X_train, y_train)
                     self.models[name] = pipe
@@ -313,7 +338,9 @@ class LazyRegressor(Custom, RegressorMixin):
                         }
 
                         if self.custom_metric:
-                            scores_verbose[self.custom_metric.__name__] = custom_metric
+                            scores_verbose[
+                                self.custom_metric.__name__
+                            ] = custom_metric
 
                         print(scores_verbose)
                     if self.predictions:
@@ -324,45 +351,48 @@ class LazyRegressor(Custom, RegressorMixin):
                         print(exception)
 
         else:
-
-            for name, model in tqdm(self.regressors): # do parallel exec
+            for name, model in tqdm(self.regressors):  # do parallel exec
                 start = time.time()
                 try:
                     if "random_state" in model().get_params().keys():
-                        pipe = CustomRegressor(obj=model(random_state=self.random_state),
-                                n_hidden_features=self.n_hidden_features,
-                                activation_name=self.activation_name,
-                                a=self.a,
-                                nodes_sim=self.nodes_sim,
-                                bias=self.bias,
-                                dropout=self.dropout,
-                                direct_link=self.direct_link,
-                                n_clusters=self.n_clusters,
-                                cluster_encode=self.cluster_encode,
-                                type_clust=self.type_clust,
-                                type_scaling=self.type_scaling,
-                                col_sample=self.col_sample,
-                                row_sample=self.row_sample,
-                                seed=self.seed,
-                                backend=self.backend)
+                        pipe = CustomRegressor(
+                            obj=model(random_state=self.random_state),
+                            n_hidden_features=self.n_hidden_features,
+                            activation_name=self.activation_name,
+                            a=self.a,
+                            nodes_sim=self.nodes_sim,
+                            bias=self.bias,
+                            dropout=self.dropout,
+                            direct_link=self.direct_link,
+                            n_clusters=self.n_clusters,
+                            cluster_encode=self.cluster_encode,
+                            type_clust=self.type_clust,
+                            type_scaling=self.type_scaling,
+                            col_sample=self.col_sample,
+                            row_sample=self.row_sample,
+                            seed=self.seed,
+                            backend=self.backend,
+                        )
                     else:
-                        pipe = CustomRegressor(obj=model(),
-                                    n_hidden_features=self.n_hidden_features,
-                                    activation_name=self.activation_name,
-                                    a=self.a,
-                                    nodes_sim=self.nodes_sim,
-                                    bias=self.bias,
-                                    dropout=self.dropout,
-                                    direct_link=self.direct_link,
-                                    n_clusters=self.n_clusters,
-                                    cluster_encode=self.cluster_encode,
-                                    type_clust=self.type_clust,
-                                    type_scaling=self.type_scaling,
-                                    col_sample=self.col_sample,
-                                    row_sample=self.row_sample,
-                                    seed=self.seed,
-                                    backend=self.backend)
-                        
+                        pipe = CustomRegressor(
+                            obj=model(),
+                            n_hidden_features=self.n_hidden_features,
+                            activation_name=self.activation_name,
+                            a=self.a,
+                            nodes_sim=self.nodes_sim,
+                            bias=self.bias,
+                            dropout=self.dropout,
+                            direct_link=self.direct_link,
+                            n_clusters=self.n_clusters,
+                            cluster_encode=self.cluster_encode,
+                            type_clust=self.type_clust,
+                            type_scaling=self.type_scaling,
+                            col_sample=self.col_sample,
+                            row_sample=self.row_sample,
+                            seed=self.seed,
+                            backend=self.backend,
+                        )
+
                     pipe.fit(X_train, y_train)
                     self.models[name] = pipe
                     y_pred = pipe.predict(X_test)
@@ -393,7 +423,9 @@ class LazyRegressor(Custom, RegressorMixin):
                         }
 
                         if self.custom_metric:
-                            scores_verbose[self.custom_metric.__name__] = custom_metric
+                            scores_verbose[
+                                self.custom_metric.__name__
+                            ] = custom_metric
 
                         print(scores_verbose)
                     if self.predictions:
@@ -444,7 +476,7 @@ class LazyRegressor(Custom, RegressorMixin):
         Returns
         -------
         models: dict-object,
-            Returns a dictionary with each model pipeline as value 
+            Returns a dictionary with each model pipeline as value
             with key as name of models.
         """
         if len(self.models.keys()) == 0:

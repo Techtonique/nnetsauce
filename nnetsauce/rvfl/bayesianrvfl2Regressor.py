@@ -115,7 +115,6 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         return_std=True,
         backend="cpu",
     ):
-
         super().__init__(
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,
@@ -167,13 +166,12 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         q = self.n_hidden_features
 
         if self.direct_link == True:
-
             r = p + self.n_clusters
 
-            block11 = (self.s1 ** 2) * np.eye(r)
+            block11 = (self.s1**2) * np.eye(r)
             block12 = np.zeros((r, q))
             block21 = np.zeros((q, r))
-            block22 = (self.s2 ** 2) * np.eye(q)
+            block22 = (self.s2**2) * np.eye(q)
 
             Sigma_prior = mo.rbind(
                 x=mo.cbind(x=block11, y=block12, backend=self.backend),
@@ -182,8 +180,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
             )
 
         else:
-
-            Sigma_prior = (self.s2 ** 2) * np.eye(q)
+            Sigma_prior = (self.s2**2) * np.eye(q)
 
         fit_obj = lmf.beta_Sigma_hat_rvfl2(
             X=scaled_Z,
@@ -235,9 +232,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         self.return_std = return_std
 
         if self.return_std == False:
-
             if len(X.shape) == 1:
-
                 return (
                     self.y_mean_
                     + mo.safe_sparse_dot(
@@ -254,9 +249,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
             )
 
         else:  # confidence interval required for preds?
-
             if len(X.shape) == 1:
-
                 Z = self.cook_test_set(new_X, **kwargs)
 
                 pred_obj = lmf.beta_Sigma_hat_rvfl2(

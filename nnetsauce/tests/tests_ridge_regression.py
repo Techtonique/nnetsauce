@@ -11,7 +11,6 @@ np.random.seed(123)
 
 class TestRidge2Regressor(ut.TestCase):
     def test_Ridge2Regressor(self):
-
         X, y = datasets.make_regression(
             n_samples=25, n_features=3, random_state=123
         )
@@ -195,61 +194,63 @@ class TestRidge2Regressor(ut.TestCase):
 
         fit_obj.fit(X_train, y_train)
         err = fit_obj.predict(X_test) - y_test
-        rmse = np.sqrt(np.mean(err ** 2))
+        rmse = np.sqrt(np.mean(err**2))
 
         fit_obj2.fit(X_train, y_train)
         err2 = fit_obj2.predict(X_test) - y_test
-        rmse2 = np.sqrt(np.mean(err2 ** 2))
+        rmse2 = np.sqrt(np.mean(err2**2))
 
         fit_obj3.fit(X_train, y_train)
         err3 = fit_obj3.predict(X_test) - y_test
-        rmse3 = np.sqrt(np.mean(err3 ** 2))
+        rmse3 = np.sqrt(np.mean(err3**2))
 
         fit_obj4.fit(X_train, y_train)
         err4 = fit_obj4.predict(X_test) - y_test
-        rmse4 = np.sqrt(np.mean(err4 ** 2))
+        rmse4 = np.sqrt(np.mean(err4**2))
 
         fit_obj5.fit(X_train, y_train)
         err5 = fit_obj5.predict(X_test) - y_test
-        rmse5 = np.sqrt(np.mean(err5 ** 2))
+        rmse5 = np.sqrt(np.mean(err5**2))
 
         fit_obj6.fit(X_train, y_train)
         err6 = fit_obj6.predict(X_test) - y_test
-        rmse6 = np.sqrt(np.mean(err6 ** 2))
+        rmse6 = np.sqrt(np.mean(err6**2))
 
         fit_obj7.fit(X_train, y_train)
         err7 = fit_obj7.predict(X_test) - y_test
-        rmse7 = np.sqrt(np.mean(err7 ** 2))
+        rmse7 = np.sqrt(np.mean(err7**2))
 
         fit_obj8.fit(X_train, y_train)
         err8 = fit_obj8.predict(X_test) - y_test
-        rmse8 = np.sqrt(np.mean(err8 ** 2))
+        rmse8 = np.sqrt(np.mean(err8**2))
 
         fit_obj9.fit(X_train, y_train)
         err9 = fit_obj9.predict(X_test) - y_test
-        rmse9 = np.sqrt(np.mean(err9 ** 2))
+        rmse9 = np.sqrt(np.mean(err9**2))
 
         fit_obj10.fit(X_train, y_train)
         err10 = fit_obj10.predict(X_test) - y_test
-        rmse10 = np.sqrt(np.mean(err10 ** 2))
+        rmse10 = np.sqrt(np.mean(err10**2))
 
         fit_obj11.fit(X_train, y_train)
         err11 = fit_obj11.predict(X_test) - y_test
-        rmse11 = np.sqrt(np.mean(err11 ** 2))
+        rmse11 = np.sqrt(np.mean(err11**2))
 
         fit_obj12.fit(X_train, y_train)
         err12 = fit_obj12.predict(X_test) - y_test
-        rmse12 = np.sqrt(np.mean(err12 ** 2))
+        rmse12 = np.sqrt(np.mean(err12**2))
 
         fit_obj13.fit(X_train, y_train)
         err13 = fit_obj13.predict(X_test) - y_test
-        rmse13 = np.sqrt(np.mean(err13 ** 2))
+        rmse13 = np.sqrt(np.mean(err13**2))
 
         self.assertTrue(np.allclose(np.round(rmse, 3), 5.435, atol=1e-3))
         self.assertTrue(np.allclose(np.round(rmse2, 3), 19.947, atol=1e-3))
         self.assertTrue(np.allclose(np.round(rmse3, 3), 1.934, atol=1e-3))
         self.assertTrue(np.allclose(np.round(rmse4, 3), 10.097, atol=1e-3))
-        self.assertTrue(np.allclose(np.round(rmse5, 3), 22.200957971897672, atol=1e-3))
+        self.assertTrue(
+            np.allclose(np.round(rmse5, 3), 22.200957971897672, atol=1e-3)
+        )
         self.assertTrue(np.allclose(np.round(rmse6, 3), 0.614, atol=1e-3))
         self.assertTrue(np.allclose(np.round(rmse7, 3), 6.789, atol=1e-3))
         self.assertTrue(
@@ -272,7 +273,6 @@ class TestRidge2Regressor(ut.TestCase):
         self.assertTrue(np.allclose(np.round(rmse13, 3), 4.054, atol=1e-3))
 
     def test_score(self):
-
         X, y = datasets.make_regression(
             n_samples=100, n_features=3, random_state=123
         )

@@ -12,7 +12,6 @@ from . import matrixops as mo
 
 # computes beta_hat = (t(x)%*%x + lam*I)^{-1}%*%t(x)%*%y
 def beta_hat(x, y, lam=None, backend="cpu"):
-
     # assert on dimensions
     if lam is None:
         return mo.safe_sparse_dot(
@@ -55,9 +54,7 @@ def beta_Sigma_hat(
     Sigma_hat_=None,
     backend="cpu",
 ):  # for prediction only (X_star is not None)
-
     if (X is not None) & (y is not None):  # fit
-
         if len(X.shape) == 1:
             X = X.reshape(-1, 1)
 
@@ -77,9 +74,7 @@ def beta_Sigma_hat(
         Cn = inv_penalized_cov(x=X, backend=backend)
 
         if return_cov == True:
-
             if X_star is None:
-
                 beta_hat_ = mo.safe_sparse_dot(
                     a=Cn,
                     b=mo.crossprod(x=X, y=y, backend=backend),
@@ -111,7 +106,6 @@ def beta_Sigma_hat(
                 }
 
             else:
-
                 if beta_hat_ is None:
                     beta_hat_ = mo.safe_sparse_dot(
                         a=Cn,
@@ -162,9 +156,7 @@ def beta_Sigma_hat(
                 }
 
         else:  # return_cov == False
-
             if X_star is None:
-
                 beta_hat_ = mo.safe_sparse_dot(
                     a=Cn,
                     b=mo.crossprod(x=X, y=y, backend=backend),
@@ -194,7 +186,6 @@ def beta_Sigma_hat(
                 }
 
             else:
-
                 if beta_hat_ is None:
                     beta_hat_ = beta_hat(X, y)
                     Sigma_hat_ = np.eye(X.shape[1]) - mo.safe_sparse_dot(
@@ -226,11 +217,9 @@ def beta_Sigma_hat(
                 }
 
     else:  # X is None | y is None  # predict
-
         assert (beta_hat_ is not None) & (X_star is not None)
 
         if return_cov == True:
-
             assert Sigma_hat_ is not None
 
             return {
@@ -251,7 +240,6 @@ def beta_Sigma_hat(
             }
 
         else:
-
             return {
                 "preds": mo.safe_sparse_dot(
                     a=X_star, b=beta_hat_, backend=backend
@@ -273,9 +261,7 @@ def beta_Sigma_hat_rvfl(
     Sigma_hat_=None,
     backend="cpu",
 ):  # for prediction only (X_star is not None)
-
     if (X is not None) & (y is not None):  # fit
-
         if len(X.shape) == 1:
             X = X.reshape(-1, 1)
 
@@ -292,14 +278,12 @@ def beta_Sigma_hat_rvfl(
                     x=np.ones(X_star.shape[0]), y=X_star, backend=backend
                 )
 
-        s2 = s ** 2
-        lambda_ = (sigma ** 2) / s2
+        s2 = s**2
+        lambda_ = (sigma**2) / s2
         Cn = inv_penalized_cov(X, lam=lambda_)
 
         if return_cov == True:
-
             if X_star is None:
-
                 beta_hat_ = mo.safe_sparse_dot(
                     a=Cn,
                     b=mo.crossprod(x=X, y=y, backend=backend),
@@ -335,7 +319,6 @@ def beta_Sigma_hat_rvfl(
                 }
 
             else:
-
                 if beta_hat_ is None:
                     beta_hat_ = mo.safe_sparse_dot(
                         a=Cn,
@@ -384,15 +367,13 @@ def beta_Sigma_hat_rvfl(
                                 ),
                                 backend=backend,
                             )
-                            + (sigma ** 2) * np.eye(X_star.shape[0])
+                            + (sigma**2) * np.eye(X_star.shape[0])
                         )
                     ),
                 }
 
         else:  # return_cov == False
-
             if X_star is None:
-
                 beta_hat_ = mo.safe_sparse_dot(
                     a=Cn,
                     b=mo.crossprod(x=X, y=y, backend=backend),
@@ -425,7 +406,6 @@ def beta_Sigma_hat_rvfl(
                 }
 
             else:
-
                 if beta_hat_ is None:
                     beta_hat_ = beta_hat(X, y, lam=lambda_, backend=backend)
                     Sigma_hat_ = s2 * (
@@ -460,11 +440,9 @@ def beta_Sigma_hat_rvfl(
                 }
 
     else:  # X is None | y is None  # predict
-
         assert (beta_hat_ is not None) & (X_star is not None)
 
         if return_cov == True:
-
             assert Sigma_hat_ is not None
 
             return {
@@ -478,13 +456,12 @@ def beta_Sigma_hat_rvfl(
                             ),
                             backend=backend,
                         )
-                        + (sigma ** 2) * np.eye(X_star.shape[0])
+                        + (sigma**2) * np.eye(X_star.shape[0])
                     )
                 ),
             }
 
         else:
-
             return {
                 "preds": mo.safe_sparse_dot(
                     a=X_star, b=beta_hat_, backend=backend
@@ -506,9 +483,7 @@ def beta_Sigma_hat_rvfl2(
     Sigma_hat_=None,
     backend="cpu",
 ):  # for prediction only (X_star is not None)
-
     if (X is not None) & (y is not None):
-
         if len(X.shape) == 1:
             X = X.reshape(-1, 1)
 
@@ -525,7 +500,6 @@ def beta_Sigma_hat_rvfl2(
                 X_star = X_star.reshape(-1, 1)
 
         if fit_intercept == True:
-
             X = mo.cbind(np.ones(n), X)
             Cn = (
                 la.inv(
@@ -534,7 +508,7 @@ def beta_Sigma_hat_rvfl2(
                         b=mo.crossprod(x=X, backend=backend),
                         backend="cpu",
                     )
-                    + (sigma ** 2) * np.eye(p + 1)
+                    + (sigma**2) * np.eye(p + 1)
                 )
                 if backend == "cpu"
                 else jla.inv(
@@ -543,7 +517,7 @@ def beta_Sigma_hat_rvfl2(
                         b=mo.crossprod(x=X, backend=backend),
                         backend=backend,
                     )
-                    + (sigma ** 2) * np.eye(p + 1)
+                    + (sigma**2) * np.eye(p + 1)
                 )
             )
 
@@ -560,7 +534,7 @@ def beta_Sigma_hat_rvfl2(
                         b=mo.crossprod(x=X, backend=backend),
                         backend="cpu",
                     )
-                    + (sigma ** 2) * np.eye(p)
+                    + (sigma**2) * np.eye(p)
                 )
                 if backend == "cpu"
                 else jla.inv(
@@ -569,7 +543,7 @@ def beta_Sigma_hat_rvfl2(
                         b=mo.crossprod(x=X, backend=backend),
                         backend=backend,
                     )
-                    + (sigma ** 2) * np.eye(p)
+                    + (sigma**2) * np.eye(p)
                 )
             )
 
@@ -582,9 +556,7 @@ def beta_Sigma_hat_rvfl2(
         y_hat = mo.safe_sparse_dot(a=smoothing_matrix, b=y, backend=backend)
 
         if return_cov == True:
-
             if X_star is None:
-
                 return {
                     "beta_hat": mo.safe_sparse_dot(
                         a=temp, b=y, backend=backend
@@ -602,7 +574,6 @@ def beta_Sigma_hat_rvfl2(
                 }
 
             else:
-
                 if beta_hat_ is None:
                     beta_hat_ = mo.safe_sparse_dot(a=temp, b=y, backend=backend)
 
@@ -632,15 +603,13 @@ def beta_Sigma_hat_rvfl2(
                                 ),
                                 backend=backend,
                             )
-                            + (sigma ** 2) * np.eye(X_star.shape[0])
+                            + (sigma**2) * np.eye(X_star.shape[0])
                         )
                     ),
                 }
 
         else:  # return_cov == False
-
             if X_star is None:
-
                 return {
                     "beta_hat": mo.safe_sparse_dot(
                         a=temp, b=y, backend=backend
@@ -652,7 +621,6 @@ def beta_Sigma_hat_rvfl2(
                 }
 
             else:
-
                 if beta_hat_ is None:
                     beta_hat_ = mo.safe_sparse_dot(a=temp, b=y, backend=backend)
 
@@ -668,11 +636,9 @@ def beta_Sigma_hat_rvfl2(
                 }
 
     else:  # (X is None) | (y is None) # predict
-
         assert (beta_hat_ is not None) & (X_star is not None)
 
         if return_cov == True:
-
             assert Sigma_hat_ is not None
 
             return {
@@ -688,13 +654,12 @@ def beta_Sigma_hat_rvfl2(
                             ),
                             backend=backend,
                         )
-                        + (sigma ** 2) * np.eye(X_star.shape[0])
+                        + (sigma**2) * np.eye(X_star.shape[0])
                     )
                 ),
             }
 
         else:
-
             return {
                 "preds": mo.safe_sparse_dot(
                     a=X_star, b=beta_hat_, backend=backend

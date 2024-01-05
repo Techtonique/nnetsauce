@@ -1,5 +1,12 @@
 from .lmfuncs import beta_hat, inv_penalized_cov
-from .matrixops import cbind, rbind, convert_df_to_numeric, crossprod, tcrossprod, to_np_array
+from .matrixops import (
+    cbind,
+    rbind,
+    convert_df_to_numeric,
+    crossprod,
+    tcrossprod,
+    to_np_array,
+)
 from .misc import merge_two_dicts, is_factor
 from .model_selection import TimeSeriesSplit
 from .progress_bar import Progbar

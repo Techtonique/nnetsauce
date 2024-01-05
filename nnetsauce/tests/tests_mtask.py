@@ -9,7 +9,6 @@ from sklearn import linear_model, gaussian_process
 
 class TestMultitask(ut.TestCase):
     def test_Multitask(self):
-
         breast_cancer = load_breast_cancer()
         X = breast_cancer.data
         y = breast_cancer.target

@@ -9,7 +9,6 @@ import nnetsauce as ns
 
 class TestCustom(ut.TestCase):
     def test_custom(self):
-
         np.random.seed(123)
         X, y = datasets.make_regression(n_samples=15, n_features=3)
 
@@ -127,26 +126,26 @@ class TestCustom(ut.TestCase):
 
         fit_obj.fit(X_train, y_train)
         err = fit_obj.predict(X_test) - y_test
-        rmse = np.sqrt(np.mean(err ** 2))
+        rmse = np.sqrt(np.mean(err**2))
 
         fit_obj2.fit(X_train, y_train)
         err2 = fit_obj2.predict(X_test) - y_test
-        rmse2 = np.sqrt(np.mean(err2 ** 2))
+        rmse2 = np.sqrt(np.mean(err2**2))
 
         fit_obj3.fit(X_train, y_train)
         err3 = fit_obj3.predict(X_test) - y_test
-        rmse3 = np.sqrt(np.mean(err3 ** 2))
+        rmse3 = np.sqrt(np.mean(err3**2))
 
         fit_obj4.fit(X_train, y_train)
         err4 = fit_obj4.predict(X_test) - y_test
-        rmse4 = np.sqrt(np.mean(err4 ** 2))
+        rmse4 = np.sqrt(np.mean(err4**2))
 
         err4_1 = fit_obj4.predict(X_test[0, :]) - y_test[0]
-        rmse4_1 = np.sqrt(np.mean(err4_1 ** 2))
+        rmse4_1 = np.sqrt(np.mean(err4_1**2))
 
         fit_obj8.fit(X_train, y_train)
         err8 = fit_obj8.predict(X_test) - y_test
-        rmse8 = np.sqrt(np.mean(err8 ** 2))
+        rmse8 = np.sqrt(np.mean(err8**2))
 
         fit_obj5.fit(Z[0:100, :], t[0:100])
         pred5 = fit_obj5.predict(Z[106, :])
@@ -163,24 +162,25 @@ class TestCustom(ut.TestCase):
 
         fit_obj9.fit(X_train, y_train)
         err9 = fit_obj9.predict(X_test) - y_test
-        rmse9 = np.sqrt(np.mean(err9 ** 2))
+        rmse9 = np.sqrt(np.mean(err9**2))
 
         self.assertTrue(np.allclose(rmse, 64.933610490495667))
         self.assertTrue(np.allclose(rmse2, 12.968755131423396))
         self.assertTrue(np.allclose(rmse3, 26.716371782298673))
-        self.assertTrue(np.allclose(rmse4, 3.3480756467541766))                
-        self.assertTrue(np.allclose(rmse4_1, 2.074450947020523e-06))        
+        self.assertTrue(np.allclose(rmse4, 3.3480756467541766))
+        self.assertTrue(np.allclose(rmse4_1, 2.074450947020523e-06))
         self.assertTrue(np.allclose(rmse8, 64.93379560651447))
         self.assertTrue(np.allclose(pred5, 1))
-        self.assertTrue(np.allclose(pred6, 1))        
+        self.assertTrue(np.allclose(pred6, 1))
         self.assertTrue(np.allclose(pred6_proba1[0], 0.50507336, atol=1e-6))
-        self.assertTrue(np.allclose(pred6_proba2[3, 0], 0.4836233209751839, atol=1e-6))        
+        self.assertTrue(
+            np.allclose(pred6_proba2[3, 0], 0.4836233209751839, atol=1e-6)
+        )
         self.assertTrue(np.allclose(score6, 0.94999999999999996))
         self.assertTrue(np.allclose(score7, 0.85))
         self.assertTrue(np.allclose(rmse9, 76.12747461579583))
 
     def test_score(self):
-
         np.random.seed(123)
         X, y = datasets.make_regression(n_samples=15, n_features=3)
         breast_cancer = datasets.load_breast_cancer()

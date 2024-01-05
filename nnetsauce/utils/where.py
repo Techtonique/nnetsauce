@@ -18,7 +18,6 @@ except:
 
 
 def index_where(x, elt):
-
     x_ = x.tolist() if isinstance(x, np.ndarray) else x.copy()
 
     n = len(x_)

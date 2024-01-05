@@ -16,7 +16,11 @@ from sklearn.metrics import (
     roc_auc_score,
     f1_score,
 )
-from .config import CLASSIFIERS, MULTITASKCLASSIFIERS, SIMPLEMULTITASKCLASSIFIERS
+from .config import (
+    CLASSIFIERS,
+    MULTITASKCLASSIFIERS,
+    SIMPLEMULTITASKCLASSIFIERS,
+)
 from ..custom import Custom, CustomClassifier
 from ..utils.misc import flatten
 
@@ -93,7 +97,7 @@ class LazyClassifier(Custom, ClassifierMixin):
 
     Examples
     --------
-    >>> import nnetsauce as ns 
+    >>> import nnetsauce as ns
     >>> from sklearn.datasets import load_breast_cancer
     >>> from sklearn.model_selection import train_test_split
     >>> data = load_breast_cancer()
@@ -225,11 +229,17 @@ class LazyClassifier(Custom, ClassifierMixin):
             )
 
         if self.classifiers == "all":
-
-            self.classifiers = [item for sublist in [CLASSIFIERS, MULTITASKCLASSIFIERS, SIMPLEMULTITASKCLASSIFIERS] for item in sublist]            
+            self.classifiers = [
+                item
+                for sublist in [
+                    CLASSIFIERS,
+                    MULTITASKCLASSIFIERS,
+                    SIMPLEMULTITASKCLASSIFIERS,
+                ]
+                for item in sublist
+            ]
 
         else:
-
             try:
                 temp_list = []
                 for classifier in self.classifiers:
@@ -241,21 +251,23 @@ class LazyClassifier(Custom, ClassifierMixin):
                 print("Invalid Classifier(s)")
 
         if self.preprocess is True:
-
             for name, model in tqdm(self.classifiers):  # do parallel exec
-
-                other_args = {} # use this trick for `random_state` too --> refactor                
-                try:                                
-                    if "n_jobs" in model().get_params().keys() and name.find("LogisticRegression") == -1:
+                other_args = (
+                    {}
+                )  # use this trick for `random_state` too --> refactor
+                try:
+                    if (
+                        "n_jobs" in model().get_params().keys()
+                        and name.find("LogisticRegression") == -1
+                    ):
                         other_args["n_jobs"] = self.n_jobs
                 except Exception:
-                    pass 
+                    pass
 
                 start = time.time()
 
                 try:
-                    if "random_state" in model().get_params().keys():                        
-
+                    if "random_state" in model().get_params().keys():
                         pipe = Pipeline(
                             [
                                 ("preprocessor", preprocessor),
@@ -263,7 +275,8 @@ class LazyClassifier(Custom, ClassifierMixin):
                                     "classifier",
                                     CustomClassifier(
                                         obj=model(
-                                            random_state=self.random_state, **other_args
+                                            random_state=self.random_state,
+                                            **other_args
                                         ),
                                         n_hidden_features=self.n_hidden_features,
                                         activation_name=self.activation_name,
@@ -286,7 +299,6 @@ class LazyClassifier(Custom, ClassifierMixin):
                         )
 
                     else:
-
                         pipe = Pipeline(
                             [
                                 ("preprocessor", preprocessor),
@@ -370,21 +382,26 @@ class LazyClassifier(Custom, ClassifierMixin):
                     continue
 
         else:
-
             for name, model in tqdm(self.classifiers):  # do parallel exec
-
-                other_args = {} # use this trick for `random_state` too --> refactor   
-                try:                                
-                    if "n_jobs" in model().get_params().keys() and name.find("LogisticRegression") == -1:
+                other_args = (
+                    {}
+                )  # use this trick for `random_state` too --> refactor
+                try:
+                    if (
+                        "n_jobs" in model().get_params().keys()
+                        and name.find("LogisticRegression") == -1
+                    ):
                         other_args["n_jobs"] = self.n_jobs
                 except Exception:
-                    pass 
+                    pass
 
                 start = time.time()
                 try:
                     if "random_state" in model().get_params().keys():
                         pipe = CustomClassifier(
-                            obj=model(random_state=self.random_state, **other_args),
+                            obj=model(
+                                random_state=self.random_state, **other_args
+                            ),
                             n_hidden_features=self.n_hidden_features,
                             activation_name=self.activation_name,
                             a=self.a,
@@ -499,9 +516,9 @@ class LazyClassifier(Custom, ClassifierMixin):
                     "Time Taken": TIME,
                 }
             )
-        scores = scores.sort_values(
-            by="Accuracy", ascending=False
-        ).set_index("Model")
+        scores = scores.sort_values(by="Accuracy", ascending=False).set_index(
+            "Model"
+        )
 
         if self.predictions:
             predictions_df = pd.DataFrame.from_dict(predictions)
@@ -528,7 +545,7 @@ class LazyClassifier(Custom, ClassifierMixin):
         Returns
         -------
         models: dict-object,
-            Returns a dictionary with each model pipeline as value 
+            Returns a dictionary with each model pipeline as value
             with key as name of models.
         """
         if len(self.models.keys()) == 0:

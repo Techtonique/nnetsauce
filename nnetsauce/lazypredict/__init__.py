@@ -4,5 +4,10 @@ from .lazyMTS import LazyMTS
 from .lazydeepClassifier import LazyDeepClassifier
 from .lazydeepRegressor import LazyDeepRegressor
 
-__all__ = ["LazyClassifier", "LazyRegressor", "LazyMTS", 
-"LazyDeepClassifier", "LazyDeepRegressor"]
+__all__ = [
+    "LazyClassifier",
+    "LazyRegressor",
+    "LazyMTS",
+    "LazyDeepClassifier",
+    "LazyDeepRegressor",
+]

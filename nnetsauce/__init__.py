@@ -38,7 +38,7 @@ __all__ = [
     "DeepRegressor",
     "DeepMTS",
     "GLMClassifier",
-    "GLMRegressor",    
+    "GLMRegressor",
     "LazyClassifier",
     "LazyRegressor",
     "LazyMTS",
@@ -53,5 +53,5 @@ __all__ = [
     "Ridge2Regressor",
     "Ridge2Classifier",
     "Ridge2MultitaskClassifier",
-    "SubSampler"
+    "SubSampler",
 ]

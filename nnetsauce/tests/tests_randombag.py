@@ -13,7 +13,6 @@ from sklearn.linear_model import LogisticRegression
 
 class TestRandomBag(ut.TestCase):
     def test_RandomBag(self):
-
         breast_cancer = load_breast_cancer()
         X = breast_cancer.data
         y = breast_cancer.target
@@ -136,11 +135,10 @@ class TestRandomBag(ut.TestCase):
         self.assertTrue(
             np.allclose(fit_obj.predict(X_test)[0], 1)
             & np.allclose(fit_obj2.predict(X_test)[0], 0)
-        )        
+        )
         self.assertTrue(np.allclose(preds4[0], 125.74435958332731))
 
     def test_score(self):
-
         breast_cancer = load_breast_cancer()
         X = breast_cancer.data
         y = breast_cancer.target
