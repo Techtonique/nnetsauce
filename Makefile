@@ -60,6 +60,7 @@ servedocs: docs## compile the docs watching for changes
 	cd nnetsauce-docs&&mkdocs serve&&cd ..
 
 release: dist ## package and upload a release
+	pip install twine
 	twine upload dist/*
 
 dist: clean ## builds source and wheel package
