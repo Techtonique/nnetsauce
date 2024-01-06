@@ -15,11 +15,11 @@ regr = ns.LazyRegressor(verbose=0, ignore_warnings=True, custom_metric=None,
 models, predictions = regr.fit(X_train, X_test, y_train, y_test)
 model_dictionary = regr.provide_models(X_train, X_test, y_train, y_test)
 print(models)
-print(model_dictionary["LassoLarsIC"])
+print(model_dictionary["CustomRegressor(LassoLarsIC)"])
 
 regr2 = ns.LazyRegressor(verbose=0, ignore_warnings=True, custom_metric=None, 
                         preprocess=False)
 models, predictions = regr2.fit(X_train, X_test, y_train, y_test)
 model_dictionary = regr2.provide_models(X_train, X_test, y_train, y_test)
 print(models)
-print(model_dictionary["LassoLarsIC"])
+print(model_dictionary["CustomRegressor(LassoLarsIC)"])
