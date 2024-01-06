@@ -16,7 +16,7 @@ from sklearn.metrics import (
     mean_pinball_loss,
     mean_absolute_percentage_error,
 )
-from .config import REGRESSORS
+from .config import REGRESSORSMTS
 from ..mts import MTS
 from ..utils import convert_df_to_numeric
 
@@ -234,7 +234,7 @@ class LazyMTS(MTS):
             )
 
         if self.regressors == "all":
-            self.regressors = REGRESSORS
+            self.regressors = REGRESSORSMTS
         else:
             try:
                 temp_list = []

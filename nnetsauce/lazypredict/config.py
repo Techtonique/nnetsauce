@@ -90,3 +90,12 @@ REGRESSORS = [
         and (est[0] not in removed_regressors)
     )
 ]
+
+REGRESSORSMTS = [
+    ("MTS(" + est[0] + ")", est[1])
+    for est in all_estimators()
+    if (
+        issubclass(est[1], RegressorMixin)
+        and (est[0] not in removed_regressors)
+    )
+]
