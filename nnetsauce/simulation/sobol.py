@@ -13520,7 +13520,7 @@ def i4_sobol(dim_num, seed):
             16381,
         ]
 
-        atmost = 2 ** log_max - 1
+        atmost = 2**log_max - 1
         #
         # 	Find the number of bits in ATMOST.
         #
@@ -13613,7 +13613,6 @@ def i4_sobol(dim_num, seed):
         var_l = i4_bit_lo0(seed)
 
     elif seed <= seed_save:
-
         seed_save = 0
         var_l = 1
         lastq = np.zeros(dim_num)
@@ -13628,7 +13627,6 @@ def i4_sobol(dim_num, seed):
         var_l = i4_bit_lo0(seed)
 
     elif seed_save + 1 < seed:
-
         for seed_temp in range(int(seed_save + 1), int(seed)):
             var_l = i4_bit_lo0(seed_temp)
             for i in range(1, dim_num + 1):
@@ -13652,7 +13650,9 @@ def i4_sobol(dim_num, seed):
     quasi = np.zeros(dim_num)
     for i in range(1, dim_num + 1):
         quasi[i - 1] = lastq[i - 1] * recipd
-        lastq[i - 1] = np.bitwise_xor(int(lastq[i - 1]), int(v[i - 1, var_l - 1]))
+        lastq[i - 1] = np.bitwise_xor(
+            int(lastq[i - 1]), int(v[i - 1, var_l - 1])
+        )
 
     seed_save = seed
     seed = seed + 1

@@ -14,7 +14,11 @@ from sklearn.metrics import (
     roc_auc_score,
     f1_score,
 )
-from .config import CLASSIFIERS
+from .config import (
+    CLASSIFIERS,
+    MULTITASKCLASSIFIERS,
+    SIMPLEMULTITASKCLASSIFIERS,
+)
 from ..custom import Custom, CustomClassifier
 
 import warnings
@@ -86,10 +90,11 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         When set to True, the predictions of all the models models are returned as dataframe.
     classifiers : list, optional (default="all")
         When function is provided, trains the chosen classifier(s).
+    n_jobs : int, when possible, run in parallel
 
     Examples
     --------
-    >>> import nnetsauce as ns 
+    >>> import nnetsauce as ns
     >>> from sklearn.datasets import load_breast_cancer
     >>> from sklearn.model_selection import train_test_split
     >>> data = load_breast_cancer()
@@ -110,6 +115,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         predictions=False,
         random_state=42,
         classifiers="all",
+        n_jobs=None,
         # Defining depth
         n_layers=3,
         # CustomClassifier attributes
@@ -138,6 +144,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         self.random_state = random_state
         self.classifiers = classifiers
         self.n_layers = n_layers - 1
+        self.n_jobs = n_jobs
         super().__init__(
             obj=obj,
             n_hidden_features=n_hidden_features,
@@ -203,7 +210,15 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         )
 
         if self.classifiers == "all":
-            self.classifiers = CLASSIFIERS
+            self.classifiers = [
+                item
+                for sublist in [
+                    CLASSIFIERS,
+                    MULTITASKCLASSIFIERS,
+                    SIMPLEMULTITASKCLASSIFIERS,
+                ]
+                for item in sublist
+            ]
         else:
             try:
                 temp_list = []
@@ -214,12 +229,10 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
             except Exception as exception:
                 print(exception)
                 print("Invalid Classifier(s)")
-    
-        for name, model in tqdm(self.classifiers):  # do parallel exec
 
+        for name, model in tqdm(self.classifiers):  # do parallel exec
             start = time.time()
             try:
-
                 if "random_state" in model().get_params().keys():
                     layer_clf = CustomClassifier(
                         obj=model(random_state=self.random_state),
@@ -241,7 +254,6 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                     )
 
                 else:
-
                     layer_clf = CustomClassifier(
                         obj=model(),
                         n_hidden_features=self.n_hidden_features,
@@ -264,25 +276,30 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                 layer_clf.fit(X_train, y_train)
 
                 for _ in range(self.n_layers):
+                    layer_clf = deepcopy(
+                        CustomClassifier(
+                            obj=layer_clf,
+                            n_hidden_features=self.n_hidden_features,
+                            activation_name=self.activation_name,
+                            a=self.a,
+                            nodes_sim=self.nodes_sim,
+                            bias=self.bias,
+                            dropout=self.dropout,
+                            direct_link=self.direct_link,
+                            n_clusters=self.n_clusters,
+                            cluster_encode=self.cluster_encode,
+                            type_clust=self.type_clust,
+                            type_scaling=self.type_scaling,
+                            col_sample=self.col_sample,
+                            row_sample=self.row_sample,
+                            seed=self.seed,
+                            backend=self.backend,
+                        )
+                    )
 
-                    layer_clf = deepcopy(CustomClassifier(obj=layer_clf,
-                        n_hidden_features=self.n_hidden_features,
-                        activation_name=self.activation_name,
-                        a=self.a,
-                        nodes_sim=self.nodes_sim,
-                        bias=self.bias,
-                        dropout=self.dropout,
-                        direct_link=self.direct_link,
-                        n_clusters=self.n_clusters,
-                        cluster_encode=self.cluster_encode,
-                        type_clust=self.type_clust,
-                        type_scaling=self.type_scaling,
-                        col_sample=self.col_sample,
-                        row_sample=self.row_sample,
-                        seed=self.seed,
-                        backend=self.backend))
-                    
-                    layer_clf.fit(X_train, y_train)
+                    # layer_clf.fit(X_train, y_train)
+
+                layer_clf.fit(X_train, y_train)
 
                 self.models[name] = layer_clf
                 y_pred = layer_clf.predict(X_test)
@@ -359,9 +376,9 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                     "Time Taken": TIME,
                 }
             )
-        scores = scores.sort_values(
-            by="Balanced Accuracy", ascending=False
-        ).set_index("Model")
+        scores = scores.sort_values(by="Accuracy", ascending=False).set_index(
+            "Model"
+        )
 
         if self.predictions:
             predictions_df = pd.DataFrame.from_dict(predictions)
@@ -388,7 +405,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         Returns
         -------
         models: dict-object,
-            Returns a dictionary with each model pipeline as value 
+            Returns a dictionary with each model pipeline as value
             with key as name of models.
         """
         if len(self.models.keys()) == 0:

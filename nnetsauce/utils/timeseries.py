@@ -7,36 +7,36 @@
 import numpy as np
 import pandas as pd
 
+
 # compute output dates from data frame's index
 def compute_input_dates(df):
-
     input_dates = df.index.values
-        
+
     frequency = pd.infer_freq(pd.DatetimeIndex(input_dates))
-        
-    input_dates = pd.date_range(start=input_dates[0], 
-                                periods=len(input_dates), 
-                                freq=frequency).values.tolist()
-        
-    df_input_dates = pd.DataFrame({"date": input_dates})                    
+
+    input_dates = pd.date_range(
+        start=input_dates[0], periods=len(input_dates), freq=frequency
+    ).values.tolist()
+
+    df_input_dates = pd.DataFrame({"date": input_dates})
 
     return pd.to_datetime(df_input_dates["date"]).dt.date
 
 
 # compute output dates from data frame's index
 def compute_output_dates(df, horizon):
-
     input_dates = df.index.values
 
     if input_dates[0] == 0:
-        input_dates = pd.date_range(start = pd.Timestamp.today().strftime("%Y-%m-%d"), 
-                                    periods=horizon)
+        input_dates = pd.date_range(
+            start=pd.Timestamp.today().strftime("%Y-%m-%d"), periods=horizon
+        )
 
-    #print(f"\n in nnetsauce.utils.timeseries 1: {input_dates} \n")
+    # print(f"\n in nnetsauce.utils.timeseries 1: {input_dates} \n")
 
     frequency = pd.infer_freq(pd.DatetimeIndex(input_dates))
 
-    #print(f"\n in nnetsauce.utils.timeseries 2: {frequency} \n")
+    # print(f"\n in nnetsauce.utils.timeseries 2: {frequency} \n")
 
     output_dates = np.delete(
         pd.date_range(
@@ -45,7 +45,7 @@ def compute_output_dates(df, horizon):
         0,
     ).tolist()
 
-    #print(f"\n in nnetsauce.utils.timeseries 3: {output_dates} \n")
+    # print(f"\n in nnetsauce.utils.timeseries 3: {output_dates} \n")
 
     df_output_dates = pd.DataFrame({"date": output_dates})
     output_dates = pd.to_datetime(df_output_dates["date"]).dt.date
@@ -55,7 +55,6 @@ def compute_output_dates(df, horizon):
 
 # create lags for one series
 def create_lags(x, k, n=None):
-
     k_ = k + 1
 
     n_k = len(x) - k_
@@ -65,7 +64,6 @@ def create_lags(x, k, n=None):
     z = [x_[i : (n_k + i + 1)] for i in range(k_)]
 
     if n is None:
-
         return np.column_stack(z)
 
     temp = np.column_stack(z)
@@ -77,7 +75,6 @@ def create_lags(x, k, n=None):
 # a = np.reshape(range(0, 24), (8, 3))
 # create_train_inputs(a, 2)
 def create_train_inputs(X, k):
-
     n_k = X.shape[0] - k
 
     z = [X[i : n_k + i, :] for i in range(1, (k + 1))]
@@ -89,7 +86,6 @@ def create_train_inputs(X, k):
 # a = np.reshape(range(0, 24), (8, 3))
 # reformat_response(a, 2)
 def reformat_response(X, k):
-
     return np.concatenate([X[i, :] for i in range(k)])
 
 

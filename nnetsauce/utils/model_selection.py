@@ -79,9 +79,7 @@ class TimeSeriesSplit(TimeSeriesSplit):
         # Main loop -----
 
         if fixed_window == True:
-
             while max_index_test <= n:
-
                 yield (
                     indices[min_index_train:max_index_train],
                     indices[min_index_test:max_index_test],
@@ -95,9 +93,7 @@ class TimeSeriesSplit(TimeSeriesSplit):
                 n_splits += 1
 
         else:
-
             while max_index_test <= n:
-
                 yield (
                     indices[min_index_train:max_index_train],
                     indices[min_index_test:max_index_test],

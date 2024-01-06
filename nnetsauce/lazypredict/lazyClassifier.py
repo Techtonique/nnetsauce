@@ -16,8 +16,13 @@ from sklearn.metrics import (
     roc_auc_score,
     f1_score,
 )
-from .config import CLASSIFIERS
+from .config import (
+    CLASSIFIERS,
+    MULTITASKCLASSIFIERS,
+    SIMPLEMULTITASKCLASSIFIERS,
+)
 from ..custom import Custom, CustomClassifier
+from ..utils.misc import flatten
 
 import warnings
 
@@ -84,14 +89,15 @@ class LazyClassifier(Custom, ClassifierMixin):
         When set to True, the warning related to algorigms that are not able to run are ignored.
     custom_metric : function, optional (default=None)
         When function is provided, models are evaluated based on the custom evaluation metric provided.
-    prediction : bool, optional (default=False)
+    predictions : bool, optional (default=False)
         When set to True, the predictions of all the models models are returned as dataframe.
     classifiers : list, optional (default="all")
         When function is provided, trains the chosen classifier(s).
+    n_jobs : int, when possible, run in parallel
 
     Examples
     --------
-    >>> import nnetsauce as ns 
+    >>> import nnetsauce as ns
     >>> from sklearn.datasets import load_breast_cancer
     >>> from sklearn.model_selection import train_test_split
     >>> data = load_breast_cancer()
@@ -113,6 +119,7 @@ class LazyClassifier(Custom, ClassifierMixin):
         random_state=42,
         classifiers="all",
         preprocess=False,
+        n_jobs=None,
         # CustomClassifier attributes
         obj=None,
         n_hidden_features=5,
@@ -139,6 +146,7 @@ class LazyClassifier(Custom, ClassifierMixin):
         self.random_state = random_state
         self.classifiers = classifiers
         self.preprocess = preprocess
+        self.n_jobs = n_jobs
         super().__init__(
             obj=obj,
             n_hidden_features=n_hidden_features,
@@ -221,7 +229,16 @@ class LazyClassifier(Custom, ClassifierMixin):
             )
 
         if self.classifiers == "all":
-            self.classifiers = CLASSIFIERS
+            self.classifiers = [
+                item
+                for sublist in [
+                    CLASSIFIERS,
+                    MULTITASKCLASSIFIERS,
+                    SIMPLEMULTITASKCLASSIFIERS,
+                ]
+                for item in sublist
+            ]
+
         else:
             try:
                 temp_list = []
@@ -234,9 +251,21 @@ class LazyClassifier(Custom, ClassifierMixin):
                 print("Invalid Classifier(s)")
 
         if self.preprocess is True:
-
             for name, model in tqdm(self.classifiers):  # do parallel exec
+                other_args = (
+                    {}
+                )  # use this trick for `random_state` too --> refactor
+                try:
+                    if (
+                        "n_jobs" in model().get_params().keys()
+                        and name.find("LogisticRegression") == -1
+                    ):
+                        other_args["n_jobs"] = self.n_jobs
+                except Exception:
+                    pass
+
                 start = time.time()
+
                 try:
                     if "random_state" in model().get_params().keys():
                         pipe = Pipeline(
@@ -246,7 +275,8 @@ class LazyClassifier(Custom, ClassifierMixin):
                                     "classifier",
                                     CustomClassifier(
                                         obj=model(
-                                            random_state=self.random_state
+                                            random_state=self.random_state,
+                                            **other_args
                                         ),
                                         n_hidden_features=self.n_hidden_features,
                                         activation_name=self.activation_name,
@@ -267,6 +297,7 @@ class LazyClassifier(Custom, ClassifierMixin):
                                 ),
                             ]
                         )
+
                     else:
                         pipe = Pipeline(
                             [
@@ -274,7 +305,7 @@ class LazyClassifier(Custom, ClassifierMixin):
                                 (
                                     "classifier",
                                     CustomClassifier(
-                                        obj=model(),
+                                        obj=model(**other_args),
                                         n_hidden_features=self.n_hidden_features,
                                         activation_name=self.activation_name,
                                         a=self.a,
@@ -347,15 +378,30 @@ class LazyClassifier(Custom, ClassifierMixin):
                     if self.ignore_warnings is False:
                         print(name + " model failed to execute")
                         print(exception)
+                finally:
+                    continue
 
         else:
-
             for name, model in tqdm(self.classifiers):  # do parallel exec
+                other_args = (
+                    {}
+                )  # use this trick for `random_state` too --> refactor
+                try:
+                    if (
+                        "n_jobs" in model().get_params().keys()
+                        and name.find("LogisticRegression") == -1
+                    ):
+                        other_args["n_jobs"] = self.n_jobs
+                except Exception:
+                    pass
+
                 start = time.time()
                 try:
                     if "random_state" in model().get_params().keys():
                         pipe = CustomClassifier(
-                            obj=model(random_state=self.random_state),
+                            obj=model(
+                                random_state=self.random_state, **other_args
+                            ),
                             n_hidden_features=self.n_hidden_features,
                             activation_name=self.activation_name,
                             a=self.a,
@@ -374,7 +420,7 @@ class LazyClassifier(Custom, ClassifierMixin):
                         )
                     else:
                         pipe = CustomClassifier(
-                            obj=model(),
+                            obj=model(**other_args),
                             n_hidden_features=self.n_hidden_features,
                             activation_name=self.activation_name,
                             a=self.a,
@@ -444,6 +490,8 @@ class LazyClassifier(Custom, ClassifierMixin):
                     if self.ignore_warnings is False:
                         print(name + " model failed to execute")
                         print(exception)
+                finally:
+                    continue
 
         if self.custom_metric is None:
             scores = pd.DataFrame(
@@ -468,9 +516,9 @@ class LazyClassifier(Custom, ClassifierMixin):
                     "Time Taken": TIME,
                 }
             )
-        scores = scores.sort_values(
-            by="Balanced Accuracy", ascending=False
-        ).set_index("Model")
+        scores = scores.sort_values(by="Accuracy", ascending=False).set_index(
+            "Model"
+        )
 
         if self.predictions:
             predictions_df = pd.DataFrame.from_dict(predictions)
@@ -497,7 +545,7 @@ class LazyClassifier(Custom, ClassifierMixin):
         Returns
         -------
         models: dict-object,
-            Returns a dictionary with each model pipeline as value 
+            Returns a dictionary with each model pipeline as value
             with key as name of models.
         """
         if len(self.models.keys()) == 0:

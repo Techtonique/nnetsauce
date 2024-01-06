@@ -111,7 +111,6 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
         return_std=True,
         backend="cpu",
     ):
-
         super().__init__(
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,
@@ -207,9 +206,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
         self.return_std = return_std
 
         if self.return_std == False:
-
             if len(X.shape) == 1:
-
                 return (
                     self.y_mean_
                     + mo.safe_sparse_dot(
@@ -226,9 +223,7 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
             )
 
         else:  # confidence interval required for preds?
-
             if len(X.shape) == 1:
-
                 Z = self.cook_test_set(new_X, **kwargs)
 
                 pred_obj = lmf.beta_Sigma_hat_rvfl(

@@ -36,7 +36,7 @@ regr_mts = ns.LazyMTS(verbose=0, ignore_warnings=True, custom_metric=None,
 models, predictions = regr_mts.fit(df_train, df_test)
 model_dictionary = regr_mts.provide_models(df_train, df_test)
 print(models)
-print(model_dictionary["QuantileRegressor"])
+print(model_dictionary["MTS(QuantileRegressor)"])
 
 regr_mts2 = ns.LazyMTS(verbose=0, ignore_warnings=True, custom_metric=None,
                       lags = 4, n_hidden_features=7, n_clusters=2,
@@ -44,29 +44,5 @@ regr_mts2 = ns.LazyMTS(verbose=0, ignore_warnings=True, custom_metric=None,
 models, predictions = regr_mts2.fit(df_train, df_test)
 model_dictionary = regr_mts.provide_models(df_train, df_test)
 print(models)
-print(model_dictionary["QuantileRegressor"])
+print(model_dictionary["MTS(LinearSVR)"])
 
-# print(f"\n ----- Example 2 ----- \n")
-# M = np.random.rand(50, 3)
-# M[:,0] = 10*M[:,0]
-# M[:,2] = 25*M[:,2]
-# #print(M)
-# df = pd.DataFrame(M, columns=["series1", "series2", "series3"])
-
-# idx_train = int(df.shape[0]*0.8)
-# idx_end = df.shape[0]
-# df_train = df.iloc[0:idx_train,]
-# df_test = df.iloc[idx_train:idx_end,]
-
-# # y_train = np.random.rand(df_train.shape[0])
-# # obj = Ridge()
-# # regr = ns.CustomRegressor(obj=obj, n_clusters=2)
-# # regr.fit(df_train, y_train)
-# # regr.predict(df_test)
-
-# regr_mts = ns.LazyMTS(verbose=0, ignore_warnings=False, custom_metric=None,
-#                       lags = 4, n_hidden_features=7, n_clusters=3)
-# models, predictions = regr_mts.fit(df_train, df_test)
-# model_dictionary = regr_mts.provide_models(df_train, df_test)
-# print(models)
-# #print(model_dictionary["QuantileRegressor"])

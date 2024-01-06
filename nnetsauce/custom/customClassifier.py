@@ -143,7 +143,6 @@ class CustomClassifier(Custom, ClassifierMixin):
         seed=123,
         backend="cpu",
     ):
-
         super().__init__(
             obj=obj,
             n_hidden_features=n_hidden_features,
@@ -189,7 +188,6 @@ class CustomClassifier(Custom, ClassifierMixin):
 
         # if sample_weights, else: (must use self.row_index)
         if sample_weight is not None:
-
             self.obj.fit(
                 scaled_Z,
                 output_y,
@@ -224,7 +222,6 @@ class CustomClassifier(Custom, ClassifierMixin):
         """
 
         if len(X.shape) == 1:
-
             n_features = X.shape[0]
             new_X = mo.rbind(
                 X.reshape(1, n_features),
@@ -255,7 +252,6 @@ class CustomClassifier(Custom, ClassifierMixin):
         """
 
         if len(X.shape) == 1:
-
             n_features = X.shape[0]
             new_X = mo.rbind(
                 X.reshape(1, n_features),

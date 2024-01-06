@@ -177,7 +177,6 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         method="SAMME",
         backend="cpu",
     ):
-
         super().__init__(
             obj=obj,
             n_estimators=n_estimators,
@@ -248,11 +247,9 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         self.n_classes = len(np.unique(y))
 
         if sample_weight is None:
-
             w_m = np.repeat(1.0 / n, n)
 
         else:
-
             w_m = np.asarray(sample_weight)
 
         base_learner = CustomClassifier(
@@ -276,14 +273,12 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             pbar = Progbar(self.n_estimators)
 
         if self.method == "SAMME":
-
             err_m = 1e6
             err_bound = 1 - 1 / self.n_classes
             self.alpha_.append(1.0)
             x_range_n = range(n)
 
             for m in range(self.n_estimators):
-
                 preds = base_learner.fit(
                     X, y, sample_weight=np.ravel(w_m, order="C"), **kwargs
                 ).predict(X)
@@ -300,9 +295,8 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                 )  # sum(w_m) == 1
 
                 if self.reg_lambda > 0:
-
                     err_m += self.reg_lambda * (
-                        (1 - self.reg_alpha) * 0.5 * sum([x ** 2 for x in w_m])
+                        (1 - self.reg_alpha) * 0.5 * sum([x**2 for x in w_m])
                         + self.reg_alpha * sum([abs(x) for x in w_m])
                     )
 
@@ -333,19 +327,15 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             return self
 
         if self.method == "SAMME.R":
-
             Y = mo.one_hot_encode2(y, self.n_classes)
 
             if sample_weight is None:
-
                 w_m = np.repeat(1.0 / n, n)  # (N, 1)
 
             else:
-
                 w_m = np.asarray(sample_weight)
 
             for m in range(self.n_estimators):
-
                 probs = base_learner.fit(
                     X, y, sample_weight=np.ravel(w_m, order="C"), **kwargs
                 ).predict_proba(X)
@@ -419,14 +409,12 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         n_iter = len(self.base_learners_)
 
         if self.method == "SAMME":
-
             ensemble_learner = np.zeros((X.shape[0], self.n_classes))
 
             # if self.verbose == 1:
             #    pbar = Progbar(n_iter)
 
-            for (idx, base_learner) in self.base_learners_.items():
-
+            for idx, base_learner in self.base_learners_.items():
                 preds = base_learner.predict(X, **kwargs)
 
                 ensemble_learner += self.alpha_[idx] * mo.one_hot_encode2(
@@ -452,7 +440,6 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         #    pbar = Progbar(n_iter)
 
         for idx, base_learner in self.base_learners_.items():
-
             probs = base_learner.predict_proba(X, **kwargs)
 
             np.clip(a=probs, a_min=2.220446049250313e-16, a_max=1.0, out=probs)

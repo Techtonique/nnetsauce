@@ -9,7 +9,6 @@ import nnetsauce as ns
 
 class TestRVFL(ut.TestCase):
     def test_rvfl(self):
-
         np.random.seed(123)
         X, y = datasets.make_regression(n_samples=25, n_features=3)
 
@@ -73,23 +72,23 @@ class TestRVFL(ut.TestCase):
 
         fit_obj.fit(X_train, y_train)
         err = fit_obj.predict(X_test, return_std=True)[0] - y_test
-        rmse = np.sqrt(np.mean(err ** 2))
+        rmse = np.sqrt(np.mean(err**2))
 
         fit_obj2.fit(X_train, y_train)
         err2 = fit_obj2.predict(X_test, return_std=True)[0] - y_test
-        rmse2 = np.sqrt(np.mean(err2 ** 2))
+        rmse2 = np.sqrt(np.mean(err2**2))
 
         fit_obj3.fit(X_train, y_train)
         err3 = fit_obj3.predict(X_test, return_std=True)[0] - y_test
-        rmse3 = np.sqrt(np.mean(err3 ** 2))
+        rmse3 = np.sqrt(np.mean(err3**2))
 
         fit_obj4.fit(X_train, y_train)
         err4 = fit_obj4.predict(X_test, return_std=True)[0] - y_test
-        rmse4 = np.sqrt(np.mean(err4 ** 2))
+        rmse4 = np.sqrt(np.mean(err4**2))
 
         fit_obj5.fit(X_train, y_train)
         err5 = fit_obj5.predict(X_test, return_std=True)[0] - y_test
-        rmse5 = np.sqrt(np.mean(err5 ** 2))
+        rmse5 = np.sqrt(np.mean(err5**2))
 
         pred1 = fit_obj.predict(X_test[0, :], return_std=True)[0]
 
@@ -112,7 +111,6 @@ class TestRVFL(ut.TestCase):
         )
 
     def test_get_set(self):
-
         fit_obj = ns.BayesianRVFLRegressor(
             n_hidden_features=10,
             direct_link=False,
@@ -168,7 +166,6 @@ class TestRVFL(ut.TestCase):
         )
 
     def test_score(self):
-
         np.random.seed(123)
         X, y = datasets.make_regression(n_samples=100, n_features=3)
 

@@ -140,7 +140,6 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
         verbose=1,
         backend="cpu",
     ):
-
         super().__init__(
             obj=obj,
             n_estimators=n_estimators,
@@ -207,7 +206,6 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
         # 1 - Sequential training -----
 
         if self.n_jobs is None:
-
             self.voter_ = rbagloop_regression(
                 base_learner, X, y, self.n_estimators, self.verbose, self.seed
             )
@@ -223,21 +221,19 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
             base_learner__ = pickle.loads(pickle.dumps(base_learner, -1))
             base_learner__.set_params(seed=self.seed + m * 1000)
             base_learner__.fit(X, y, **kwargs)
-            return base_learner__          
+            return base_learner__
 
         if self.verbose == 1:
-
             voters_list = Parallel(n_jobs=self.n_jobs, prefer="threads")(
                 delayed(fit_estimators)(m)
                 for m in tqdm(range(self.n_estimators))
             )
         else:
-
             voters_list = Parallel(n_jobs=self.n_jobs, prefer="threads")(
                 delayed(fit_estimators)(m) for m in range(self.n_estimators)
             )
 
-        self.voter_ = {i: elt for i, elt in enumerate(voters_list)}    
+        self.voter_ = {i: elt for i, elt in enumerate(voters_list)}
 
         self.n_estimators = len(self.voter_)
 
@@ -262,7 +258,6 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
         """
 
         def calculate_preds(voter, weights=None):
-
             ensemble_preds = 0
 
             n_iter = len(voter)
@@ -270,16 +265,13 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
             assert n_iter > 0, "no estimator found in `RandomBag` ensemble"
 
             if weights is None:
-
                 for idx, elt in voter.items():
-
                     ensemble_preds += elt.predict(X)
 
                 return ensemble_preds / n_iter
 
             # if weights is not None:
             for idx, elt in voter.items():
-
                 ensemble_preds += weights[idx] * elt.predict(X)
 
             return ensemble_preds
@@ -287,7 +279,6 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
         # end calculate_preds ----
 
         if weights is None:
-
             return calculate_preds(self.voter_)
 
         # if weights is not None:

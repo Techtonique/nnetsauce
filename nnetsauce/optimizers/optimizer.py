@@ -4,7 +4,8 @@
 
 from .helpers import scd, sgd, one_hot_encode
 
-class Optimizer():
+
+class Optimizer:
     """Optimizer class
 
     Attributes:
@@ -67,7 +68,6 @@ class Optimizer():
         tolerance=1e-3,
         verbose=1,
     ):
-
         self.type_optim = type_optim
         self.num_iters = num_iters
         self.learning_rate = learning_rate
@@ -103,7 +103,6 @@ class Optimizer():
         """
 
         if self.type_optim == "scd":
-
             self.results = scd(
                 loss_func,
                 response=response,
@@ -121,7 +120,6 @@ class Optimizer():
             )
 
         if self.type_optim == "sgd":
-
             self.results = sgd(
                 loss_func,
                 response=response,

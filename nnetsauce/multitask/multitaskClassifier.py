@@ -144,7 +144,6 @@ class MultitaskClassifier(Base, ClassifierMixin):
         seed=123,
         backend="cpu",
     ):
-
         super().__init__(
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,
@@ -199,7 +198,6 @@ class MultitaskClassifier(Base, ClassifierMixin):
 
         # if sample_weight is None:
         for i in range(self.n_classes_):
-
             self.fit_objs_[i] = pickle.loads(
                 pickle.dumps(self.obj.fit(scaled_Z, Y[:, i], **kwargs), -1)
             )
@@ -249,7 +247,6 @@ class MultitaskClassifier(Base, ClassifierMixin):
         probs = np.zeros((shape_X[0], self.n_classes_))
 
         if len(shape_X) == 1:
-
             n_features = shape_X[0]
 
             new_X = mo.rbind(
@@ -261,16 +258,13 @@ class MultitaskClassifier(Base, ClassifierMixin):
 
             # loop on all the classes
             for i in range(self.n_classes_):
-
                 probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)[0]
 
         else:
-
             Z = self.cook_test_set(X, **kwargs)
 
             # loop on all the classes
             for i in range(self.n_classes_):
-
                 probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)
 
         expit_raw_probs = expit(probs)

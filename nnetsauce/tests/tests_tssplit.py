@@ -9,7 +9,6 @@ import nnetsauce as ns
 
 class TestTimeSeriesSplit(ut.TestCase):
     def test_TimeSeriesSplit(self):
-
         X = [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10], [11, 12], [13, 14]]
 
         tscv2 = ns.utils.TimeSeriesSplit()

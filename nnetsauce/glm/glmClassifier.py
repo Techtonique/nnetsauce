@@ -73,7 +73,7 @@ class GLMClassifier(GLM, ClassifierMixin):
 
         optimizer: object
             optimizer, from class nnetsauce.Optimizer
-        
+
         seed: int
             reproducibility seed for nodes_sim=='uniform'
 
@@ -109,9 +109,8 @@ class GLMClassifier(GLM, ClassifierMixin):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         optimizer=Optimizer(),
-        seed=123
+        seed=123,
     ):
-
         super().__init__(
             n_hidden_features=n_hidden_features,
             lambda1=lambda1,
@@ -131,12 +130,11 @@ class GLMClassifier(GLM, ClassifierMixin):
             optimizer=optimizer,
             seed=seed,
         )
-        
-        self.family = family        
+
+        self.family = family
 
     def logit_loss(self, Y, row_index, XB):
-
-        self.n_classes = Y.shape[1] #len(np.unique(y))
+        self.n_classes = Y.shape[1]  # len(np.unique(y))
         # Y = mo.one_hot_encode2(y, self.n_classes)
         # Y = self.optimizer.one_hot_encode(y, self.n_classes)
 
@@ -150,7 +148,6 @@ class GLMClassifier(GLM, ClassifierMixin):
         return -np.mean(np.sum(Y[row_index, :] * XB, axis=1) - logsumexp(XB))
 
     def expit_erf_loss(self, Y, row_index, XB):
-
         # self.n_classes = len(np.unique(y))
         # Y = mo.one_hot_encode2(y, self.n_classes)
         # Y = self.optimizer.one_hot_encode(y, self.n_classes)
@@ -172,7 +169,6 @@ class GLMClassifier(GLM, ClassifierMixin):
         type_loss="logit",
         **kwargs
     ):
-
         res = {
             "logit": self.logit_loss,
             "expit": self.expit_erf_loss,
@@ -180,7 +176,6 @@ class GLMClassifier(GLM, ClassifierMixin):
         }
 
         if row_index is None:
-
             row_index = range(len(y))
             XB = self.compute_XB(
                 X,
@@ -201,12 +196,7 @@ class GLMClassifier(GLM, ClassifierMixin):
             group_index=group_index, beta=beta
         )
 
-    def fit(
-        self,
-        X,
-        y,
-        **kwargs
-    ):
+    def fit(self, X, y, **kwargs):
         """Fit GLM model to training data (X, y).
 
         Args:
@@ -246,7 +236,7 @@ class GLMClassifier(GLM, ClassifierMixin):
 
         # initialization
         beta_ = np.linalg.lstsq(scaled_Z, Y, rcond=None)[0]
-        
+
         # optimization
         # fit(self, loss_func, response, x0, **kwargs):
         # loss_func(self, beta, group_index, X, y,
@@ -260,7 +250,7 @@ class GLMClassifier(GLM, ClassifierMixin):
             X=scaled_Z,
             Y=Y,
             y=y,
-            type_loss=self.family
+            type_loss=self.family,
         )
 
         self.beta_ = self.optimizer.results[0]
@@ -305,7 +295,6 @@ class GLMClassifier(GLM, ClassifierMixin):
 
         """
         if len(X.shape) == 1:
-
             n_features = X.shape[0]
             new_X = mo.rbind(
                 X.reshape(1, n_features),
@@ -315,7 +304,6 @@ class GLMClassifier(GLM, ClassifierMixin):
             Z = self.cook_test_set(new_X, **kwargs)
 
         else:
-
             Z = self.cook_test_set(X, **kwargs)
 
         ZB = mo.safe_sparse_dot(
@@ -327,19 +315,16 @@ class GLMClassifier(GLM, ClassifierMixin):
         )
 
         if self.family == "logit":
-
             exp_ZB = np.exp(ZB)
 
             return exp_ZB / exp_ZB.sum(axis=1)[:, None]
 
         if self.family == "expit":
-
             exp_ZB = expit(ZB)
 
             return exp_ZB / exp_ZB.sum(axis=1)[:, None]
 
         if self.family == "erf":
-
             exp_ZB = 0.5 * (1 + erf(ZB))
 
             return exp_ZB / exp_ZB.sum(axis=1)[:, None]

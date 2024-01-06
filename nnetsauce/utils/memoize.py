@@ -2,12 +2,10 @@ import functools
 
 
 def memoize(func, maxsize=128):
-
     cache = func.cache = {}
 
     @functools.wraps(func)
     def memoized_func(*args, **kwargs):
-
         key = str(args) + str(kwargs)
 
         if key in cache:

@@ -1,45 +1,101 @@
-
+from functools import partial
 from sklearn.base import ClassifierMixin, RegressorMixin
-from sklearn.utils import all_estimators
+from sklearn.utils.discovery import all_estimators
+from ..multitask import MultitaskClassifier, SimpleMultitaskClassifier
+
 
 removed_classifiers = [
     "ClassifierChain",
     "ComplementNB",
-    "MultiOutputClassifier", 
-    "MultinomialNB", 
+    "GaussianProcessClassifier",
+    "GradientBoostingClassifier",
+    "HistGradientBoostingClassifier",
+    # "LogisticRegression",
+    # "LogisticRegressionCV",
+    "MultiOutputClassifier",
+    "MultinomialNB",
     "OneVsOneClassifier",
     "OneVsRestClassifier",
     "OutputCodeClassifier",
     "RadiusNeighborsClassifier",
+    "StackingClassifier",
     "VotingClassifier",
 ]
 
 removed_regressors = [
     "TheilSenRegressor",
-    "ARDRegression", 
-    "CCA", 
-    "IsotonicRegression", 
+    "ARDRegression",
+    "CCA",
+    "GaussianProcessRegressor",
+    "GradientBoostingRegressor",
+    "HistGradientBoostingRegressor",
+    "IsotonicRegression",
+    "KernelRidge",
+    "MultiOutputRegressor",
+    "MultiTaskElasticNet",
+    "MultiTaskElasticNetCV",
+    "MultiTaskLasso",
+    "MultiTaskLassoCV",
+    "NuSVR",
+    "OrthogonalMatchingPursuit",
+    "OrthogonalMatchingPursuitCV",
+    "PLSCanonical",
+    "PLSRegression",
+    "RadiusNeighborsRegressor",
+    "RandomForestRegressor",
+    "RegressorChain",
     "StackingRegressor",
-    "MultiOutputRegressor", 
-    "MultiTaskElasticNet", 
-    "MultiTaskElasticNetCV", 
-    "MultiTaskLasso", 
-    "MultiTaskLassoCV", 
-    "PLSCanonical", 
-    "PLSRegression", 
-    "RadiusNeighborsRegressor", 
-    "RegressorChain", 
-    "VotingRegressor", 
+    "SVR",
+    "VotingRegressor",
 ]
 
 CLASSIFIERS = [
-    est
+    ("CustomClassifier(" + est[0] + ")", est[1])
     for est in all_estimators()
-    if (issubclass(est[1], ClassifierMixin) and (est[0] not in removed_classifiers))
+    if (
+        issubclass(est[1], ClassifierMixin)
+        and (est[0] not in removed_classifiers)
+    )
+]
+
+MULTITASKCLASSIFIERS = [
+    (
+        "MultitaskClassifier(" + est[0] + ")",
+        partial(MultitaskClassifier, obj=est[1]()),
+    )
+    for est in all_estimators()
+    if (
+        issubclass(est[1], RegressorMixin)
+        and (est[0] not in removed_regressors)
+    )
+]
+
+SIMPLEMULTITASKCLASSIFIERS = [
+    (
+        "SimpleMultitaskClassifier(" + est[0] + ")",
+        partial(SimpleMultitaskClassifier, obj=est[1]()),
+    )
+    for est in all_estimators()
+    if (
+        issubclass(est[1], RegressorMixin)
+        and (est[0] not in removed_regressors)
+    )
 ]
 
 REGRESSORS = [
-    est
+    ("CustomRegressor(" + est[0] + ")", est[1])
     for est in all_estimators()
-    if (issubclass(est[1], RegressorMixin) and (est[0] not in removed_regressors))
+    if (
+        issubclass(est[1], RegressorMixin)
+        and (est[0] not in removed_regressors)
+    )
+]
+
+REGRESSORSMTS = [
+    ("MTS(" + est[0] + ")", est[1])
+    for est in all_estimators()
+    if (
+        issubclass(est[1], RegressorMixin)
+        and (est[0] not in removed_regressors)
+    )
 ]

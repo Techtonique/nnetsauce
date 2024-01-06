@@ -1,4 +1,5 @@
-import numpy as np 
+import numpy as np
+
 
 def getsims(input_tuple, ix):
     n_sims = len(input_tuple)

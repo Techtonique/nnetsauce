@@ -49,7 +49,7 @@ def nearestPD(A):
     k = 1
     while not isPD(A3):
         mineig = np.min(np.real(la.eigvals(A3)))
-        A3 += I * (-mineig * k ** 2 + spacing)
+        A3 += I * (-mineig * k**2 + spacing)
         k += 1
 
     return A3

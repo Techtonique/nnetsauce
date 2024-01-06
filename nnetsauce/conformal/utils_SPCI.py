@@ -66,7 +66,7 @@ def make_NP_df(X, Y):
 
 def generate_bootstrap_samples(n, m, B):
     """
-      Return: B-by-m matrix, where row b gives the indices for b-th bootstrap sample
+    Return: B-by-m matrix, where row b gives the indices for b-th bootstrap sample
     """
     samples_idx = np.zeros((B, m), dtype=int)
     for b in range(B):

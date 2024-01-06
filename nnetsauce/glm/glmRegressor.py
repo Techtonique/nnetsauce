@@ -9,6 +9,7 @@ from ..utils import matrixops as mo
 from sklearn.base import RegressorMixin
 from ..optimizers import Optimizer
 
+
 class GLMRegressor(GLM, RegressorMixin):
     """Generalized 'linear' models using quasi-randomized networks (regression)
 
@@ -109,9 +110,8 @@ class GLMRegressor(GLM, RegressorMixin):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         optimizer=Optimizer(),
-        seed=123
+        seed=123,
     ):
-
         super().__init__(
             n_hidden_features=n_hidden_features,
             lambda1=lambda1,
@@ -132,7 +132,7 @@ class GLMRegressor(GLM, RegressorMixin):
             seed=seed,
         )
 
-        self.family = family                
+        self.family = family
 
     def gaussian_loss(self, y, row_index, XB):
         return 0.5 * np.mean(np.square(y[row_index] - XB))
@@ -153,7 +153,6 @@ class GLMRegressor(GLM, RegressorMixin):
         type_loss="gaussian",
         **kwargs
     ):
-
         res = {
             "gaussian": self.gaussian_loss,
             "laplace": self.laplace_loss,
@@ -161,7 +160,6 @@ class GLMRegressor(GLM, RegressorMixin):
         }
 
         if row_index is None:
-
             row_index = range(len(y))
             XB = self.compute_XB(X, beta=beta)
 
@@ -175,12 +173,7 @@ class GLMRegressor(GLM, RegressorMixin):
             group_index=group_index, beta=beta
         )
 
-    def fit(
-        self,
-        X,
-        y,
-        **kwargs
-    ):
+    def fit(self, X, y, **kwargs):
         """Fit GLM model to training data (X, y).
 
         Args:
@@ -212,7 +205,7 @@ class GLMRegressor(GLM, RegressorMixin):
         n_Z = scaled_Z.shape[0]
 
         # initialization
-        beta_ = np.linalg.lstsq(scaled_Z, centered_y, rcond=None)[0]        
+        beta_ = np.linalg.lstsq(scaled_Z, centered_y, rcond=None)[0]
 
         # optimization
         # fit(self, loss_func, response, x0, **kwargs):
@@ -253,7 +246,6 @@ class GLMRegressor(GLM, RegressorMixin):
         """
 
         if len(X.shape) == 1:
-
             n_features = X.shape[0]
             new_X = mo.rbind(
                 X.reshape(1, n_features),

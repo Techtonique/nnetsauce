@@ -1,6 +1,3 @@
-# Adapted from: https://github.com/shankarpandala/lazypredict
-# Author: Shankar Rao Pandala <shankar.pandala@live.com>
-
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -14,9 +11,9 @@ from sklearn.metrics import (
     mean_squared_error,
     mean_absolute_error,
     mean_pinball_loss,
-    mean_absolute_percentage_error
+    mean_absolute_percentage_error,
 )
-from .config import REGRESSORS
+from .config import REGRESSORSMTS
 from ..mts import MTS
 from ..utils import convert_df_to_numeric
 
@@ -27,7 +24,10 @@ pd.set_option("display.precision", 2)
 pd.set_option("display.float_format", lambda x: "%.2f" % x)
 
 numeric_transformer = Pipeline(
-    steps=[("imputer", SimpleImputer(strategy="mean")), ("scaler", StandardScaler())]
+    steps=[
+        ("imputer", SimpleImputer(strategy="mean")),
+        ("scaler", StandardScaler()),
+    ]
 )
 
 categorical_transformer_low = Pipeline(
@@ -72,12 +72,14 @@ def get_card_split(df, cols, n=11):
     card_low = cols[~cond]
     return card_low, card_high
 
+
 def adjusted_rsquared(r2, n, p):
     return 1 - (1 - r2) * ((n - 1) / (n - p - 1))
 
+
 # def mean_percentage_error(y_pred, y_true):
-#     pe = (y_pred - y_true) / np.maximum(np.abs(y_true), 
-#                                         np.finfo(np.float64).eps)    
+#     pe = (y_pred - y_true) / np.maximum(np.abs(y_true),
+#                                         np.finfo(np.float64).eps)
 #     return np.average(pe)
 
 
@@ -113,7 +115,7 @@ class LazyMTS(MTS):
         regressors="all",
         preprocess=False,
         # MTS attributes
-        obj = None,
+        obj=None,
         n_hidden_features=5,
         activation_name="relu",
         a=0.01,
@@ -131,7 +133,7 @@ class LazyMTS(MTS):
         agg="mean",
         seed=123,
         backend="cpu",
-        show_progress=False
+        show_progress=False,
     ):
         self.verbose = verbose
         self.ignore_warnings = ignore_warnings
@@ -160,7 +162,7 @@ class LazyMTS(MTS):
             replications=replications,
             kernel=kernel,
             agg=agg,
-            show_progress=show_progress
+            show_progress=show_progress,
         )
 
     def fit(self, X_train, X_test, xreg=None, new_xreg=None, **kwargs):
@@ -200,7 +202,7 @@ class LazyMTS(MTS):
         if isinstance(X_train, np.ndarray):
             X_train = pd.DataFrame(X_train)
             X_test = pd.DataFrame(X_test)
-        
+
         X_train = convert_df_to_numeric(X_train)
         X_test = convert_df_to_numeric(X_test)
 
@@ -215,13 +217,21 @@ class LazyMTS(MTS):
             preprocessor = ColumnTransformer(
                 transformers=[
                     ("numeric", numeric_transformer, numeric_features),
-                    ("categorical_low", categorical_transformer_low, categorical_low),
-                    ("categorical_high", categorical_transformer_high, categorical_high),
+                    (
+                        "categorical_low",
+                        categorical_transformer_low,
+                        categorical_low,
+                    ),
+                    (
+                        "categorical_high",
+                        categorical_transformer_high,
+                        categorical_high,
+                    ),
                 ]
             )
 
         if self.regressors == "all":
-            self.regressors = REGRESSORS
+            self.regressors = REGRESSORSMTS
         else:
             try:
                 temp_list = []
@@ -234,64 +244,85 @@ class LazyMTS(MTS):
                 print("Invalid Regressor(s)")
 
         if self.preprocess is True:
-            for name, model in tqdm(self.regressors): # do parallel exec
+            for name, model in tqdm(self.regressors):  # do parallel exec
                 start = time.time()
                 try:
                     if "random_state" in model().get_params().keys():
                         pipe = Pipeline(
                             steps=[
                                 ("preprocessor", preprocessor),
-                                ("regressor", MTS(obj=model(random_state=self.random_state, **kwargs),
-                                            n_hidden_features=self.n_hidden_features,
-                                            activation_name=self.activation_name,
-                                            a=self.a,
-                                            nodes_sim=self.nodes_sim,
-                                            bias=self.bias,
-                                            dropout=self.dropout,
-                                            direct_link=self.direct_link,
-                                            n_clusters=self.n_clusters,
-                                            cluster_encode=self.cluster_encode,
-                                            type_clust=self.type_clust,
-                                            type_scaling=self.type_scaling,
-                                            lags=self.lags,
-                                            replications=self.replications,
-                                            kernel=self.kernel,
-                                            agg=self.agg,
-                                            seed=self.seed,
-                                            backend=self.backend,
-                                            show_progress=self.show_progress))])
+                                (
+                                    "regressor",
+                                    MTS(
+                                        obj=model(
+                                            random_state=self.random_state,
+                                            **kwargs
+                                        ),
+                                        n_hidden_features=self.n_hidden_features,
+                                        activation_name=self.activation_name,
+                                        a=self.a,
+                                        nodes_sim=self.nodes_sim,
+                                        bias=self.bias,
+                                        dropout=self.dropout,
+                                        direct_link=self.direct_link,
+                                        n_clusters=self.n_clusters,
+                                        cluster_encode=self.cluster_encode,
+                                        type_clust=self.type_clust,
+                                        type_scaling=self.type_scaling,
+                                        lags=self.lags,
+                                        replications=self.replications,
+                                        kernel=self.kernel,
+                                        agg=self.agg,
+                                        seed=self.seed,
+                                        backend=self.backend,
+                                        show_progress=self.show_progress,
+                                    ),
+                                ),
+                            ]
+                        )
                     else:
                         pipe = Pipeline(
                             steps=[
                                 ("preprocessor", preprocessor),
-                                ("regressor", MTS(obj=model(**kwargs),
-                                    n_hidden_features=self.n_hidden_features,
-                                    activation_name=self.activation_name,
-                                    a=self.a,
-                                    nodes_sim=self.nodes_sim,
-                                    bias=self.bias,
-                                    dropout=self.dropout,
-                                    direct_link=self.direct_link,
-                                    n_clusters=self.n_clusters,
-                                    cluster_encode=self.cluster_encode,
-                                    type_clust=self.type_clust,
-                                    type_scaling=self.type_scaling,
-                                    lags=self.lags,
-                                    replications=self.replications,
-                                    kernel=self.kernel,
-                                    agg=self.agg,
-                                    seed=self.seed,
-                                    backend=self.backend,
-                                    show_progress=self.show_progress))])
+                                (
+                                    "regressor",
+                                    MTS(
+                                        obj=model(**kwargs),
+                                        n_hidden_features=self.n_hidden_features,
+                                        activation_name=self.activation_name,
+                                        a=self.a,
+                                        nodes_sim=self.nodes_sim,
+                                        bias=self.bias,
+                                        dropout=self.dropout,
+                                        direct_link=self.direct_link,
+                                        n_clusters=self.n_clusters,
+                                        cluster_encode=self.cluster_encode,
+                                        type_clust=self.type_clust,
+                                        type_scaling=self.type_scaling,
+                                        lags=self.lags,
+                                        replications=self.replications,
+                                        kernel=self.kernel,
+                                        agg=self.agg,
+                                        seed=self.seed,
+                                        backend=self.backend,
+                                        show_progress=self.show_progress,
+                                    ),
+                                ),
+                            ]
+                        )
 
-                    pipe.fit(X_train, **kwargs)                                                   
-                    #pipe.fit(X_train, xreg=xreg)                
+                    pipe.fit(X_train, **kwargs)
+                    # pipe.fit(X_train, xreg=xreg)
 
                     self.models[name] = pipe
                     if xreg is not None:
-                        assert new_xreg is not None, "xreg and new_xreg must be provided"
-                    #X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg)
-                    X_pred = pipe["regressor"].predict(h=X_test.shape[0], **kwargs)
+                        assert (
+                            new_xreg is not None
+                        ), "xreg and new_xreg must be provided"
+                    # X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg)
+                    X_pred = pipe["regressor"].predict(
+                        h=X_test.shape[0], **kwargs
+                    )
                     rmse = mean_squared_error(X_test, X_pred, squared=False)
                     mae = mean_absolute_error(X_test, X_pred)
                     mpl = mean_pinball_loss(X_test, X_pred)
@@ -309,18 +340,20 @@ class LazyMTS(MTS):
                     if self.verbose > 0:
                         scores_verbose = {
                             "Model": name,
-                            #"R-Squared": r_squared,
-                            #"Adjusted R-Squared": adj_rsquared,
+                            # "R-Squared": r_squared,
+                            # "Adjusted R-Squared": adj_rsquared,
                             "RMSE": rmse,
                             "MAE": mae,
                             "MPL": mpl,
-                            #"MPE": mpe,
-                            #"MAPE": mape,
+                            # "MPE": mpe,
+                            # "MAPE": mape,
                             "Time taken": time.time() - start,
                         }
 
                         if self.custom_metric:
-                            scores_verbose[self.custom_metric.__name__] = custom_metric
+                            scores_verbose[
+                                self.custom_metric.__name__
+                            ] = custom_metric
 
                         print(scores_verbose)
                     if self.predictions:
@@ -330,64 +363,73 @@ class LazyMTS(MTS):
                         print(name + " model failed to execute")
                         print(exception)
 
-        else: # no preprocessing
-
-            for name, model in tqdm(self.regressors): # do parallel exec
+        else:  # no preprocessing
+            for name, model in tqdm(self.regressors):  # do parallel exec
                 start = time.time()
                 try:
                     if "random_state" in model().get_params().keys():
-                        pipe = MTS(obj=model(random_state=self.random_state, **kwargs),
-                                            n_hidden_features=self.n_hidden_features,
-                                            activation_name=self.activation_name,
-                                            a=self.a,
-                                            nodes_sim=self.nodes_sim,
-                                            bias=self.bias,
-                                            dropout=self.dropout,
-                                            direct_link=self.direct_link,
-                                            n_clusters=self.n_clusters,
-                                            cluster_encode=self.cluster_encode,
-                                            type_clust=self.type_clust,
-                                            type_scaling=self.type_scaling,
-                                            lags=self.lags,
-                                            replications=self.replications,
-                                            kernel=self.kernel,
-                                            agg=self.agg,
-                                            seed=self.seed,
-                                            backend=self.backend,
-                                            show_progress=self.show_progress)                        
+                        pipe = MTS(
+                            obj=model(random_state=self.random_state, **kwargs),
+                            n_hidden_features=self.n_hidden_features,
+                            activation_name=self.activation_name,
+                            a=self.a,
+                            nodes_sim=self.nodes_sim,
+                            bias=self.bias,
+                            dropout=self.dropout,
+                            direct_link=self.direct_link,
+                            n_clusters=self.n_clusters,
+                            cluster_encode=self.cluster_encode,
+                            type_clust=self.type_clust,
+                            type_scaling=self.type_scaling,
+                            lags=self.lags,
+                            replications=self.replications,
+                            kernel=self.kernel,
+                            agg=self.agg,
+                            seed=self.seed,
+                            backend=self.backend,
+                            show_progress=self.show_progress,
+                        )
                     else:
-                        pipe = MTS(obj=model(**kwargs),
-                                    n_hidden_features=self.n_hidden_features,
-                                    activation_name=self.activation_name,
-                                    a=self.a,
-                                    nodes_sim=self.nodes_sim,
-                                    bias=self.bias,
-                                    dropout=self.dropout,
-                                    direct_link=self.direct_link,
-                                    n_clusters=self.n_clusters,
-                                    cluster_encode=self.cluster_encode,
-                                    type_clust=self.type_clust,
-                                    type_scaling=self.type_scaling,
-                                    lags=self.lags,
-                                    replications=self.replications,
-                                    kernel=self.kernel,
-                                    agg=self.agg,
-                                    seed=self.seed,
-                                    backend=self.backend,
-                                    show_progress=self.show_progress)
+                        pipe = MTS(
+                            obj=model(**kwargs),
+                            n_hidden_features=self.n_hidden_features,
+                            activation_name=self.activation_name,
+                            a=self.a,
+                            nodes_sim=self.nodes_sim,
+                            bias=self.bias,
+                            dropout=self.dropout,
+                            direct_link=self.direct_link,
+                            n_clusters=self.n_clusters,
+                            cluster_encode=self.cluster_encode,
+                            type_clust=self.type_clust,
+                            type_scaling=self.type_scaling,
+                            lags=self.lags,
+                            replications=self.replications,
+                            kernel=self.kernel,
+                            agg=self.agg,
+                            seed=self.seed,
+                            backend=self.backend,
+                            show_progress=self.show_progress,
+                        )
 
-                    pipe.fit(X_train, **kwargs)                                                   
-                    #pipe.fit(X_train, xreg=xreg) # DO xreg like in `ahead`
+                    pipe.fit(X_train, **kwargs)
+                    # pipe.fit(X_train, xreg=xreg) # DO xreg like in `ahead`
 
                     self.models[name] = pipe
                     if xreg is not None:
-                        assert new_xreg is not None, "xreg and new_xreg must be provided"
+                        assert (
+                            new_xreg is not None
+                        ), "xreg and new_xreg must be provided"
 
-                    if self.preprocess is True: 
-                        X_pred = pipe["regressor"].predict(h=X_test.shape[0], **kwargs)
+                    if self.preprocess is True:
+                        X_pred = pipe["regressor"].predict(
+                            h=X_test.shape[0], **kwargs
+                        )
                     else:
-                        X_pred = pipe.predict(h=X_test.shape[0], **kwargs) #X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg) ## DO xreg like in `ahead`
-                    
+                        X_pred = pipe.predict(
+                            h=X_test.shape[0], **kwargs
+                        )  # X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg) ## DO xreg like in `ahead`
+
                     rmse = mean_squared_error(X_test, X_pred, squared=False)
                     mae = mean_absolute_error(X_test, X_pred)
                     mpl = mean_pinball_loss(X_test, X_pred)
@@ -405,18 +447,20 @@ class LazyMTS(MTS):
                     if self.verbose > 0:
                         scores_verbose = {
                             "Model": name,
-                            #"R-Squared": r_squared,
-                            #"Adjusted R-Squared": adj_rsquared,
+                            # "R-Squared": r_squared,
+                            # "Adjusted R-Squared": adj_rsquared,
                             "RMSE": rmse,
                             "MAE": mae,
                             "MPL": mpl,
-                            #"MPE": mpe,
-                            #"MAPE": mape,
+                            # "MPE": mpe,
+                            # "MAPE": mape,
                             "Time taken": time.time() - start,
                         }
 
                         if self.custom_metric:
-                            scores_verbose[self.custom_metric.__name__] = custom_metric
+                            scores_verbose[
+                                self.custom_metric.__name__
+                            ] = custom_metric
 
                         print(scores_verbose)
                     if self.predictions:
@@ -425,18 +469,16 @@ class LazyMTS(MTS):
                     if self.ignore_warnings is False:
                         print(name + " model failed to execute")
                         print(exception)
-            
-            
 
         scores = {
             "Model": names,
-            #"Adjusted R-Squared": ADJR2,
-            #"R-Squared": R2,
+            # "Adjusted R-Squared": ADJR2,
+            # "R-Squared": R2,
             "RMSE": RMSE,
             "MAE": MAE,
             "MPL": MPL,
-            #"MPE": MPE,
-            #"MAPE": MAPE,
+            # "MPE": MPE,
+            # "MAPE": MAPE,
             "Time Taken": TIME,
         }
 
@@ -467,7 +509,7 @@ class LazyMTS(MTS):
         Returns
         -------
         models: dict-object,
-            Returns a dictionary with each model pipeline as value 
+            Returns a dictionary with each model pipeline as value
             with key as name of models.
         """
         if len(self.models.keys()) == 0:

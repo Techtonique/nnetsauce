@@ -25,7 +25,10 @@ pd.set_option("display.precision", 2)
 pd.set_option("display.float_format", lambda x: "%.2f" % x)
 
 numeric_transformer = Pipeline(
-    steps=[("imputer", SimpleImputer(strategy="mean")), ("scaler", StandardScaler())]
+    steps=[
+        ("imputer", SimpleImputer(strategy="mean")),
+        ("scaler", StandardScaler()),
+    ]
 )
 
 categorical_transformer_low = Pipeline(
@@ -70,6 +73,7 @@ def get_card_split(df, cols, n=11):
     card_low = cols[~cond]
     return card_low, card_high
 
+
 def adjusted_rsquared(r2, n, p):
     return 1 - (1 - r2) * ((n - 1) / (n - p - 1))
 
@@ -90,6 +94,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         When set to True, the predictions of all the models models are returned as dataframe.
     regressors : list, optional (default="all")
         When function is provided, trains the chosen regressor(s).
+    n_jobs : int, when possible, run in parallel
 
     Examples
     --------
@@ -120,10 +125,11 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         predictions=False,
         random_state=42,
         regressors="all",
+        n_jobs=None,
         # Defining depth
-        n_layers=3,        
+        n_layers=3,
         # CustomRegressor attributes
-        obj = None,
+        obj=None,
         n_hidden_features=5,
         activation_name="relu",
         a=0.01,
@@ -138,7 +144,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         col_sample=1,
         row_sample=1,
         seed=123,
-        backend="cpu"        
+        backend="cpu",
     ):
         self.verbose = verbose
         self.ignore_warnings = ignore_warnings
@@ -148,6 +154,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         self.random_state = random_state
         self.regressors = regressors
         self.n_layers = n_layers - 1
+        self.n_jobs = n_jobs
         super().__init__(
             obj=obj,
             n_hidden_features=n_hidden_features,
@@ -224,51 +231,13 @@ class LazyDeepRegressor(Custom, RegressorMixin):
             except Exception as exception:
                 print(exception)
                 print("Invalid Regressor(s)")
-       
-        for name, model in tqdm(self.regressors): # do parallel exec
+
+        for name, model in tqdm(self.regressors):  # do parallel exec
             start = time.time()
             try:
-
                 if "random_state" in model().get_params().keys():
-                    layer_regr = CustomRegressor(obj=model(random_state=self.random_state),
-                            n_hidden_features=self.n_hidden_features,
-                            activation_name=self.activation_name,
-                            a=self.a,
-                            nodes_sim=self.nodes_sim,
-                            bias=self.bias,
-                            dropout=self.dropout,
-                            direct_link=self.direct_link,
-                            n_clusters=self.n_clusters,
-                            cluster_encode=self.cluster_encode,
-                            type_clust=self.type_clust,
-                            type_scaling=self.type_scaling,
-                            col_sample=self.col_sample,
-                            row_sample=self.row_sample,
-                            seed=self.seed,
-                            backend=self.backend)
-                else:
-                    layer_regr = CustomRegressor(obj=model(),
-                                n_hidden_features=self.n_hidden_features,
-                                activation_name=self.activation_name,
-                                a=self.a,
-                                nodes_sim=self.nodes_sim,
-                                bias=self.bias,
-                                dropout=self.dropout,
-                                direct_link=self.direct_link,
-                                n_clusters=self.n_clusters,
-                                cluster_encode=self.cluster_encode,
-                                type_clust=self.type_clust,
-                                type_scaling=self.type_scaling,
-                                col_sample=self.col_sample,
-                                row_sample=self.row_sample,
-                                seed=self.seed,
-                                backend=self.backend)
-                    
-                layer_regr.fit(X_train, y_train)
-
-                for _ in range(self.n_layers):
-
-                    layer_regr = deepcopy(CustomRegressor(obj=layer_regr,
+                    layer_regr = CustomRegressor(
+                        obj=model(random_state=self.random_state),
                         n_hidden_features=self.n_hidden_features,
                         activation_name=self.activation_name,
                         a=self.a,
@@ -283,9 +252,55 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                         col_sample=self.col_sample,
                         row_sample=self.row_sample,
                         seed=self.seed,
-                        backend=self.backend))
-                    
-                    layer_regr.fit(X_train, y_train)
+                        backend=self.backend,
+                    )
+                else:
+                    layer_regr = CustomRegressor(
+                        obj=model(),
+                        n_hidden_features=self.n_hidden_features,
+                        activation_name=self.activation_name,
+                        a=self.a,
+                        nodes_sim=self.nodes_sim,
+                        bias=self.bias,
+                        dropout=self.dropout,
+                        direct_link=self.direct_link,
+                        n_clusters=self.n_clusters,
+                        cluster_encode=self.cluster_encode,
+                        type_clust=self.type_clust,
+                        type_scaling=self.type_scaling,
+                        col_sample=self.col_sample,
+                        row_sample=self.row_sample,
+                        seed=self.seed,
+                        backend=self.backend,
+                    )
+
+                layer_regr.fit(X_train, y_train)
+
+                for _ in range(self.n_layers):
+                    layer_regr = deepcopy(
+                        CustomRegressor(
+                            obj=layer_regr,
+                            n_hidden_features=self.n_hidden_features,
+                            activation_name=self.activation_name,
+                            a=self.a,
+                            nodes_sim=self.nodes_sim,
+                            bias=self.bias,
+                            dropout=self.dropout,
+                            direct_link=self.direct_link,
+                            n_clusters=self.n_clusters,
+                            cluster_encode=self.cluster_encode,
+                            type_clust=self.type_clust,
+                            type_scaling=self.type_scaling,
+                            col_sample=self.col_sample,
+                            row_sample=self.row_sample,
+                            seed=self.seed,
+                            backend=self.backend,
+                        )
+                    )
+
+                    # layer_regr.fit(X_train, y_train)
+
+                layer_regr.fit(X_train, y_train)
 
                 self.models[name] = layer_regr
                 y_pred = layer_regr.predict(X_test)
@@ -316,7 +331,9 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                     }
 
                     if self.custom_metric:
-                        scores_verbose[self.custom_metric.__name__] = custom_metric
+                        scores_verbose[
+                            self.custom_metric.__name__
+                        ] = custom_metric
 
                     print(scores_verbose)
                 if self.predictions:
@@ -367,7 +384,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         Returns
         -------
         models: dict-object,
-            Returns a dictionary with each model pipeline as value 
+            Returns a dictionary with each model pipeline as value
             with key as name of models.
         """
         if len(self.models.keys()) == 0:

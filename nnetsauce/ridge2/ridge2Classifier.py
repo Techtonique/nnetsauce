@@ -144,7 +144,6 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
         seed=123,
         backend="cpu",
     ):
-
         super().__init__(
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,
@@ -389,7 +388,6 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
 
         """
         if len(X.shape) == 1:
-
             n_features = X.shape[0]
             new_X = mo.rbind(
                 X.reshape(1, n_features),
@@ -399,7 +397,6 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
             Z = self.cook_test_set(new_X, **kwargs)
 
         else:
-
             Z = self.cook_test_set(X, **kwargs)
 
         ZB = mo.safe_sparse_dot(

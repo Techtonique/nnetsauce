@@ -29,12 +29,13 @@ def center_response(y):
 
 # cluster the covariates
 def cluster_covariates(X, n_clusters, seed, type_clust="kmeans", **kwargs):
-
     if isinstance(X, pd.DataFrame):
-        X = copy.deepcopy(X.values.astype(float))        
+        X = copy.deepcopy(X.values.astype(float))
 
     if type_clust == "kmeans":
-        kmeans = KMeans(n_clusters=n_clusters, random_state=seed, n_init=10, **kwargs)
+        kmeans = KMeans(
+            n_clusters=n_clusters, random_state=seed, n_init=10, **kwargs
+        )
         kmeans.fit(X)
 
         return kmeans, kmeans.predict(X)
@@ -47,13 +48,14 @@ def cluster_covariates(X, n_clusters, seed, type_clust="kmeans", **kwargs):
 
         return gmm, gmm.predict(X)
 
+
 def convert_df_to_numeric(df):
     """
     Convert all columns of DataFrame to numeric type using astype with loop.
-    
+
     Parameters:
         df (pd.DataFrame): Input DataFrame with mixed data types.
-        
+
     Returns:
         pd.DataFrame: DataFrame with all columns converted to numeric type.
     """
@@ -64,6 +66,7 @@ def convert_df_to_numeric(df):
         except ValueError:
             print(f"Column '{column}' contains non-numeric values.")
     return df
+
 
 # computes t(x)%*%y
 def crossprod(x, y=None, backend="cpu"):
@@ -87,7 +90,6 @@ def crossprod(x, y=None, backend="cpu"):
 # Obtain this for JAX
 # dropout
 def dropout(x, drop_prob=0, seed=123):
-
     assert 0 <= drop_prob <= 1
 
     n, p = x.shape
@@ -106,7 +108,6 @@ def dropout(x, drop_prob=0, seed=123):
 
 # one-hot encoding
 def one_hot_encode(x_clusters, n_clusters):
-
     assert (
         max(x_clusters) <= n_clusters
     ), "you must have max(x_clusters) <= n_clusters"
@@ -122,7 +123,6 @@ def one_hot_encode(x_clusters, n_clusters):
 
 # one-hot encoding
 def one_hot_encode2(y, n_classes):
-
     n_obs = len(y)
     res = np.zeros((n_obs, n_classes))
 
@@ -204,8 +204,7 @@ def safe_sparse_dot(a, b, backend="cpu", dense_output=False):
 # Obtain this for JAX
 # Obtain this for JAX
 # scale... covariates
-def scale_covariates(X, choice="std", training=True, scaler=None):    
-
+def scale_covariates(X, choice="std", training=True, scaler=None):
     scaling_options = {
         "std": StandardScaler(copy=True, with_mean=True, with_std=True),
         "minmax": MinMaxScaler(),

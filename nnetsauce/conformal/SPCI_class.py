@@ -17,19 +17,19 @@ from .utils_SPCI import (
 # Ensemble_pred_interval_centers: point forecast
 # PIs_Ensemble: predictions intervals PIs_Ensemble['lower'], PIs_Ensemble['upper']
 
+
 #### Main Class ####
 class SPCI_and_EnbPI:
     """
-        Create prediction intervals assuming Y_t = f(X_t) + \sigma(X_t)\eps_t
-        Currently, assume the regression function is by default MLP implemented with PyTorch, as it needs to estimate BOTH f(X_t) and \sigma(X_t), where the latter is impossible to estimate using scikit-learn modules
+    Create prediction intervals assuming Y_t = f(X_t) + \sigma(X_t)\eps_t
+    Currently, assume the regression function is by default MLP implemented with PyTorch, as it needs to estimate BOTH f(X_t) and \sigma(X_t), where the latter is impossible to estimate using scikit-learn modules
 
-        Most things carry out, except that we need to have different estimators for f and \sigma.
+    Most things carry out, except that we need to have different estimators for f and \sigma.
 
-        fit_func = None: use MLP above
+    fit_func = None: use MLP above
     """
 
     def __init__(self, X_train, Y_train, h=5, fit_func=None):
-
         self.regressor = fit_func
         self.X_train = X_train
         self.Y_train = Y_train
@@ -81,15 +81,15 @@ class SPCI_and_EnbPI:
         self, B=100, fit_sigmaX=True, stride=1, h=5
     ):
         """
-          Train B bootstrap estimators from subsets of (X_train, Y_train), compute aggregated predictors, and compute the residuals
-          fit_sigmaX: If False, just avoid predicting \sigma(X_t) by defaulting it to 1
+        Train B bootstrap estimators from subsets of (X_train, Y_train), compute aggregated predictors, and compute the residuals
+        fit_sigmaX: If False, just avoid predicting \sigma(X_t) by defaulting it to 1
 
-          stride: int. If > 1, then we perform multi-step prediction, where we have to fit stride*B boostrap predictors.
-            Idea: train on (X_i,Y_i), i=1,...,n-stride
-            Then predict on X_1,X_{1+s},...,X_{1+k*s} where 1+k*s <= n+n1
-            Note, when doing LOO prediction thus only care above the points above
+        stride: int. If > 1, then we perform multi-step prediction, where we have to fit stride*B boostrap predictors.
+          Idea: train on (X_i,Y_i), i=1,...,n-stride
+          Then predict on X_1,X_{1+s},...,X_{1+k*s} where 1+k*s <= n+n1
+          Note, when doing LOO prediction thus only care above the points above
 
-          h: int. forecasting horizon
+        h: int. forecasting horizon
         """
         n, self.d = self.X_train.shape
         self.fit_sigmaX = fit_sigmaX
@@ -203,11 +203,11 @@ class SPCI_and_EnbPI:
         quantile_regr="RF",
     ):
         """
-            stride: control how many steps we predict ahead
-            smallT: if True, we would only start with the last n number of LOO residuals, rather than use the full length T ones. Used in change detection
-                NOTE: smallT can be important if time-series is very dynamic, in which case training MORE data may actaully be worse (because quantile longer)
-                HOWEVER, if fit quantile regression, set it to be FALSE because we want to have many training pts for the quantile regressor
-            use_SPCI: if True, we fit conditional quantile to compute the widths, rather than simply using empirical quantile
+        stride: control how many steps we predict ahead
+        smallT: if True, we would only start with the last n number of LOO residuals, rather than use the full length T ones. Used in change detection
+            NOTE: smallT can be important if time-series is very dynamic, in which case training MORE data may actaully be worse (because quantile longer)
+            HOWEVER, if fit quantile regression, set it to be FALSE because we want to have many training pts for the quantile regressor
+        use_SPCI: if True, we fit conditional quantile to compute the widths, rather than simply using empirical quantile
         """
         self.alpha = alpha
         n1 = self.X_train.shape[0]
