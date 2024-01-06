@@ -209,8 +209,12 @@ class DeepMTS(MTS):
     ):
         assert int(lags) == lags, "parameter 'lags' should be an integer"
 
-        super().__init__(
+        self.deepobj = DeepRegressor(
             obj=obj,
+            verbose=0, # keep this at 0
+            # Defining depth
+            n_layers=n_layers,
+            # CustomRegressor attributes
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,
             a=a,
@@ -226,8 +230,24 @@ class DeepMTS(MTS):
             backend=backend,
         )
 
-        self.n_layers = n_layers
-        self.obj = obj
+        super().__init__(
+            obj=self.deepobj,
+            n_hidden_features=n_hidden_features,
+            activation_name=activation_name,
+            a=a,
+            nodes_sim=nodes_sim,
+            bias=bias,
+            dropout=dropout,
+            direct_link=direct_link,
+            n_clusters=n_clusters,
+            cluster_encode=cluster_encode,
+            type_clust=type_clust,
+            type_scaling=type_scaling,
+            seed=seed,
+            backend=backend,
+        )
+
+        self.n_layers = n_layers        
         self.n_series = None
         self.lags = lags
         self.type_pi = type_pi
@@ -237,27 +257,7 @@ class DeepMTS(MTS):
         self.verbose = verbose
         self.show_progress = show_progress
         self.series_names = None
-        self.input_dates = None
-        self.deepobj = DeepRegressor(
-            obj=self.obj,
-            verbose=0,
-            # Defining depth
-            n_layers=self.n_layers,
-            # CustomRegressor attributes
-            n_hidden_features=self.n_hidden_features,
-            activation_name=self.activation_name,
-            a=self.a,
-            nodes_sim=self.nodes_sim,
-            bias=self.bias,
-            dropout=self.dropout,
-            direct_link=self.direct_link,
-            n_clusters=self.n_clusters,
-            cluster_encode=self.cluster_encode,
-            type_clust=self.type_clust,
-            type_scaling=self.type_scaling,
-            seed=self.seed,
-            backend=self.backend,
-        )
+        self.input_dates = None        
         self.fit_objs_ = {}
         self.y_ = None  # MTS responses (most recent observations first)
         self.X_ = None  # MTS lags
@@ -366,8 +366,7 @@ class DeepMTS(MTS):
             dummy_y, scaled_Z = self.cook_training_set(y=rep_1_n, X=self.X_)
 
         self.scaled_Z_ = scaled_Z
-
-        # loop on all the time series and adjust self.obj.fit
+        
         if self.verbose > 0:
             print(
                 f"\n Adjusting {type(self.deepobj).__name__} to multivariate time series... \n "
