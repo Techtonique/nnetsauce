@@ -36,6 +36,7 @@ nnetsauce/lazypredict/lazyClassifier.py
 nnetsauce/lazypredict/lazyMTS.py
 nnetsauce/lazypredict/lazyRegressor.py
 nnetsauce/lazypredict/lazydeepClassifier.py
+nnetsauce/lazypredict/lazydeepMTS.py
 nnetsauce/lazypredict/lazydeepRegressor.py
 nnetsauce/mts/__init__.py
 nnetsauce/mts/mts.py

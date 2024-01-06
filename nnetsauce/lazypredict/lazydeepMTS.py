@@ -15,6 +15,7 @@ from sklearn.metrics import (
 )
 from .config import REGRESSORSMTS
 from ..mts import MTS
+from ..deep import DeepMTS
 from ..utils import convert_df_to_numeric
 
 import warnings
@@ -83,7 +84,7 @@ def adjusted_rsquared(r2, n, p):
 #     return np.average(pe)
 
 
-class LazyMTS(MTS):
+class LazyDeepMTS(MTS):
     """
     This module helps in fitting regression models that are available in Scikit-learn to nnetsauce's MTS
     Parameters
@@ -253,7 +254,7 @@ class LazyMTS(MTS):
                                 ("preprocessor", preprocessor),
                                 (
                                     "regressor",
-                                    MTS(
+                                    DeepMTS(
                                         obj=model(
                                             random_state=self.random_state,
                                             **kwargs
@@ -286,7 +287,7 @@ class LazyMTS(MTS):
                                 ("preprocessor", preprocessor),
                                 (
                                     "regressor",
-                                    MTS(
+                                    DeepMTS(
                                         obj=model(**kwargs),
                                         n_hidden_features=self.n_hidden_features,
                                         activation_name=self.activation_name,

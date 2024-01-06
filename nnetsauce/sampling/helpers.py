@@ -8,7 +8,7 @@ from tqdm import tqdm
 from ..utils.misc import flatten, is_factor
 
 
-def dosubsample(y, row_sample=0.8, seed=123, n_jobs=None):
+def dosubsample(y, row_sample=0.8, seed=123, n_jobs=None, verbose=False):
     index = []
     assert (row_sample < 1) & (
         row_sample >= 0
@@ -23,7 +23,8 @@ def dosubsample(y, row_sample=0.8, seed=123, n_jobs=None):
         n_classes = len(classes)
         y_as_classes = y.copy()
         freqs_hist = np.zeros_like(n_elem_classes, dtype=float)
-        print(f"creating breaks...")
+        if verbose is True: 
+            print(f"creating breaks...")
         if n_jobs is None:
             for i in range(len(n_elem_classes)):
                 freqs_hist[i] = float(n_elem_classes[i]) / n_obs
@@ -40,7 +41,8 @@ def dosubsample(y, row_sample=0.8, seed=123, n_jobs=None):
         n_elem_classes = np.asarray(h[0], dtype=np.integer)
         freqs_hist = np.zeros_like(n_elem_classes, dtype=float)
 
-        print(f"creating breaks...")
+        if verbose is True:
+            print(f"creating breaks...")
         if n_jobs is None:
             for i in range(len(n_elem_classes)):
                 freqs_hist[i] = float(n_elem_classes[i]) / n_obs
@@ -62,10 +64,17 @@ def dosubsample(y, row_sample=0.8, seed=123, n_jobs=None):
 
     # main loop ----
 
-    print(f"main loop...")
+    if verbose is True:
+        print(f"main loop...")
+
     if n_jobs is None:
 
-        for i in tqdm(range(n_classes)):
+        if verbose is True:
+            iterator = tqdm(range(n_classes))
+        else:
+            iterator = range(n_classes)
+
+        for i in iterator:
             bool_class_i = y_as_classes == classes[i] 
             index_class_i = np.asarray(
                 np.where(bool_class_i == True)[0], dtype=np.integer
@@ -106,10 +115,15 @@ def dosubsample(y, row_sample=0.8, seed=123, n_jobs=None):
                     return(index_class_i[0])
                 except:
                     pass 
-
-        index = Parallel(n_jobs=n_jobs)(
-            delayed(get_index)(i) for i in tqdm(range(n_classes))
-        )
+        
+        if verbose is True:
+            index = Parallel(n_jobs=n_jobs)(
+                delayed(get_index)(i) for i in tqdm(range(n_classes))
+            )
+        else:
+            index = Parallel(n_jobs=n_jobs)(
+                delayed(get_index)(i) for i in range(n_classes)
+            )
 
     try:
         return np.asarray(flatten(index))
