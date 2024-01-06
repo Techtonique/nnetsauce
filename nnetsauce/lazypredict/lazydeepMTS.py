@@ -115,6 +115,8 @@ class LazyDeepMTS(MTS):
         random_state=42,
         regressors="all",
         preprocess=False,
+        # Defining depth
+        n_layers=3,
         # MTS attributes
         obj=None,
         n_hidden_features=5,
@@ -144,6 +146,7 @@ class LazyDeepMTS(MTS):
         self.random_state = random_state
         self.regressors = regressors
         self.preprocess = preprocess
+        self.n_layers = n_layers
         super().__init__(
             obj=obj,
             n_hidden_features=n_hidden_features,
@@ -259,6 +262,7 @@ class LazyDeepMTS(MTS):
                                             random_state=self.random_state,
                                             **kwargs
                                         ),
+                                        n_layers=self.n_layers,
                                         n_hidden_features=self.n_hidden_features,
                                         activation_name=self.activation_name,
                                         a=self.a,
@@ -289,6 +293,7 @@ class LazyDeepMTS(MTS):
                                     "regressor",
                                     DeepMTS(
                                         obj=model(**kwargs),
+                                        n_layers=self.n_layers,
                                         n_hidden_features=self.n_hidden_features,
                                         activation_name=self.activation_name,
                                         a=self.a,
@@ -369,7 +374,7 @@ class LazyDeepMTS(MTS):
                 start = time.time()
                 try:
                     if "random_state" in model().get_params().keys():
-                        pipe = MTS(
+                        pipe = DeepMTS(
                             obj=model(random_state=self.random_state, **kwargs),
                             n_hidden_features=self.n_hidden_features,
                             activation_name=self.activation_name,
@@ -391,7 +396,7 @@ class LazyDeepMTS(MTS):
                             show_progress=self.show_progress,
                         )
                     else:
-                        pipe = MTS(
+                        pipe = DeepMTS(
                             obj=model(**kwargs),
                             n_hidden_features=self.n_hidden_features,
                             activation_name=self.activation_name,
