@@ -13,7 +13,6 @@ jobs:
       url: https://pypi.org/p/nnetsauce  # Replace <package-name> with your PyPI project name
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
-
     steps:
       - name: Debug directory structure
         run: |
@@ -22,8 +21,8 @@ jobs:
       - name: Find directory two levels higher
         id: find-dir
         run: |
-          found_dir=$(find . -type d -name "dist" -print -quit)
-          echo "Found directory two levels higher: $found_dir"
+          found_dir=$(find "dist" -maxdepth 2)
+          echo "Found directory: $found_dir"
           echo "PACKAGES_DIR=$found_dir" >> $GITHUB_ENV
 
       - name: Publish distribution 📦 to PyPI
