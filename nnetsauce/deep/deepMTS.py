@@ -358,7 +358,7 @@ class DeepMTS(Base):
         for i in range(p):
             # loop on all the time series and adjust self.obj.fit            
             self.stacked_objs[i] = CustomRegressor(
-                obj=self.stacked_objs[i],
+                obj=self.obj,
                 n_hidden_features=self.n_hidden_features,
                 activation_name=self.activation_name,
                 a=self.a,
@@ -408,7 +408,8 @@ class DeepMTS(Base):
                         seed=self.seed,
                         backend=self.backend,
                     )
-                )                
+                )  
+                self.obj = deepcopy(self.stacked_objs[i]) # for compatibility with DeepRegressor L.155
             self.stacked_objs[i].fit(X=scaled_Z, y=centered_y_i)            
             self.fit_objs_[i] = deepcopy(self.stacked_objs[i]) 
             self.objs[i] = deepcopy(self.stacked_objs[i]) # for compatibility with DeepAR]           
