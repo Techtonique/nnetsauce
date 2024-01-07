@@ -228,6 +228,7 @@ class DeepMTS(Base):
         )
 
         self.stacked_objs = {}
+        self.objs = {}
         self.verbose = verbose
         self.n_layers = n_layers        
         self.n_series = None
@@ -258,7 +259,6 @@ class DeepMTS(Base):
         self.kde_ = None
         self.sims_ = None
         self.obj = obj
-        self.objs = {}
 
     def fit(self, X, xreg=None, **kwargs):
         """Fit DeepMTS model to training data X, with optional regressors xreg
@@ -316,6 +316,7 @@ class DeepMTS(Base):
         self.scaled_Z_ = None
         self.centered_y_is_ = []  
         for i in range(p):
+            self.objs[i] = self.obj
             self.stacked_objs[i] = self.obj # init layer for each time series      
 
         if p > 1:
@@ -354,11 +355,11 @@ class DeepMTS(Base):
 
         self.scaled_Z_ = scaled_Z        
 
-        # init layer for each time series
+        # initial layer for each time series
         for i in range(p):
             # loop on all the time series and adjust self.obj.fit            
             self.stacked_objs[i] = CustomRegressor(
-                obj=self.obj,
+                obj=self.objs[i],
                 n_hidden_features=self.n_hidden_features,
                 activation_name=self.activation_name,
                 a=self.a,
@@ -409,14 +410,12 @@ class DeepMTS(Base):
                         backend=self.backend,
                     )
                 )  
-                self.obj = deepcopy(self.stacked_objs[i]) # for compatibility with DeepRegressor L.155
-            self.stacked_objs[i].fit(X=scaled_Z, y=centered_y_i)            
-            self.fit_objs_[i] = deepcopy(self.stacked_objs[i]) 
-            self.objs[i] = deepcopy(self.stacked_objs[i]) # for compatibility with DeepAR]           
+            self.obj = deepcopy(self.stacked_objs[i]) # for compatibility with DeepRegressor L.155
+            self.obj.fit(X=scaled_Z, y=centered_y_i)
+            self.fit_objs_[i] = deepcopy(self.obj)
             residuals_.append(
                 (centered_y_i - self.fit_objs_[i].predict(scaled_Z)).tolist()
             )
-
         self.residuals_ = np.asarray(residuals_).T
 
         if self.replications != None and self.type_pi == "kde":
