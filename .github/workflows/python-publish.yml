@@ -18,6 +18,7 @@ jobs:
       - name: Debug directory structure
         run: |
           pwd
+          sudo apt install tree&&tree
           ls -la
           ls -la .
           ls -la ..
