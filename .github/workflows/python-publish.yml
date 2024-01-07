@@ -18,7 +18,7 @@ jobs:
       - name: Debug directory structure
         run: |
           pwd
-          ls -la ../dist
+          ls -la ..
       - name: Find directory two levels higher
         id: find-dir
         run: |
