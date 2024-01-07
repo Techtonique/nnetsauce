@@ -15,16 +15,10 @@ jobs:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 
     steps:
-      - name: Find dist
-        run: |
-          found_dir=$(find ../.. -type d -name "dist" -print -quit)
-          echo "Found directory two levels higher: $found_dir"
-          echo "::set-env name=PACKAGES_DIR::$found_dir"
-
       - name: Publish distribution 📦 to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: ${{ env.PACKAGES_DIR }}
+          packages-dir: ../..//dist
           password: ${{ secrets.PYPI_GLOBAL }}
           repository-url: https://test.pypi.org/legacy/
           verbose: true
