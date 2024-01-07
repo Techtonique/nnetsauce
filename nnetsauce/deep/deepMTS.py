@@ -227,8 +227,8 @@ class DeepMTS(Base):
             backend=backend,
         )
 
-        self.stacked_objs = {}
-        self.objs = {}
+        self.obj = obj
+        self.stacked_obj = obj # init layer for each time series        
         self.verbose = verbose
         self.n_layers = n_layers        
         self.n_series = None
@@ -258,7 +258,7 @@ class DeepMTS(Base):
         self.residuals_sims_ = None
         self.kde_ = None
         self.sims_ = None
-        self.obj = obj
+        
 
     def fit(self, X, xreg=None, **kwargs):
         """Fit DeepMTS model to training data X, with optional regressors xreg
@@ -306,7 +306,7 @@ class DeepMTS(Base):
         self.X_ = None
         self.n_series = p
         self.fit_objs_.clear()
-        self.stacked_objs.clear()
+        self.stacked_obj = None
         self.y_means_.clear()
         residuals_ = []
         self.residuals_ = None
@@ -315,9 +315,6 @@ class DeepMTS(Base):
         self.sims_ = None
         self.scaled_Z_ = None
         self.centered_y_is_ = []  
-        for i in range(p):
-            self.objs[i] = self.obj
-            self.stacked_objs[i] = self.obj # init layer for each time series      
 
         if p > 1:
             # multivariate time series
@@ -355,27 +352,25 @@ class DeepMTS(Base):
 
         self.scaled_Z_ = scaled_Z        
 
-        # initial layer for each time series
-        for i in range(p):
-            # loop on all the time series and adjust self.obj.fit            
-            self.stacked_objs[i] = CustomRegressor(
-                obj=self.objs[i],
-                n_hidden_features=self.n_hidden_features,
-                activation_name=self.activation_name,
-                a=self.a,
-                nodes_sim=self.nodes_sim,
-                bias=self.bias,
-                dropout=self.dropout,
-                direct_link=self.direct_link,
-                n_clusters=self.n_clusters,
-                cluster_encode=self.cluster_encode,
-                type_clust=self.type_clust,
-                type_scaling=self.type_scaling,
-                col_sample=self.col_sample,
-                row_sample=self.row_sample,
-                seed=self.seed,
-                backend=self.backend,
-            )
+        # initial layer for each time series        
+        self.stacked_obj = CustomRegressor(
+            obj=self.obj,
+            n_hidden_features=self.n_hidden_features,
+            activation_name=self.activation_name,
+            a=self.a,
+            nodes_sim=self.nodes_sim,
+            bias=self.bias,
+            dropout=self.dropout,
+            direct_link=self.direct_link,
+            n_clusters=self.n_clusters,
+            cluster_encode=self.cluster_encode,
+            type_clust=self.type_clust,
+            type_scaling=self.type_scaling,
+            col_sample=self.col_sample,
+            row_sample=self.row_sample,
+            seed=self.seed,
+            backend=self.backend,
+        )
 
         if self.show_progress is True:
             iterator_series = tqdm(range(p))
@@ -384,33 +379,36 @@ class DeepMTS(Base):
             iterator_series = range(p)
             iterator_layers = range(self.n_layers - 1)
         
+        # create all the layers before fitting
+        for _ in iterator_layers:
+            self.stacked_obj = deepcopy(
+                CustomRegressor(
+                    obj=self.stacked_obj,
+                    n_hidden_features=self.n_hidden_features,
+                    activation_name=self.activation_name,
+                    a=self.a,
+                    nodes_sim=self.nodes_sim,
+                    bias=self.bias,
+                    dropout=self.dropout,
+                    direct_link=self.direct_link,
+                    n_clusters=self.n_clusters,
+                    cluster_encode=self.cluster_encode,
+                    type_clust=self.type_clust,
+                    type_scaling=self.type_scaling,
+                    col_sample=self.col_sample,
+                    row_sample=self.row_sample,
+                    seed=self.seed,
+                    backend=self.backend,
+                )
+            )
+        
+        self.obj = deepcopy(self.stacked_obj) # this is important /!\
+
         for i in iterator_series:
             y_mean = np.mean(self.y_[:, i])
             self.y_means_[i] = y_mean
             centered_y_i = self.y_[:, i] - y_mean
-            self.centered_y_is_.append(centered_y_i)
-            for _ in iterator_layers:
-                self.stacked_objs[i] = deepcopy(
-                    CustomRegressor(
-                        obj=self.stacked_objs[i],
-                        n_hidden_features=self.n_hidden_features,
-                        activation_name=self.activation_name,
-                        a=self.a,
-                        nodes_sim=self.nodes_sim,
-                        bias=self.bias,
-                        dropout=self.dropout,
-                        direct_link=self.direct_link,
-                        n_clusters=self.n_clusters,
-                        cluster_encode=self.cluster_encode,
-                        type_clust=self.type_clust,
-                        type_scaling=self.type_scaling,
-                        col_sample=self.col_sample,
-                        row_sample=self.row_sample,
-                        seed=self.seed,
-                        backend=self.backend,
-                    )
-                )  
-            self.obj = deepcopy(self.stacked_objs[i]) # for compatibility with DeepRegressor L.155
+            self.centered_y_is_.append(centered_y_i)                           
             self.obj.fit(X=scaled_Z, y=centered_y_i)
             self.fit_objs_[i] = deepcopy(self.obj)
             residuals_.append(
