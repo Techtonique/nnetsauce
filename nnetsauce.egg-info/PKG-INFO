@@ -11,6 +11,7 @@ Classifier: Development Status :: 3 - Alpha
 Classifier: Intended Audience :: Developers
 Classifier: Programming Language :: Python :: 3
 License-File: LICENSE
+License-File: LICENSE.md
 Requires-Dist: joblib
 Requires-Dist: matplotlib
 Requires-Dist: numpy
