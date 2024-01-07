@@ -3,7 +3,9 @@ name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
 on: push
 
 jobs:
+  
   publish-to-pypi:
+  
     name: >-
       Publish Python 🐍 distribution 📦 to PyPI
     #if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
@@ -14,6 +16,12 @@ jobs:
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
     steps:
+      - name: Install pypa/build
+        run: >-
+          python3 -m
+          pip install
+          twine
+          --user
       - name: Debug directory structure
         run: |
           pwd          
