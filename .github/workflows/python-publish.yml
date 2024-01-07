@@ -15,6 +15,10 @@ jobs:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 
     steps:
+      - name: Debug directory structure
+        run: |
+          ls -la ../..
+          ls -la ../../dist
       - name: Find directory two levels higher
         id: find-dir
         run: |
