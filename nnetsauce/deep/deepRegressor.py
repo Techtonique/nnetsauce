@@ -119,7 +119,7 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
             backend=self.backend,
         )
 
-        self.stacked_obj.fit(X, y)
+        #self.stacked_obj.fit(X, y)
 
         if self.verbose > 0:
             iterator = tqdm(range(self.n_layers - 1))

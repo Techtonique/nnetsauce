@@ -10,29 +10,28 @@ import matplotlib.pyplot as plt
 from collections import namedtuple
 from copy import deepcopy
 from scipy.stats import norm
-from sklearn.base import BaseEstimator
 from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
 from tqdm import tqdm
 from ..base import Base
-from ..deep import DeepRegressor
+from ..custom import CustomRegressor
 from ..conformal import SPCI_and_EnbPI
 from ..simulation import getsims
 from ..utils import matrixops as mo
 from ..utils import timeseries as ts
 
 
-class DeepMTS(BaseEstimator):
-    """Univariate and multivariate time series (MTS) forecasting with Quasi-Randomized networks (Work in progress /!\)
+class DeepMTS(Base):
+    """Univariate and multivariate time series (DeepMTS) forecasting with Quasi-Randomized networks (Work in progress /!\)
 
     Parameters:
 
         obj: object.
             any object containing a method fit (obj.fit()) and a method predict
             (obj.predict()).
-        
+
         n_layers: int.
-            number of hidden layers.
+            number of layers in the neural network.
 
         n_hidden_features: int.
             number of nodes in the hidden layer.
@@ -104,10 +103,10 @@ class DeepMTS(BaseEstimator):
             objects adjusted to each individual time series
 
         y_: {array-like}
-            MTS responses (most recent observations first)
+            DeepMTS responses (most recent observations first)
 
         X_: {array-like}
-            MTS lags
+            DeepMTS lags
 
         xreg_: {array-like}
             external regressors
@@ -144,14 +143,14 @@ class DeepMTS(BaseEstimator):
 
     # Adjust Bayesian Ridge
     regr4 = linear_model.BayesianRidge()
-    obj_MTS = ns.MTS(regr4, lags = 1, n_hidden_features=5)
-    obj_MTS.fit(M)
-    print(obj_MTS.predict())
+    obj_DeepMTS = ns.DeepMTS(regr4, lags = 1, n_hidden_features=5)
+    obj_DeepMTS.fit(M)
+    print(obj_DeepMTS.predict())
 
     # with credible intervals
-    print(obj_MTS.predict(return_std=True, level=80))
+    print(obj_DeepMTS.predict(return_std=True, level=80))
 
-    print(obj_MTS.predict(return_std=True, level=95))
+    print(obj_DeepMTS.predict(return_std=True, level=95))
     ```
 
     Example 2:
@@ -171,14 +170,14 @@ class DeepMTS(BaseEstimator):
 
     # Adjust Bayesian Ridge
     regr5 = linear_model.BayesianRidge()
-    obj_MTS = ns.MTS(regr5, lags = 1, n_hidden_features=5)
-    obj_MTS.fit(df)
-    print(obj_MTS.predict())
+    obj_DeepMTS = ns.DeepMTS(regr5, lags = 1, n_hidden_features=5)
+    obj_DeepMTS.fit(df)
+    print(obj_DeepMTS.predict())
 
     # with credible intervals
-    print(obj_MTS.predict(return_std=True, level=80))
+    print(obj_DeepMTS.predict(return_std=True, level=80))
 
-    print(obj_MTS.predict(return_std=True, level=95))
+    print(obj_DeepMTS.predict(return_std=True, level=95))
     ```
     """
 
@@ -210,12 +209,9 @@ class DeepMTS(BaseEstimator):
         show_progress=True,
     ):
         assert int(lags) == lags, "parameter 'lags' should be an integer"
+        assert n_layers >= 2, "must have n_layers >= 2"        
 
-        self.obj = DeepRegressor(
-            obj=obj,
-            verbose=0,
-            # Defining depth
-            n_layers=n_layers,
+        super().__init__(
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,
             a=a,
@@ -231,42 +227,22 @@ class DeepMTS(BaseEstimator):
             backend=backend,
         )
 
-        self.n_hidden_features = n_hidden_features
-        self.activation_name = activation_name
-        self.a = a
-        self.nodes_sim = nodes_sim
-        self.bias = bias
-        self.dropout = dropout
-        self.direct_link = direct_link
-        self.n_clusters = n_clusters
-        self.cluster_encode = cluster_encode
-        self.type_clust = type_clust
-        self.type_scaling = type_scaling
-        self.lags = lags
-        self.type_pi = type_pi
-        self.replications = replications
-        self.kernel = kernel
-        self.seed = seed
-        self.agg = agg
-        self.backend = backend
+        self.stacked_objs = {}
         self.verbose = verbose
-        self.show_progress = show_progress
-
-        self.n_layers = n_layers
+        self.n_layers = n_layers        
         self.n_series = None
         self.lags = lags
         self.type_pi = type_pi
         self.replications = replications
         self.kernel = kernel
-        self.seed = seed
         self.agg = agg
         self.verbose = verbose
         self.show_progress = show_progress
         self.series_names = None
         self.input_dates = None
         self.fit_objs_ = {}
-        self.y_ = None  # MTS responses (most recent observations first)
-        self.X_ = None  # MTS lags
+        self.y_ = None  # DeepMTS responses (most recent observations first)
+        self.X_ = None  # DeepMTS lags
         self.xreg_ = None
         self.y_means_ = {}
         self.mean_ = None
@@ -281,9 +257,11 @@ class DeepMTS(BaseEstimator):
         self.residuals_sims_ = None
         self.kde_ = None
         self.sims_ = None
+        self.obj = obj
+        self.objs = {}
 
     def fit(self, X, xreg=None, **kwargs):
-        """Fit MTS model to training data X, with optional regressors xreg
+        """Fit DeepMTS model to training data X, with optional regressors xreg
 
         Parameters:
 
@@ -328,6 +306,7 @@ class DeepMTS(BaseEstimator):
         self.X_ = None
         self.n_series = p
         self.fit_objs_.clear()
+        self.stacked_objs.clear()
         self.y_means_.clear()
         residuals_ = []
         self.residuals_ = None
@@ -335,7 +314,9 @@ class DeepMTS(BaseEstimator):
         self.kde_ = None
         self.sims_ = None
         self.scaled_Z_ = None
-        self.centered_y_is_ = []
+        self.centered_y_is_ = []  
+        for i in range(p):
+            self.stacked_objs[i] = self.obj # init layer for each time series      
 
         if p > 1:
             # multivariate time series
@@ -360,25 +341,79 @@ class DeepMTS(BaseEstimator):
 
             self.xreg_ = xreg
 
-            xreg_input = ts.create_train_inputs(xreg[::-1], self.lags)            
+            xreg_input = ts.create_train_inputs(xreg[::-1], self.lags)
 
-        # loop on all the time series and adjust self.obj.fit
-        if self.verbose > 0:
-            print(
-                f"\n Adjusting {type(self.obj).__name__} to multivariate time series... \n "
+            dummy_y, scaled_Z = self.cook_training_set(
+                y=rep_1_n,
+                X=mo.cbind(self.X_, xreg_input[1], backend=self.backend),
+            )
+
+        else:  # xreg is None
+            # avoids scaling X p times in the loop
+            dummy_y, scaled_Z = self.cook_training_set(y=rep_1_n, X=self.X_)
+
+        self.scaled_Z_ = scaled_Z        
+
+        # init layer for each time series
+        for i in range(p):
+            # loop on all the time series and adjust self.obj.fit            
+            self.stacked_objs[i] = CustomRegressor(
+                obj=self.stacked_objs[i],
+                n_hidden_features=self.n_hidden_features,
+                activation_name=self.activation_name,
+                a=self.a,
+                nodes_sim=self.nodes_sim,
+                bias=self.bias,
+                dropout=self.dropout,
+                direct_link=self.direct_link,
+                n_clusters=self.n_clusters,
+                cluster_encode=self.cluster_encode,
+                type_clust=self.type_clust,
+                type_scaling=self.type_scaling,
+                col_sample=self.col_sample,
+                row_sample=self.row_sample,
+                seed=self.seed,
+                backend=self.backend,
             )
 
         if self.show_progress is True:
-            iterator = tqdm(range(p))
+            iterator_series = tqdm(range(p))
+            iterator_layers = tqdm(range(self.n_layers - 1))
         else:
-            iterator = range(p)
-
-        for i in iterator:
-            self.obj.fit(X=self.X_, 
-                         y=self.y_[:, i])
-            self.fit_objs_[i] = deepcopy(self.obj)
+            iterator_series = range(p)
+            iterator_layers = range(self.n_layers - 1)
+        
+        for i in iterator_series:
+            y_mean = np.mean(self.y_[:, i])
+            self.y_means_[i] = y_mean
+            centered_y_i = self.y_[:, i] - y_mean
+            self.centered_y_is_.append(centered_y_i)
+            for _ in iterator_layers:
+                self.stacked_objs[i] = deepcopy(
+                    CustomRegressor(
+                        obj=self.stacked_objs[i],
+                        n_hidden_features=self.n_hidden_features,
+                        activation_name=self.activation_name,
+                        a=self.a,
+                        nodes_sim=self.nodes_sim,
+                        bias=self.bias,
+                        dropout=self.dropout,
+                        direct_link=self.direct_link,
+                        n_clusters=self.n_clusters,
+                        cluster_encode=self.cluster_encode,
+                        type_clust=self.type_clust,
+                        type_scaling=self.type_scaling,
+                        col_sample=self.col_sample,
+                        row_sample=self.row_sample,
+                        seed=self.seed,
+                        backend=self.backend,
+                    )
+                )                
+            self.stacked_objs[i].fit(X=scaled_Z, y=centered_y_i)            
+            self.fit_objs_[i] = deepcopy(self.stacked_objs[i]) 
+            self.objs[i] = deepcopy(self.stacked_objs[i]) # for compatibility with DeepAR]           
             residuals_.append(
-                (self.y_[:, i] - self.fit_objs_[i].predict(self.X_)).tolist()
+                (centered_y_i - self.fit_objs_[i].predict(scaled_Z)).tolist()
             )
 
         self.residuals_ = np.asarray(residuals_).T
@@ -446,6 +481,8 @@ class DeepMTS(BaseEstimator):
 
         self.sims_ = None
 
+        y_means_ = np.asarray([self.y_means_[i] for i in range(self.n_series)])
+
         n_features = self.n_series * self.lags
 
         self.alpha_ = 100 - level
@@ -468,34 +505,34 @@ class DeepMTS(BaseEstimator):
                 )
 
             for _ in range(h):
-
                 new_obs = ts.reformat_response(self.mean_, self.lags)
 
                 new_X = new_obs.reshape(1, n_features)
 
-                if "return_std" in kwargs:
+                cooked_new_X = self.cook_test_set(new_X, **kwargs)
 
+                if "return_std" in kwargs:
                     self.preds_std_.append(
                         [
                             np.asarray(
                                 self.fit_objs_[i].predict(
-                                    new_X, return_std=True
+                                    cooked_new_X, return_std=True
                                 )[1]
                             ).item()
                             for i in range(self.n_series)
                         ]
                     )
 
-                predicted_new_X = np.asarray(
+                predicted_cooked_new_X = np.asarray(
                     [
                         np.asarray(
-                            self.fit_objs_[i].predict(new_X)
+                            self.fit_objs_[i].predict(cooked_new_X)
                         ).item()
                         for i in range(self.n_series)
                     ]
                 )
 
-                preds = np.asarray(predicted_new_X)
+                preds = np.asarray(y_means_ + predicted_cooked_new_X)
 
                 self.mean_ = mo.rbind(preds, self.mean_)
 
@@ -542,28 +579,30 @@ class DeepMTS(BaseEstimator):
                     (new_obs, new_obs_xreg), axis=None
                 ).reshape(1, -1)
 
+                cooked_new_X = self.cook_test_set(new_X, **kwargs)
+
                 if "return_std" in kwargs:
                     self.preds_std_.append(
                         [
                             np.asarray(
                                 self.fit_objs_[i].predict(
-                                    new_X, return_std=True
+                                    cooked_new_X, return_std=True
                                 )[1]
                             ).item()
                             for i in range(self.n_series)
                         ]
                     )
 
-                predicted_new_X = np.asarray(
+                predicted_cooked_new_X = np.asarray(
                     [
                         np.asarray(
-                            self.fit_objs_[i].predict(new_X)
+                            self.fit_objs_[i].predict(cooked_new_X)
                         ).item()
                         for i in range(self.n_series)
                     ]
                 )
 
-                preds = np.asarray(predicted_new_X)
+                preds = np.asarray(y_means_ + predicted_cooked_new_X)
 
                 self.mean_ = mo.rbind(preds, self.mean_)
 

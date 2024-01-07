@@ -13,7 +13,7 @@ from sklearn.metrics import (
     mean_pinball_loss,
     mean_absolute_percentage_error,
 )
-from .config import REGRESSORSMTS
+from .config import REGRESSORSDEEPMTS
 from ..mts import MTS
 from ..deep import DeepMTS
 from ..utils import convert_df_to_numeric
@@ -235,7 +235,7 @@ class LazyDeepMTS(MTS):
             )
 
         if self.regressors == "all":
-            self.regressors = REGRESSORSMTS
+            self.regressors = REGRESSORSDEEPMTS
         else:
             try:
                 temp_list = []
