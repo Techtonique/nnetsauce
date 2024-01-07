@@ -50,8 +50,8 @@ jobs:
         pip install setuptools
     - name: Build package for linux
       run: python3 setup.py sdist
-    - name: Publish package
-      uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
+    - name: pypi-publish
+      uses: pypa/gh-action-pypi-publish@v1.8.11
       with:
         user: thierrymoudiki
         password: ${{ secrets.NNETSAUCE_PYPI_RELEASE }}
