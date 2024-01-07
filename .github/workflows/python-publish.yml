@@ -22,9 +22,9 @@ jobs:
           echo "Found directory two levels higher: $found_dir"
           echo "PACKAGES_DIR=$found_dir" >> $GITHUB_ENV
 
-      - name: Publish distribution 📦 to PyPI
+      - name: Publish distribution 📦 to PyPI (.tar.gz)
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: ${{ env.PACKAGES_DIR }}/nnetsauce-0.16.2.tar.gz
+          packages-dir: ${{ env.PACKAGES_DIR }}/*.tar.gz  # Change to match .tar.gz files
           password: ${{ secrets.PYPI_GLOBAL }}
           repository-url: https://test.pypi.org/legacy/
