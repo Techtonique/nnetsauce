@@ -32,6 +32,6 @@ jobs:
       - name: Publish distribution 📦 to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: ${{ env.PACKAGES_DIR }}/  # Change to match .tar.gz files
+          #packages-dir: ${{ env.PACKAGES_DIR }}/  # Change to match .tar.gz files
           password: ${{ secrets.PYPI_GLOBAL }}
           repository-url: https://test.pypi.org/legacy/
