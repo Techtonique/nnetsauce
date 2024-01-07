@@ -1,9 +1,10 @@
 name: Publish Python 🐍 distribution 📦 to PyPI
 
 on:
+  workflow_dispatch:
   push:
     branches:
-      - main  # Replace with your branch name
+      - master  # Replace with your branch name
 
 jobs:
   publish:
