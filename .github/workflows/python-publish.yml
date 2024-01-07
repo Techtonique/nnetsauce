@@ -27,16 +27,8 @@ jobs:
       - name: Build distribution
         run: python setup.py sdist bdist_wheel
 
-      - name: Download all the dists
-        uses: actions/download-artifact@v3
-        with:
-          name: python-package-distributions
-          path: dist/    
-
       - name: Publish to PyPI        
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_GLOBAL }}
           repository-url: https://test.pypi.org/legacy/
-
-      
