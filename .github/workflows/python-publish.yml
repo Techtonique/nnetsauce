@@ -18,12 +18,12 @@ jobs:
         run: |
           pwd          
           ls -la          
-      - name: Find directory two levels higher
-        id: find-dir
-        run: |
-          found_dir=$(find "dist" -maxdepth 2)
-          echo "Found directory: $found_dir"
-          echo "PACKAGES_DIR=$found_dir" >> $GITHUB_ENV
+      #- name: Find directory two levels higher
+      #  id: find-dir
+      #  run: |
+      #    found_dir=$(find "dist" -maxdepth 2)
+      #    echo "Found directory: $found_dir"
+      #    echo "PACKAGES_DIR=$found_dir" >> $GITHUB_ENV
 
       - name: Publish distribution 📦 to PyPI
         run: python -m twine upload --skip-existing dist/*
