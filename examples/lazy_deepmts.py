@@ -36,7 +36,7 @@ regr_mts = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
 models, predictions = regr_mts.fit(df_train, df_test)
 model_dictionary = regr_mts.provide_models(df_train, df_test)
 print(models)
-print(model_dictionary["MTS(LinearSVR)"])
+print(model_dictionary["DeepMTS(LinearSVR)"])
 
 regr_mts2 = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
                       lags = 4, n_hidden_features=7, n_clusters=2,
@@ -44,7 +44,7 @@ regr_mts2 = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
 models, predictions = regr_mts2.fit(df_train, df_test)
 model_dictionary = regr_mts.provide_models(df_train, df_test)
 print(models)
-print(model_dictionary["MTS(LinearSVR)"])
+print(model_dictionary["DeepMTS(LinearSVR)"])
 
 
 
