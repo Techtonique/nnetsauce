@@ -22,6 +22,7 @@ jobs:
           ls -la .
           ls -la ..
           ls -la ../..
+          ls -la ../nnetsauce
       - name: Find directory two levels higher
         id: find-dir
         run: |
