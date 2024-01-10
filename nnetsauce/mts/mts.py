@@ -746,7 +746,7 @@ class MTS(Base):
         n_points_all = len(y_all)
         n_points_train = self.df_.shape[0]
 
-        if type_axis == "numeric":
+        if type_axis == "numeric" or type_plot == "spaghetti":
             x_all = [i for i in range(n_points_all)]
             x_test = [i for i in range(n_points_train, n_points_all)]
         
