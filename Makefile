@@ -53,11 +53,11 @@ coverage: ## check code coverage quickly with the default Python
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
-docs: ## generate mkdocs
-	cd nnetsauce-docs&&mkdocs build&&cd ..
+docs: ## generate docs (TODO)
+	pwd
 
-servedocs: docs## compile the docs watching for changes
-	cd nnetsauce-docs&&mkdocs serve&&cd ..
+servedocs: docs## compile the docs watching for changes (TODO)
+	pwd
 
 release: dist ## package and upload a release
 	pip install twine
@@ -65,7 +65,7 @@ release: dist ## package and upload a release
 
 dist: clean ## builds source and wheel package
 	python3 setup.py sdist
-	python3 setup.py bdist_wheel
+	python3 setup.py bdist_wheel	
 	ls -l dist
 
 install: clean ## install the package to the active Python's site-packages
