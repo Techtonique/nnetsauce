@@ -775,7 +775,7 @@ class MTS(Base):
             plt.plot(x_all, y_all, "-")     
             for col_ix in range(sims_ix.shape[1]): # avoid this when there are thousands of simulations                                
                 plt.plot(x_test, sims_ix[:, col_ix], 
-                         marker='-', color=palette(col_ix), 
+                         "-", color=palette(col_ix), 
                          linewidth=1, alpha=0.9)            
             # Add titles
             plt.title(f"{self.replications} simulations of {series}", loc='left', fontsize=12, fontweight=0, color='orange')
