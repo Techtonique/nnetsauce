@@ -178,16 +178,18 @@ coverage html
 - [https://techtonique.github.io/nnetsauce/](https://techtonique.github.io/nnetsauce/)
 
 
-## Citation
+## Citation (BibTeX entry)
+
+Replace `Version x.x.x` by the version number you've used. 
 
 ```
 @misc{moudiki2019nnetsauce,
-author={Moudiki, Thierry},
-title={\code{nnetsauce}, {A} package for {S}tatistical/{M}achine {L}earning using {R}andomized and {Q}uasi-{R}andomized (neural) networks.,
+author={Moudiki, T.},
+title={nnetsauce, {A} package for {S}tatistical/{M}achine {L}earning using {R}andomized and {Q}uasi-{R}andomized (neural) networks.},
 howpublished={\url{https://github.com/thierrymoudiki/nnetsauce}},
-note={BSD 3-Clause Clear License. Version 0.x.x.},
-year={2019--2023}
-}
+note={BSD 3-Clause Clear License. Version x.x.x},
+year={2019--2024}
+}}
 ```
 
 ## References
