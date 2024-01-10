@@ -770,7 +770,7 @@ class MTS(Base):
             plt.title(f"prediction intervals for {self.replications} simulations of {series}", loc='left', fontsize=12, fontweight=0, color='black')
             plt.show()
         
-        if type_plot == "spaghetti" and type_axis == "numeric":                                      
+        if type_plot == "spaghetti":                                      
             palette = plt.get_cmap('Set1')  
             sims_ix = getsims(self.sims_, series_idx)
             plt.plot(x_all, y_all, "-")     
