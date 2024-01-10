@@ -194,7 +194,7 @@ year={2019--2024}
 
 ## References
 
-- Moudikit, T. (2024). Regression-based machine learning classifiers. Available at: https://www.researchgate.net/publication/377227280_Regression-based_machine_learning_classifiers
+- Moudiki, T. (2024). Regression-based machine learning classifiers. Available at: https://www.researchgate.net/publication/377227280_Regression-based_machine_learning_classifiers
 
 - Moudiki, T. (2020). Quasi-randomized networks for regression and classification, with two shrinkage parameters. Available at: https://www.researchgate.net/publication/339512391_Quasi-randomized_networks_for_regression_and_classification_with_two_shrinkage_parameters
 
