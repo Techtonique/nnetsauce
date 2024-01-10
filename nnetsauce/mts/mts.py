@@ -770,8 +770,7 @@ class MTS(Base):
             )
             plt.show()
         
-        if type_plot == "spaghetti":            
-            assert self.sims_ is not None, "model predictive simulations must be obtained first (with predict)"
+        if type_plot == "spaghetti":                        
             sims_ix = getsims(self.sims_, series_idx)  
             palette = plt.get_cmap('Set1')                      
             for num, column in enumerate(sims_ix): # avoid this when there are thousands of simulations                
