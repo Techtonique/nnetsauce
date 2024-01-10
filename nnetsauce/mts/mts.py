@@ -746,11 +746,11 @@ class MTS(Base):
         n_points_all = len(y_all)
         n_points_train = self.df_.shape[0]
 
-        if type_axis == "numeric" or type_plot == "spaghetti":
+        if type_axis == "numeric":
             x_all = [i for i in range(n_points_all)]
             x_test = [i for i in range(n_points_train, n_points_all)]
         
-        if type_axis == "dates" and type_plot != "spaghetti": # use dates
+        if type_axis == "dates": # use dates
             x_all = np.concatenate(
                 (self.input_dates.values, self.output_dates_.values), axis=None
             )
@@ -772,11 +772,10 @@ class MTS(Base):
         if type_plot == "spaghetti" and type_axis == "numeric":                                      
             palette = plt.get_cmap('Set1')  
             sims_ix = getsims(self.sims_, series_idx)
-            print(f"sims_ix: {sims_ix}")
-            print(f"x_all: {x_all}")
+            plt.plot(x_all, y_all, "-")     
             for col_ix in range(sims_ix.shape[1]): # avoid this when there are thousands of simulations                                
-                plt.plot(x_all, sims_ix[:, col_ix], 
-                         marker='', color=palette(col_ix), 
+                plt.plot(x_test, sims_ix[:, col_ix], 
+                         marker='-', color=palette(col_ix), 
                          linewidth=1, alpha=0.9)            
             # Add titles
             plt.title(f"{self.replications} simulations of {series}", loc='left', fontsize=12, fontweight=0, color='orange')
