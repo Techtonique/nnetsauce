@@ -774,7 +774,7 @@ class MTS(Base):
             sims_ix = getsims(self.sims_, series_idx)  
             palette = plt.get_cmap('Set1')                      
             for num, column in enumerate(sims_ix): # avoid this when there are thousands of simulations                
-                plt.plot(sims_ix.index, sims_ix[column], 
+                plt.plot(x_all, sims_ix[column], 
                          marker='', color=palette(num), 
                          linewidth=1, alpha=0.9, label=column)            
             # Add titles
