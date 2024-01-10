@@ -777,7 +777,8 @@ class MTS(Base):
                 plt.plot(x_test, sims_ix[:, col_ix], 
                          "-", color=palette(col_ix), 
                          linewidth=1, alpha=0.9)  
-            plt.plot(x_all, y_all, "-", color='black')          
+            plt.plot(x_all, y_all, "-", color='black')
+            plt.plot(x_test, y_test, "-", color='blue')          
             # Add titles
             plt.title(f"{self.replications} simulations of {series}", loc='left', fontsize=12, fontweight=0, color='black')
             plt.xlabel("Time")
