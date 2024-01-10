@@ -750,8 +750,7 @@ class MTS(Base):
             x_all = [i for i in range(n_points_all)]
             x_test = [i for i in range(n_points_train, n_points_all)]
         
-        if type_axis == "dates": # use dates
-            print("use dates")            
+        if type_axis == "dates" and type_plot != "spaghetti": # use dates
             x_all = np.concatenate(
                 (self.input_dates.values, self.output_dates_.values), axis=None
             )
@@ -770,7 +769,7 @@ class MTS(Base):
             )
             plt.show()
         
-        if type_plot == "spaghetti":                                      
+        if type_plot == "spaghetti" and type_axis == "numeric":                                      
             palette = plt.get_cmap('Set1')  
             sims_ix = getsims(self.sims_, series_idx)
             print(f"sims_ix: {sims_ix}")
