@@ -710,7 +710,7 @@ class MTS(Base):
         # else:
         return scoring_options[scoring](X_test, preds)
 
-    def plot(self, series):
+    def plot(self, series, type_axis = "dates", type_plot = "pi"):
         """Plot time series forecast
 
         Parameters:
@@ -718,8 +718,6 @@ class MTS(Base):
             series: {integer} or {string}
                 series index or name
         """
-
-        type_graph = "dates"  # not clean, stabilize this in future releases
 
         assert all(
             [
@@ -748,23 +746,42 @@ class MTS(Base):
         n_points_all = len(y_all)
         n_points_train = self.df_.shape[0]
 
-        if type_graph == "numeric":
+        if type_axis == "numeric":
             x_all = [i for i in range(n_points_all)]
             x_test = [i for i in range(n_points_train, n_points_all)]
-        else:  # use dates
+        
+        if type_axis == "dates": # use dates
+            print("use dates")            
             x_all = np.concatenate(
                 (self.input_dates.values, self.output_dates_.values), axis=None
             )
             x_test = self.output_dates_.values
 
-        fig, ax = plt.subplots()
-        ax.plot(x_all, y_all, "-")
-        ax.plot(x_test, y_test, "-", color="orange")
-        ax.fill_between(
-            x_test,
-            self.lower_.iloc[:, series_idx],
-            self.upper_.iloc[:, series_idx],
-            alpha=0.2,
-            color="orange",
-        )
-        plt.show()
+        if type_plot == "pi":
+            fig, ax = plt.subplots()
+            ax.plot(x_all, y_all, "-")
+            ax.plot(x_test, y_test, "-", color="orange")
+            ax.fill_between(
+                x_test,
+                self.lower_.iloc[:, series_idx],
+                self.upper_.iloc[:, series_idx],
+                alpha=0.2,
+                color="orange",
+            )
+            plt.show()
+        
+        if type_plot == "spaghetti":            
+            assert self.sims_ is None, "model predictive simulations must be obtained first (with predict)"
+            sims_ix = getsims(self.sims_, series_idx)  
+            palette = plt.get_cmap('Set1')                      
+            for num, column in enumerate(sims_ix): # avoid this when there are thousands of simulations                
+                plt.plot(sims_ix.index, sims_ix[column], 
+                         marker='', color=palette(num), 
+                         linewidth=1, alpha=0.9, label=column)            
+            # Add titles
+            plt.title(f"{self.replications} simulations of {series}", loc='left', fontsize=12, fontweight=0, color='orange')
+            plt.xlabel("Time")
+            plt.ylabel("Values")
+            # Show the graph
+            plt.show()
+
