@@ -770,10 +770,13 @@ class MTS(Base):
             )
             plt.show()
         
-        if type_plot == "spaghetti":                        
-            sims_ix = getsims(self.sims_, series_idx)  
+        if type_plot == "spaghetti":                                      
             palette = plt.get_cmap('Set1')  
+            sims_ix = getsims(self.sims_, series_idx)
+            print(f"sims_ix: {sims_ix}")
+            print(f"x_all: {x_all}")
             for num, column in enumerate(sims_ix): # avoid this when there are thousands of simulations                
+                print(f"num: {num}, column: {column}")
                 plt.plot(x_all, sims_ix[column].values, 
                          marker='', color=palette(num), 
                          linewidth=1, alpha=0.9, label=column)            
