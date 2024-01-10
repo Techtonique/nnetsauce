@@ -774,11 +774,10 @@ class MTS(Base):
             sims_ix = getsims(self.sims_, series_idx)
             print(f"sims_ix: {sims_ix}")
             print(f"x_all: {x_all}")
-            for num, column in enumerate(sims_ix): # avoid this when there are thousands of simulations                
-                print(f"num: {num}, column: {column}")
-                plt.plot(x_all, sims_ix[column].values, 
-                         marker='', color=palette(num), 
-                         linewidth=1, alpha=0.9, label=column)            
+            for col_ix in range(sims_ix.shape[1]): # avoid this when there are thousands of simulations                                
+                plt.plot(x_all, sims_ix[:, col_ix], 
+                         marker='', color=palette(col_ix), 
+                         linewidth=1, alpha=0.9)            
             # Add titles
             plt.title(f"{self.replications} simulations of {series}", loc='left', fontsize=12, fontweight=0, color='orange')
             plt.xlabel("Time")
