@@ -4,7 +4,7 @@ import pandas as pd
 import platform
 from jax import device_put
 from scipy import sparse
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
 from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
 
@@ -205,9 +205,11 @@ def safe_sparse_dot(a, b, backend="cpu", dense_output=False):
 # Obtain this for JAX
 # scale... covariates
 def scale_covariates(X, choice="std", training=True, scaler=None):
+    
     scaling_options = {
         "std": StandardScaler(copy=True, with_mean=True, with_std=True),
         "minmax": MinMaxScaler(),
+        "robust": RobustScaler(copy=True, with_centering=True, with_scaling=True)
     }
 
     if training == True:

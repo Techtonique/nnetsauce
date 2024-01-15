@@ -58,6 +58,15 @@ CLASSIFIERS = [
     )
 ]
 
+DEEPCLASSIFIERS = [
+    ("DeepCustomClassifier(" + est[0] + ")", est[1])
+    for est in all_estimators()
+    if (
+        issubclass(est[1], ClassifierMixin)
+        and (est[0] not in removed_classifiers)
+    )
+]
+
 MULTITASKCLASSIFIERS = [
     (
         "MultitaskClassifier(" + est[0] + ")",
@@ -84,6 +93,15 @@ SIMPLEMULTITASKCLASSIFIERS = [
 
 REGRESSORS = [
     ("CustomRegressor(" + est[0] + ")", est[1])
+    for est in all_estimators()
+    if (
+        issubclass(est[1], RegressorMixin)
+        and (est[0] not in removed_regressors)
+    )
+]
+
+DEEPREGRESSORS = [
+    ("DeepCustomRegressor(" + est[0] + ")", est[1])
     for est in all_estimators()
     if (
         issubclass(est[1], RegressorMixin)
