@@ -206,16 +206,20 @@ def safe_sparse_dot(a, b, backend="cpu", dense_output=False):
 # scale... covariates
 def scale_covariates(X, choice="std", training=True, scaler=None):
     
-    scaling_options = {
-        "std": StandardScaler(copy=True, with_mean=True, with_std=True),
-        "minmax": MinMaxScaler(),
-        "robust": RobustScaler(copy=True, with_centering=True, with_scaling=True)
-    }
-
     if training == True:
+
         # scaler must be not None
-        scaler = scaling_options[choice]
+        if choice == "std":
+            scaler = StandardScaler(copy=True, with_mean=True, with_std=True)
+
+        elif choice == "minmax":
+            scaler = MinMaxScaler()
+
+        else:
+            scaler = RobustScaler(copy=True, with_centering=True, with_scaling=True)
+
         scaled_X = scaler.fit_transform(X)
+
         return scaler, scaled_X
 
     # training == False:
