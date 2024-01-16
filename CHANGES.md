@@ -6,7 +6,7 @@
 - `DeepMTS` (multivariate time series forecasting with deep quasi-random layers): see https://thierrymoudiki.github.io/blog/2024/01/15/python/quasirandomizednn/forecasting/DeepMTS
 - AutoML for `MTS` (multivariate time series forecasting): see https://thierrymoudiki.github.io/blog/2023/10/29/python/quasirandomizednn/MTS-LazyPredict
 - AutoML for `DeepMTS` (multivariate time series forecasting): see https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/demo/thierrymoudiki_20240106_LazyDeepMTS.ipynb
-- Spaghetti plots for `MTS` and `DeepMTS` (multivariate time series forecasting): see https://thierrymoudiki.github.io/blog/2024/01/15/python/quasirandomizednn/forecasting/MTS
+- Spaghetti plots for `MTS` and `DeepMTS` (multivariate time series forecasting): see https://thierrymoudiki.github.io/blog/2024/01/15/python/quasirandomizednn/forecasting/DeepMTS
 - Subsample continuous and discrete responses  
 
 # version 0.16.0
