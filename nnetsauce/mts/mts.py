@@ -14,7 +14,6 @@ from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
 from tqdm import tqdm
 from ..base import Base
-from ..conformal import SPCI_and_EnbPI
 from ..simulation import getsims
 from ..utils import matrixops as mo
 from ..utils import timeseries as ts

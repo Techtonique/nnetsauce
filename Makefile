@@ -53,14 +53,16 @@ coverage: ## check code coverage quickly with the default Python
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
-docs: ## generate docs (TODO)
-	pwd
+docs: ## generate docs
+	pip install pdoc --ignore-installed
+	pdoc nnetsauce/* --output-dir nnetsauce-docs
 
-servedocs: docs## compile the docs watching for changes (TODO)
-	pwd
+servedocs: ## compile the docs watching for change
+	pip install pdoc --ignore-installed
+	pdoc nnetsauce/* 
 
 release: dist ## package and upload a release
-	pip install twine
+	pip install twine --ignore-installed
 	python3 -m twine upload --repository pypi dist/* --verbose
 
 dist: clean ## builds source and wheel package
