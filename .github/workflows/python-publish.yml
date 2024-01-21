@@ -28,7 +28,7 @@ jobs:
         run: python setup.py sdist bdist_wheel
 
       - name: Run examples 
-        run: find examples -maxdepth 2 -name "*.py" -exec  python3 {} \;
+        run: pip install .&&find examples -maxdepth 2 -name "*.py" -exec  python3 {} \;
 
       - name: Publish to PyPI                
         uses: pypa/gh-action-pypi-publish@release/v1
