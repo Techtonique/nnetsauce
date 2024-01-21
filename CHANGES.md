@@ -1,4 +1,4 @@
-# version 0.16.4
+# version 0.16.5
 
 - Improve consistency with sklearn's v1.2, for `OneHotEncoder`
 
