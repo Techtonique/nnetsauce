@@ -1,3 +1,7 @@
+# version 0.16.4
+
+- Improve consistency with sklearn's v1.2, for `OneHotEncoder`
+
 # version 0.16.3
 
 - add **robust scaler** 
