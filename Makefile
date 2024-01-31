@@ -32,6 +32,7 @@ clean-build: ## remove build artifacts
 	rm -fr build/
 	rm -fr dist/
 	rm -fr .eggs/
+	rm -fr nnetsauce-docs/
 	find . -name '*.egg-info' -exec rm -fr {} +
 	find . -name '*.egg' -exec rm -fr {} +
 
@@ -53,13 +54,15 @@ coverage: ## check code coverage quickly with the default Python
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
-docs: ## generate docs
+docs: install ## generate docs	
+	pip install black --ignore-installed
+	black nnetsauce/* --line-length 80
 	pip install pdoc --ignore-installed
 	pdoc nnetsauce/* --output-dir nnetsauce-docs
 
-servedocs: ## compile the docs watching for change
+servedocs: install ## compile the docs watching for change	 
 	pip install pdoc --ignore-installed
-	pdoc nnetsauce/* 
+	pdoc nnetsauce/*
 
 release: dist ## package and upload a release
 	pip install twine --ignore-installed
@@ -73,9 +76,8 @@ dist: clean ## builds source and wheel package
 install: clean ## install the package to the active Python's site-packages
 	python3 -m pip install .
 
-build-site: docs ## export mkdocs website to a folder
-	cd docs&&mkdocs build
-	cp -rf docs/site/* ../../Pro_Website/Techtonique.github.io/nnetsauce
+build-site: docs ## export mkdocs website to a folder	
+	cp -rf nnetsauce-docs/* ../../Pro_Website/Techtonique.github.io/nnetsauce
 	cd ..
 
 run-examples: ## run all examples with one command

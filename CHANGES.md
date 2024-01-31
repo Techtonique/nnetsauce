@@ -1,5 +1,6 @@
-# version 0.16.5
+# version 0.16.6
 
+- Subsample response by using the **number of rows**, not only a percentage (see [https://thierrymoudiki.github.io/blog/2024/01/22/python/nnetsauce-subsampling](https://thierrymoudiki.github.io/blog/2024/01/22/python/nnetsauce-subsampling))
 - Improve consistency with sklearn's v1.2, for `OneHotEncoder`
 
 # version 0.16.3

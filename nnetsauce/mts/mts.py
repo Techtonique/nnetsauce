@@ -709,7 +709,7 @@ class MTS(Base):
         # else:
         return scoring_options[scoring](X_test, preds)
 
-    def plot(self, series, type_axis = "dates", type_plot = "pi"):
+    def plot(self, series, type_axis="dates", type_plot="pi"):
         """Plot time series forecast
 
         Parameters:
@@ -748,8 +748,8 @@ class MTS(Base):
         if type_axis == "numeric":
             x_all = [i for i in range(n_points_all)]
             x_test = [i for i in range(n_points_train, n_points_all)]
-        
-        if type_axis == "dates": # use dates
+
+        if type_axis == "dates":  # use dates
             x_all = np.concatenate(
                 (self.input_dates.values, self.output_dates_.values), axis=None
             )
@@ -766,23 +766,41 @@ class MTS(Base):
                 alpha=0.2,
                 color="orange",
             )
-            plt.title(f"prediction intervals for {self.replications} simulations of {series}", loc='left', fontsize=12, fontweight=0, color='black')
+            plt.title(
+                f"prediction intervals for {self.replications} simulations of {series}",
+                loc="left",
+                fontsize=12,
+                fontweight=0,
+                color="black",
+            )
             plt.show()
-        
-        if type_plot == "spaghetti":                                      
-            palette = plt.get_cmap('Set1')  
+
+        if type_plot == "spaghetti":
+            palette = plt.get_cmap("Set1")
             sims_ix = getsims(self.sims_, series_idx)
-            plt.plot(x_all, y_all, "-")     
-            for col_ix in range(sims_ix.shape[1]): # avoid this when there are thousands of simulations                                
-                plt.plot(x_test, sims_ix[:, col_ix], 
-                         "-", color=palette(col_ix), 
-                         linewidth=1, alpha=0.9)  
-            plt.plot(x_all, y_all, "-", color='black')
-            plt.plot(x_test, y_test, "-", color='blue')          
+            plt.plot(x_all, y_all, "-")
+            for col_ix in range(
+                sims_ix.shape[1]
+            ):  # avoid this when there are thousands of simulations
+                plt.plot(
+                    x_test,
+                    sims_ix[:, col_ix],
+                    "-",
+                    color=palette(col_ix),
+                    linewidth=1,
+                    alpha=0.9,
+                )
+            plt.plot(x_all, y_all, "-", color="black")
+            plt.plot(x_test, y_test, "-", color="blue")
             # Add titles
-            plt.title(f"{self.replications} simulations of {series}", loc='left', fontsize=12, fontweight=0, color='black')
+            plt.title(
+                f"{self.replications} simulations of {series}",
+                loc="left",
+                fontsize=12,
+                fontweight=0,
+                color="black",
+            )
             plt.xlabel("Time")
             plt.ylabel("Values")
             # Show the graph
             plt.show()
-

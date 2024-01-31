@@ -33,7 +33,10 @@ numeric_transformer = Pipeline(
 categorical_transformer_low = Pipeline(
     steps=[
         ("imputer", SimpleImputer(strategy="constant", fill_value="missing")),
-        ("encoding", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
+        (
+            "encoding",
+            OneHotEncoder(handle_unknown="ignore", sparse_output=False),
+        ),
     ]
 )
 
@@ -351,9 +354,9 @@ class LazyMTS(MTS):
                         }
 
                         if self.custom_metric:
-                            scores_verbose[
-                                self.custom_metric.__name__
-                            ] = custom_metric
+                            scores_verbose[self.custom_metric.__name__] = (
+                                custom_metric
+                            )
 
                         print(scores_verbose)
                     if self.predictions:
@@ -458,9 +461,9 @@ class LazyMTS(MTS):
                         }
 
                         if self.custom_metric:
-                            scores_verbose[
-                                self.custom_metric.__name__
-                            ] = custom_metric
+                            scores_verbose[self.custom_metric.__name__] = (
+                                custom_metric
+                            )
 
                         print(scores_verbose)
                     if self.predictions:

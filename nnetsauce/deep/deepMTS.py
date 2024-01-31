@@ -5,6 +5,7 @@
 from ..deep import DeepRegressor
 from ..mts import MTS
 
+
 class DeepMTS(MTS):
     """Univariate and multivariate time series (DeepMTS) forecasting with Quasi-Randomized networks (Work in progress /!\)
 
@@ -193,25 +194,27 @@ class DeepMTS(MTS):
         show_progress=True,
     ):
         assert int(lags) == lags, "parameter 'lags' should be an integer"
-        assert n_layers >= 2, "must have n_layers >= 2"  
+        assert n_layers >= 2, "must have n_layers >= 2"
         self.n_layers = int(n_layers)
-        
-        self.obj = DeepRegressor(obj=obj,    
-                                 verbose=0, 
-                                 n_layers=self.n_layers,
-                                 n_hidden_features=n_hidden_features,
-                                 activation_name=activation_name,
-                                 a=a,
-                                 nodes_sim=nodes_sim,
-                                 bias=bias,
-                                 dropout=dropout,
-                                 direct_link=direct_link,
-                                 n_clusters=n_clusters,
-                                 cluster_encode=cluster_encode,
-                                 type_clust=type_clust,
-                                 type_scaling=type_scaling,
-                                 seed=seed,
-                                 backend=backend)
+
+        self.obj = DeepRegressor(
+            obj=obj,
+            verbose=0,
+            n_layers=self.n_layers,
+            n_hidden_features=n_hidden_features,
+            activation_name=activation_name,
+            a=a,
+            nodes_sim=nodes_sim,
+            bias=bias,
+            dropout=dropout,
+            direct_link=direct_link,
+            n_clusters=n_clusters,
+            cluster_encode=cluster_encode,
+            type_clust=type_clust,
+            type_scaling=type_scaling,
+            seed=seed,
+            backend=backend,
+        )
 
         super().__init__(
             obj=self.obj,
@@ -235,4 +238,3 @@ class DeepMTS(MTS):
             verbose=verbose,
             show_progress=show_progress,
         )
-

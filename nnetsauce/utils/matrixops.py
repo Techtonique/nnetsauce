@@ -205,7 +205,7 @@ def safe_sparse_dot(a, b, backend="cpu", dense_output=False):
 # Obtain this for JAX
 # scale... covariates
 def scale_covariates(X, choice="std", training=True, scaler=None):
-    
+
     if training == True:
 
         # scaler must be not None
@@ -216,7 +216,9 @@ def scale_covariates(X, choice="std", training=True, scaler=None):
             scaler = MinMaxScaler()
 
         else:
-            scaler = RobustScaler(copy=True, with_centering=True, with_scaling=True)
+            scaler = RobustScaler(
+                copy=True, with_centering=True, with_scaling=True
+            )
 
         scaled_X = scaler.fit_transform(X)
 

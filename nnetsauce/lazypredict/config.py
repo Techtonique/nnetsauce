@@ -41,7 +41,7 @@ removed_regressors = [
     "OrthogonalMatchingPursuitCV",
     "PLSCanonical",
     "PLSRegression",
-    "RadiusNeighborsRegressor",    
+    "RadiusNeighborsRegressor",
     "RegressorChain",
     "StackingRegressor",
     "SVR",
