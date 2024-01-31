@@ -16,10 +16,7 @@ def dosubsample(
         row_sample >= 0
     ), "'row_sample' must be < 1 and >= 0"
     n_obs = len(y)   
-    print(f"n_obs: {n_obs}")
-    print(f"row_sample: {row_sample}") 
     n_obs_out = np.ceil(n_obs * row_sample)
-    print(f"n_obs_out: {n_obs_out}")
 
     # preproc -----
     if is_factor(y):  # classification
