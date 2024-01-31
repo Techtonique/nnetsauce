@@ -42,12 +42,12 @@ class SubSampler:
     ):
         self.y = y
         self.n_samples = n_samples
-        if n_samples is None:
+        if self.n_samples is None:
             assert row_sample < 1 and row_sample >= 0, "'row_sample' must be provided, plus < 1 and >= 0"
             self.row_sample = row_sample
         else:
-            assert n_samples < len(y), "'n_samples' must be < len(y)"
-            self.row_sample = n_samples / len(y)
+            assert self.n_samples < len(y), "'n_samples' must be < len(y)"
+            self.row_sample = self.n_samples / len(y)
         self.seed = seed
         self.indices = None
         self.n_jobs = n_jobs
@@ -55,11 +55,10 @@ class SubSampler:
 
     def subsample(self):
         self.indices = dosubsample(
-            self.y,
-            self.row_sample,
-            #self.n_samples,
-            self.seed,
-            self.n_jobs,
-            self.verbose,
+            y = self.y,
+            row_sample = self.row_sample,            
+            seed = self.seed,
+            n_jobs = self.n_jobs,
+            verbose = self.verbose,
         )
         return self.indices
