@@ -1,3 +1,4 @@
+import numpy as np
 from .helpers import dosubsample
 
 
@@ -13,7 +14,7 @@ class SubSampler:
            subsampling fraction
 
        n_samples: int
-            subsampling by using the number of rows
+            subsampling by using the number of rows (supersedes row_sample)
 
        seed: int
            reproductibility seed
@@ -40,8 +41,13 @@ class SubSampler:
         verbose=False,
     ):
         self.y = y
-        self.row_sample = row_sample
         self.n_samples = n_samples
+        if n_samples is None:
+            assert row_sample < 1 and row_sample >= 0, "'row_sample' must be provided, plus < 1 and >= 0"
+            self.row_sample = row_sample
+        else:
+            assert n_samples < len(y), "'n_samples' must be < len(y)"
+            self.row_sample = n_samples / len(y)
         self.seed = seed
         self.indices = None
         self.n_jobs = n_jobs
@@ -51,7 +57,7 @@ class SubSampler:
         self.indices = dosubsample(
             self.y,
             self.row_sample,
-            self.n_samples,
+            #self.n_samples,
             self.seed,
             self.n_jobs,
             self.verbose,

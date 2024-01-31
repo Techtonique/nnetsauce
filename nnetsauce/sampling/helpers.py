@@ -9,17 +9,17 @@ from ..utils.misc import flatten, is_factor
 
 
 def dosubsample(
-    y, row_sample=0.8, n_samples=None, seed=123, n_jobs=None, verbose=False
+    y, row_sample=0.8, seed=123, n_jobs=None, verbose=False
 ):
     index = []
     assert (row_sample < 1) & (
         row_sample >= 0
     ), "'row_sample' must be < 1 and >= 0"
-    n_obs = len(y)
-    if n_samples is not None:
-        assert n_samples <= n_obs, "'n_samples' must be <= len(y)"
-        row_sample = np.ceil(n_samples / n_obs)
+    n_obs = len(y)   
+    print(f"n_obs: {n_obs}")
+    print(f"row_sample: {row_sample}") 
     n_obs_out = np.ceil(n_obs * row_sample)
+    print(f"n_obs_out: {n_obs_out}")
 
     # preproc -----
     if is_factor(y):  # classification
