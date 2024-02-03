@@ -3,6 +3,7 @@ from .base.baseRegressor import BaseRegressor
 from .boosting.adaBoostClassifier import AdaBoostClassifier
 from .custom.customClassifier import CustomClassifier
 from .custom.customRegressor import CustomRegressor
+from .datasets import Downloader
 from .deep.deepClassifier import DeepClassifier
 from .deep.deepRegressor import DeepRegressor
 from .deep.deepMTS import DeepMTS
@@ -38,6 +39,7 @@ __all__ = [
     "DeepClassifier",
     "DeepRegressor",
     "DeepMTS",
+    "Downloader",
     "GLMClassifier",
     "GLMRegressor",
     "LazyClassifier",
