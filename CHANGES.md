@@ -1,6 +1,7 @@
 # version 0.17.0
 
-- Attribute `estimators` (a list of `Estimator`'s as strings) for `LazyClassifier`, `LazyRegressor`, `LazyDeepClassifier`, `LazyDeepRegressor`, `LazyMTS`, and `LazyDeepMTS`
+- Attribute `estimators` (a list of `Estimator`'s as strings) for `LazyClassifier`, 
+  `LazyRegressor`, `LazyDeepClassifier`, `LazyDeepRegressor`, `LazyMTS`, and `LazyDeepMTS`
 - New documentation for the package, using `pdoc` (not `pdoc3`)
 - Remove `xreg` at inference time for `MTS` and `DeepMTS`
 - New class `Downloader`: querying the R universe API for datasets (see https://thierrymoudiki.github.io/blog/2023/12/25/python/r/misc/mlsauce/runiverse-api2 for similar example in `mlsauce`)
