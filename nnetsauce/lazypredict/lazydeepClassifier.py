@@ -1,13 +1,15 @@
 import numpy as np
 import pandas as pd
 from copy import deepcopy
+from functools import partial
 from tqdm import tqdm
 import time
+from sklearn.utils.discovery import all_estimators
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder
 from sklearn.compose import ColumnTransformer
-from sklearn.base import ClassifierMixin
+from sklearn.base import ClassifierMixin, RegressorMixin
 from sklearn.metrics import (
     accuracy_score,
     balanced_accuracy_score,
@@ -15,11 +17,12 @@ from sklearn.metrics import (
     f1_score,
 )
 from .config import (
-    CLASSIFIERS,
-    MULTITASKCLASSIFIERS,
-    SIMPLEMULTITASKCLASSIFIERS,
+    DEEPCLASSIFIERS,
+    DEEPMULTITASKCLASSIFIERS,
+    DEEPSIMPLEMULTITASKCLASSIFIERS,
 )
 from ..custom import Custom, CustomClassifier
+from ..multitask import MultitaskClassifier, SimpleMultitaskClassifier
 
 import warnings
 
@@ -117,7 +120,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         custom_metric=None,
         predictions=False,
         random_state=42,
-        classifiers="all",
+        estimators="all",
         n_jobs=None,
         # Defining depth
         n_layers=3,
@@ -145,7 +148,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         self.predictions = predictions
         self.models = {}
         self.random_state = random_state
-        self.classifiers = classifiers
+        self.estimators = estimators
         self.n_layers = n_layers - 1
         self.n_jobs = n_jobs
         super().__init__(
@@ -212,26 +215,48 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
             X_train, categorical_features
         )
 
-        if self.classifiers == "all":
+        if self.estimators == "all":
             self.classifiers = [
                 item
                 for sublist in [
-                    CLASSIFIERS,
-                    MULTITASKCLASSIFIERS,
-                    SIMPLEMULTITASKCLASSIFIERS,
+                    DEEPCLASSIFIERS,
+                    DEEPMULTITASKCLASSIFIERS,
+                    DEEPSIMPLEMULTITASKCLASSIFIERS,
                 ]
                 for item in sublist
             ]
         else:
-            try:
-                temp_list = []
-                for classifier in self.classifiers:
-                    full_name = (classifier.__name__, classifier)
-                    temp_list.append(full_name)
-                self.classifiers = temp_list
-            except Exception as exception:
-                print(exception)
-                print("Invalid Classifier(s)")
+            self.classifiers = [
+            ("DeepCustomClassifier(" + est[0] + ")", est[1])
+            for est in all_estimators()
+            if (
+                issubclass(est[1], ClassifierMixin)
+                and (est[0] in self.estimators)
+            )
+            ] +\
+            [
+            (
+                "DeepMultitaskClassifier(" + est[0] + ")",
+                partial(MultitaskClassifier, obj=est[1]()),
+            )
+            for est in all_estimators()
+            if (
+                issubclass(est[1], RegressorMixin)
+                and (est[0] in self.estimators)
+            )
+            ] +\
+            [
+                (
+                    "DeepSimpleMultitaskClassifier(" + est[0] + ")",
+                    partial(SimpleMultitaskClassifier, obj=est[1]()),
+                )
+                for est in all_estimators()
+                if (
+                    issubclass(est[1], RegressorMixin)
+                    and (est[0] in self.estimators)
+                )
+            ]
+            
 
         for name, model in tqdm(self.classifiers):  # do parallel exec
             start = time.time()

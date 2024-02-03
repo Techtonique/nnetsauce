@@ -2,10 +2,12 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import time
+from sklearn.utils.discovery import all_estimators
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder
 from sklearn.compose import ColumnTransformer
+from sklearn.base import RegressorMixin
 from sklearn.metrics import (
     r2_score,
     mean_squared_error,
@@ -100,12 +102,11 @@ class LazyMTS(MTS):
         When function is provided, models are evaluated based on the custom evaluation metric provided.
     prediction : bool, optional (default=False)
         When set to True, the predictions of all the models models are returned as dataframe.
-    regressors : list, optional (default="all")
-        When function is provided, trains the chosen regressor(s).
+    estimators : list of Estimators names or just 'all' for all regression models (default='all')        
 
     Examples
     --------
-
+    see https://thierrymoudiki.github.io/blog/2023/10/29/python/quasirandomizednn/MTS-LazyPredict
     """
 
     def __init__(
@@ -115,7 +116,7 @@ class LazyMTS(MTS):
         custom_metric=None,
         predictions=False,
         random_state=42,
-        regressors="all",
+        estimators="all",
         preprocess=False,
         # MTS attributes
         obj=None,
@@ -144,7 +145,7 @@ class LazyMTS(MTS):
         self.predictions = predictions
         self.models = {}
         self.random_state = random_state
-        self.regressors = regressors
+        self.estimators = estimators
         self.preprocess = preprocess
         super().__init__(
             obj=obj,
@@ -233,18 +234,17 @@ class LazyMTS(MTS):
                 ]
             )
 
-        if self.regressors == "all":
+        if self.estimators == "all":
             self.regressors = REGRESSORSMTS
         else:
-            try:
-                temp_list = []
-                for regressor in self.regressors:
-                    full_name = (regressor.__name__, regressor)
-                    temp_list.append(full_name)
-                self.regressors = temp_list
-            except Exception as exception:
-                print(exception)
-                print("Invalid Regressor(s)")
+            self.regressors = [
+            ("MTS(" + est[0] + ")", est[1])
+            for est in all_estimators()
+            if (
+                issubclass(est[1], RegressorMixin)
+                and (est[0] in self.estimators)
+            )
+            ]
 
         if self.preprocess is True:
             for name, model in tqdm(self.regressors):  # do parallel exec
