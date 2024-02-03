@@ -107,7 +107,7 @@ class LazyRegressor(Custom, RegressorMixin):
     X = data.data
     y= data.target
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2, random_state=123)
-    regr = ns.Regressor(verbose=0, ignore_warnings=True)
+    regr = ns.LazyRegressor(verbose=0, ignore_warnings=True)
     models, predictions = clf.fit(X_train, X_test, y_train, y_test)
     model_dictionary = clf.provide_models(X_train,X_test,y_train,y_test)
     print(models)

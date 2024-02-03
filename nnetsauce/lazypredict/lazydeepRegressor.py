@@ -128,7 +128,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         custom_metric=None,
         predictions=False,
         random_state=42,
-        regressors="all",
+        estimators="all",
         n_jobs=None,
         # Defining depth
         n_layers=3,
@@ -156,7 +156,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         self.predictions = predictions
         self.models = {}
         self.random_state = random_state
-        self.regressors = regressors
+        self.estimators = estimators
         self.n_layers = n_layers - 1
         self.n_jobs = n_jobs
         super().__init__(
@@ -223,10 +223,17 @@ class LazyDeepRegressor(Custom, RegressorMixin):
             X_train, categorical_features
         )
 
-        if self.regressors == "all":
+        if self.estimators == "all":
             self.regressors = DEEPREGRESSORS
         else:
-            
+            self.regressors = [
+            ("DeepCustomRegressor(" + est[0] + ")", est[1])
+            for est in all_estimators()
+            if (
+                issubclass(est[1], RegressorMixin)
+                and (est[0] in self.estimators)
+            )
+            ]
 
         for name, model in tqdm(self.regressors):  # do parallel exec
             start = time.time()
