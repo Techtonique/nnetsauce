@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import time
+from sklearn.utils.discovery import all_estimators
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder
@@ -94,28 +95,21 @@ class LazyRegressor(Custom, RegressorMixin):
         When function is provided, models are evaluated based on the custom evaluation metric provided.
     prediction : bool, optional (default=False)
         When set to True, the predictions of all the models models are returned as dataframe.
-    regressors : list, optional (default="all")
-        When function is provided, trains the chosen regressor(s).
+    estimators: list of Estimators names or just 'all' for all regression models (default='all').
     n_jobs : int, when possible, run in parallel
 
     Examples
     --------
-    >>> from lazypredict.Supervised import LazyRegressor
-    >>> from sklearn import datasets
-    >>> from sklearn.utils import shuffle
-    >>> import numpy as np
-
-    >>> diabetes = datasets.load_diabetes()
-    >>> X, y = shuffle(diabetes.data, diabetes.target, random_state=13)
-    >>> X = X.astype(np.float32)
-
-    >>> offset = int(X.shape[0] * 0.9)
-    >>> X_train, y_train = X[:offset], y[:offset]
-    >>> X_test, y_test = X[offset:], y[offset:]
-
-    >>> reg = LazyRegressor(verbose=0, ignore_warnings=False, custom_metric=None)
-    >>> models, predictions = reg.fit(X_train, X_test, y_train, y_test)
-    >>> model_dictionary = reg.provide_models(X_train, X_test, y_train, y_test)
+    >>> import nnetsauce as ns
+    >>> from sklearn.datasets import load_diabetes 
+    >>> from sklearn.model_selection import train_test_split
+    >>> data = load_diabetes()
+    >>> X = data.data
+    >>> y= data.target
+    >>> X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2, random_state=123)
+    >>> regr = ns.Regressor(verbose=0, ignore_warnings=True)
+    >>> models, predictions = clf.fit(X_train, X_test, y_train, y_test)
+    >>> model_dictionary = clf.provide_models(X_train,X_test,y_train,y_test)
     >>> print(models)
     """
 
@@ -126,7 +120,7 @@ class LazyRegressor(Custom, RegressorMixin):
         custom_metric=None,
         predictions=False,
         random_state=42,
-        regressors="all",
+        estimators="all",
         preprocess=False,
         n_jobs=None,
         # CustomRegressor attributes
@@ -153,7 +147,7 @@ class LazyRegressor(Custom, RegressorMixin):
         self.predictions = predictions
         self.models = {}
         self.random_state = random_state
-        self.regressors = regressors
+        self.estimators = estimators
         self.preprocess = preprocess
         self.n_jobs = n_jobs
         super().__init__(
@@ -237,18 +231,17 @@ class LazyRegressor(Custom, RegressorMixin):
                 ]
             )
 
-        if self.regressors == "all":
+        if self.estimators == "all":
             self.regressors = REGRESSORS
         else:
-            try:
-                temp_list = []
-                for regressor in self.regressors:
-                    full_name = (regressor.__name__, regressor)
-                    temp_list.append(full_name)
-                self.regressors = temp_list
-            except Exception as exception:
-                print(exception)
-                print("Invalid Regressor(s)")
+            self.regressors = [
+            ("CustomRegressor(" + est[0] + ")", est[1])
+            for est in all_estimators()
+            if (
+                issubclass(est[1], RegressorMixin)
+                and (est[0] in self.estimators)
+            )
+            ]
 
         if self.preprocess is True:
             for name, model in tqdm(self.regressors):  # do parallel exec

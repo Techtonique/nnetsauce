@@ -97,8 +97,7 @@ class LazyClassifier(Custom, ClassifierMixin):
         When function is provided, models are evaluated based on the custom evaluation metric provided.
     predictions: bool, optional (default=False)
         When set to True, the predictions of all the models models are returned as dataframe.
-    estimators: list of Estimators names or just 'all' for > 90 classifiers, optional (default='all')
-        When function is provided, trains the chosen classifier(s).
+    estimators: list of Estimators names or just 'all' for > 90 classifiers (default='all')        
     preprocess: bool, preprocessing is done when set to True
     n_jobs : int, when possible, run in parallel
 
@@ -111,7 +110,7 @@ class LazyClassifier(Custom, ClassifierMixin):
     >>> X = data.data
     >>> y= data.target
     >>> X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2, random_state=123)
-    >>> clf = ns.LazyClassifier(verbose=0, ignore_warnings=True, custom_metric=None)
+    >>> clf = ns.LazyClassifier(verbose=0, ignore_warnings=True)
     >>> models, predictions = clf.fit(X_train, X_test, y_train, y_test)
     >>> model_dictionary = clf.provide_models(X_train,X_test,y_train,y_test)
     >>> print(models)
