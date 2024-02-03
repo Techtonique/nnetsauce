@@ -2,6 +2,7 @@ joblib
 matplotlib
 numpy
 pandas
+requests
 scipy
 scikit-learn
 threadpoolctl
