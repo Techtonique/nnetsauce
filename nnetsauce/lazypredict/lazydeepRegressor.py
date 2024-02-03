@@ -6,6 +6,7 @@ import pandas as pd
 from copy import deepcopy
 from tqdm import tqdm
 import time
+from sklearn.utils.discovery import all_estimators
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder
@@ -15,7 +16,7 @@ from sklearn.metrics import (
     r2_score,
     mean_squared_error,
 )
-from .config import REGRESSORS
+from .config import DEEPREGRESSORS
 from ..custom import Custom, CustomRegressor
 
 import warnings
@@ -95,7 +96,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         When function is provided, models are evaluated based on the custom evaluation metric provided.
     prediction : bool, optional (default=False)
         When set to True, the predictions of all the models models are returned as dataframe.
-    regressors : list, optional (default="all")
+    estimators : list, optional (default="all")
         When function is provided, trains the chosen regressor(s).
     n_jobs : int, when possible, run in parallel
 
@@ -223,17 +224,9 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         )
 
         if self.regressors == "all":
-            self.regressors = REGRESSORS
+            self.regressors = DEEPREGRESSORS
         else:
-            try:
-                temp_list = []
-                for regressor in self.regressors:
-                    full_name = (regressor.__name__, regressor)
-                    temp_list.append(full_name)
-                self.regressors = temp_list
-            except Exception as exception:
-                print(exception)
-                print("Invalid Regressor(s)")
+            
 
         for name, model in tqdm(self.regressors):  # do parallel exec
             start = time.time()
