@@ -2,10 +2,12 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import time
+from sklearn.utils.discovery import all_estimators
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder
 from sklearn.compose import ColumnTransformer
+from sklearn.base import RegressorMixin
 from sklearn.metrics import (
     r2_score,
     mean_squared_error,
@@ -116,7 +118,7 @@ class LazyDeepMTS(MTS):
         custom_metric=None,
         predictions=False,
         random_state=42,
-        regressors="all",
+        estimators="all",
         preprocess=False,
         # Defining depth
         n_layers=3,
@@ -147,7 +149,7 @@ class LazyDeepMTS(MTS):
         self.predictions = predictions
         self.models = {}
         self.random_state = random_state
-        self.regressors = regressors
+        self.estimators = estimators
         self.preprocess = preprocess
         self.n_layers = n_layers
         super().__init__(
@@ -237,18 +239,17 @@ class LazyDeepMTS(MTS):
                 ]
             )
 
-        if self.regressors == "all":
+        if self.estimators == "all":
             self.regressors = DEEPREGRESSORSMTS
         else:
-            try:
-                temp_list = []
-                for regressor in self.regressors:
-                    full_name = (regressor.__name__, regressor)
-                    temp_list.append(full_name)
-                self.regressors = temp_list
-            except Exception as exception:
-                print(exception)
-                print("Invalid Regressor(s)")
+            self.regressors = [
+            ("DeepMTS(" + est[0] + ")", est[1])
+            for est in all_estimators()
+            if (
+                issubclass(est[1], RegressorMixin)
+                and (est[0] in self.estimators)
+            )
+            ]
 
         if self.preprocess is True:
             for name, model in tqdm(self.regressors):  # do parallel exec
