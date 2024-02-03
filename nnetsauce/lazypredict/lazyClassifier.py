@@ -3,13 +3,16 @@
 
 import numpy as np
 import pandas as pd
+from functools import partial
 from tqdm import tqdm
 import time
+from ..multitask import MultitaskClassifier, SimpleMultitaskClassifier
+from sklearn.utils.discovery import all_estimators
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder
 from sklearn.compose import ColumnTransformer
-from sklearn.base import ClassifierMixin
+from sklearn.base import ClassifierMixin, RegressorMixin
 from sklearn.metrics import (
     accuracy_score,
     balanced_accuracy_score,
@@ -82,20 +85,21 @@ def get_card_split(df, cols, n=11):
 
 class LazyClassifier(Custom, ClassifierMixin):
     """
-    This module helps in fitting to all the classification algorithms that are available in Scikit-learn to nnetsauce's CustomClassifier
+    This module helps in fitting to almost all the classification algorithms to nnetsauce's CustomClassifier
     Parameters
     ----------
-    verbose : int, optional (default=0)
+    verbose: int, optional (default=0)
         For the liblinear and lbfgs solvers set verbose to any positive
         number for verbosity.
-    ignore_warnings : bool, optional (default=True)
+    ignore_warnings: bool, optional (default=True)
         When set to True, the warning related to algorigms that are not able to run are ignored.
-    custom_metric : function, optional (default=None)
+    custom_metric: function, optional (default=None)
         When function is provided, models are evaluated based on the custom evaluation metric provided.
-    predictions : bool, optional (default=False)
+    predictions: bool, optional (default=False)
         When set to True, the predictions of all the models models are returned as dataframe.
-    classifiers : list, optional (default="all")
+    estimators: list of Estimators names or just 'all' for > 90 classifiers, optional (default='all')
         When function is provided, trains the chosen classifier(s).
+    preprocess: bool, preprocessing is done when set to True
     n_jobs : int, when possible, run in parallel
 
     Examples
@@ -120,9 +124,9 @@ class LazyClassifier(Custom, ClassifierMixin):
         custom_metric=None,
         predictions=False,
         random_state=42,
-        classifiers="all",
+        estimators="all",
         preprocess=False,
-        n_jobs=None,
+        n_jobs=None,        
         # CustomClassifier attributes
         obj=None,
         n_hidden_features=5,
@@ -147,7 +151,7 @@ class LazyClassifier(Custom, ClassifierMixin):
         self.predictions = predictions
         self.models = {}
         self.random_state = random_state
-        self.classifiers = classifiers
+        self.estimators = estimators
         self.preprocess = preprocess
         self.n_jobs = n_jobs
         super().__init__(
@@ -215,6 +219,7 @@ class LazyClassifier(Custom, ClassifierMixin):
         )
 
         if self.preprocess is True:
+
             preprocessor = ColumnTransformer(
                 transformers=[
                     ("numeric", numeric_transformer, numeric_features),
@@ -230,31 +235,48 @@ class LazyClassifier(Custom, ClassifierMixin):
                     ),
                 ]
             )
+        
+        if self.estimators == "all":
 
-        if self.classifiers == "all":
+            self.classifiers = CLASSIFIERS + MULTITASKCLASSIFIERS + SIMPLEMULTITASKCLASSIFIERS                
+
+        else: # list custom estimators, by their names 
+
             self.classifiers = [
-                item
-                for sublist in [
-                    CLASSIFIERS,
-                    MULTITASKCLASSIFIERS,
-                    SIMPLEMULTITASKCLASSIFIERS,
-                ]
-                for item in sublist
+            ("CustomClassifier(" + est[0] + ")", est[1])
+            for est in all_estimators()
+            if (
+                issubclass(est[1], ClassifierMixin)
+                and (est[0] in self.estimators)
+            )
+            ] +\
+            [
+            (
+                "MultitaskClassifier(" + est[0] + ")",
+                partial(MultitaskClassifier, obj=est[1]()),
+            )
+            for est in all_estimators()
+            if (
+                issubclass(est[1], RegressorMixin)
+                and (est[0] in self.estimators)
+            )
+            ] +\
+            [
+                (
+                    "SimpleMultitaskClassifier(" + est[0] + ")",
+                    partial(SimpleMultitaskClassifier, obj=est[1]()),
+                )
+                for est in all_estimators()
+                if (
+                    issubclass(est[1], RegressorMixin)
+                    and (est[0] in self.estimators)
+                )
             ]
 
-        else:
-            try:
-                temp_list = []
-                for classifier in self.classifiers:
-                    full_name = (classifier.__name__, classifier)
-                    temp_list.append(full_name)
-                self.classifiers = temp_list
-            except Exception as exception:
-                print(exception)
-                print("Invalid Classifier(s)")
-
         if self.preprocess is True:
+
             for name, model in tqdm(self.classifiers):  # do parallel exec
+                
                 other_args = (
                     {}
                 )  # use this trick for `random_state` too --> refactor
@@ -300,7 +322,6 @@ class LazyClassifier(Custom, ClassifierMixin):
                                 ),
                             ]
                         )
-
                     else:
                         pipe = Pipeline(
                             [
@@ -384,7 +405,8 @@ class LazyClassifier(Custom, ClassifierMixin):
                 finally:
                     continue
 
-        else:
+        else: # if self.preprocess is True:
+
             for name, model in tqdm(self.classifiers):  # do parallel exec
                 other_args = (
                     {}

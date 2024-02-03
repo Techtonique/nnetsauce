@@ -1,3 +1,10 @@
+# version 0.17.0
+
+- Attribute `estimators` (a list of `Estimator`'s as strings) for `LazyClassifier`, `LazyRegressor`, `LazyDeepClassifier`, `LazyDeepRegressor`, `LazyMTS`, and `LazyDeepMTS`
+- New documentation for the package, using `pdoc` (not `pdoc3`)
+- Remove `xreg` at inference time for `MTS` and `DeepMTS`
+- New function: querying the R universe API for datasets (see https://thierrymoudiki.github.io/blog/2023/12/25/python/r/misc/mlsauce/runiverse-api2 for similar example in `mlsauce`)
+
 # version 0.16.8
 
 - Subsample response by using the **number of rows**, not only a percentage (see [https://thierrymoudiki.github.io/blog/2024/01/22/python/nnetsauce-subsampling](https://thierrymoudiki.github.io/blog/2024/01/22/python/nnetsauce-subsampling))
