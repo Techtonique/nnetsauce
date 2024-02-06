@@ -118,6 +118,7 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
                 self.obj.fit(self.scaled_X_, Y[:, i], **kwargs)
             )
 
+        self.classes_ = np.unique(y)
         return self
 
     def predict(self, X, **kwargs):

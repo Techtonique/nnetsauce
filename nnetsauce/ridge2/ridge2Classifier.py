@@ -348,7 +348,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
                 hess=hessian_func,
                 method=solver,
             ).x
-
+        self.classes_ = np.unique(y)
         return self
 
     def predict(self, X, **kwargs):

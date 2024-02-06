@@ -253,7 +253,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
         self.voter_ = {idx: elt for idx, elt in enumerate(voters_list)}
 
         self.n_estimators = len(self.voter_)
-
+        self.classes_ = np.unique(y)
         return self
 
     def predict(self, X, weights=None, **kwargs):

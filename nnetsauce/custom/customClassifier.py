@@ -201,6 +201,7 @@ class CustomClassifier(Custom, ClassifierMixin):
 
         # if sample_weight is None:
         self.obj.fit(scaled_Z, output_y)
+        self.classes_ = np.unique(y)
 
         return self
 

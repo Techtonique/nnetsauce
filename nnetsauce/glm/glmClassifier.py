@@ -254,6 +254,7 @@ class GLMClassifier(GLM, ClassifierMixin):
         )
 
         self.beta_ = self.optimizer.results[0]
+        self.classes_ = np.unique(y)
 
         return self
 

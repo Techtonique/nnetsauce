@@ -83,6 +83,12 @@ build-site: docs ## export mkdocs website to a folder
 run-examples: ## run all examples with one command
 	find examples -maxdepth 2 -name "*.py" -exec  python3 {} \;
 
+run-mts: ## run all mts examples with one command
+	find examples -maxdepth 2 -name "mts*.py" -exec  python3 {} \;
+
+run-lazy: ## run all lazy examples with one command
+	find examples -maxdepth 2 -name "lazy*.py" -exec  python3 {} \;
+
 run-tests: ## run all the tests with one command
 	pip install nose2 coverage	
 	nose2 -v --with-coverage

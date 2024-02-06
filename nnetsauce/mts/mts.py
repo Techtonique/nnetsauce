@@ -270,15 +270,43 @@ class MTS(Base):
             self: object
         """
 
-        if isinstance(X, pd.DataFrame) is False:
-            self.series_names = ["series" + str(i) for i in range(X.shape[1])]
-            X = pd.DataFrame(X, columns=self.series_names)
-        else:
-            X = copy.deepcopy(mo.convert_df_to_numeric(X))
-            self.series_names = list(X.columns.values)
+        if isinstance(X, pd.DataFrame) is False: # it's a numpy array
+            if len(X.shape) > 1:
+                if xreg is None:                     
+                    X = pd.DataFrame(X)                    
+                    self.series_names = ["series" + str(i) for i in range(X.shape[1])]
+                else: # xreg is not None                                          
+                    X = pd.DataFrame(mo.cbind(X, xreg), 
+                                    columns=self.series_names)
+                    self.series_names = ["series" + str(i) for i in range(X.shape[1])]                                          
+            else: # len(X.shape) == 1
+                if xreg is None:                     
+                    X = pd.DataFrame(X)
+                    self.series_names = ["series0"]
+                else:                
+                    X = pd.DataFrame(mo.cbind(X, xreg))
+                    self.series_names = ["series" + str(i) for i in range(X.shape[1])]
+        else: # it's a DataFrame with column names
+            columns_names = X.columns
+            X_index = None
+            if X.index is not None:
+                X_index = X.index
+            if xreg is None:                 
+                X = copy.deepcopy(mo.convert_df_to_numeric(X))
+                self.series_names = list(columns_names)              
+            else:                
+                X = copy.deepcopy(pd.DataFrame(mo.cbind(mo.convert_df_to_numeric(X).values, 
+                                           xreg)))
+                if len(xreg.shape) == 1:
+                    self.series_names = list(columns_names) + ["xreg"]
+                else:
+                    self.series_names = list(columns_names) + ["xreg" + str(i) for i in range(xreg.shape[1])]
+            if X_index is not None:
+                X.index = X_index
 
-        self.df_ = X
+        self.df_ = X        
         X = X.values
+        self.df_.columns = self.series_names
         self.input_dates = ts.compute_input_dates(self.df_)
 
         try:
@@ -316,27 +344,8 @@ class MTS(Base):
         self.y_ = mts_input[0]
 
         self.X_ = mts_input[1]
-
-        if xreg is not None:
-            if isinstance(xreg, pd.DataFrame):
-                xreg = xreg.values
-
-            assert (
-                xreg.shape[0] == n
-            ), "'xreg' and 'X' must have the same number of observations"
-
-            self.xreg_ = xreg
-
-            xreg_input = ts.create_train_inputs(xreg[::-1], self.lags)
-
-            dummy_y, scaled_Z = self.cook_training_set(
-                y=rep_1_n,
-                X=mo.cbind(self.X_, xreg_input[1], backend=self.backend),
-            )
-
-        else:  # xreg is None
-            # avoids scaling X p times in the loop
-            dummy_y, scaled_Z = self.cook_training_set(y=rep_1_n, X=self.X_)
+        
+        dummy_y, scaled_Z = self.cook_training_set(y=rep_1_n, X=self.X_)
 
         self.scaled_Z_ = scaled_Z
 
@@ -387,7 +396,7 @@ class MTS(Base):
 
         return self
 
-    def predict(self, h=5, level=95, new_xreg=None, **kwargs):
+    def predict(self, h=5, level=95, **kwargs):
         """Forecast all the time series, h steps ahead
 
         Parameters:
@@ -441,118 +450,47 @@ class MTS(Base):
                 "DescribeResult", ("mean", "lower", "upper")
             )  # to be updated
 
-        if self.xreg_ is None:  # no external regressors
-            if self.kde_ != None and self.type_pi == "kde":
-                self.residuals_sims_ = tuple(
-                    self.kde_.sample(
-                        n_samples=h, random_state=self.seed + 100 * i
-                    )
-                    for i in tqdm(range(self.replications))
+        if self.kde_ != None and self.type_pi == "kde":
+            self.residuals_sims_ = tuple(
+                self.kde_.sample(
+                    n_samples=h, random_state=self.seed + 100 * i
                 )
+                for i in tqdm(range(self.replications))
+            )
 
-            for _ in range(h):
-                new_obs = ts.reformat_response(self.mean_, self.lags)
+        for _ in range(h):
+            new_obs = ts.reformat_response(self.mean_, self.lags)
 
-                new_X = new_obs.reshape(1, n_features)
+            new_X = new_obs.reshape(1, n_features)
 
-                cooked_new_X = self.cook_test_set(new_X, **kwargs)
+            cooked_new_X = self.cook_test_set(new_X, **kwargs)
 
-                if "return_std" in kwargs:
-                    self.preds_std_.append(
-                        [
-                            np.asarray(
-                                self.fit_objs_[i].predict(
-                                    cooked_new_X, return_std=True
-                                )[1]
-                            ).item()
-                            for i in range(self.n_series)
-                        ]
-                    )
-
-                predicted_cooked_new_X = np.asarray(
+            if "return_std" in kwargs:
+                self.preds_std_.append(
                     [
                         np.asarray(
-                            self.fit_objs_[i].predict(cooked_new_X)
+                            self.fit_objs_[i].predict(
+                                cooked_new_X, return_std=True
+                            )[1]
                         ).item()
                         for i in range(self.n_series)
                     ]
                 )
 
-                preds = np.asarray(y_means_ + predicted_cooked_new_X)
+            predicted_cooked_new_X = np.asarray(
+                [
+                    np.asarray(
+                        self.fit_objs_[i].predict(cooked_new_X)
+                    ).item()
+                    for i in range(self.n_series)
+                ]
+            )
 
-                self.mean_ = mo.rbind(preds, self.mean_)
+            preds = np.asarray(y_means_ + predicted_cooked_new_X)
 
-        else:  # if self.xreg_ is not None: # with external regressors
-            assert (
-                new_xreg is not None
-            ), "'new_xreg' must be provided to predict()"
+            self.mean_ = mo.rbind(preds, self.mean_) # preallocate
 
-            if isinstance(new_xreg, pd.DataFrame):
-                new_xreg = new_xreg.values
-
-            if self.kde_ is not None:
-                if self.verbose > 0:
-                    print("\n Obtain simulations for adjusted residuals... \n")
-                self.residuals_sims_ = tuple(
-                    self.kde_.sample(
-                        n_samples=h, random_state=self.seed + 100 * i
-                    )
-                    for i in tqdm(range(self.replications))
-                )
-
-            try:
-                n_obs_xreg, n_features_xreg = new_xreg.shape
-                assert (
-                    n_features_xreg == self.xreg_.shape[1]
-                ), "check number of inputs provided for 'new_xreg' (compare with self.xreg_.shape[1])"
-            except:
-                n_obs_xreg = new_xreg.shape  # one series
-
-            assert (
-                n_obs_xreg == h
-            ), "please provide values of regressors 'new_xreg' for the whole horizon 'h'"
-
-            n_features_xreg = n_features_xreg * self.lags
-
-            inv_new_xreg = mo.rbind(self.xreg_, new_xreg)[::-1]
-
-            for _ in range(h):
-                new_obs = ts.reformat_response(self.mean_, self.lags)
-
-                new_obs_xreg = ts.reformat_response(inv_new_xreg, self.lags)
-
-                new_X = np.concatenate(
-                    (new_obs, new_obs_xreg), axis=None
-                ).reshape(1, -1)
-
-                cooked_new_X = self.cook_test_set(new_X, **kwargs)
-
-                if "return_std" in kwargs:
-                    self.preds_std_.append(
-                        [
-                            np.asarray(
-                                self.fit_objs_[i].predict(
-                                    cooked_new_X, return_std=True
-                                )[1]
-                            ).item()
-                            for i in range(self.n_series)
-                        ]
-                    )
-
-                predicted_cooked_new_X = np.asarray(
-                    [
-                        np.asarray(
-                            self.fit_objs_[i].predict(cooked_new_X)
-                        ).item()
-                        for i in range(self.n_series)
-                    ]
-                )
-
-                preds = np.asarray(y_means_ + predicted_cooked_new_X)
-
-                self.mean_ = mo.rbind(preds, self.mean_)
-
-        # function's return ----------------------------------------------------------------------
+        # function's return ----------------------------------------------------------------------        
         self.mean_ = pd.DataFrame(
             self.mean_[0:h, :][::-1],
             columns=self.df_.columns,
@@ -588,19 +526,19 @@ class MTS(Base):
 
             self.mean_ = pd.DataFrame(
                 np.asarray(meanf).T,
-                columns=self.df_.columns,
+                columns=self.series_names, #self.df_.columns,
                 index=self.output_dates_,
             )
 
             self.lower_ = pd.DataFrame(
                 np.asarray(lower).T,
-                columns=self.df_.columns,
+                columns=self.series_names, #self.df_.columns,
                 index=self.output_dates_,
             )
 
             self.upper_ = pd.DataFrame(
                 np.asarray(upper).T,
-                columns=self.df_.columns,
+                columns=self.series_names, #self.df_.columns,
                 index=self.output_dates_,
             )
 
@@ -615,7 +553,7 @@ class MTS(Base):
 
         self.mean_ = pd.DataFrame(
             np.asarray(self.mean_),
-            columns=self.df_.columns,
+            columns=self.series_names, #self.df_.columns,
             index=self.output_dates_,
         )
 
@@ -623,13 +561,13 @@ class MTS(Base):
 
         self.lower_ = pd.DataFrame(
             self.mean_.values - pi_multiplier * self.preds_std_,
-            columns=self.df_.columns,
+            columns=self.series_names, #self.df_.columns,
             index=self.output_dates_,
         )
 
         self.upper_ = pd.DataFrame(
             self.mean_.values + pi_multiplier * self.preds_std_,
-            columns=self.df_.columns,
+            columns=self.series_names, #self.df_.columns,
             index=self.output_dates_,
         )
 

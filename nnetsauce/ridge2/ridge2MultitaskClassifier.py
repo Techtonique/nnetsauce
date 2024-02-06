@@ -236,7 +236,7 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
             b=mo.crossprod(x=scaled_Z, y=Y, backend=self.backend),
             backend=self.backend,
         )
-
+        self.classes_ = np.unique(y)
         return self
 
     def predict(self, X, **kwargs):

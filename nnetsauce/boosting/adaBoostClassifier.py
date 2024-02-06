@@ -323,6 +323,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                 pbar.update(self.n_estimators)
 
             self.n_estimators = len(self.base_learners_)
+            self.classes_ = np.unique(y)
 
             return self
 
@@ -366,7 +367,8 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                 pbar.update(self.n_estimators)
 
             self.n_estimators = len(self.base_learners_)
-
+            self.classes_ = np.unique(y)
+            
             return self
 
     def predict(self, X, **kwargs):
