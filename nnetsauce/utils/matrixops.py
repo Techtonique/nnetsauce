@@ -83,6 +83,25 @@ def crossprod(x, y=None, backend="cpu"):
     return np.dot(x.transpose(), y)
 
 
+def delete_last_columns(df, num_columns, inplace=False):
+    """
+    Delete the last 'num_columns' columns from a DataFrame.
+    
+    Parameters:
+        df (DataFrame): The pandas DataFrame.
+        num_columns (int): Number of columns to delete from the end.
+        inplace (bool): Whether to modify the DataFrame in place. Default is False.
+        
+    Returns:
+        DataFrame: Modified DataFrame if inplace=False, None otherwise.
+    """
+    if inplace:
+        df.drop(df.columns[-num_columns:], axis=1, inplace=True)
+    else:
+        modified_df = df.drop(df.columns[-num_columns:], axis=1)
+        return modified_df
+
+
 # Obtain this for JAX
 # Obtain this for JAX
 # Obtain this for JAX

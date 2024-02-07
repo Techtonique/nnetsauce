@@ -4,9 +4,10 @@
   `LazyRegressor`, `LazyDeepClassifier`, `LazyDeepRegressor`, `LazyMTS`, and `LazyDeepMTS`
 - New documentation for the package, using `pdoc` (not `pdoc3`)
 - Remove `xreg` at inference time for `MTS` and `DeepMTS`
-- New class `Downloader`: querying the R universe API for datasets (see https://thierrymoudiki.github.io/blog/2023/12/25/python/r/misc/mlsauce/runiverse-api2 for similar example in `mlsauce`)
+- New class `Downloader`: querying the R universe API for datasets (see 
+  https://thierrymoudiki.github.io/blog/2023/12/25/python/r/misc/mlsauce/runiverse-api2 for similar example in `mlsauce`)
 - Add custom metric to `Lazy*`
-- Rename Deep regressors and classifiers to `Deep*`
+- Rename Deep regressors and classifiers to `Deep*` in `Lazy*`
 - Add attribute `classes_` to classifiers (ensure consistency with sklearn)
 
 # version 0.16.8

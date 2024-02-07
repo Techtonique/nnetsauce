@@ -9,6 +9,7 @@ import sklearn.metrics as skm2
 import matplotlib.pyplot as plt
 from collections import namedtuple
 from copy import deepcopy
+from functools import partial
 from scipy.stats import norm
 from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
@@ -16,6 +17,7 @@ from tqdm import tqdm
 from ..base import Base
 from ..simulation import getsims
 from ..utils import matrixops as mo
+from ..utils import misc as mx
 from ..utils import timeseries as ts
 
 
@@ -279,6 +281,7 @@ class MTS(Base):
                     X = pd.DataFrame(mo.cbind(X, xreg), 
                                     columns=self.series_names)
                     self.series_names = ["series" + str(i) for i in range(X.shape[1])]                                          
+                    self.xreg_ = xreg
             else: # len(X.shape) == 1
                 if xreg is None:                     
                     X = pd.DataFrame(X)
@@ -286,6 +289,7 @@ class MTS(Base):
                 else:                
                     X = pd.DataFrame(mo.cbind(X, xreg))
                     self.series_names = ["series" + str(i) for i in range(X.shape[1])]
+                    self.xreg_ = xreg
         else: # it's a DataFrame with column names
             columns_names = X.columns
             X_index = None
@@ -301,6 +305,7 @@ class MTS(Base):
                     self.series_names = list(columns_names) + ["xreg"]
                 else:
                     self.series_names = list(columns_names) + ["xreg" + str(i) for i in range(xreg.shape[1])]
+                self.xreg_ = xreg
             if X_index is not None:
                 X.index = X_index
 
@@ -430,11 +435,11 @@ class MTS(Base):
 
         self.mean_ = deepcopy(self.y_)  # do not remove (/!\)
 
-        self.lower_ = None
+        self.lower_ = None # do not remove (/!\)
 
-        self.upper_ = None
+        self.upper_ = None # do not remove (/!\)
 
-        self.sims_ = None
+        self.sims_ = None # do not remove (/!\)
 
         y_means_ = np.asarray([self.y_means_[i] for i in range(self.n_series)])
 
@@ -459,6 +464,7 @@ class MTS(Base):
             )
 
         for _ in range(h):
+
             new_obs = ts.reformat_response(self.mean_, self.lags)
 
             new_X = new_obs.reshape(1, n_features)
@@ -488,7 +494,7 @@ class MTS(Base):
 
             preds = np.asarray(y_means_ + predicted_cooked_new_X)
 
-            self.mean_ = mo.rbind(preds, self.mean_) # preallocate
+            self.mean_ = mo.rbind(preds, self.mean_) # preallocate?
 
         # function's return ----------------------------------------------------------------------        
         self.mean_ = pd.DataFrame(
@@ -542,9 +548,21 @@ class MTS(Base):
                 index=self.output_dates_,
             )
 
-            return DescribeResult(
+            res = DescribeResult(
                 self.mean_, self.sims_, self.lower_, self.upper_
             )
+
+            if self.xreg_ is not None:
+                if len(self.xreg_.shape) > 1:
+                    return mx.tuple_map(res, 
+                                        lambda x: mo.delete_last_columns(x, 
+                                                                         num_columns=self.xreg_.shape[1]))
+                else: 
+                    return mx.tuple_map(res, 
+                                        lambda x: mo.delete_last_columns(x, 
+                                                                         num_columns=1))
+
+            return res
 
         # if "return_std" in kwargs
         DescribeResult = namedtuple(
@@ -556,7 +574,7 @@ class MTS(Base):
             columns=self.series_names, #self.df_.columns,
             index=self.output_dates_,
         )
-
+        
         self.preds_std_ = np.asarray(self.preds_std_)
 
         self.lower_ = pd.DataFrame(
@@ -570,8 +588,17 @@ class MTS(Base):
             columns=self.series_names, #self.df_.columns,
             index=self.output_dates_,
         )
+        res = DescribeResult(self.mean_, self.lower_, self.upper_)
 
-        return DescribeResult(self.mean_, self.lower_, self.upper_)
+        if (self.xreg_ is not None):
+            if len(self.xreg_.shape) > 1:
+                return mx.tuple_map(res, 
+                                    lambda x: mo.delete_last_columns(x, num_columns=self.xreg_.shape[1]))
+            else: 
+                return mx.tuple_map(res, 
+                                    lambda x: mo.delete_last_columns(x, num_columns=1))
+        
+        return res
 
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):
         """Train on training_index, score on testing_index."""
