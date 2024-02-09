@@ -74,9 +74,9 @@ dist: clean ## builds source and wheel package
 install: clean ## install the package to the active Python's site-packages
 	python3 -m pip install .
 
-build-site: docs ## export mkdocs website to a folder	
+build-site: docs ## export mkdocs website to a folder		
 	cp -rf nnetsauce-docs/* ../../Pro_Website/Techtonique.github.io/nnetsauce
-	cd ..
+	find . -name '__pycache__' -exec rm -fr {} +
 
 run-examples: ## run all examples with one command
 	find examples -maxdepth 2 -name "*.py" -exec  python3 {} \;

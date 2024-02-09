@@ -86,7 +86,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
         seed: int
             reproducibility seed for nodes_sim=='uniform'
-        
+
         verbose: int
             0 for no output, 1 for a progress bar (default is 1)
 
@@ -180,10 +180,10 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         method="SAMME",
         backend="cpu",
     ):
-        self.type_fit = "classification"                
-        self.verbose = verbose                
-        self.method = method                
-        self.reg_lambda = reg_lambda                
+        self.type_fit = "classification"
+        self.verbose = verbose
+        self.method = method
+        self.reg_lambda = reg_lambda
         self.reg_alpha = reg_alpha
 
         super().__init__(
@@ -205,8 +205,8 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             row_sample=row_sample,
             seed=seed,
             backend=backend,
-        )                
-        
+        )
+
         self.alpha_ = []
         self.base_learners_ = dict.fromkeys(range(n_estimators))
 

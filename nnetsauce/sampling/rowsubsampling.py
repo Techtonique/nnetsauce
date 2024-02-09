@@ -54,11 +54,11 @@ class SubSampler:
         """Returns indices of subsampled input data.
 
         Examples:
-            
+
         <ul>
             <li> <a href="https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/demo/thierrymoudiki_20240105_subsampling.ipynb">20240105_subsampling.ipynb</a> </li>
             <li> <a href="https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/demo/thierrymoudiki_20240131_subsampling_nsamples.ipynb">20240131_subsampling_nsamples.ipynb</a> </li>
-        </ul>        
+        </ul>
 
         """
         self.indices = dosubsample(

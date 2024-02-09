@@ -74,7 +74,7 @@ class CustomClassifier(Custom, ClassifierMixin):
 
     Examples:
 
-    Note: it's better to use the `DeepClassifier` or `LazyDeepClassifier` classes directly    
+    Note: it's better to use the `DeepClassifier` or `LazyDeepClassifier` classes directly
 
     ```python
     import nnetsauce as ns

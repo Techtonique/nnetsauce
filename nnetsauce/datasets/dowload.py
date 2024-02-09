@@ -4,6 +4,7 @@ import requests
 
 class Downloader:
     """Download datasets from data sources (R-universe for now)"""
+
     def __init__(self):
         self.pkgname = None
         self.dataset = None
@@ -20,14 +21,14 @@ class Downloader:
     ):
         """Download datasets from data sources (R-universe for now)
 
-            Examples:
+        Examples:
 
-            ```python
-            import nnetsauce as ns
+        ```python
+        import nnetsauce as ns
 
-            downloader = ns.Downloader()
-            df = downloader.download(pkgname="MASS", dataset="Boston")
-            ```
+        downloader = ns.Downloader()
+        df = downloader.download(pkgname="MASS", dataset="Boston")
+        ```
 
         """
         self.pkgname = pkgname
