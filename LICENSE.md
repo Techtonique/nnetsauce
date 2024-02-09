@@ -1,6 +1,6 @@
 The Clear BSD License
 
-Copyright (c) [2019] [Thierry Moudiki]
+Copyright (c) [2019-2024] [Thierry Moudiki]
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

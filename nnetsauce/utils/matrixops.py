@@ -86,12 +86,12 @@ def crossprod(x, y=None, backend="cpu"):
 def delete_last_columns(df, num_columns, inplace=False):
     """
     Delete the last 'num_columns' columns from a DataFrame.
-    
+
     Parameters:
         df (DataFrame): The pandas DataFrame.
         num_columns (int): Number of columns to delete from the end.
         inplace (bool): Whether to modify the DataFrame in place. Default is False.
-        
+
     Returns:
         DataFrame: Modified DataFrame if inplace=False, None otherwise.
     """

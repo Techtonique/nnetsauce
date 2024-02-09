@@ -31,8 +31,7 @@ clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and 
 clean-build: ## remove build artifacts
 	rm -fr build/
 	rm -fr dist/
-	rm -fr .eggs/
-	rm -fr nnetsauce-docs/
+	rm -fr .eggs/	
 	find . -name '*.egg-info' -exec rm -fr {} +
 	find . -name '*.egg' -exec rm -fr {} +
 
@@ -54,15 +53,14 @@ coverage: ## check code coverage quickly with the default Python
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
-docs: install ## generate docs	
-	pip install black --ignore-installed
-	black nnetsauce/* --line-length 80
-	pip install pdoc --ignore-installed
-	pdoc nnetsauce/* --output-dir nnetsauce-docs
+docs: ## generate docs		
+	pip install black pdoc 
+	black nnetsauce/* --line-length=80	
+	pdoc -t docs nnetsauce/* --output-dir nnetsauce-docs
 
-servedocs: install ## compile the docs watching for change	 
-	pip install pdoc --ignore-installed
-	pdoc nnetsauce/*
+servedocs: ## compile the docs watching for change	 	
+	pip install pdoc 
+	pdoc -t docs nnetsauce/* 
 
 release: dist ## package and upload a release
 	pip install twine --ignore-installed

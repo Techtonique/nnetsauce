@@ -55,23 +55,6 @@ categorical_transformer_high = Pipeline(
 
 
 def get_card_split(df, cols, n=11):
-    """
-    Splits categorical columns into 2 lists based on cardinality (i.e # of unique values)
-    Parameters
-    ----------
-    df : Pandas DataFrame
-        DataFrame from which the cardinality of the columns is calculated.
-    cols : list-like
-        Categorical columns to list
-    n : int, optional (default=11)
-        The value of 'n' will be used to split columns.
-    Returns
-    -------
-    card_low : list-like
-        Columns with cardinality < n
-    card_high : list-like
-        Columns with cardinality >= n
-    """
     cond = df[cols].nunique() > n
     card_high = cols[cond]
     card_low = cols[~cond]
@@ -84,41 +67,55 @@ def adjusted_rsquared(r2, n, p):
 
 class LazyDeepRegressor(Custom, RegressorMixin):
     """
-    This module helps in fitting regression models that are available in Scikit-learn to nnetsauce's CustomRegressor
-    Parameters
-    ----------
-    verbose : int, optional (default=0)
-        For the liblinear and lbfgs solvers set verbose to any positive
-        number for verbosity.
-    ignore_warnings : bool, optional (default=True)
-        When set to True, the warning related to algorigms that are not able to run are ignored.
-    custom_metric : function, optional (default=None)
-        When function is provided, models are evaluated based on the custom evaluation metric provided.
-    prediction : bool, optional (default=False)
-        When set to True, the predictions of all the models models are returned as dataframe.
-    estimators : list, optional (default="all")
-        When function is provided, trains the chosen regressor(s).
-    n_jobs : int, when possible, run in parallel
+        Fitting -- almost -- all the regression algorithms with layers of
+        nnetsauce's CustomRegressor and returning their scores.
 
-    Examples
-    --------
-    >>> from lazypredict.Supervised import LazyRegressor
-    >>> from sklearn import datasets
-    >>> from sklearn.utils import shuffle
-    >>> import numpy as np
+    Parameters:
 
-    >>> diabetes = datasets.load_diabetes()
-    >>> X, y = shuffle(diabetes.data, diabetes.target, random_state=13)
-    >>> X = X.astype(np.float32)
+        verbose: int, optional (default=0)
+            Any positive number for verbosity.
+        ignore_warnings: bool, optional (default=True)
+            When set to True, the warning related to algorigms that are not able to run are ignored.
+        custom_metric: function, optional (default=None)
+            When function is provided, models are evaluated based on the custom evaluation metric provided.
+        predictions: bool, optional (default=False)
+            When set to True, the predictions of all the models models are returned as dataframe.
+        sort_by: string, optional (default='Accuracy')
+            Sort models by a metric. Available options are 'Accuracy', 'Balanced Accuracy', 'ROC AUC', 'F1 Score'
+            or a custom metric identified by its name and provided by custom_metric.
+        random_state: int, optional (default=42)
+            Reproducibiility seed.
+        estimators: list, optional (default='all')
+            list of Estimators names or just 'all' (default='all')
+        preprocess: bool, preprocessing is done when set to True
+        n_jobs : int, when possible, run in parallel
+            For now, only used by individual models that support it.
+        n_layers: int, optional (default=3)
+            Number of layers of CustomRegressors to be used.
 
-    >>> offset = int(X.shape[0] * 0.9)
-    >>> X_train, y_train = X[:offset], y[:offset]
-    >>> X_test, y_test = X[offset:], y[offset:]
+        All the other parameters are the same as CustomRegressor's.
 
-    >>> reg = LazyDeepRegressor(verbose=0, ignore_warnings=False, custom_metric=None)
-    >>> models, predictions = reg.fit(X_train, X_test, y_train, y_test)
-    >>> model_dictionary = reg.provide_models(X_train, X_test, y_train, y_test)
-    >>> print(models)
+
+    Examples:
+
+        from lazypredict.Supervised import LazyRegressor
+        from sklearn import datasets
+        from sklearn.utils import shuffle
+        import numpy as np
+
+        diabetes = datasets.load_diabetes()
+        X, y = shuffle(diabetes.data, diabetes.target, random_state=13)
+        X = X.astype(np.float32)
+
+        offset = int(X.shape[0] * 0.9)
+        X_train, y_train = X[:offset], y[:offset]
+        X_test, y_test = X[offset:], y[offset:]
+
+        reg = LazyDeepRegressor(verbose=0, ignore_warnings=False, custom_metric=None)
+        models, predictions = reg.fit(X_train, X_test, y_train, y_test)
+        model_dictionary = reg.provide_models(X_train, X_test, y_train, y_test)
+        print(models)
+
     """
 
     def __init__(
@@ -227,12 +224,12 @@ class LazyDeepRegressor(Custom, RegressorMixin):
             self.regressors = DEEPREGRESSORS
         else:
             self.regressors = [
-            ("DeepCustomRegressor(" + est[0] + ")", est[1])
-            for est in all_estimators()
-            if (
-                issubclass(est[1], RegressorMixin)
-                and (est[0] in self.estimators)
-            )
+                ("DeepCustomRegressor(" + est[0] + ")", est[1])
+                for est in all_estimators()
+                if (
+                    issubclass(est[1], RegressorMixin)
+                    and (est[0] in self.estimators)
+                )
             ]
 
         for name, model in tqdm(self.regressors):  # do parallel exec

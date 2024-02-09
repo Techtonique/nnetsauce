@@ -54,23 +54,6 @@ categorical_transformer_high = Pipeline(
 
 
 def get_card_split(df, cols, n=11):
-    """
-    Splits categorical columns into 2 lists based on cardinality (i.e # of unique values)
-    Parameters
-    ----------
-    df : Pandas DataFrame
-        DataFrame from which the cardinality of the columns is calculated.
-    cols : list-like
-        Categorical columns to list
-    n : int, optional (default=11)
-        The value of 'n' will be used to split columns.
-    Returns
-    -------
-    card_low : list-like
-        Columns with cardinality < n
-    card_high : list-like
-        Columns with cardinality >= n
-    """
     cond = df[cols].nunique() > n
     card_high = cols[cond]
     card_low = cols[~cond]
@@ -83,34 +66,48 @@ def adjusted_rsquared(r2, n, p):
 
 class LazyRegressor(Custom, RegressorMixin):
     """
-    This module helps in fitting regression models that are available in Scikit-learn to nnetsauce's CustomRegressor
-    Parameters
-    ----------
-    verbose : int, optional (default=0)
-        For the liblinear and lbfgs solvers set verbose to any positive
-        number for verbosity.
-    ignore_warnings : bool, optional (default=True)
-        When set to True, the warning related to algorigms that are not able to run are ignored.
-    custom_metric : function, optional (default=None)
-        When function is provided, models are evaluated based on the custom evaluation metric provided.
-    prediction : bool, optional (default=False)
-        When set to True, the predictions of all the models models are returned as dataframe.
-    estimators: list of Estimators names or just 'all' for all regression models (default='all').
-    n_jobs : int, when possible, run in parallel
 
-    Examples
-    --------
-    import nnetsauce as ns
-    from sklearn.datasets import load_diabetes 
-    from sklearn.model_selection import train_test_split
-    data = load_diabetes()
-    X = data.data
-    y= data.target
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2, random_state=123)
-    regr = ns.LazyRegressor(verbose=0, ignore_warnings=True)
-    models, predictions = clf.fit(X_train, X_test, y_train, y_test)
-    model_dictionary = clf.provide_models(X_train,X_test,y_train,y_test)
-    print(models)
+    Fitting a collection of regression models using nnetsauce's CustomRegressor
+
+    Parameters:
+
+        verbose: int, optional (default=0)
+            Any positive number for verbosity.
+        ignore_warnings: bool, optional (default=True)
+            When set to True, the warning related to algorigms that are not able to run are ignored.
+        custom_metric: function, optional (default=None)
+            When function is provided, models are evaluated based on the custom evaluation metric provided.
+        predictions: bool, optional (default=False)
+            When set to True, the predictions of all the models models are returned as dataframe.
+        sort_by: string, optional (default='Accuracy')
+            Sort models by a metric. Available options are 'Accuracy', 'Balanced Accuracy', 'ROC AUC', 'F1 Score'
+            or a custom metric identified by its name and provided by custom_metric.
+        random_state: int, optional (default=42)
+            Reproducibiility seed.
+        estimators: list, optional (default='all')
+            list of Estimators names or just 'all' (default='all')
+        preprocess: bool, preprocessing is done when set to True
+        n_jobs : int, when possible, run in parallel
+            For now, only used by individual models that support it.
+        n_layers: int, optional (default=3)
+            Number of layers of CustomRegressors to be used.
+
+        All the other parameters are the same as CustomRegressor's.
+
+    Examples:
+
+        import nnetsauce as ns
+        from sklearn.datasets import load_diabetes
+        from sklearn.model_selection import train_test_split
+        data = load_diabetes()
+        X = data.data
+        y= data.target
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2, random_state=123)
+        regr = ns.LazyRegressor(verbose=0, ignore_warnings=True)
+        models, predictions = clf.fit(X_train, X_test, y_train, y_test)
+        model_dictionary = clf.provide_models(X_train,X_test,y_train,y_test)
+        print(models)
+
     """
 
     def __init__(
@@ -235,12 +232,12 @@ class LazyRegressor(Custom, RegressorMixin):
             self.regressors = REGRESSORS
         else:
             self.regressors = [
-            ("CustomRegressor(" + est[0] + ")", est[1])
-            for est in all_estimators()
-            if (
-                issubclass(est[1], RegressorMixin)
-                and (est[0] in self.estimators)
-            )
+                ("CustomRegressor(" + est[0] + ")", est[1])
+                for est in all_estimators()
+                if (
+                    issubclass(est[1], RegressorMixin)
+                    and (est[0] in self.estimators)
+                )
             ]
 
         if self.preprocess is True:

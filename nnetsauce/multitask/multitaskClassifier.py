@@ -201,7 +201,7 @@ class MultitaskClassifier(Base, ClassifierMixin):
             self.fit_objs_[i] = pickle.loads(
                 pickle.dumps(self.obj.fit(scaled_Z, Y[:, i], **kwargs), -1)
             )
-            
+
         self.classes_ = np.unique(y)
         return self
 

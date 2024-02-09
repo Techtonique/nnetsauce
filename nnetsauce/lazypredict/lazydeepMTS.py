@@ -53,26 +53,7 @@ categorical_transformer_high = Pipeline(
 
 
 # Helper function
-
-
 def get_card_split(df, cols, n=11):
-    """
-    Splits categorical columns into 2 lists based on cardinality (i.e # of unique values)
-    Parameters
-    ----------
-    df : Pandas DataFrame
-        DataFrame from which the cardinality of the columns is calculated.
-    cols : list-like
-        Categorical columns to list
-    n : int, optional (default=11)
-        The value of 'n' will be used to split columns.
-    Returns
-    -------
-    card_low : list-like
-        Columns with cardinality < n
-    card_high : list-like
-        Columns with cardinality >= n
-    """
     cond = df[cols].nunique() > n
     card_high = cols[cond]
     card_low = cols[~cond]
@@ -91,23 +72,40 @@ def adjusted_rsquared(r2, n, p):
 
 class LazyDeepMTS(MTS):
     """
-    This module helps in fitting regression models that are available in Scikit-learn to nnetsauce's MTS
-    Parameters
-    ----------
-    verbose : int, optional (default=0)
-        For the liblinear and lbfgs solvers set verbose to any positive
-        number for verbosity.
-    ignore_warnings : bool, optional (default=True)
-        When set to True, the warning related to algorigms that are not able to run are ignored.
-    custom_metric : function, optional (default=None)
-        When function is provided, models are evaluated based on the custom evaluation metric provided.
-    prediction : bool, optional (default=False)
-        When set to True, the predictions of all the models models are returned as dataframe.
-    regressors : list, optional (default="all")
-        When function is provided, trains the chosen regressor(s).
+
+        Fitting -- almost -- all the regression algorithms with layers of
+        nnetsauce's CustomRegressor to multivariate time series
+        and returning their scores.
+
+    Parameters:
+
+        verbose: int, optional (default=0)
+            Any positive number for verbosity.
+        ignore_warnings: bool, optional (default=True)
+            When set to True, the warning related to algorigms that are not able to run are ignored.
+        custom_metric: function, optional (default=None)
+            When function is provided, models are evaluated based on the custom evaluation metric provided.
+        predictions: bool, optional (default=False)
+            When set to True, the predictions of all the models models are returned as dataframe.
+        sort_by: string, optional (default='RMSE')
+            Sort models by a metric. Available options are 'RMSE', 'MAE', 'MPL', 'MPE', 'MAPE',
+            'R-Squared', 'Adjusted R-Squared' or a custom metric identified by its name and
+            provided by custom_metric.
+        random_state: int, optional (default=42)
+            Reproducibiility seed.
+        estimators: list, optional (default='all')
+            list of Estimators (regression algorithms) names or just 'all' (default='all')
+        preprocess: bool, preprocessing is done when set to True
+        n_jobs : int, when possible, run in parallel
+            For now, only used by individual models that support it.
+        n_layers: int, optional (default=3)
+            Number of layers of CustomRegressors to be used.
+
+        All the other parameters are the same as MTS's.
 
     Examples
-    --------
+
+        See https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/demo/thierrymoudiki_20240106_LazyDeepMTS.ipynb
 
     """
 
@@ -243,12 +241,12 @@ class LazyDeepMTS(MTS):
             self.regressors = DEEPREGRESSORSMTS
         else:
             self.regressors = [
-            ("DeepMTS(" + est[0] + ")", est[1])
-            for est in all_estimators()
-            if (
-                issubclass(est[1], RegressorMixin)
-                and (est[0] in self.estimators)
-            )
+                ("DeepMTS(" + est[0] + ")", est[1])
+                for est in all_estimators()
+                if (
+                    issubclass(est[1], RegressorMixin)
+                    and (est[0] in self.estimators)
+                )
             ]
 
         if self.preprocess is True:
