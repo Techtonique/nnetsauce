@@ -105,7 +105,7 @@
                     {{ member(m) }}
                     {% if m.kind == "class" %}
                         {% for m in m.own_members if m.kind != "class" and is_public(m) | trim %}
-                            {% if (m.name in ["fit", "predict", "predict_proba", "score", "create_layer", "cook_training_set", "cook_test_set", "encode_clusters", "subsample", "download"]) %}
+                            {% if (m.name in ["fit", "predict", "predict_proba", "score", "create_layer", "cook_training_set", "cook_test_set", "encode_clusters", "subsample", "download", "provide_models"]) %}
                                 <div id="{{ m.qualname }}" class="classattr">
                                     {{ member(m) }}
                                 </div>
