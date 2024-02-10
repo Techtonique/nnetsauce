@@ -54,13 +54,18 @@ coverage: ## check code coverage quickly with the default Python
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate docs		
-	pip install black pdoc 
+	pip install autopep8 black pdoc 
 	black nnetsauce/* --line-length=80	
+	find nnetsauce/ -name "*.py" -exec autopep8 --max-line-length=80 --in-place {} +
 	pdoc -t docs nnetsauce/* --output-dir nnetsauce-docs
+	find . -name '__pycache__' -exec rm -fr {} +
 
 servedocs: ## compile the docs watching for change	 	
-	pip install pdoc 
+	pip install autopep8 black pdoc 
+	black nnetsauce/* --line-length=80	
+	find nnetsauce/ -name "*.py" -exec autopep8 --max-line-length=80 --in-place {} +
 	pdoc -t docs nnetsauce/* 
+	find . -name '__pycache__' -exec rm -fr {} +
 
 release: dist ## package and upload a release
 	pip install twine --ignore-installed
@@ -82,7 +87,7 @@ run-examples: ## run all examples with one command
 	find examples -maxdepth 2 -name "*.py" -exec  python3 {} \;
 
 run-mts: ## run all mts examples with one command
-	find examples -maxdepth 2 -name "mts*.py" -exec  python3 {} \;
+	find examples -maxdepth 2 -name "*mts*.py" -exec  python3 {} \;
 
 run-lazy: ## run all lazy examples with one command
 	find examples -maxdepth 2 -name "lazy*.py" -exec  python3 {} \;

@@ -40,6 +40,8 @@ print(df_train.tail())
 print(df_test.head())
 print(df_test.tail())
 
+print(f"\n 1. fit BayesianRidge: ------- \n")
+
 regr = linear_model.BayesianRidge()
 obj_MTS = ns.MTS(regr, lags = 1, n_hidden_features=5, verbose = 1)
 obj_MTS.fit(df_train.values)
@@ -47,6 +49,8 @@ print("\n")
 print(obj_MTS.predict(h=5, return_std=True))
 # print(f" stats.describe(obj_MTS.residuals_, axis=0, bias=False) \n {stats.describe(obj_MTS.residuals_, axis=0, bias=False)} ")
 # print([acorr_ljungbox(obj_MTS.residuals_[:,i], boxpierce=True, auto_lag=True, return_df=True) for i in range(obj_MTS.residuals_.shape[1])])
+
+print(f"\n 2. fit ARDRegression: ------- \n")
 
 regr2 = linear_model.ARDRegression()
 obj_MTS2 = ns.MTS(regr2, lags = 1, n_hidden_features=5, 
@@ -74,41 +78,18 @@ print(f" stats.describe(obj_MTS2.residuals_, axis=0, bias=False) \n {stats.descr
 print("\n\n")
 
 
+print(f"\n 3. fit ElasticNet: ------- \n")
 
 regr3 = linear_model.ElasticNet()
-# regr3 = linear_model.Ridge()
-# regr3 = RandomForestRegressor()
 obj_MTS3 = ns.MTS(regr3, lags = 3, n_hidden_features=7, 
                   replications=10, kernel='gaussian', 
-                  seed=24, verbose = 1)
+                  seed=24, verbose = 1, type_pi="kde")
 start = time()
-obj_MTS3.fit(df_train.values)
+obj_MTS3.fit(df_train)
 print(f"Elapsed {time()-start} s")
 print("\n\n")
-print(obj_MTS3.predict(h=5))
+print(obj_MTS3.kde_)
 print(f" Predictive simulations #1 {obj_MTS3.sims_[0]}") 
 print(f" Predictive simulations #2 {obj_MTS3.sims_[1]}") 
 print(f" Predictive simulations #3 {obj_MTS3.sims_[2]}") 
-print("\n\n")
-
-# print(obj_MTS2.residuals_sims_.shape)
-# print("\n\n")
-# print(stats.describe(obj_MTS2.residuals_[:,0], bias=False))
-# print("\n\n")
-# print(stats.describe(obj_MTS2.residuals_sims_[:,0], bias=False))
-# print("\n\n")
-# histogram_residuals = np.histogram(obj_MTS2.residuals_[:,0])
-# print(histogram_residuals)
-# print("\n\n")
-# print(np.histogram(obj_MTS2.residuals_sims_[:,0], bins=histogram_residuals[1]))
-# print(f" stats.describe(obj_MTS2.residuals_, axis=0, bias=False) \n {stats.describe(obj_MTS2.residuals_, axis=0, bias=False)} ")
-# print([acorr_ljungbox(obj_MTS2.residuals_[:,i], boxpierce=True, auto_lag=True, return_df=True) for i in range(obj_MTS2.residuals_.shape[1])])
-
-# regr3 = GaussianProcessRegressor()
-# obj_MTS3 = ns.MTS(regr3, lags = 1, n_hidden_features=5)
-# obj_MTS3.fit(df_train.values)
-# print(obj_MTS3.get_params())
-# print("\n")
-# print(obj_MTS3.predict(h=5, return_std=True))
-# print(f" stats.describe(obj_MTS3.residuals_, axis=0, bias=False) \n {stats.describe(obj_MTS3.residuals_, axis=0, bias=False)} ")
-
+print(f"obj_MTS3.predict(h=5): {obj_MTS3.predict(h=5)}")

@@ -98,10 +98,10 @@ class LazyDeepRegressor(Custom, RegressorMixin):
 
     Examples:
 
-        from lazypredict.Supervised import LazyRegressor
-        from sklearn import datasets
-        from sklearn.utils import shuffle
+        import nnetsauce as ns
         import numpy as np
+        from sklearn import datasets
+        from sklearn.utils import shuffle        
 
         diabetes = datasets.load_diabetes()
         X, y = shuffle(diabetes.data, diabetes.target, random_state=13)
@@ -111,9 +111,8 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         X_train, y_train = X[:offset], y[:offset]
         X_test, y_test = X[offset:], y[offset:]
 
-        reg = LazyDeepRegressor(verbose=0, ignore_warnings=False, custom_metric=None)
+        reg = ns.LazyDeepRegressor(verbose=0, ignore_warnings=False, custom_metric=None)
         models, predictions = reg.fit(X_train, X_test, y_train, y_test)
-        model_dictionary = reg.provide_models(X_train, X_test, y_train, y_test)
         print(models)
 
     """
@@ -177,26 +176,33 @@ class LazyDeepRegressor(Custom, RegressorMixin):
 
     def fit(self, X_train, X_test, y_train, y_test):
         """Fit Regression algorithms to X_train and y_train, predict and score on X_test, y_test.
-        Parameters
-        ----------
-        X_train : array-like,
-            Training vectors, where rows is the number of samples
-            and columns is the number of features.
-        X_test : array-like,
-            Testing vectors, where rows is the number of samples
-            and columns is the number of features.
-        y_train : array-like,
-            Training vectors, where rows is the number of samples
-            and columns is the number of features.
-        y_test : array-like,
-            Testing vectors, where rows is the number of samples
-            and columns is the number of features.
-        Returns
+
+        Parameters:
+
+            X_train : array-like,
+                Training vectors, where rows is the number of samples
+                and columns is the number of features.
+
+            X_test : array-like,
+                Testing vectors, where rows is the number of samples
+                and columns is the number of features.
+
+            y_train : array-like,
+                Training vectors, where rows is the number of samples
+                and columns is the number of features.
+
+            y_test : array-like,
+                Testing vectors, where rows is the number of samples
+                and columns is the number of features.
+
+        Returns:
         -------
-        scores : Pandas DataFrame
+        scores:  Pandas DataFrame
             Returns metrics of all the models in a Pandas DataFrame.
+
         predictions : Pandas DataFrame
             Returns predictions of all the models in a Pandas DataFrame.
+
         """
         R2 = []
         ADJR2 = []
@@ -367,25 +373,31 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         """
         This function returns all the model objects trained in fit function.
         If fit is not called already, then we call fit and then return the models.
-        Parameters
-        ----------
-        X_train : array-like,
-            Training vectors, where rows is the number of samples
-            and columns is the number of features.
-        X_test : array-like,
-            Testing vectors, where rows is the number of samples
-            and columns is the number of features.
-        y_train : array-like,
-            Training vectors, where rows is the number of samples
-            and columns is the number of features.
-        y_test : array-like,
-            Testing vectors, where rows is the number of samples
-            and columns is the number of features.
-        Returns
-        -------
-        models: dict-object,
-            Returns a dictionary with each model pipeline as value
-            with key as name of models.
+
+        Parameters:
+
+            X_train : array-like,
+                Training vectors, where rows is the number of samples
+                and columns is the number of features.
+
+            X_test : array-like,
+                Testing vectors, where rows is the number of samples
+                and columns is the number of features.
+
+            y_train : array-like,
+                Training vectors, where rows is the number of samples
+                and columns is the number of features.
+
+            y_test : array-like,
+                Testing vectors, where rows is the number of samples
+                and columns is the number of features.
+
+        Returns:
+
+            models: dict-object,
+                Returns a dictionary with each model pipeline as value
+                with key as name of models.
+
         """
         if len(self.models.keys()) == 0:
             self.fit(X_train, X_test, y_train, y_test)

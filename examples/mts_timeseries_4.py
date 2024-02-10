@@ -95,11 +95,22 @@ print(obj_MTS.predict(h=5, return_std=True))
 
 print("\n\n Example 7: MTS with BayesianRidge() -----------------")
 
+
+print("\n\n Example 7-1: MTS with BayesianRidge() -----------------")
+
+regr = linear_model.BayesianRidge()
+obj_MTS = ns.MTS(regr, lags = 2, n_hidden_features=5, verbose = 1)
+obj_MTS.fit(df_train.values, 
+            xreg=np.flip(np.arange(df_train.shape[0])))
+print("\n")
+print(obj_MTS.predict(h=5, return_std=True))
+
+print("\n\n Example 7-2: MTS with BayesianRidge() -----------------")
 regr = linear_model.BayesianRidge()
 obj_MTS = ns.MTS(regr, lags = 2, n_hidden_features=5, verbose = 1)
 obj_MTS.fit(df_train, 
-            xreg=np.column_stack((np.arange(df_train.shape[0]), np.random.randn(df_train.shape[0]))))
-#obj_MTS.fit(df_train.values, xreg=np.flip(np.arange(df_train.shape[0])))
+            xreg=np.column_stack((np.arange(df_train.shape[0]), 
+                                  np.random.randn(df_train.shape[0]))))
 print("\n")
 print(obj_MTS.predict(h=5, return_std=True))
 

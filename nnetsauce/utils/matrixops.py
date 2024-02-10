@@ -13,12 +13,60 @@ if platform.system() in ("Linux", "Darwin"):
 
 
 # column bind
-def cbind(x, y, backend="cpu"):
-    # if len(x.shape) == 1 or len(y.shape) == 1:
-    sys_platform = platform.system()
-    if backend in ("gpu", "tpu") and (sys_platform in ("Linux", "Darwin")):
-        return jnp.column_stack((x, y))
-    return np.column_stack((x, y))
+def cbind(x, y, backend="cpu"):    
+
+    if isinstance(x, pd.DataFrame) and isinstance(y, pd.DataFrame):
+
+        return pd.concat([x, y], axis=1)
+    
+    else: # x or y are numpy arrays
+
+        if isinstance(x, pd.DataFrame) == False and isinstance(y, pd.DataFrame):
+            
+            if len(x.shape) == 1:
+
+                col_names = ["series0"] + y.columns.tolist()
+
+            else:
+                    
+                col_names = ["series"+str(i) for i in range(x.shape[1])] + y.columns.tolist()
+
+            if backend in ("gpu", "tpu") and (platform.system() in ("Linux", "Darwin")):
+
+                res = jnp.column_stack((x.values, y))                
+
+                return pd.DataFrame(res, columns=col_names)            
+            
+            res = np.column_stack((x.values, y))    
+
+            return pd.DataFrame(res, columns=col_names)            
+        
+        if isinstance(x, pd.DataFrame) and isinstance(y, pd.DataFrame) == False:
+
+            if len(y.shape) == 1:
+
+                col_names = x.columns.tolist() + ["series0"] 
+
+            else:
+                    
+                col_names = x.columns.tolist() + ["series"+str(i) for i in range(x.shape[1])]
+            
+            if backend in ("gpu", "tpu") and (platform.system() in ("Linux", "Darwin")):
+                
+                res = jnp.column_stack((x.values, y))
+
+                return pd.DataFrame(res, columns=col_names)
+            
+            res = np.column_stack((x.values, y))
+
+            return pd.DataFrame(res, columns=col_names)
+
+        # x and y are numpy arrays
+        if backend in ("gpu", "tpu") and (platform.system() in ("Linux", "Darwin")):
+
+            return jnp.column_stack((x, y))
+        
+        return np.column_stack((x, y))
 
 
 # center... response
@@ -83,12 +131,12 @@ def crossprod(x, y=None, backend="cpu"):
     return np.dot(x.transpose(), y)
 
 
-def delete_last_columns(df, num_columns, inplace=False):
+def delete_last_columns(x, num_columns, inplace=False):
     """
     Delete the last 'num_columns' columns from a DataFrame.
 
     Parameters:
-        df (DataFrame): The pandas DataFrame.
+        x: pandas DataFrame or tuple or DataFrames.
         num_columns (int): Number of columns to delete from the end.
         inplace (bool): Whether to modify the DataFrame in place. Default is False.
 
@@ -96,11 +144,19 @@ def delete_last_columns(df, num_columns, inplace=False):
         DataFrame: Modified DataFrame if inplace=False, None otherwise.
     """
     if inplace:
-        df.drop(df.columns[-num_columns:], axis=1, inplace=True)
+        if isinstance(x, pd.DataFrame):
+            x.drop(x.columns[-num_columns:], axis=1, inplace=True)
+        if isinstance(x[1], pd.DataFrame):
+            for i in range(len(x)):
+                x[i].drop(x[i].columns[-num_columns:], axis=1, inplace=True) 
     else:
-        modified_df = df.drop(df.columns[-num_columns:], axis=1)
-        return modified_df
-
+        if isinstance(x, pd.DataFrame):
+            return x.drop(x.columns[-num_columns:], axis=1)
+        if isinstance(x[1], pd.DataFrame):
+            modified_dfs = []
+            for i in range(len(x)):
+                modified_dfs.append(x[i].drop(x[i].columns[-num_columns:], axis=1))
+            return tuple(modified_dfs)
 
 # Obtain this for JAX
 # Obtain this for JAX

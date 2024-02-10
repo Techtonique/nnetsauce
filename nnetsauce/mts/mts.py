@@ -272,59 +272,39 @@ class MTS(Base):
             self: object
         """
 
-        if isinstance(X, pd.DataFrame) is False:  # it's a numpy array
-            if len(X.shape) > 1:
-                if xreg is None:
-                    X = pd.DataFrame(X)
-                    self.series_names = [
-                        "series" + str(i) for i in range(X.shape[1])
-                    ]
-                else:  # xreg is not None
-                    X = pd.DataFrame(
-                        mo.cbind(X, xreg), columns=self.series_names
-                    )
-                    self.series_names = [
-                        "series" + str(i) for i in range(X.shape[1])
-                    ]
-                    self.xreg_ = xreg
-            else:  # len(X.shape) == 1
-                if xreg is None:
-                    X = pd.DataFrame(X)
-                    self.series_names = ["series0"]
-                else:
-                    X = pd.DataFrame(mo.cbind(X, xreg))
-                    self.series_names = [
-                        "series" + str(i) for i in range(X.shape[1])
-                    ]
-                    self.xreg_ = xreg
-        else:  # it's a DataFrame with column names
-            columns_names = X.columns
+        if isinstance(X, pd.DataFrame) is False:  # input data set is a numpy array
+            
+            if xreg is None:                
+                X = pd.DataFrame(X)
+                self.series_names = [
+                    "series" + str(i) for i in range(X.shape[1])
+                ]
+            else:  # xreg is not None
+                X = mo.cbind(X, xreg)
+                self.xreg_ = xreg
+        
+        else:  # input data set is a DataFrame with column names
+
             X_index = None
             if X.index is not None:
                 X_index = X.index
             if xreg is None:
                 X = copy.deepcopy(mo.convert_df_to_numeric(X))
-                self.series_names = list(columns_names)
             else:
-                X = copy.deepcopy(
-                    pd.DataFrame(
-                        mo.cbind(mo.convert_df_to_numeric(X).values, xreg)
-                    )
-                )
-                if len(xreg.shape) == 1:
-                    self.series_names = list(columns_names) + ["xreg"]
-                else:
-                    self.series_names = list(columns_names) + [
-                        "xreg" + str(i) for i in range(xreg.shape[1])
-                    ]
+                X = copy.deepcopy(mo.cbind(mo.convert_df_to_numeric(X), xreg))
                 self.xreg_ = xreg
             if X_index is not None:
                 X.index = X_index
+            self.series_names = X.columns.tolist()
 
-        self.df_ = X
-        X = X.values
-        self.df_.columns = self.series_names
-        self.input_dates = ts.compute_input_dates(self.df_)
+        if isinstance(X, pd.DataFrame):
+            self.df_ = X
+            X = X.values
+            self.df_.columns = self.series_names
+            self.input_dates = ts.compute_input_dates(self.df_)
+        else:
+            self.df_ = pd.DataFrame(X, columns=self.series_names)
+            self.input_dates = ts.compute_input_dates(self.df_)
 
         try:
             # multivariate time series
@@ -468,6 +448,7 @@ class MTS(Base):
             )  # to be updated
 
         if self.kde_ != None and self.type_pi == "kde":
+            pi_multiplier = norm.ppf(1 - self.alpha_ / 200)
             self.residuals_sims_ = tuple(
                 self.kde_.sample(n_samples=h, random_state=self.seed + 100 * i)
                 for i in tqdm(range(self.replications))
@@ -511,19 +492,22 @@ class MTS(Base):
             index=self.output_dates_,
         )
         if "return_std" not in kwargs:
+
             if self.kde_ is None:
                 return self.mean_
 
-            # if "return_std" not in kwargs and self.kde_ is not None
+            # if "return_std" not in kwargs and self.kde_ is not None            
             meanf = []
             lower = []
             upper = []
+
             self.sims_ = tuple(
                 (
                     self.mean_ + self.residuals_sims_[i]
                     for i in tqdm(range(self.replications))
                 )
-            )
+            )            
+
             DescribeResult = namedtuple(
                 "DescribeResult", ("mean", "sims", "lower", "upper")
             )
@@ -555,66 +539,76 @@ class MTS(Base):
                 columns=self.series_names,  # self.df_.columns,
                 index=self.output_dates_,
             )
-
+            
             res = DescribeResult(
                 self.mean_, self.sims_, self.lower_, self.upper_
-            )
+            )            
 
-            if self.xreg_ is not None:
+            if self.xreg_ is not None:                
+
                 if len(self.xreg_.shape) > 1:
-                    return mx.tuple_map(
+                                        
+                    res2 = mx.tuple_map(
                         res,
                         lambda x: mo.delete_last_columns(
                             x, num_columns=self.xreg_.shape[1]
                         ),
                     )
+
                 else:
-                    return mx.tuple_map(
+                    
+                    res2 = mx.tuple_map(
+                        res, lambda x: mo.delete_last_columns(x, num_columns=1)
+                    )       
+
+                return res2 
+            
+            else: 
+
+                return res
+            
+
+        if "return_std" in kwargs:
+            DescribeResult = namedtuple(
+                "DescribeResult", ("mean", "lower", "upper")
+            )
+
+            self.mean_ = pd.DataFrame(
+                np.asarray(self.mean_),
+                columns=self.series_names,  # self.df_.columns,
+                index=self.output_dates_,
+            )
+
+            self.preds_std_ = np.asarray(self.preds_std_)
+
+            self.lower_ = pd.DataFrame(
+                self.mean_.values - pi_multiplier * self.preds_std_,
+                columns=self.series_names,  # self.df_.columns,
+                index=self.output_dates_,
+            )
+
+            self.upper_ = pd.DataFrame(
+                self.mean_.values + pi_multiplier * self.preds_std_,
+                columns=self.series_names,  # self.df_.columns,
+                index=self.output_dates_,
+            )
+            res = DescribeResult(self.mean_, self.lower_, self.upper_)
+            
+            if self.xreg_ is not None:
+                if len(self.xreg_.shape) > 1:
+                    res2 = mx.tuple_map(
+                        res,
+                        lambda x: mo.delete_last_columns(
+                            x, num_columns=self.xreg_.shape[1]
+                        ),
+                    )                
+                else:
+                    res2 = mx.tuple_map(
                         res, lambda x: mo.delete_last_columns(x, num_columns=1)
                     )
+                return DescribeResult(res2[0], res2[1], res2[2])
 
             return res
-
-        # if "return_std" in kwargs
-        DescribeResult = namedtuple(
-            "DescribeResult", ("mean", "lower", "upper")
-        )
-
-        self.mean_ = pd.DataFrame(
-            np.asarray(self.mean_),
-            columns=self.series_names,  # self.df_.columns,
-            index=self.output_dates_,
-        )
-
-        self.preds_std_ = np.asarray(self.preds_std_)
-
-        self.lower_ = pd.DataFrame(
-            self.mean_.values - pi_multiplier * self.preds_std_,
-            columns=self.series_names,  # self.df_.columns,
-            index=self.output_dates_,
-        )
-
-        self.upper_ = pd.DataFrame(
-            self.mean_.values + pi_multiplier * self.preds_std_,
-            columns=self.series_names,  # self.df_.columns,
-            index=self.output_dates_,
-        )
-        res = DescribeResult(self.mean_, self.lower_, self.upper_)
-
-        if self.xreg_ is not None:
-            if len(self.xreg_.shape) > 1:
-                return mx.tuple_map(
-                    res,
-                    lambda x: mo.delete_last_columns(
-                        x, num_columns=self.xreg_.shape[1]
-                    ),
-                )
-            else:
-                return mx.tuple_map(
-                    res, lambda x: mo.delete_last_columns(x, num_columns=1)
-                )
-
-        return res
 
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):
         """Train on training_index, score on testing_index."""

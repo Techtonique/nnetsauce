@@ -73,7 +73,8 @@ def numerical_gradient(f, x, **kwargs):
     zero = 2.220446049250313e-16
     res = np.zeros_like(x)
 
-    f_ = lambda x: f(x, **kwargs)
+    def f_(x):
+        return f(x, **kwargs)
 
     for ix in range(p):
         value_x = x[ix]
@@ -105,7 +106,8 @@ def numerical_hessian(f, x, **kwargs):
     H = np.zeros((p, p))
     temp = 0
 
-    f_ = lambda x: f(x, **kwargs)
+    def f_(x):
+        return f(x, **kwargs)
 
     fx = call_f(f_, x)
 
@@ -211,7 +213,8 @@ def scd(
     else:
         iterator = range(num_iters)
 
-    f = lambda x: loss_func(x, **kwargs)
+    def f(x):
+        return loss_func(x, **kwargs)
 
     if method == "momentum":
         for i in iterator:
@@ -358,7 +361,8 @@ def sgd(
     else:
         iterator = range(num_iters)
 
-    f = lambda x: loss_func(x, **kwargs)
+    def f(x):
+        return loss_func(x, **kwargs)
 
     if method == "momentum":
         for i in iterator:

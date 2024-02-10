@@ -82,23 +82,34 @@ class LazyMTS(MTS):
 
         verbose: int, optional (default=0)
             Any positive number for verbosity.
+
         ignore_warnings: bool, optional (default=True)
-            When set to True, the warning related to algorigms that are not able to run are ignored.
+            When set to True, the warning related to algorigms that are not
+            able to run are ignored.
+
         custom_metric: function, optional (default=None)
-            When function is provided, models are evaluated based on the custom evaluation metric provided.
+            When function is provided, models are evaluated based on the custom
+              evaluation metric provided.
+
         predictions: bool, optional (default=False)
             When set to True, the predictions of all the models models are returned as dataframe.
+
         sort_by: string, optional (default='RMSE')
             Sort models by a metric. Available options are 'RMSE', 'MAE', 'MPL', 'MPE', 'MAPE',
             'R-Squared', 'Adjusted R-Squared' or a custom metric identified by its name and
             provided by custom_metric.
+
         random_state: int, optional (default=42)
             Reproducibiility seed.
+
         estimators: list, optional (default='all')
             list of Estimators (regression algorithms) names or just 'all' (default='all')
+
         preprocess: bool, preprocessing is done when set to True
+
         n_jobs : int, when possible, run in parallel
             For now, only used by individual models that support it.
+
         n_layers: int, optional (default=3)
             Number of layers of CustomRegressors to be used.
 
@@ -170,22 +181,31 @@ class LazyMTS(MTS):
             show_progress=show_progress,
         )
 
-    def fit(self, X_train, X_test, xreg=None, new_xreg=None, **kwargs):
+    def fit(self, X_train, X_test, xreg=None, **kwargs):
         """Fit Regression algorithms to X_train, predict and score on X_test.
-        Parameters
-        ----------
-        X_train : array-like,
-            Training vectors, where rows is the number of samples
-            and columns is the number of features.
-        X_test : array-like,
-            Testing vectors, where rows is the number of samples
-            and columns is the number of features.
-        Returns
-        -------
-        scores : Pandas DataFrame
-            Returns metrics of all the models in a Pandas DataFrame.
-        predictions : Pandas DataFrame
-            Returns predictions of all the models in a Pandas DataFrame.
+
+        Parameters:
+        
+            X_train: array-like,
+                Training vectors, where rows is the number of samples
+                and columns is the number of features.
+
+            X_test: array-like,
+                Testing vectors, where rows is the number of samples
+                and columns is the number of features.
+            
+            xreg: array-like, optional (default=None)
+                Additional (external) regressors to be passed to self.obj
+                xreg must be in 'increasing' order (most recent observations last)
+
+        Returns:
+
+            scores: Pandas DataFrame
+                Returns metrics of all the models in a Pandas DataFrame.
+
+            predictions: Pandas DataFrame
+                Returns predictions of all the models in a Pandas DataFrame.
+
         """
         R2 = []
         ADJR2 = []
@@ -319,14 +339,11 @@ class LazyMTS(MTS):
                     # pipe.fit(X_train, xreg=xreg)
 
                     self.models[name] = pipe
-                    if xreg is not None:
-                        assert (
-                            new_xreg is not None
-                        ), "xreg and new_xreg must be provided"
-                    # X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg)
+                    
                     X_pred = pipe["regressor"].predict(
                         h=X_test.shape[0], **kwargs
                     )
+
                     rmse = mean_squared_error(X_test, X_pred, squared=False)
                     mae = mean_absolute_error(X_test, X_pred)
                     mpl = mean_pinball_loss(X_test, X_pred)
@@ -416,15 +433,11 @@ class LazyMTS(MTS):
                             show_progress=self.show_progress,
                         )
 
-                    pipe.fit(X_train, **kwargs)
+                    pipe.fit(X_train, xreg, **kwargs)
                     # pipe.fit(X_train, xreg=xreg) # DO xreg like in `ahead`
 
                     self.models[name] = pipe
-                    if xreg is not None:
-                        assert (
-                            new_xreg is not None
-                        ), "xreg and new_xreg must be provided"
-
+                   
                     if self.preprocess is True:
                         X_pred = pipe["regressor"].predict(
                             h=X_test.shape[0], **kwargs
@@ -502,19 +515,23 @@ class LazyMTS(MTS):
         """
         This function returns all the model objects trained in fit function.
         If fit is not called already, then we call fit and then return the models.
-        Parameters
-        ----------
-        X_train : array-like,
-            Training vectors, where rows is the number of samples
-            and columns is the number of features.
-        X_test : array-like,
-            Testing vectors, where rows is the number of samples
-            and columns is the number of features.
-        Returns
-        -------
-        models: dict-object,
-            Returns a dictionary with each model pipeline as value
-            with key as name of models.
+
+        Parameters:
+        
+            X_train : array-like,
+                Training vectors, where rows is the number of samples
+                and columns is the number of features.
+                
+            X_test : array-like,
+                Testing vectors, where rows is the number of samples
+                and columns is the number of features.
+            
+        Returns:
+        
+            models: dict-object,
+                Returns a dictionary with each model pipeline as value
+                with key as name of models.
+
         """
         if len(self.models.keys()) == 0:
             self.fit(X_train, X_test)

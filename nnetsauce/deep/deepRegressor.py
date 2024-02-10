@@ -12,25 +12,28 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
     """
     Deep Regressor
 
-    Parameters
-    ----------
-    verbose : int, optional (default=0)
-        Monitor progress when fitting.
+    Parameters:
 
-    Examples
-    --------
-    >>> import nnetsauce as ns
-    >>> from sklearn.datasets import load_diabetes
-    >>> from sklearn.model_selection import train_test_split
-    >>> from sklearn.linear_model import RidgeCV
-    >>> data = load_diabetes()
-    >>> X = data.data
-    >>> y= data.target
-    >>> X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2, random_state=123)
-    >>> obj = RidgeCV()
-    >>> clf = ns.DeepRegressor(obj)
-    >>> clf.fit(X_train, y_train)
-    >>> print(clf.score(clf.predict(X_test), y_test))
+        verbose : int, optional (default=0)
+            Monitor progress when fitting.
+
+    Examples:
+
+        ```python
+        import nnetsauce as ns
+        from sklearn.datasets import load_diabetes
+        from sklearn.model_selection import train_test_split
+        from sklearn.linear_model import RidgeCV
+        data = load_diabetes()
+        X = data.data
+        y= data.target
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2, random_state=123)
+        obj = RidgeCV()
+        clf = ns.DeepRegressor(obj)
+        clf.fit(X_train, y_train)
+        print(clf.score(clf.predict(X_test), y_test))
+        ```
+
     """
 
     def __init__(

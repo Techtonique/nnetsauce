@@ -190,7 +190,7 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
         """ Score the model on test set features X and response y. 
 
         Args:
-        
+
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number 
                 of samples and n_features is the number of features
@@ -202,11 +202,11 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
                 must be in ('explained_variance', 'neg_mean_absolute_error', \
                             'neg_mean_squared_error', 'neg_mean_squared_log_error', \
                             'neg_median_absolute_error', 'r2')
-            
+
             **kwargs: additional parameters to be passed to scoring functions
-               
+
         Returns: 
-        
+
             model scores: {array-like}
 
         """

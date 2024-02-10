@@ -73,22 +73,36 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
 
         verbose: int, optional (default=0)
             Any positive number for verbosity.
+
         ignore_warnings: bool, optional (default=True)
-            When set to True, the warning related to algorigms that are not able to run are ignored.
+            When set to True, the warning related to algorigms that are not
+            able to run are ignored.
+
         custom_metric: function, optional (default=None)
-            When function is provided, models are evaluated based on the custom evaluation metric provided.
+            When function is provided, models are evaluated based on the custom
+              evaluation metric provided.
+
         predictions: bool, optional (default=False)
-            When set to True, the predictions of all the models models are returned as dataframe.
+            When set to True, the predictions of all the models models are
+            returned as data frame.
+
         sort_by: string, optional (default='Accuracy')
-            Sort models by a metric. Available options are 'Accuracy', 'Balanced Accuracy', 'ROC AUC', 'F1 Score'
-            or a custom metric identified by its name and provided by custom_metric.
+            Sort models by a metric. Available options are 'Accuracy',
+            'Balanced Accuracy', 'ROC AUC', 'F1 Score' or a custom metric
+            identified by its name and provided by custom_metric.
+
         random_state: int, optional (default=42)
             Reproducibiility seed.
+
         estimators: list, optional (default='all')
-            list of Estimators names or just 'all' for > 90 classifiers (default='all')
+            list of Estimators names or just 'all' for > 90 classifiers
+            (default='all')
+
         preprocess: bool, preprocessing is done when set to True
-        n_jobs : int, when possible, run in parallel
+
+        n_jobs: int, when possible, run in parallel
             For now, only used by individual models that support it.
+
         n_layers: int, optional (default=3)
             Number of layers of CustomClassifiers to be used.
 
@@ -97,17 +111,20 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
 
     Examples
 
+        ```python
         import nnetsauce as ns
         from sklearn.datasets import load_breast_cancer
         from sklearn.model_selection import train_test_split
         data = load_breast_cancer()
         X = data.data
         y= data.target
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2, random_state=123)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2,
+            random_state=123)
         clf = ns.LazyDeepClassifier(verbose=0, ignore_warnings=True, custom_metric=None)
         models, predictions = clf.fit(X_train, X_test, y_train, y_test)
         model_dictionary = clf.provide_models(X_train,X_test,y_train,y_test)
         print(models)
+        ```
 
     """
 
@@ -171,27 +188,34 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         )
 
     def fit(self, X_train, X_test, y_train, y_test):
-        """Fit Classification algorithms to X_train and y_train, predict and score on X_test, y_test.
-        Parameters
-        ----------
-        X_train : array-like,
-            Training vectors, where rows is the number of samples
-            and columns is the number of features.
-        X_test : array-like,
-            Testing vectors, where rows is the number of samples
-            and columns is the number of features.
-        y_train : array-like,
-            Training vectors, where rows is the number of samples
-            and columns is the number of features.
-        y_test : array-like,
-            Testing vectors, where rows is the number of samples
-            and columns is the number of features.
-        Returns
-        -------
-        scores : Pandas DataFrame
-            Returns metrics of all the models in a Pandas DataFrame.
-        predictions : Pandas DataFrame
-            Returns predictions of all the models in a Pandas DataFrame.
+        """Fit classifiers to X_train and y_train, predict and score on X_test,
+        y_test.
+
+        Parameters:
+
+            X_train: array-like,
+                Training vectors, where rows is the number of samples
+                and columns is the number of features.
+
+            X_test: array-like,
+                Testing vectors, where rows is the number of samples
+                and columns is the number of features.
+
+            y_train: array-like,
+                Training vectors, where rows is the number of samples
+                and columns is the number of features.
+
+            y_test: array-like,
+                Testing vectors, where rows is the number of samples
+                and columns is the number of features.
+
+        Returns:
+
+            scores: Pandas DataFrame
+                Returns metrics of all the models in a Pandas DataFrame.
+
+            predictions: Pandas DataFrame
+                Returns predictions of all the models in a Pandas DataFrame.
         """
         Accuracy = []
         B_Accuracy = []
@@ -414,28 +438,32 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         return scores, predictions_df if self.predictions is True else scores
 
     def provide_models(self, X_train, X_test, y_train, y_test):
-        """
-        This function returns all the model objects trained in fit function.
-        If fit is not called already, then we call fit and then return the models.
-        Parameters
-        ----------
-        X_train : array-like,
+        """Returns all the model objects trained. If fit hasn't been called yet,
+        then it's called to return the models.
+
+        Parameters:
+
+        X_train: array-like,
             Training vectors, where rows is the number of samples
             and columns is the number of features.
-        X_test : array-like,
+
+        X_test: array-like,
             Testing vectors, where rows is the number of samples
             and columns is the number of features.
-        y_train : array-like,
+
+        y_train: array-like,
             Training vectors, where rows is the number of samples
             and columns is the number of features.
-        y_test : array-like,
+
+        y_test: array-like,
             Testing vectors, where rows is the number of samples
             and columns is the number of features.
-        Returns
-        -------
-        models: dict-object,
-            Returns a dictionary with each model pipeline as value
-            with key as name of models.
+
+        Returns:
+
+            models: dict-object,
+                Returns a dictionary with each model's pipeline as value
+                and key = name of the model.
         """
         if len(self.models.keys()) == 0:
             self.fit(X_train, X_test, y_train, y_test)

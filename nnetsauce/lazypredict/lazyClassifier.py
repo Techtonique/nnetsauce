@@ -66,8 +66,8 @@ def get_card_split(df, cols, n=11):
 class LazyClassifier(Custom, ClassifierMixin):
     """
 
-        Fitting -- almost -- all the classification algorithms with nnetsauce's CustomClassifier
-        and returning their scores.
+        Fitting -- almost -- all the classification algorithms with nnetsauce's
+        CustomClassifier and returning their scores.
 
     Parameters:
 
@@ -75,32 +75,38 @@ class LazyClassifier(Custom, ClassifierMixin):
             Any positive number for verbosity.
 
         ignore_warnings: bool, optional (default=True)
-            When set to True, the warning related to algorigms that are not able to run are ignored.
+            When set to True, warnings related to algorithms that were not
+            run are ignored.
 
         custom_metric: function, optional (default=None)
-            When function is provided, models are evaluated based on the custom evaluation metric provided.
+            When function is provided, models are evaluated based on the
+            custom evaluation metric provided.
 
         predictions: bool, optional (default=False)
-            When set to True, the predictions of all the models models are returned as data frame.
+            When set to True, the predictions of all the models models are
+            returned as data frame.
 
         sort_by: string, optional (default='Accuracy')
-            Sort models by a metric. Available options are 'Accuracy', 'Balanced Accuracy', 'ROC AUC', 'F1 Score'
-            or a custom metric identified by its name and provided by custom_metric.
+            Sort models by a metric. Available options are 'Accuracy',
+            'Balanced Accuracy', 'ROC AUC', 'F1 Score' or a custom metric
+            identified by its name and provided by custom_metric.
 
         random_state: int, optional (default=42)
             Reproducibiility seed.
 
         estimators: list, optional (default='all')
-            list of Estimators names or just 'all' for > 90 classifiers (default='all')
+            list of Estimators names or just 'all' for > 90
+            classifiers (default='all')
 
         preprocess: bool, preprocessing is done when set to True
 
-        n_jobs : int, when possible, run in parallel
+        n_jobs: int, when possible, run in parallel
             For now, only used by individual models that support it.
 
         All the other parameters are the same as CustomClassifier's.
 
     Examples:
+
         ```python
         import nnetsauce as ns
         from sklearn.datasets import load_breast_cancer
@@ -108,12 +114,14 @@ class LazyClassifier(Custom, ClassifierMixin):
         data = load_breast_cancer()
         X = data.data
         y= data.target
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2, random_state=123)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2,
+        random_state=123)
         clf = ns.LazyClassifier(verbose=0, ignore_warnings=True)
         models, predictions = clf.fit(X_train, X_test, y_train, y_test)
         model_dictionary = clf.provide_models(X_train,X_test,y_train,y_test)
         print(models)
         ```
+
     """
 
     def __init__(
@@ -175,34 +183,33 @@ class LazyClassifier(Custom, ClassifierMixin):
         )
 
     def fit(self, X_train, X_test, y_train, y_test):
-        """
-
-            Fit classifiers to X_train and y_train, predict and score on X_test, y_test.
+        """Fit classifiers to X_train and y_train, predict and score on X_test,
+        y_test.
 
         Parameters:
-        
-            X_train : array-like,
+
+            X_train: array-like,
                 Training vectors, where rows is the number of samples
                 and columns is the number of features.
 
-            X_test : array-like,
+            X_test: array-like,
                 Testing vectors, where rows is the number of samples
                 and columns is the number of features.
 
-            y_train : array-like,
+            y_train: array-like,
                 Training vectors, where rows is the number of samples
                 and columns is the number of features.
 
-            y_test : array-like,
+            y_test: array-like,
                 Testing vectors, where rows is the number of samples
                 and columns is the number of features.
 
         Returns:
-        
-            scores : Pandas DataFrame
+
+            scores: Pandas DataFrame
                 Returns metrics of all the models in a Pandas DataFrame.
-                
-            predictions : Pandas DataFrame
+
+            predictions: Pandas DataFrame
                 Returns predictions of all the models in a Pandas DataFrame.
         """
         Accuracy = []
@@ -563,30 +570,29 @@ class LazyClassifier(Custom, ClassifierMixin):
         return scores, predictions_df if self.predictions is True else scores
 
     def provide_models(self, X_train, X_test, y_train, y_test):
-        """
-
-            Returns all the model objects trained. If fit is not called already,
-            then it's called to return the models.
+        """Returns all the model objects trained. If fit hasn't been called yet,
+        then it's called to return the models.
 
         Parameters:
-        
-        X_train : array-like,
+
+        X_train: array-like,
             Training vectors, where rows is the number of samples
             and columns is the number of features.
 
-        X_test : array-like,
+        X_test: array-like,
             Testing vectors, where rows is the number of samples
             and columns is the number of features.
 
-        y_train : array-like,
+        y_train: array-like,
             Training vectors, where rows is the number of samples
             and columns is the number of features.
 
-        y_test : array-like,
+        y_test: array-like,
             Testing vectors, where rows is the number of samples
             and columns is the number of features.
 
-        Returns:        
+        Returns:
+
             models: dict-object,
                 Returns a dictionary with each model's pipeline as value
                 and key = name of the model.
