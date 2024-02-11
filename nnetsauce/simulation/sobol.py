@@ -8,7 +8,7 @@ import numpy as np
 def i4_bit_hi1(n):
     # *****************************************************************************80
     #
-    ## I4_BIT_HI1 returns the position of the high 1 bit base 2 in an integer.
+    # I4_BIT_HI1 returns the position of the high 1 bit base 2 in an integer.
     #
     #  Example:
     #
@@ -70,7 +70,7 @@ def i4_bit_hi1(n):
 def i4_bit_lo0(n):
     # *****************************************************************************80
     #
-    ## I4_BIT_LO0 returns the position of the low 0 bit base 2 in an integer.
+    # I4_BIT_LO0 returns the position of the low 0 bit base 2 in an integer.
     #
     #  Example:
     #
@@ -133,7 +133,7 @@ def i4_bit_lo0(n):
 def i4_sobol_generate(m, n, skip):
     # *****************************************************************************80
     #
-    ## I4_SOBOL_GENERATE generates a Sobol dataset.
+    # I4_SOBOL_GENERATE generates a Sobol dataset.
     #
     # 	Licensing:
     #
@@ -168,7 +168,7 @@ def i4_sobol_generate(m, n, skip):
 def i4_sobol(dim_num, seed):
     # *****************************************************************************80
     #
-    ## I4_SOBOL generates a new quasirandom Sobol vector with each call.
+    # I4_SOBOL generates a new quasirandom Sobol vector with each call.
     #
     # 	Discussion:
     #
@@ -13663,7 +13663,7 @@ def i4_sobol(dim_num, seed):
 def i4_uniform(a, b, seed):
     # *****************************************************************************80
     #
-    ## I4_UNIFORM returns a scaled pseudorandom I4.
+    # I4_UNIFORM returns a scaled pseudorandom I4.
     #
     # 	Discussion:
     #
@@ -13758,7 +13758,7 @@ def i4_uniform(a, b, seed):
 def prime_ge(n):
     # *****************************************************************************80
     #
-    ## PRIME_GE returns the smallest prime greater than or equal to N.
+    # PRIME_GE returns the smallest prime greater than or equal to N.
     #
     #
     # 	Example:
@@ -13807,7 +13807,7 @@ def prime_ge(n):
 def isprime(n):
     # *****************************************************************************80
     #
-    ## IS_PRIME returns True if N is a prime number, False otherwise
+    # IS_PRIME returns True if N is a prime number, False otherwise
     #
     #
     # 	Licensing:

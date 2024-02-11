@@ -107,3 +107,6 @@ site/
 
 # R files
 *.Rhistory
+
+# Others 
+nnetsauce-docs/

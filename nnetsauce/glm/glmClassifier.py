@@ -254,6 +254,7 @@ class GLMClassifier(GLM, ClassifierMixin):
         )
 
         self.beta_ = self.optimizer.results[0]
+        self.classes_ = np.unique(y)
 
         return self
 
@@ -333,7 +334,7 @@ class GLMClassifier(GLM, ClassifierMixin):
         """ Score the model on test set features X and response y. 
 
         Args:
-        
+
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number 
                 of samples and n_features is the number of features
@@ -347,11 +348,11 @@ class GLMClassifier(GLM, ClassifierMixin):
                             'f1_macro', 'f1_weighted',  'f1_samples', \
                             'neg_log_loss', 'precision', 'recall', \
                             'roc_auc')
-            
+
             **kwargs: additional parameters to be passed to scoring functions
-               
+
         Returns: 
-        
+
             model scores: {array-like}
 
         """

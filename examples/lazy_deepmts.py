@@ -30,6 +30,15 @@ df_test = df.iloc[idx_train:idx_end,]
 print(f"----- df_train: {df_train} -----")
 print(f"----- df_train.dtypes: {df_train.dtypes} -----")
 
+regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
+                      lags = 4, n_hidden_features=7, n_clusters=2,
+                      show_progress=False, preprocess=False, 
+                      estimators=["ElasticNetCV", "RidgeCV"])
+models, predictions = regr_mts3.fit(df_train, df_test)
+model_dictionary = regr_mts3.provide_models(df_train, df_test)
+print(models)
+print(model_dictionary["DeepMTS(ElasticNetCV)"])
+
 regr_mts = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
                       lags = 4, n_hidden_features=7, n_clusters=2,
                       show_progress=False, preprocess=False)

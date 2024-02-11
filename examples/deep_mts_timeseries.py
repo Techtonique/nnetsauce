@@ -83,3 +83,27 @@ res3 = obj_MTS.predict()
 print(res3)
 print("\n")
 print(f"obj_MTS.get_params() {obj_MTS.get_params()}")
+
+regr7 = linear_model.ElasticNetCV()
+obj_MTS = ns.DeepMTS(regr7, 
+                     n_layers=2,
+                     lags = 1, 
+                     n_hidden_features=5, 
+                     replications=10, 
+                     kernel='gaussian', 
+                     verbose = 1)
+obj_MTS.fit(df_train, xreg = np.arange(df_train.shape[0]))
+res3 = obj_MTS.predict() 
+print(res3)
+
+regr8 = linear_model.BayesianRidge()
+obj_MTS = ns.DeepMTS(regr8, 
+                     n_layers=2,
+                     lags = 1, 
+                     n_hidden_features=5, 
+                     replications=10, 
+                     kernel='gaussian', 
+                     verbose = 1)
+obj_MTS.fit(df_train, xreg = np.arange(df_train.shape[0]))
+res3 = obj_MTS.predict() 
+print(res3)

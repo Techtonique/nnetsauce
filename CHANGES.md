@@ -1,3 +1,16 @@
+# version 0.17.0
+
+- Attribute `estimators` (a list of `Estimator`'s as strings) for `LazyClassifier`, 
+  `LazyRegressor`, `LazyDeepClassifier`, `LazyDeepRegressor`, `LazyMTS`, and `LazyDeepMTS`
+- New documentation for the package, using `pdoc` (not `pdoc3`)
+- Remove external regressors `xreg` at inference time for `MTS` and `DeepMTS`
+- New class `Downloader`: querying the R universe API for datasets (see 
+  https://thierrymoudiki.github.io/blog/2023/12/25/python/r/misc/mlsauce/runiverse-api2 for similar example in `mlsauce`)
+- Add custom metric to `Lazy*`
+- Rename Deep regressors and classifiers to `Deep*` in `Lazy*`
+- Add attribute `sort_by` to `Lazy*` -- sort the data frame output by a given metric
+- Add attribute `classes_` to classifiers (ensure consistency with sklearn)
+
 # version 0.16.8
 
 - Subsample response by using the **number of rows**, not only a percentage (see [https://thierrymoudiki.github.io/blog/2024/01/22/python/nnetsauce-subsampling](https://thierrymoudiki.github.io/blog/2024/01/22/python/nnetsauce-subsampling))
@@ -18,7 +31,7 @@
 
 - actually implement _deep_ `Estimator`s in [`/deep`](./nnetsauce/deep/) (in addition to [`/lazypredict`](./nnetsauce/lazypredict/))
 - include new multi-output regression-based classifiers (see [https://thierrymoudiki.github.io/blog/2021/09/26/python/quasirandomizednn/classification-using-regression](https://thierrymoudiki.github.io/blog/2021/09/26/python/quasirandomizednn/classification-using-regression) for more details)
-- use proper names for `Estimator`s in [`/lazypredict`](./nnetsauce/lazypredict/)) and [`/deep`](./nnetsauce/deep/)
+- use proper names for `Estimator`s in [`/lazypredict`](./nnetsauce/lazypredict/) and [`/deep`](./nnetsauce/deep/)
 - expose `SubSampler` (stratified subsampling) to the external API 
 
 # version 0.15.0

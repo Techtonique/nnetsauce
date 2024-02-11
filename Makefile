@@ -31,8 +31,7 @@ clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and 
 clean-build: ## remove build artifacts
 	rm -fr build/
 	rm -fr dist/
-	rm -fr .eggs/
-	rm -fr nnetsauce-docs/
+	rm -fr .eggs/	
 	find . -name '*.egg-info' -exec rm -fr {} +
 	find . -name '*.egg' -exec rm -fr {} +
 
@@ -54,15 +53,19 @@ coverage: ## check code coverage quickly with the default Python
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
-docs: install ## generate docs	
-	pip install black --ignore-installed
-	black nnetsauce/* --line-length 80
-	pip install pdoc --ignore-installed
-	pdoc nnetsauce/* --output-dir nnetsauce-docs
+docs: ## generate docs		
+	pip install autopep8 black pdoc 
+	black nnetsauce/* --line-length=80	
+	find nnetsauce/ -name "*.py" -exec autopep8 --max-line-length=80 --in-place {} +
+	pdoc -t docs nnetsauce/* --output-dir nnetsauce-docs
+	find . -name '__pycache__' -exec rm -fr {} +
 
-servedocs: install ## compile the docs watching for change	 
-	pip install pdoc --ignore-installed
-	pdoc nnetsauce/*
+servedocs: ## compile the docs watching for change	 	
+	pip install autopep8 black pdoc 
+	black nnetsauce/* --line-length=80	
+	find nnetsauce/ -name "*.py" -exec autopep8 --max-line-length=80 --in-place {} +
+	pdoc -t docs nnetsauce/* 
+	find . -name '__pycache__' -exec rm -fr {} +
 
 release: dist ## package and upload a release
 	pip install twine --ignore-installed
@@ -76,12 +79,18 @@ dist: clean ## builds source and wheel package
 install: clean ## install the package to the active Python's site-packages
 	python3 -m pip install .
 
-build-site: docs ## export mkdocs website to a folder	
+build-site: docs ## export mkdocs website to a folder		
 	cp -rf nnetsauce-docs/* ../../Pro_Website/Techtonique.github.io/nnetsauce
-	cd ..
+	find . -name '__pycache__' -exec rm -fr {} +
 
 run-examples: ## run all examples with one command
 	find examples -maxdepth 2 -name "*.py" -exec  python3 {} \;
+
+run-mts: ## run all mts examples with one command
+	find examples -maxdepth 2 -name "*mts*.py" -exec  python3 {} \;
+
+run-lazy: ## run all lazy examples with one command
+	find examples -maxdepth 2 -name "lazy*.py" -exec  python3 {} \;
 
 run-tests: ## run all the tests with one command
 	pip install nose2 coverage	

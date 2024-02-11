@@ -78,9 +78,33 @@ MULTITASKCLASSIFIERS = [
     )
 ]
 
+DEEPMULTITASKCLASSIFIERS = [
+    (
+        "DeepMultitaskClassifier(" + est[0] + ")",
+        partial(MultitaskClassifier, obj=est[1]()),
+    )
+    for est in all_estimators()
+    if (
+        issubclass(est[1], RegressorMixin)
+        and (est[0] not in removed_regressors)
+    )
+]
+
 SIMPLEMULTITASKCLASSIFIERS = [
     (
         "SimpleMultitaskClassifier(" + est[0] + ")",
+        partial(SimpleMultitaskClassifier, obj=est[1]()),
+    )
+    for est in all_estimators()
+    if (
+        issubclass(est[1], RegressorMixin)
+        and (est[0] not in removed_regressors)
+    )
+]
+
+DEEPSIMPLEMULTITASKCLASSIFIERS = [
+    (
+        "DeepSimpleMultitaskClassifier(" + est[0] + ")",
         partial(SimpleMultitaskClassifier, obj=est[1]()),
     )
     for est in all_estimators()
@@ -117,7 +141,7 @@ REGRESSORSMTS = [
     )
 ]
 
-REGRESSORSDEEPMTS = [
+DEEPREGRESSORSMTS = [
     ("DeepMTS(" + est[0] + ")", est[1])
     for est in all_estimators()
     if (

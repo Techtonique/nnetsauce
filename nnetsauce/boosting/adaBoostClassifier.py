@@ -87,6 +87,9 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         seed: int
             reproducibility seed for nodes_sim=='uniform'
 
+        verbose: int
+            0 for no output, 1 for a progress bar (default is 1)
+
         method: str
             type of Adaboost method, 'SAMME' (discrete) or 'SAMME.R' (real)
 
@@ -177,6 +180,12 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         method="SAMME",
         backend="cpu",
     ):
+        self.type_fit = "classification"
+        self.verbose = verbose
+        self.method = method
+        self.reg_lambda = reg_lambda
+        self.reg_alpha = reg_alpha
+
         super().__init__(
             obj=obj,
             n_estimators=n_estimators,
@@ -197,12 +206,6 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             seed=seed,
             backend=backend,
         )
-
-        self.type_fit = "classification"
-        self.verbose = verbose
-        self.method = method
-        self.reg_lambda = reg_lambda
-        self.reg_alpha = reg_alpha
 
         self.alpha_ = []
         self.base_learners_ = dict.fromkeys(range(n_estimators))
@@ -323,6 +326,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                 pbar.update(self.n_estimators)
 
             self.n_estimators = len(self.base_learners_)
+            self.classes_ = np.unique(y)
 
             return self
 
@@ -366,6 +370,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                 pbar.update(self.n_estimators)
 
             self.n_estimators = len(self.base_learners_)
+            self.classes_ = np.unique(y)
 
             return self
 

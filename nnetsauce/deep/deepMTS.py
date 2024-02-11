@@ -115,55 +115,56 @@ class DeepMTS(MTS):
 
     Example 1:
 
-    ```python
-    import nnetsauce as ns
-    import numpy as np
-    from sklearn import linear_model
-    np.random.seed(123)
+        ```python
+        import nnetsauce as ns
+        import numpy as np
+        from sklearn import linear_model
+        np.random.seed(123)
 
-    M = np.random.rand(10, 3)
-    M[:,0] = 10*M[:,0]
-    M[:,2] = 25*M[:,2]
-    print(M)
+        M = np.random.rand(10, 3)
+        M[:,0] = 10*M[:,0]
+        M[:,2] = 25*M[:,2]
+        print(M)
 
-    # Adjust Bayesian Ridge
-    regr4 = linear_model.BayesianRidge()
-    obj_DeepMTS = ns.DeepMTS(regr4, lags = 1, n_hidden_features=5)
-    obj_DeepMTS.fit(M)
-    print(obj_DeepMTS.predict())
+        # Adjust Bayesian Ridge
+        regr4 = linear_model.BayesianRidge()
+        obj_DeepMTS = ns.DeepMTS(regr4, lags = 1, n_hidden_features=5)
+        obj_DeepMTS.fit(M)
+        print(obj_DeepMTS.predict())
 
-    # with credible intervals
-    print(obj_DeepMTS.predict(return_std=True, level=80))
+        # with credible intervals
+        print(obj_DeepMTS.predict(return_std=True, level=80))
 
-    print(obj_DeepMTS.predict(return_std=True, level=95))
-    ```
+        print(obj_DeepMTS.predict(return_std=True, level=95))
+        ```
 
     Example 2:
 
-    ```python
-    import nnetsauce as ns
-    import numpy as np
-    from sklearn import linear_model
+        ```python
+        import nnetsauce as ns
+        import numpy as np
+        from sklearn import linear_model
 
-    dataset = {
-    'date' : ['2001-01-01', '2002-01-01', '2003-01-01', '2004-01-01', '2005-01-01'],
-    'series1' : [34, 30, 35.6, 33.3, 38.1],
-    'series2' : [4, 5.5, 5.6, 6.3, 5.1],
-    'series3' : [100, 100.5, 100.6, 100.2, 100.1]}
-    df = pd.DataFrame(dataset).set_index('date')
-    print(df)
+        dataset = {
+        'date' : ['2001-01-01', '2002-01-01', '2003-01-01', '2004-01-01', '2005-01-01'],
+        'series1' : [34, 30, 35.6, 33.3, 38.1],
+        'series2' : [4, 5.5, 5.6, 6.3, 5.1],
+        'series3' : [100, 100.5, 100.6, 100.2, 100.1]}
+        df = pd.DataFrame(dataset).set_index('date')
+        print(df)
 
-    # Adjust Bayesian Ridge
-    regr5 = linear_model.BayesianRidge()
-    obj_DeepMTS = ns.DeepMTS(regr5, lags = 1, n_hidden_features=5)
-    obj_DeepMTS.fit(df)
-    print(obj_DeepMTS.predict())
+        # Adjust Bayesian Ridge
+        regr5 = linear_model.BayesianRidge()
+        obj_DeepMTS = ns.DeepMTS(regr5, lags = 1, n_hidden_features=5)
+        obj_DeepMTS.fit(df)
+        print(obj_DeepMTS.predict())
 
-    # with credible intervals
-    print(obj_DeepMTS.predict(return_std=True, level=80))
+        # with credible intervals
+        print(obj_DeepMTS.predict(return_std=True, level=80))
 
-    print(obj_DeepMTS.predict(return_std=True, level=95))
-    ```
+        print(obj_DeepMTS.predict(return_std=True, level=95))
+        ```
+        
     """
 
     # construct the object -----

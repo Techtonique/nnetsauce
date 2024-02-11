@@ -1,13 +1,14 @@
 from .lmfuncs import beta_hat, inv_penalized_cov
 from .matrixops import (
     cbind,
+    delete_last_columns,
     rbind,
     convert_df_to_numeric,
     crossprod,
     tcrossprod,
     to_np_array,
 )
-from .misc import merge_two_dicts, is_factor
+from .misc import merge_two_dicts, is_factor, tuple_map
 from .model_selection import TimeSeriesSplit
 from .progress_bar import Progbar
 from .psdcheck import isPD, nearestPD
@@ -23,6 +24,7 @@ __all__ = [
     "beta_hat",
     "inv_penalized_cov",
     "cbind",
+    "delete_last_columns",
     "rbind",
     "convert_df_to_numeric",
     "crossprod",
@@ -36,6 +38,7 @@ __all__ = [
     "create_lags",
     "create_train_inputs",
     "reformat_response",
+    "tuple_map",
     "TimeSeriesSplit",
     "Progbar",
 ]

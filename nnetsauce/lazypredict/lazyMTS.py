@@ -2,10 +2,12 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import time
+from sklearn.utils.discovery import all_estimators
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder
 from sklearn.compose import ColumnTransformer
+from sklearn.base import RegressorMixin
 from sklearn.metrics import (
     r2_score,
     mean_squared_error,
@@ -53,23 +55,6 @@ categorical_transformer_high = Pipeline(
 
 
 def get_card_split(df, cols, n=11):
-    """
-    Splits categorical columns into 2 lists based on cardinality (i.e # of unique values)
-    Parameters
-    ----------
-    df : Pandas DataFrame
-        DataFrame from which the cardinality of the columns is calculated.
-    cols : list-like
-        Categorical columns to list
-    n : int, optional (default=11)
-        The value of 'n' will be used to split columns.
-    Returns
-    -------
-    card_low : list-like
-        Columns with cardinality < n
-    card_high : list-like
-        Columns with cardinality >= n
-    """
     cond = df[cols].nunique() > n
     card_high = cols[cond]
     card_low = cols[~cond]
@@ -88,23 +73,51 @@ def adjusted_rsquared(r2, n, p):
 
 class LazyMTS(MTS):
     """
-    This module helps in fitting regression models that are available in Scikit-learn to nnetsauce's MTS
-    Parameters
-    ----------
-    verbose : int, optional (default=0)
-        For the liblinear and lbfgs solvers set verbose to any positive
-        number for verbosity.
-    ignore_warnings : bool, optional (default=True)
-        When set to True, the warning related to algorigms that are not able to run are ignored.
-    custom_metric : function, optional (default=None)
-        When function is provided, models are evaluated based on the custom evaluation metric provided.
-    prediction : bool, optional (default=False)
-        When set to True, the predictions of all the models models are returned as dataframe.
-    regressors : list, optional (default="all")
-        When function is provided, trains the chosen regressor(s).
 
-    Examples
-    --------
+    Fitting -- almost -- all the regression algorithms with layers of
+    nnetsauce's CustomRegressor to multivariate time series
+    and returning their scores.
+
+    Parameters:
+
+        verbose: int, optional (default=0)
+            Any positive number for verbosity.
+
+        ignore_warnings: bool, optional (default=True)
+            When set to True, the warning related to algorigms that are not
+            able to run are ignored.
+
+        custom_metric: function, optional (default=None)
+            When function is provided, models are evaluated based on the custom
+              evaluation metric provided.
+
+        predictions: bool, optional (default=False)
+            When set to True, the predictions of all the models models are returned as dataframe.
+
+        sort_by: string, optional (default='RMSE')
+            Sort models by a metric. Available options are 'RMSE', 'MAE', 'MPL', 'MPE', 'MAPE',
+            'R-Squared', 'Adjusted R-Squared' or a custom metric identified by its name and
+            provided by custom_metric.
+
+        random_state: int, optional (default=42)
+            Reproducibiility seed.
+
+        estimators: list, optional (default='all')
+            list of Estimators (regression algorithms) names or just 'all' (default='all')
+
+        preprocess: bool, preprocessing is done when set to True
+
+        n_jobs : int, when possible, run in parallel
+            For now, only used by individual models that support it.
+
+        n_layers: int, optional (default=3)
+            Number of layers of CustomRegressors to be used.
+
+        All the other parameters are the same as MTS's.
+
+    Examples:
+
+        See https://thierrymoudiki.github.io/blog/2023/10/29/python/quasirandomizednn/MTS-LazyPredict
 
     """
 
@@ -115,7 +128,7 @@ class LazyMTS(MTS):
         custom_metric=None,
         predictions=False,
         random_state=42,
-        regressors="all",
+        estimators="all",
         preprocess=False,
         # MTS attributes
         obj=None,
@@ -144,7 +157,7 @@ class LazyMTS(MTS):
         self.predictions = predictions
         self.models = {}
         self.random_state = random_state
-        self.regressors = regressors
+        self.estimators = estimators
         self.preprocess = preprocess
         super().__init__(
             obj=obj,
@@ -168,22 +181,31 @@ class LazyMTS(MTS):
             show_progress=show_progress,
         )
 
-    def fit(self, X_train, X_test, xreg=None, new_xreg=None, **kwargs):
+    def fit(self, X_train, X_test, xreg=None, **kwargs):
         """Fit Regression algorithms to X_train, predict and score on X_test.
-        Parameters
-        ----------
-        X_train : array-like,
-            Training vectors, where rows is the number of samples
-            and columns is the number of features.
-        X_test : array-like,
-            Testing vectors, where rows is the number of samples
-            and columns is the number of features.
-        Returns
-        -------
-        scores : Pandas DataFrame
-            Returns metrics of all the models in a Pandas DataFrame.
-        predictions : Pandas DataFrame
-            Returns predictions of all the models in a Pandas DataFrame.
+
+        Parameters:
+        
+            X_train: array-like,
+                Training vectors, where rows is the number of samples
+                and columns is the number of features.
+
+            X_test: array-like,
+                Testing vectors, where rows is the number of samples
+                and columns is the number of features.
+            
+            xreg: array-like, optional (default=None)
+                Additional (external) regressors to be passed to self.obj
+                xreg must be in 'increasing' order (most recent observations last)
+
+        Returns:
+
+            scores: Pandas DataFrame
+                Returns metrics of all the models in a Pandas DataFrame.
+
+            predictions: Pandas DataFrame
+                Returns predictions of all the models in a Pandas DataFrame.
+
         """
         R2 = []
         ADJR2 = []
@@ -233,18 +255,17 @@ class LazyMTS(MTS):
                 ]
             )
 
-        if self.regressors == "all":
+        if self.estimators == "all":
             self.regressors = REGRESSORSMTS
         else:
-            try:
-                temp_list = []
-                for regressor in self.regressors:
-                    full_name = (regressor.__name__, regressor)
-                    temp_list.append(full_name)
-                self.regressors = temp_list
-            except Exception as exception:
-                print(exception)
-                print("Invalid Regressor(s)")
+            self.regressors = [
+                ("MTS(" + est[0] + ")", est[1])
+                for est in all_estimators()
+                if (
+                    issubclass(est[1], RegressorMixin)
+                    and (est[0] in self.estimators)
+                )
+            ]
 
         if self.preprocess is True:
             for name, model in tqdm(self.regressors):  # do parallel exec
@@ -318,14 +339,11 @@ class LazyMTS(MTS):
                     # pipe.fit(X_train, xreg=xreg)
 
                     self.models[name] = pipe
-                    if xreg is not None:
-                        assert (
-                            new_xreg is not None
-                        ), "xreg and new_xreg must be provided"
-                    # X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg)
+                    
                     X_pred = pipe["regressor"].predict(
                         h=X_test.shape[0], **kwargs
                     )
+
                     rmse = mean_squared_error(X_test, X_pred, squared=False)
                     mae = mean_absolute_error(X_test, X_pred)
                     mpl = mean_pinball_loss(X_test, X_pred)
@@ -415,15 +433,11 @@ class LazyMTS(MTS):
                             show_progress=self.show_progress,
                         )
 
-                    pipe.fit(X_train, **kwargs)
+                    pipe.fit(X_train, xreg, **kwargs)
                     # pipe.fit(X_train, xreg=xreg) # DO xreg like in `ahead`
 
                     self.models[name] = pipe
-                    if xreg is not None:
-                        assert (
-                            new_xreg is not None
-                        ), "xreg and new_xreg must be provided"
-
+                   
                     if self.preprocess is True:
                         X_pred = pipe["regressor"].predict(
                             h=X_test.shape[0], **kwargs
@@ -501,19 +515,23 @@ class LazyMTS(MTS):
         """
         This function returns all the model objects trained in fit function.
         If fit is not called already, then we call fit and then return the models.
-        Parameters
-        ----------
-        X_train : array-like,
-            Training vectors, where rows is the number of samples
-            and columns is the number of features.
-        X_test : array-like,
-            Testing vectors, where rows is the number of samples
-            and columns is the number of features.
-        Returns
-        -------
-        models: dict-object,
-            Returns a dictionary with each model pipeline as value
-            with key as name of models.
+
+        Parameters:
+        
+            X_train : array-like,
+                Training vectors, where rows is the number of samples
+                and columns is the number of features.
+                
+            X_test : array-like,
+                Testing vectors, where rows is the number of samples
+                and columns is the number of features.
+            
+        Returns:
+        
+            models: dict-object,
+                Returns a dictionary with each model pipeline as value
+                with key as name of models.
+
         """
         if len(self.models.keys()) == 0:
             self.fit(X_train, X_test)

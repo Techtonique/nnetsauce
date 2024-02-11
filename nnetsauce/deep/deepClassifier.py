@@ -12,25 +12,27 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
     """
     Deep Classifier
 
-    Parameters
-    ----------
-    verbose : int, optional (default=0)
-        Monitor progress when fitting.
+    Parameters:
+    
+        verbose : int, optional (default=0)
+            Monitor progress when fitting.
 
-    Examples
-    --------
-    >>> import nnetsauce as ns
-    >>> from sklearn.datasets import load_breast_cancer
-    >>> from sklearn.model_selection import train_test_split
-    >>> from sklearn.linear_model import LogisticRegressionCV
-    >>> data = load_breast_cancer()
-    >>> X = data.data
-    >>> y= data.target
-    >>> X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2, random_state=123)
-    >>> obj = LogisticRegressionCV()
-    >>> clf = ns.DeepClassifier(obj)
-    >>> clf.fit(X_train, y_train)
-    >>> print(clf.score(clf.predict(X_test), y_test))
+    Examples:
+    
+        ```python
+        import nnetsauce as ns
+        from sklearn.datasets import load_breast_cancer
+        from sklearn.model_selection import train_test_split
+        from sklearn.linear_model import LogisticRegressionCV
+        data = load_breast_cancer()
+        X = data.data
+        y= data.target
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2, random_state=123)
+        obj = LogisticRegressionCV()
+        clf = ns.DeepClassifier(obj)
+        clf.fit(X_train, y_train)
+        print(clf.score(clf.predict(X_test), y_test))
+        ```
     """
 
     def __init__(

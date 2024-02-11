@@ -1,15 +1,15 @@
-# Adapted from: https://github.com/shankarpandala/lazypredict
-# Author: Shankar Rao Pandala <shankar.pandala@live.com>
-
 import numpy as np
 import pandas as pd
+from functools import partial
 from tqdm import tqdm
 import time
+from ..multitask import MultitaskClassifier, SimpleMultitaskClassifier
+from sklearn.utils.discovery import all_estimators
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder
 from sklearn.compose import ColumnTransformer
-from sklearn.base import ClassifierMixin
+from sklearn.base import ClassifierMixin, RegressorMixin
 from sklearn.metrics import (
     accuracy_score,
     balanced_accuracy_score,
@@ -57,23 +57,6 @@ categorical_transformer_high = Pipeline(
 
 
 def get_card_split(df, cols, n=11):
-    """
-    Splits categorical columns into 2 lists based on cardinality (i.e # of unique values)
-    Parameters
-    ----------
-    df : Pandas DataFrame
-        DataFrame from which the cardinality of the columns is calculated.
-    cols : list-like
-        Categorical columns to list
-    n : int, optional (default=11)
-        The value of 'n' will be used to split columns.
-    Returns
-    -------
-    card_low : list-like
-        Columns with cardinality < n
-    card_high : list-like
-        Columns with cardinality >= n
-    """
     cond = df[cols].nunique() > n
     card_high = cols[cond]
     card_low = cols[~cond]
@@ -82,35 +65,63 @@ def get_card_split(df, cols, n=11):
 
 class LazyClassifier(Custom, ClassifierMixin):
     """
-    This module helps in fitting to all the classification algorithms that are available in Scikit-learn to nnetsauce's CustomClassifier
-    Parameters
-    ----------
-    verbose : int, optional (default=0)
-        For the liblinear and lbfgs solvers set verbose to any positive
-        number for verbosity.
-    ignore_warnings : bool, optional (default=True)
-        When set to True, the warning related to algorigms that are not able to run are ignored.
-    custom_metric : function, optional (default=None)
-        When function is provided, models are evaluated based on the custom evaluation metric provided.
-    predictions : bool, optional (default=False)
-        When set to True, the predictions of all the models models are returned as dataframe.
-    classifiers : list, optional (default="all")
-        When function is provided, trains the chosen classifier(s).
-    n_jobs : int, when possible, run in parallel
 
-    Examples
-    --------
-    >>> import nnetsauce as ns
-    >>> from sklearn.datasets import load_breast_cancer
-    >>> from sklearn.model_selection import train_test_split
-    >>> data = load_breast_cancer()
-    >>> X = data.data
-    >>> y= data.target
-    >>> X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2, random_state=123)
-    >>> clf = ns.LazyClassifier(verbose=0, ignore_warnings=True, custom_metric=None)
-    >>> models, predictions = clf.fit(X_train, X_test, y_train, y_test)
-    >>> model_dictionary = clf.provide_models(X_train,X_test,y_train,y_test)
-    >>> print(models)
+        Fitting -- almost -- all the classification algorithms with nnetsauce's
+        CustomClassifier and returning their scores.
+
+    Parameters:
+
+        verbose: int, optional (default=0)
+            Any positive number for verbosity.
+
+        ignore_warnings: bool, optional (default=True)
+            When set to True, warnings related to algorithms that were not
+            run are ignored.
+
+        custom_metric: function, optional (default=None)
+            When function is provided, models are evaluated based on the
+            custom evaluation metric provided.
+
+        predictions: bool, optional (default=False)
+            When set to True, the predictions of all the models models are
+            returned as data frame.
+
+        sort_by: string, optional (default='Accuracy')
+            Sort models by a metric. Available options are 'Accuracy',
+            'Balanced Accuracy', 'ROC AUC', 'F1 Score' or a custom metric
+            identified by its name and provided by custom_metric.
+
+        random_state: int, optional (default=42)
+            Reproducibiility seed.
+
+        estimators: list, optional (default='all')
+            list of Estimators names or just 'all' for > 90
+            classifiers (default='all')
+
+        preprocess: bool, preprocessing is done when set to True
+
+        n_jobs: int, when possible, run in parallel
+            For now, only used by individual models that support it.
+
+        All the other parameters are the same as CustomClassifier's.
+
+    Examples:
+
+        ```python
+        import nnetsauce as ns
+        from sklearn.datasets import load_breast_cancer
+        from sklearn.model_selection import train_test_split
+        data = load_breast_cancer()
+        X = data.data
+        y= data.target
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2,
+        random_state=123)
+        clf = ns.LazyClassifier(verbose=0, ignore_warnings=True)
+        models, predictions = clf.fit(X_train, X_test, y_train, y_test)
+        model_dictionary = clf.provide_models(X_train,X_test,y_train,y_test)
+        print(models)
+        ```
+
     """
 
     def __init__(
@@ -119,8 +130,9 @@ class LazyClassifier(Custom, ClassifierMixin):
         ignore_warnings=True,
         custom_metric=None,
         predictions=False,
+        sort_by="Accuracy",
         random_state=42,
-        classifiers="all",
+        estimators="all",
         preprocess=False,
         n_jobs=None,
         # CustomClassifier attributes
@@ -145,9 +157,10 @@ class LazyClassifier(Custom, ClassifierMixin):
         self.ignore_warnings = ignore_warnings
         self.custom_metric = custom_metric
         self.predictions = predictions
+        self.sort_by = sort_by
         self.models = {}
         self.random_state = random_state
-        self.classifiers = classifiers
+        self.estimators = estimators
         self.preprocess = preprocess
         self.n_jobs = n_jobs
         super().__init__(
@@ -170,27 +183,34 @@ class LazyClassifier(Custom, ClassifierMixin):
         )
 
     def fit(self, X_train, X_test, y_train, y_test):
-        """Fit Classification algorithms to X_train and y_train, predict and score on X_test, y_test.
-        Parameters
-        ----------
-        X_train : array-like,
-            Training vectors, where rows is the number of samples
-            and columns is the number of features.
-        X_test : array-like,
-            Testing vectors, where rows is the number of samples
-            and columns is the number of features.
-        y_train : array-like,
-            Training vectors, where rows is the number of samples
-            and columns is the number of features.
-        y_test : array-like,
-            Testing vectors, where rows is the number of samples
-            and columns is the number of features.
-        Returns
-        -------
-        scores : Pandas DataFrame
-            Returns metrics of all the models in a Pandas DataFrame.
-        predictions : Pandas DataFrame
-            Returns predictions of all the models in a Pandas DataFrame.
+        """Fit classifiers to X_train and y_train, predict and score on X_test,
+        y_test.
+
+        Parameters:
+
+            X_train: array-like,
+                Training vectors, where rows is the number of samples
+                and columns is the number of features.
+
+            X_test: array-like,
+                Testing vectors, where rows is the number of samples
+                and columns is the number of features.
+
+            y_train: array-like,
+                Training vectors, where rows is the number of samples
+                and columns is the number of features.
+
+            y_test: array-like,
+                Testing vectors, where rows is the number of samples
+                and columns is the number of features.
+
+        Returns:
+
+            scores: Pandas DataFrame
+                Returns metrics of all the models in a Pandas DataFrame.
+
+            predictions: Pandas DataFrame
+                Returns predictions of all the models in a Pandas DataFrame.
         """
         Accuracy = []
         B_Accuracy = []
@@ -215,6 +235,7 @@ class LazyClassifier(Custom, ClassifierMixin):
         )
 
         if self.preprocess is True:
+
             preprocessor = ColumnTransformer(
                 transformers=[
                     ("numeric", numeric_transformer, numeric_features),
@@ -231,30 +252,51 @@ class LazyClassifier(Custom, ClassifierMixin):
                 ]
             )
 
-        if self.classifiers == "all":
-            self.classifiers = [
-                item
-                for sublist in [
-                    CLASSIFIERS,
-                    MULTITASKCLASSIFIERS,
-                    SIMPLEMULTITASKCLASSIFIERS,
-                ]
-                for item in sublist
-            ]
+        if self.estimators == "all":
 
-        else:
-            try:
-                temp_list = []
-                for classifier in self.classifiers:
-                    full_name = (classifier.__name__, classifier)
-                    temp_list.append(full_name)
-                self.classifiers = temp_list
-            except Exception as exception:
-                print(exception)
-                print("Invalid Classifier(s)")
+            self.classifiers = (
+                CLASSIFIERS + MULTITASKCLASSIFIERS + SIMPLEMULTITASKCLASSIFIERS
+            )
+
+        else:  # list custom estimators, by their names
+
+            self.classifiers = (
+                [
+                    ("CustomClassifier(" + est[0] + ")", est[1])
+                    for est in all_estimators()
+                    if (
+                        issubclass(est[1], ClassifierMixin)
+                        and (est[0] in self.estimators)
+                    )
+                ]
+                + [
+                    (
+                        "MultitaskClassifier(" + est[0] + ")",
+                        partial(MultitaskClassifier, obj=est[1]()),
+                    )
+                    for est in all_estimators()
+                    if (
+                        issubclass(est[1], RegressorMixin)
+                        and (est[0] in self.estimators)
+                    )
+                ]
+                + [
+                    (
+                        "SimpleMultitaskClassifier(" + est[0] + ")",
+                        partial(SimpleMultitaskClassifier, obj=est[1]()),
+                    )
+                    for est in all_estimators()
+                    if (
+                        issubclass(est[1], RegressorMixin)
+                        and (est[0] in self.estimators)
+                    )
+                ]
+            )
 
         if self.preprocess is True:
+
             for name, model in tqdm(self.classifiers):  # do parallel exec
+
                 other_args = (
                     {}
                 )  # use this trick for `random_state` too --> refactor
@@ -300,7 +342,6 @@ class LazyClassifier(Custom, ClassifierMixin):
                                 ),
                             ]
                         )
-
                     else:
                         pipe = Pipeline(
                             [
@@ -384,7 +425,8 @@ class LazyClassifier(Custom, ClassifierMixin):
                 finally:
                     continue
 
-        else:
+        else:  # if self.preprocess is True:
+
             for name, model in tqdm(self.classifiers):  # do parallel exec
                 other_args = (
                     {}
@@ -519,7 +561,7 @@ class LazyClassifier(Custom, ClassifierMixin):
                     "Time Taken": TIME,
                 }
             )
-        scores = scores.sort_values(by="Accuracy", ascending=False).set_index(
+        scores = scores.sort_values(by=self.sort_by, ascending=False).set_index(
             "Model"
         )
 
@@ -528,28 +570,32 @@ class LazyClassifier(Custom, ClassifierMixin):
         return scores, predictions_df if self.predictions is True else scores
 
     def provide_models(self, X_train, X_test, y_train, y_test):
-        """
-        This function returns all the model objects trained in fit function.
-        If fit is not called already, then we call fit and then return the models.
-        Parameters
-        ----------
-        X_train : array-like,
+        """Returns all the model objects trained. If fit hasn't been called yet,
+        then it's called to return the models.
+
+        Parameters:
+
+        X_train: array-like,
             Training vectors, where rows is the number of samples
             and columns is the number of features.
-        X_test : array-like,
+
+        X_test: array-like,
             Testing vectors, where rows is the number of samples
             and columns is the number of features.
-        y_train : array-like,
+
+        y_train: array-like,
             Training vectors, where rows is the number of samples
             and columns is the number of features.
-        y_test : array-like,
+
+        y_test: array-like,
             Testing vectors, where rows is the number of samples
             and columns is the number of features.
-        Returns
-        -------
-        models: dict-object,
-            Returns a dictionary with each model pipeline as value
-            with key as name of models.
+
+        Returns:
+
+            models: dict-object,
+                Returns a dictionary with each model's pipeline as value
+                and key = name of the model.
         """
         if len(self.models.keys()) == 0:
             self.fit(X_train, X_test, y_train, y_test)
