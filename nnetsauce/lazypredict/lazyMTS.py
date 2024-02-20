@@ -185,7 +185,7 @@ class LazyMTS(MTS):
         """Fit Regression algorithms to X_train, predict and score on X_test.
 
         Parameters:
-        
+
             X_train: array-like,
                 Training vectors, where rows is the number of samples
                 and columns is the number of features.
@@ -193,7 +193,7 @@ class LazyMTS(MTS):
             X_test: array-like,
                 Testing vectors, where rows is the number of samples
                 and columns is the number of features.
-            
+
             xreg: array-like, optional (default=None)
                 Additional (external) regressors to be passed to self.obj
                 xreg must be in 'increasing' order (most recent observations last)
@@ -339,7 +339,7 @@ class LazyMTS(MTS):
                     # pipe.fit(X_train, xreg=xreg)
 
                     self.models[name] = pipe
-                    
+
                     X_pred = pipe["regressor"].predict(
                         h=X_test.shape[0], **kwargs
                     )
@@ -437,7 +437,7 @@ class LazyMTS(MTS):
                     # pipe.fit(X_train, xreg=xreg) # DO xreg like in `ahead`
 
                     self.models[name] = pipe
-                   
+
                     if self.preprocess is True:
                         X_pred = pipe["regressor"].predict(
                             h=X_test.shape[0], **kwargs
@@ -517,17 +517,17 @@ class LazyMTS(MTS):
         If fit is not called already, then we call fit and then return the models.
 
         Parameters:
-        
+
             X_train : array-like,
                 Training vectors, where rows is the number of samples
                 and columns is the number of features.
-                
+
             X_test : array-like,
                 Testing vectors, where rows is the number of samples
                 and columns is the number of features.
-            
+
         Returns:
-        
+
             models: dict-object,
                 Returns a dictionary with each model pipeline as value
                 with key as name of models.

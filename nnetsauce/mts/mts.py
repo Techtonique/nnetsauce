@@ -272,9 +272,11 @@ class MTS(Base):
             self: object
         """
 
-        if isinstance(X, pd.DataFrame) is False:  # input data set is a numpy array
-            
-            if xreg is None:                
+        if (
+            isinstance(X, pd.DataFrame) is False
+        ):  # input data set is a numpy array
+
+            if xreg is None:
                 X = pd.DataFrame(X)
                 self.series_names = [
                     "series" + str(i) for i in range(X.shape[1])
@@ -282,7 +284,7 @@ class MTS(Base):
             else:  # xreg is not None
                 X = mo.cbind(X, xreg)
                 self.xreg_ = xreg
-        
+
         else:  # input data set is a DataFrame with column names
 
             X_index = None
@@ -496,7 +498,7 @@ class MTS(Base):
             if self.kde_ is None:
                 return self.mean_
 
-            # if "return_std" not in kwargs and self.kde_ is not None            
+            # if "return_std" not in kwargs and self.kde_ is not None
             meanf = []
             lower = []
             upper = []
@@ -506,7 +508,7 @@ class MTS(Base):
                     self.mean_ + self.residuals_sims_[i]
                     for i in tqdm(range(self.replications))
                 )
-            )            
+            )
 
             DescribeResult = namedtuple(
                 "DescribeResult", ("mean", "sims", "lower", "upper")
@@ -539,15 +541,15 @@ class MTS(Base):
                 columns=self.series_names,  # self.df_.columns,
                 index=self.output_dates_,
             )
-            
+
             res = DescribeResult(
                 self.mean_, self.sims_, self.lower_, self.upper_
-            )            
+            )
 
-            if self.xreg_ is not None:                
+            if self.xreg_ is not None:
 
                 if len(self.xreg_.shape) > 1:
-                                        
+
                     res2 = mx.tuple_map(
                         res,
                         lambda x: mo.delete_last_columns(
@@ -556,17 +558,16 @@ class MTS(Base):
                     )
 
                 else:
-                    
+
                     res2 = mx.tuple_map(
                         res, lambda x: mo.delete_last_columns(x, num_columns=1)
-                    )       
+                    )
 
-                return res2 
-            
-            else: 
+                return res2
+
+            else:
 
                 return res
-            
 
         if "return_std" in kwargs:
             DescribeResult = namedtuple(
@@ -593,7 +594,7 @@ class MTS(Base):
                 index=self.output_dates_,
             )
             res = DescribeResult(self.mean_, self.lower_, self.upper_)
-            
+
             if self.xreg_ is not None:
                 if len(self.xreg_.shape) > 1:
                     res2 = mx.tuple_map(
@@ -601,7 +602,7 @@ class MTS(Base):
                         lambda x: mo.delete_last_columns(
                             x, num_columns=self.xreg_.shape[1]
                         ),
-                    )                
+                    )
                 else:
                     res2 = mx.tuple_map(
                         res, lambda x: mo.delete_last_columns(x, num_columns=1)

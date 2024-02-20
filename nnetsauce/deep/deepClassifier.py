@@ -13,12 +13,12 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
     Deep Classifier
 
     Parameters:
-    
+
         verbose : int, optional (default=0)
             Monitor progress when fitting.
 
     Examples:
-    
+
         ```python
         import nnetsauce as ns
         from sklearn.datasets import load_breast_cancer

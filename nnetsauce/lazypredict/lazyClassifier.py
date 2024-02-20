@@ -425,7 +425,7 @@ class LazyClassifier(Custom, ClassifierMixin):
                 finally:
                     continue
 
-        else:  # if self.preprocess is True:
+        else:  # if self.preprocess is False:
 
             for name, model in tqdm(self.classifiers):  # do parallel exec
                 other_args = (

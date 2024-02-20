@@ -137,6 +137,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         sort_by="Accuracy",
         random_state=42,
         estimators="all",
+        preprocess=False,
         n_jobs=None,
         # Defining depth
         n_layers=3,
@@ -166,6 +167,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         self.models = {}
         self.random_state = random_state
         self.estimators = estimators
+        self.preprocess = preprocess
         self.n_layers = n_layers - 1
         self.n_jobs = n_jobs
         super().__init__(
@@ -238,6 +240,23 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         categorical_low, categorical_high = get_card_split(
             X_train, categorical_features
         )
+        
+        if self.preprocess is True:
+            preprocessor = ColumnTransformer(
+                transformers=[
+                    ("numeric", numeric_transformer, numeric_features),
+                    (
+                        "categorical_low",
+                        categorical_transformer_low,
+                        categorical_low,
+                    ),
+                    (
+                        "categorical_high",
+                        categorical_transformer_high,
+                        categorical_high,
+                    ),
+                ]
+            )
 
         if self.estimators == "all":
             self.classifiers = [
@@ -282,8 +301,153 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                     )
                 ]
             )
+        
+        if self.preprocess is True:
+          
+          for name, model in tqdm(self.classifiers):  # do parallel exec
+            
+            other_args = (
+                    {}
+                )  # use this trick for `random_state` too --> refactor
+            try:
+                if (
+                    "n_jobs" in model().get_params().keys()
+                    and name.find("LogisticRegression") == -1
+                ):
+                    other_args["n_jobs"] = self.n_jobs
+            except Exception:
+                pass
+                  
+            start = time.time()
+            
+            try:
+                if "random_state" in model().get_params().keys():
+                    layer_clf = CustomClassifier(
+                        obj=model(random_state=self.random_state),
+                        n_hidden_features=self.n_hidden_features,
+                        activation_name=self.activation_name,
+                        a=self.a,
+                        nodes_sim=self.nodes_sim,
+                        bias=self.bias,
+                        dropout=self.dropout,
+                        direct_link=self.direct_link,
+                        n_clusters=self.n_clusters,
+                        cluster_encode=self.cluster_encode,
+                        type_clust=self.type_clust,
+                        type_scaling=self.type_scaling,
+                        col_sample=self.col_sample,
+                        row_sample=self.row_sample,
+                        seed=self.seed,
+                        backend=self.backend,
+                    )
 
-        for name, model in tqdm(self.classifiers):  # do parallel exec
+                else:
+                    layer_clf = CustomClassifier(
+                        obj=model(),
+                        n_hidden_features=self.n_hidden_features,
+                        activation_name=self.activation_name,
+                        a=self.a,
+                        nodes_sim=self.nodes_sim,
+                        bias=self.bias,
+                        dropout=self.dropout,
+                        direct_link=self.direct_link,
+                        n_clusters=self.n_clusters,
+                        cluster_encode=self.cluster_encode,
+                        type_clust=self.type_clust,
+                        type_scaling=self.type_scaling,
+                        col_sample=self.col_sample,
+                        row_sample=self.row_sample,
+                        seed=self.seed,
+                        backend=self.backend,
+                    )
+
+                layer_clf.fit(X_train, y_train)
+
+                for _ in range(self.n_layers):
+                    layer_clf = deepcopy(
+                        CustomClassifier(
+                            obj=layer_clf,
+                            n_hidden_features=self.n_hidden_features,
+                            activation_name=self.activation_name,
+                            a=self.a,
+                            nodes_sim=self.nodes_sim,
+                            bias=self.bias,
+                            dropout=self.dropout,
+                            direct_link=self.direct_link,
+                            n_clusters=self.n_clusters,
+                            cluster_encode=self.cluster_encode,
+                            type_clust=self.type_clust,
+                            type_scaling=self.type_scaling,
+                            col_sample=self.col_sample,
+                            row_sample=self.row_sample,
+                            seed=self.seed,
+                            backend=self.backend,
+                        )
+                    )
+
+                pipe = Pipeline(
+                            [
+                                ("preprocessor", preprocessor),
+                                ("classifier", layer_clf),
+                            ])
+
+                pipe.fit(X_train, y_train)
+                self.models[name] = pipe
+                y_pred = pipe.predict(X_test)
+                accuracy = accuracy_score(y_test, y_pred, normalize=True)
+                b_accuracy = balanced_accuracy_score(y_test, y_pred)
+                f1 = f1_score(y_test, y_pred, average="weighted")
+                try:
+                    roc_auc = roc_auc_score(y_test, y_pred)
+                except Exception as exception:
+                    roc_auc = None
+                    if self.ignore_warnings is False:
+                        print("ROC AUC couldn't be calculated for " + name)
+                        print(exception)
+                names.append(name)
+                Accuracy.append(accuracy)
+                B_Accuracy.append(b_accuracy)
+                ROC_AUC.append(roc_auc)
+                F1.append(f1)
+                TIME.append(time.time() - start)
+                if self.custom_metric is not None:
+                    custom_metric = self.custom_metric(y_test, y_pred)
+                    CUSTOM_METRIC.append(custom_metric)
+                if self.verbose > 0:
+                    if self.custom_metric is not None:
+                        print(
+                            {
+                                "Model": name,
+                                "Accuracy": accuracy,
+                                "Balanced Accuracy": b_accuracy,
+                                "ROC AUC": roc_auc,
+                                "F1 Score": f1,
+                                self.custom_metric.__name__: custom_metric,
+                                "Time taken": time.time() - start,
+                            }
+                        )
+                    else:
+                        print(
+                            {
+                                "Model": name,
+                                "Accuracy": accuracy,
+                                "Balanced Accuracy": b_accuracy,
+                                "ROC AUC": roc_auc,
+                                "F1 Score": f1,
+                                "Time taken": time.time() - start,
+                            }
+                        )
+                if self.predictions:
+                    predictions[name] = y_pred
+            except Exception as exception:
+                if self.ignore_warnings is False:
+                    print(name + " model failed to execute")
+                    print(exception)
+
+        
+        else: # no preprocessing
+
+          for name, model in tqdm(self.classifiers):  # do parallel exec
             start = time.time()
             try:
                 if "random_state" in model().get_params().keys():

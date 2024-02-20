@@ -164,7 +164,7 @@ class DeepMTS(MTS):
 
         print(obj_DeepMTS.predict(return_std=True, level=95))
         ```
-        
+
     """
 
     # construct the object -----

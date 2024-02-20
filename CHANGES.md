@@ -1,3 +1,7 @@
+# version 0.17.1
+
+- `preprocess`ing for all `LazyDeep*`
+
 # version 0.17.0
 
 - Attribute `estimators` (a list of `Estimator`'s as strings) for `LazyClassifier`, 

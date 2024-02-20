@@ -93,7 +93,8 @@ class LazyRegressor(Custom, RegressorMixin):
         estimators: list, optional (default='all')
             a list of Estimators names or just 'all' (default='all')
 
-        preprocess: bool, preprocessing is done when set to True
+        preprocess: bool
+            preprocessing is done when set to True
 
         n_jobs : int, when possible, run in parallel
             For now, only used by individual models that support it.

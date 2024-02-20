@@ -198,7 +198,7 @@ class LazyDeepMTS(MTS):
             X_test : array-like,
                 Testing vectors, where rows is the number of samples
                 and columns is the number of features.
-            
+
             xreg: {array-like}, shape = [n_samples, n_features_xreg]
                 Additional (external) regressors to be passed to self.obj
                 xreg must be in 'increasing' order (most recent observations last)

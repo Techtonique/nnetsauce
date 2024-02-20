@@ -1,6 +1,3 @@
-# Adapted from: https://github.com/shankarpandala/lazypredict
-# Author: Shankar Rao Pandala <shankar.pandala@live.com>
-
 import numpy as np
 import pandas as pd
 from copy import deepcopy
@@ -74,34 +71,43 @@ class LazyDeepRegressor(Custom, RegressorMixin):
 
         verbose: int, optional (default=0)
             Any positive number for verbosity.
+
         ignore_warnings: bool, optional (default=True)
             When set to True, the warning related to algorigms that are not able to run are ignored.
+
         custom_metric: function, optional (default=None)
             When function is provided, models are evaluated based on the custom evaluation metric provided.
+
         predictions: bool, optional (default=False)
             When set to True, the predictions of all the models models are returned as dataframe.
+
         sort_by: string, optional (default='Accuracy')
             Sort models by a metric. Available options are 'Accuracy', 'Balanced Accuracy', 'ROC AUC', 'F1 Score'
             or a custom metric identified by its name and provided by custom_metric.
+
         random_state: int, optional (default=42)
             Reproducibiility seed.
+
         estimators: list, optional (default='all')
             list of Estimators names or just 'all' (default='all')
-        preprocess: bool, preprocessing is done when set to True
+
+        preprocess: bool 
+            preprocessing is done when set to True
+
         n_jobs : int, when possible, run in parallel
             For now, only used by individual models that support it.
+
         n_layers: int, optional (default=3)
             Number of layers of CustomRegressors to be used.
 
         All the other parameters are the same as CustomRegressor's.
-
 
     Examples:
 
         import nnetsauce as ns
         import numpy as np
         from sklearn import datasets
-        from sklearn.utils import shuffle        
+        from sklearn.utils import shuffle
 
         diabetes = datasets.load_diabetes()
         X, y = shuffle(diabetes.data, diabetes.target, random_state=13)
@@ -125,6 +131,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         predictions=False,
         random_state=42,
         estimators="all",
+        preprocess=False,
         n_jobs=None,
         # Defining depth
         n_layers=3,
@@ -153,6 +160,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         self.models = {}
         self.random_state = random_state
         self.estimators = estimators
+        self.preprocess = preprocess
         self.n_layers = n_layers - 1
         self.n_jobs = n_jobs
         super().__init__(
@@ -226,6 +234,23 @@ class LazyDeepRegressor(Custom, RegressorMixin):
             X_train, categorical_features
         )
 
+        if self.preprocess is True:
+            preprocessor = ColumnTransformer(
+                transformers=[
+                    ("numeric", numeric_transformer, numeric_features),
+                    (
+                        "categorical_low",
+                        categorical_transformer_low,
+                        categorical_low,
+                    ),
+                    (
+                        "categorical_high",
+                        categorical_transformer_high,
+                        categorical_high,
+                    ),
+                ]
+            )
+
         if self.estimators == "all":
             self.regressors = DEEPREGRESSORS
         else:
@@ -238,54 +263,14 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                 )
             ]
 
-        for name, model in tqdm(self.regressors):  # do parallel exec
-            start = time.time()
-            try:
-                if "random_state" in model().get_params().keys():
-                    layer_regr = CustomRegressor(
-                        obj=model(random_state=self.random_state),
-                        n_hidden_features=self.n_hidden_features,
-                        activation_name=self.activation_name,
-                        a=self.a,
-                        nodes_sim=self.nodes_sim,
-                        bias=self.bias,
-                        dropout=self.dropout,
-                        direct_link=self.direct_link,
-                        n_clusters=self.n_clusters,
-                        cluster_encode=self.cluster_encode,
-                        type_clust=self.type_clust,
-                        type_scaling=self.type_scaling,
-                        col_sample=self.col_sample,
-                        row_sample=self.row_sample,
-                        seed=self.seed,
-                        backend=self.backend,
-                    )
-                else:
-                    layer_regr = CustomRegressor(
-                        obj=model(),
-                        n_hidden_features=self.n_hidden_features,
-                        activation_name=self.activation_name,
-                        a=self.a,
-                        nodes_sim=self.nodes_sim,
-                        bias=self.bias,
-                        dropout=self.dropout,
-                        direct_link=self.direct_link,
-                        n_clusters=self.n_clusters,
-                        cluster_encode=self.cluster_encode,
-                        type_clust=self.type_clust,
-                        type_scaling=self.type_scaling,
-                        col_sample=self.col_sample,
-                        row_sample=self.row_sample,
-                        seed=self.seed,
-                        backend=self.backend,
-                    )
-
-                layer_regr.fit(X_train, y_train)
-
-                for _ in range(self.n_layers):
-                    layer_regr = deepcopy(
-                        CustomRegressor(
-                            obj=layer_regr,
+        if self.preprocess is True:
+            
+            for name, model in tqdm(self.regressors):  # do parallel exec
+                start = time.time()
+                try:
+                    if "random_state" in model().get_params().keys():
+                        layer_regr = CustomRegressor(
+                            obj=model(random_state=self.random_state),
                             n_hidden_features=self.n_hidden_features,
                             activation_name=self.activation_name,
                             a=self.a,
@@ -302,52 +287,207 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                             seed=self.seed,
                             backend=self.backend,
                         )
-                    )
+                    else:
+                        layer_regr = CustomRegressor(
+                            obj=model(),
+                            n_hidden_features=self.n_hidden_features,
+                            activation_name=self.activation_name,
+                            a=self.a,
+                            nodes_sim=self.nodes_sim,
+                            bias=self.bias,
+                            dropout=self.dropout,
+                            direct_link=self.direct_link,
+                            n_clusters=self.n_clusters,
+                            cluster_encode=self.cluster_encode,
+                            type_clust=self.type_clust,
+                            type_scaling=self.type_scaling,
+                            col_sample=self.col_sample,
+                            row_sample=self.row_sample,
+                            seed=self.seed,
+                            backend=self.backend,
+                        )                    
 
-                    # layer_regr.fit(X_train, y_train)
-
-                layer_regr.fit(X_train, y_train)
-
-                self.models[name] = layer_regr
-                y_pred = layer_regr.predict(X_test)
-
-                r_squared = r2_score(y_test, y_pred)
-                adj_rsquared = adjusted_rsquared(
-                    r_squared, X_test.shape[0], X_test.shape[1]
-                )
-                rmse = mean_squared_error(y_test, y_pred, squared=False)
-
-                names.append(name)
-                R2.append(r_squared)
-                ADJR2.append(adj_rsquared)
-                RMSE.append(rmse)
-                TIME.append(time.time() - start)
-
-                if self.custom_metric:
-                    custom_metric = self.custom_metric(y_test, y_pred)
-                    CUSTOM_METRIC.append(custom_metric)
-
-                if self.verbose > 0:
-                    scores_verbose = {
-                        "Model": name,
-                        "R-Squared": r_squared,
-                        "Adjusted R-Squared": adj_rsquared,
-                        "RMSE": rmse,
-                        "Time taken": time.time() - start,
-                    }
-
-                    if self.custom_metric:
-                        scores_verbose[self.custom_metric.__name__] = (
-                            custom_metric
+                    for _ in range(self.n_layers):
+                        layer_regr = deepcopy(
+                            CustomRegressor(
+                                obj=layer_regr,
+                                n_hidden_features=self.n_hidden_features,
+                                activation_name=self.activation_name,
+                                a=self.a,
+                                nodes_sim=self.nodes_sim,
+                                bias=self.bias,
+                                dropout=self.dropout,
+                                direct_link=self.direct_link,
+                                n_clusters=self.n_clusters,
+                                cluster_encode=self.cluster_encode,
+                                type_clust=self.type_clust,
+                                type_scaling=self.type_scaling,
+                                col_sample=self.col_sample,
+                                row_sample=self.row_sample,
+                                seed=self.seed,
+                                backend=self.backend,
+                            )
                         )
 
-                    print(scores_verbose)
-                if self.predictions:
-                    predictions[name] = y_pred
-            except Exception as exception:
-                if self.ignore_warnings is False:
-                    print(name + " model failed to execute")
-                    print(exception)
+                    layer_regr.fit(X_train, y_train)
+
+                    pipe = Pipeline(steps=[("preprocessor", preprocessor),
+                                ("regressor", layer_regr)])
+                    
+                    pipe.fit(X_train, y_train)
+
+                    self.models[name] = pipe
+                    y_pred = pipe.predict(X_test)
+                    r_squared = r2_score(y_test, y_pred)
+                    adj_rsquared = adjusted_rsquared(
+                        r_squared, X_test.shape[0], X_test.shape[1]
+                    )
+                    rmse = mean_squared_error(y_test, y_pred, squared=False)
+
+                    names.append(name)
+                    R2.append(r_squared)
+                    ADJR2.append(adj_rsquared)
+                    RMSE.append(rmse)
+                    TIME.append(time.time() - start)
+
+                    if self.custom_metric:
+                        custom_metric = self.custom_metric(y_test, y_pred)
+                        CUSTOM_METRIC.append(custom_metric)
+
+                    if self.verbose > 0:
+                        scores_verbose = {
+                            "Model": name,
+                            "R-Squared": r_squared,
+                            "Adjusted R-Squared": adj_rsquared,
+                            "RMSE": rmse,
+                            "Time taken": time.time() - start,
+                        }
+
+                        if self.custom_metric:
+                            scores_verbose[self.custom_metric.__name__] = (
+                                custom_metric
+                            )
+
+                        print(scores_verbose)
+                    if self.predictions:
+                        predictions[name] = y_pred
+                except Exception as exception:
+                    if self.ignore_warnings is False:
+                        print(name + " model failed to execute")
+                        print(exception)
+
+        else: # no preprocessing
+
+            for name, model in tqdm(self.regressors):  # do parallel exec
+                start = time.time()
+                try:
+                    if "random_state" in model().get_params().keys():
+                        layer_regr = CustomRegressor(
+                            obj=model(random_state=self.random_state),
+                            n_hidden_features=self.n_hidden_features,
+                            activation_name=self.activation_name,
+                            a=self.a,
+                            nodes_sim=self.nodes_sim,
+                            bias=self.bias,
+                            dropout=self.dropout,
+                            direct_link=self.direct_link,
+                            n_clusters=self.n_clusters,
+                            cluster_encode=self.cluster_encode,
+                            type_clust=self.type_clust,
+                            type_scaling=self.type_scaling,
+                            col_sample=self.col_sample,
+                            row_sample=self.row_sample,
+                            seed=self.seed,
+                            backend=self.backend,
+                        )
+                    else:
+                        layer_regr = CustomRegressor(
+                            obj=model(),
+                            n_hidden_features=self.n_hidden_features,
+                            activation_name=self.activation_name,
+                            a=self.a,
+                            nodes_sim=self.nodes_sim,
+                            bias=self.bias,
+                            dropout=self.dropout,
+                            direct_link=self.direct_link,
+                            n_clusters=self.n_clusters,
+                            cluster_encode=self.cluster_encode,
+                            type_clust=self.type_clust,
+                            type_scaling=self.type_scaling,
+                            col_sample=self.col_sample,
+                            row_sample=self.row_sample,
+                            seed=self.seed,
+                            backend=self.backend,
+                        )
+
+                    layer_regr.fit(X_train, y_train)
+
+                    for _ in range(self.n_layers):
+                        layer_regr = deepcopy(
+                            CustomRegressor(
+                                obj=layer_regr,
+                                n_hidden_features=self.n_hidden_features,
+                                activation_name=self.activation_name,
+                                a=self.a,
+                                nodes_sim=self.nodes_sim,
+                                bias=self.bias,
+                                dropout=self.dropout,
+                                direct_link=self.direct_link,
+                                n_clusters=self.n_clusters,
+                                cluster_encode=self.cluster_encode,
+                                type_clust=self.type_clust,
+                                type_scaling=self.type_scaling,
+                                col_sample=self.col_sample,
+                                row_sample=self.row_sample,
+                                seed=self.seed,
+                                backend=self.backend,
+                            )
+                        )
+
+                        # layer_regr.fit(X_train, y_train)
+
+                    layer_regr.fit(X_train, y_train)
+
+                    self.models[name] = layer_regr
+                    y_pred = layer_regr.predict(X_test)
+
+                    r_squared = r2_score(y_test, y_pred)
+                    adj_rsquared = adjusted_rsquared(
+                        r_squared, X_test.shape[0], X_test.shape[1]
+                    )
+                    rmse = mean_squared_error(y_test, y_pred, squared=False)
+
+                    names.append(name)
+                    R2.append(r_squared)
+                    ADJR2.append(adj_rsquared)
+                    RMSE.append(rmse)
+                    TIME.append(time.time() - start)
+
+                    if self.custom_metric:
+                        custom_metric = self.custom_metric(y_test, y_pred)
+                        CUSTOM_METRIC.append(custom_metric)
+
+                    if self.verbose > 0:
+                        scores_verbose = {
+                            "Model": name,
+                            "R-Squared": r_squared,
+                            "Adjusted R-Squared": adj_rsquared,
+                            "RMSE": rmse,
+                            "Time taken": time.time() - start,
+                        }
+
+                        if self.custom_metric:
+                            scores_verbose[self.custom_metric.__name__] = (
+                                custom_metric
+                            )
+
+                        print(scores_verbose)
+                    if self.predictions:
+                        predictions[name] = y_pred
+                except Exception as exception:
+                    if self.ignore_warnings is False:
+                        print(name + " model failed to execute")
+                        print(exception)
 
         scores = {
             "Model": names,
