@@ -1,3 +1,7 @@
+# version 0.17.2
+
+- `self.n_classes_ = len(np.unique(y))` # for compatibility with sklearn 
+
 # version 0.17.1
 
 - `preprocess`ing for all `LazyDeep*`

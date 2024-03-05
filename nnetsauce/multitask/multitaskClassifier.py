@@ -189,6 +189,8 @@ class MultitaskClassifier(Base, ClassifierMixin):
 
         assert mx.is_factor(y), "y must contain only integers"
 
+        self.n_classes_ = len(np.unique(y)) # for compatibility with sklearn 
+
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
         self.n_classes_ = len(np.unique(y))

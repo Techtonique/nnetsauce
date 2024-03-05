@@ -91,7 +91,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         estimators: list, optional (default='all')
             list of Estimators names or just 'all' (default='all')
 
-        preprocess: bool 
+        preprocess: bool
             preprocessing is done when set to True
 
         n_jobs : int, when possible, run in parallel
@@ -264,7 +264,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
             ]
 
         if self.preprocess is True:
-            
+
             for name, model in tqdm(self.regressors):  # do parallel exec
                 start = time.time()
                 try:
@@ -305,7 +305,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                             row_sample=self.row_sample,
                             seed=self.seed,
                             backend=self.backend,
-                        )                    
+                        )
 
                     for _ in range(self.n_layers):
                         layer_regr = deepcopy(
@@ -331,9 +331,13 @@ class LazyDeepRegressor(Custom, RegressorMixin):
 
                     layer_regr.fit(X_train, y_train)
 
-                    pipe = Pipeline(steps=[("preprocessor", preprocessor),
-                                ("regressor", layer_regr)])
-                    
+                    pipe = Pipeline(
+                        steps=[
+                            ("preprocessor", preprocessor),
+                            ("regressor", layer_regr),
+                        ]
+                    )
+
                     pipe.fit(X_train, y_train)
 
                     self.models[name] = pipe
@@ -376,7 +380,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                         print(name + " model failed to execute")
                         print(exception)
 
-        else: # no preprocessing
+        else:  # no preprocessing
 
             for name, model in tqdm(self.regressors):  # do parallel exec
                 start = time.time()

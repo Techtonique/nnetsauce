@@ -248,6 +248,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         # training
         n, p = X.shape
         self.n_classes = len(np.unique(y))
+        self.n_classes_ = len(np.unique(y)) # for compatibility with sklearn 
 
         if sample_weight is None:
             w_m = np.repeat(1.0 / n, n)

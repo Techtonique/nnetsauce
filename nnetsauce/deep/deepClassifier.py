@@ -101,6 +101,8 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         if isinstance(X, np.ndarray):
             X = pd.DataFrame(X)
 
+        self.n_classes_ = len(np.unique(y)) # for compatibility with sklearn 
+        
         # init layer
         self.stacked_obj = CustomClassifier(
             obj=self.stacked_obj,

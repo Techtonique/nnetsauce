@@ -200,6 +200,8 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
         assert mx.is_factor(y), "y must contain only integers"
 
+        self.n_classes_ = len(np.unique(y)) # for compatibility with sklearn 
+
         # training
         self.n_classes = len(np.unique(y))
 
