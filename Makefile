@@ -92,9 +92,9 @@ run-mts: ## run all mts examples with one command
 run-lazy: ## run all lazy examples with one command
 	find examples -maxdepth 2 -name "lazy*.py" -exec  python3 {} \;
 
-run-tests: ## run all the tests with one command
-	pip install nose2 coverage	
-	nose2 -v --with-coverage
-	coverage report -m
-	coverage html
+run-tests: install ## run all the tests with one command
+	pip install coverage
+	python3 -m coverage run -m unittest discover -s nnetsauce/tests -p "*.py"
+	python3 -m coverage report --omit="venv/*,nnetsauce/tests/*"
+	python3 -m coverage html --omit="venv/*,nnetsauce/tests/*"
 	$(BROWSER) htmlcov/index.html

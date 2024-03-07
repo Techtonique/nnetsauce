@@ -40,7 +40,7 @@ def dosubsample(y, row_sample=0.8, seed=123, n_jobs=None, verbose=False):
     else:  # regression
 
         h = np.histogram(y, bins="auto")
-        n_elem_classes = np.asarray(h[0], dtype=np.integer)
+        n_elem_classes = np.asarray(h[0], dtype=np.int32)
         freqs_hist = np.zeros_like(n_elem_classes, dtype=float)
 
         if verbose is True:
@@ -81,7 +81,7 @@ def dosubsample(y, row_sample=0.8, seed=123, n_jobs=None, verbose=False):
         for i in iterator:
             bool_class_i = y_as_classes == classes[i]
             index_class_i = np.asarray(
-                np.where(bool_class_i == True)[0], dtype=np.integer
+                np.where(bool_class_i == True)[0], dtype=np.int32
             )
             if np.sum(bool_class_i) > 1:  # at least 2 elements in class  #i
                 np.random.seed(seed + i)
@@ -103,7 +103,7 @@ def dosubsample(y, row_sample=0.8, seed=123, n_jobs=None, verbose=False):
         def get_index(i):
             bool_class_i = y_as_classes == classes[i]
             index_class_i = np.asarray(
-                np.where(bool_class_i == True)[0], dtype=np.integer
+                np.where(bool_class_i == True)[0], dtype=np.int32
             )
             if np.sum(bool_class_i) > 1:  # at least 2 elements in class  #i
                 np.random.seed(seed + i)
