@@ -195,7 +195,7 @@ class MTS(Base):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         lags=1,
-        type_pi="kde",
+        type_pi=None,
         replications=None,
         kernel=None,
         agg="mean",
@@ -395,7 +395,7 @@ class MTS(Base):
 
         return self
 
-    def predict(self, h=5, level=95, **kwargs):
+    def predict(self, h=5, level=95, sampling=False, **kwargs):
         """Forecast all the time series, h steps ahead
 
         Parameters:
@@ -407,9 +407,8 @@ class MTS(Base):
                 Level of confidence (if obj has option 'return_std' and the
                 posterior is gaussian)
 
-            new_xreg: {array-like}, shape = [n_samples = h, n_new_xreg]
-                New values of additional (deterministic) regressors on horizon = h
-                new_xreg must be in increasing order (most recent observations last)
+            sampling {boolean}: 
+                Sampling for Gaussian process posterior? 
 
             **kwargs: additional parameters to be passed to
                     self.cook_test_set
@@ -455,6 +454,9 @@ class MTS(Base):
                 self.kde_.sample(n_samples=h, random_state=self.seed + 100 * i)
                 for i in tqdm(range(self.replications))
             )
+        
+        if sampling == True and self.type_pi != "kde":
+            sample_preds = []
 
         for _ in range(h):
 
@@ -483,6 +485,15 @@ class MTS(Base):
                 ]
             )
 
+            if sampling == True and self.type_pi != "kde":      
+                print(f"y_means_: {y_means_}")           
+                sample_preds.append(tuple(
+                [
+                    np.asarray(y_means_[i] + self.fit_objs_[i].sample_y(cooked_new_X, 
+                                                          n_samples=self.replications))
+                    for i in range(self.n_series)
+                ]))                
+
             preds = np.asarray(y_means_ + predicted_cooked_new_X)
 
             self.mean_ = mo.rbind(preds, self.mean_)  # preallocate?
@@ -495,8 +506,16 @@ class MTS(Base):
         )
         if "return_std" not in kwargs:
 
-            if self.kde_ is None:
+            if self.kde_ is None and sampling == False:
                 return self.mean_
+            
+            if sampling == True and self.type_pi != "kde":
+                try:
+                    print(f"getsims(sample_preds, 0): {getsims(sample_preds, 0)}")
+                    print(f"getsims(sample_preds, 1): {getsims(sample_preds, 1)}")
+                except:
+                    print("")
+                return (self.mean_, sample_preds)
 
             # if "return_std" not in kwargs and self.kde_ is not None
             meanf = []
