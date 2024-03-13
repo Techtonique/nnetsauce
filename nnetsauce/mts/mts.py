@@ -510,11 +510,8 @@ class MTS(Base):
                 return self.mean_
             
             if sampling == True and self.type_pi != "kde":
-                try:
-                    print(f"getsims(sample_preds, 0): {getsims(sample_preds, 0)}")
-                    print(f"getsims(sample_preds, 1): {getsims(sample_preds, 1)}")
-                except:
-                    print("")
+                print(f"\n\n getsims(sample_preds, 0): {getsims(sample_preds, 0)} \n\n")                    
+                print(f"\n\n getsims(sample_preds, 1): {getsims(sample_preds, 1)} \n\n")                    
                 return (self.mean_, sample_preds)
 
             # if "return_std" not in kwargs and self.kde_ is not None

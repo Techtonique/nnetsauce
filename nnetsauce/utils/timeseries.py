@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 
-# compute output dates from data frame's index
+# compute input dates from data frame's index
 def compute_input_dates(df):
     input_dates = df.index.values
 

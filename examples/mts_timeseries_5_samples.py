@@ -29,8 +29,9 @@ df.index.rename('date')
 
 print(df.shape)
 print(198*0.8)
-df_train = df.iloc[0:75,]
-df_test = df.iloc[75:85,]
+df_train = df.iloc[0:150,]
+df_test = df.iloc[150:155,]
+
 
 print(f"df_train.head():\n{df_train.head()}")
 print(f"df_train.tail():\n{df_train.tail()}")
@@ -45,7 +46,7 @@ regr = GaussianProcessRegressor(kernel=Matern(nu=1.5),
                                 random_state=42,)
 
 obj_MTS = ns.MTS(regr, lags = 1, n_hidden_features=5, verbose = 1,
-                 replications=3)
+                 replications=4)
 
 obj_MTS.fit(df_train.values)
 

@@ -1,10 +1,11 @@
 import numpy as np
+import os 
 from sklearn import datasets, linear_model, gaussian_process
 import unittest as ut
 import nnetsauce as ns
 
 
-# Basic tests
+print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
 
 class TestCustom(ut.TestCase):
