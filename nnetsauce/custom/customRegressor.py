@@ -6,6 +6,7 @@ import numpy as np
 import sklearn.metrics as skm2
 from .custom import Custom
 from ..utils import matrixops as mo
+from ..predictioninterval import PredictionInterval
 from sklearn.base import RegressorMixin
 from functools import partial
 from scipy.stats import norm
@@ -167,9 +168,15 @@ class CustomRegressor(Custom, RegressorMixin):
 
         self.obj.fit(scaled_Z, centered_y, **kwargs)
 
+        self.X_ = X
+
+        self.y_ = y        
+
         return self
 
-    def predict(self, X, level=95, **kwargs):
+    def predict(self, X, level=95, 
+                method="splitconformal", 
+                **kwargs):
         """Predict test data X.
 
         Parameters:
@@ -177,8 +184,15 @@ class CustomRegressor(Custom, RegressorMixin):
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number
                 of samples and n_features is the number of features.
+            
+            level: int
+                Level of confidence (default = 95)
+            
+            method: str
+                "splitconformal", "localconformal" (for now, and if 
+                you specify `return_pi = True`)
 
-                **kwargs: additional parameters to be passed to
+            **kwargs: additional parameters to be passed to
                     self.cook_test_set
 
         Returns:
@@ -220,6 +234,16 @@ class CustomRegressor(Custom, RegressorMixin):
             upper = self.y_mean_ + (mean_ + pi_multiplier*std_)
 
             return preds, std_, lower, upper
+
+        if "return_pi" in kwargs:
+            self.pi = PredictionInterval(obj = self, 
+                                         method=method, 
+                                         level=level/100)            
+            self.pi.fit(self.X_, self.y_)
+            self.X_ = None
+            self.y_ = None 
+            preds = self.pi.predict(X, return_pi=True)
+            return preds
 
         # "return_std" not in kwargs
         if len(X.shape) == 1:
