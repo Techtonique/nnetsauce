@@ -20,14 +20,14 @@ start = time()
 regr.fit(X_train, y_train)
 print(f"Elapsed: {time() - start}s")
 preds = regr.predict(X_test, return_std=True)
-print(f"coverage_rate Bayesian Ridge: {np.mean((preds[1]<=y_test)*(preds[2]>=y_test))}")
+print(f"coverage_rate Bayesian Ridge: {np.mean((preds[2]<=y_test)*(preds[3]>=y_test))}")
 
 regr2 = ns.CustomRegressor(ARDRegression())
 start = time()
 regr2.fit(X_train, y_train)
 print(f"Elapsed: {time() - start}s")
 preds2 = regr2.predict(X_test, return_std=True)
-print(f"coverage_rate ARD Regressor: {np.mean((preds2[1]<=y_test)*(preds2[2]>=y_test))}")
+print(f"coverage_rate ARD Regressor: {np.mean((preds2[2]<=y_test)*(preds2[3]>=y_test))}")
 
 regr3 = ns.CustomRegressor(GaussianProcessRegressor(kernel=Matern(nu=1.5),
                           alpha=1e-6,
@@ -38,4 +38,4 @@ start = time()
 regr3.fit(X_train, y_train)
 print(f"Elapsed: {time() - start}s")
 preds3 = regr3.predict(X_test, return_std=True)
-print(f"coverage_rate Gaussian Process: {np.mean((preds3[1]<=y_test)*(preds3[2]>=y_test))}")
+print(f"coverage_rate Gaussian Process: {np.mean((preds3[2]<=y_test)*(preds3[3]>=y_test))}")

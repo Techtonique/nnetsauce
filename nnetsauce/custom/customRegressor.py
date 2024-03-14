@@ -208,7 +208,7 @@ class CustomRegressor(Custom, RegressorMixin):
                 lower = self.y_mean_ + (mean_ - pi_multiplier*std_)
                 upper = self.y_mean_ + (mean_ + pi_multiplier*std_)
 
-                return preds, lower, upper
+                return preds, std_, lower, upper
 
             # len(X.shape) > 1
             mean_, std_ = self.obj.predict(
@@ -219,7 +219,7 @@ class CustomRegressor(Custom, RegressorMixin):
             lower = self.y_mean_ + (mean_ - pi_multiplier*std_)
             upper = self.y_mean_ + (mean_ + pi_multiplier*std_)
 
-            return preds, lower, upper
+            return preds, std_, lower, upper
 
         # "return_std" not in kwargs
         if len(X.shape) == 1:
