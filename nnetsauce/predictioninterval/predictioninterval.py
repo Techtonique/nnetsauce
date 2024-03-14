@@ -3,7 +3,7 @@ import numpy as np
 import pickle
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import ExtraTreesRegressor
 from ..nonconformist import IcpRegressor
 from ..nonconformist import RegressorNc 
 from ..nonconformist import RegressorNormalizer, AbsErrorErrFunc
@@ -75,7 +75,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
 
         if self.method == "localconformal":
 
-            mad_estimator = RandomForestRegressor()
+            mad_estimator = ExtraTreesRegressor()
             normalizer = RegressorNormalizer(self.obj, mad_estimator, AbsErrorErrFunc())
             nc = RegressorNc(self.obj, AbsErrorErrFunc(), normalizer)
         
