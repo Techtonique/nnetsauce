@@ -391,7 +391,7 @@ class MTS(Base):
                     f"\n Best parameters for {self.kernel} kernel: {grid.best_params_} \n"
                 )
 
-            self.kde_ = grid.best_estimator_
+            self.kde_ = grid.best_estimator_            
 
         return self
 
@@ -448,14 +448,15 @@ class MTS(Base):
                 "DescribeResult", ("mean", "lower", "upper")
             )  # to be updated
 
-        if self.kde_ != None and self.type_pi == "kde":
-            pi_multiplier = norm.ppf(1 - self.alpha_ / 200)
+        if self.kde_ != None and self.type_pi == "kde":            
+            pi_multiplier = norm.ppf(1 - self.alpha_ / 200)            
             self.residuals_sims_ = tuple(
                 self.kde_.sample(n_samples=h, random_state=self.seed + 100 * i)
                 for i in tqdm(range(self.replications))
             )
         
         if sampling == True and self.type_pi != "kde":
+            self.sims_ = []
             sample_preds = []
 
         for _ in range(h):
@@ -485,8 +486,7 @@ class MTS(Base):
                 ]
             )
 
-            if sampling == True and self.type_pi != "kde":      
-                print(f"y_means_: {y_means_}")           
+            if sampling == True and self.type_pi != "kde":                            
                 sample_preds.append(tuple(
                 [
                     np.asarray(y_means_[i] + self.fit_objs_[i].sample_y(cooked_new_X, 
@@ -510,9 +510,67 @@ class MTS(Base):
                 return self.mean_
             
             if sampling == True and self.type_pi != "kde":
-                print(f"\n\n getsims(sample_preds, 0): {getsims(sample_preds, 0)} \n\n")                    
-                print(f"\n\n getsims(sample_preds, 1): {getsims(sample_preds, 1)} \n\n")                    
-                return (self.mean_, sample_preds)
+
+                meanf = []
+                sims = []
+                lower = []
+                upper = []
+
+                DescribeResult = namedtuple(
+                "DescribeResult", ("mean", "sims", "lower", "upper")) 
+
+                # inspo
+                #tuple(self.mean_ + self.residuals_sims_[i] for i in tqdm(range(self.replications)))
+
+                for ix in range(self.n_series): 
+
+                    sims_ix = getsims(sample_preds, ix)
+
+                    print(f"\n\n sims_ix: {sims_ix} \n\n")
+
+                    sims.append(sims_ix)
+
+                    if self.agg == "mean":
+                        meanf.append(np.mean(sims_ix, axis=1))
+                    else:
+                        meanf.append(np.median(sims_ix, axis=1))
+                    lower.append(np.quantile(sims_ix, q=self.alpha_ / 200, axis=1))
+                    upper.append(
+                        np.quantile(sims_ix, q=1 - self.alpha_ / 200, axis=1)
+                    )
+
+                self.mean_ = pd.DataFrame(
+                    np.asarray(meanf).T,
+                    columns=self.series_names,  # self.df_.columns,
+                    index=self.output_dates_,
+                )
+
+                self.lower_ = pd.DataFrame(
+                    np.asarray(lower).T,
+                    columns=self.series_names,  # self.df_.columns,
+                    index=self.output_dates_,
+                )
+
+                self.upper_ = pd.DataFrame(
+                    np.asarray(upper).T,
+                    columns=self.series_names,  # self.df_.columns,
+                    index=self.output_dates_,
+                )
+                                                
+                for i in range(self.replications):                    
+                    temp = []
+                    for j in range(self.n_series):                     
+                        temp.append(sims[j][:,i])
+                    self.sims_.append(pd.DataFrame(
+                    np.asarray(temp).T,
+                    columns=self.series_names,  # self.df_.columns,
+                    index=self.output_dates_,
+                ))
+
+                return DescribeResult(self.mean_, 
+                                      self.sims_,
+                                      self.lower_, 
+                                      self.upper_)
 
             # if "return_std" not in kwargs and self.kde_ is not None
             meanf = []
@@ -586,6 +644,7 @@ class MTS(Base):
                 return res
 
         if "return_std" in kwargs:
+
             DescribeResult = namedtuple(
                 "DescribeResult", ("mean", "lower", "upper")
             )

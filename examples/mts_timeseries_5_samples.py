@@ -37,7 +37,6 @@ print(f"df_train.head():\n{df_train.head()}")
 print(f"df_train.tail():\n{df_train.tail()}")
 print(f"df_test.head():\n{df_test.head()}")
 
-print("\n\n Example: MTS with GaussianProcessRegressor() sampling -----------------")
 
 regr = GaussianProcessRegressor(kernel=Matern(nu=1.5),
                                 alpha=1e-6,
@@ -45,12 +44,29 @@ regr = GaussianProcessRegressor(kernel=Matern(nu=1.5),
                                 n_restarts_optimizer=25,
                                 random_state=42,)
 
+print("\n\n Example: MTS2 with GaussianProcessRegressor() s -----------------")
+
+obj_MTS2 = ns.MTS(regr, lags = 1, n_hidden_features=5, 
+                  replications=4, kernel='gaussian', 
+                  verbose = 1, type_pi="kde")
+obj_MTS2.fit(df_train.values)
+preds2 = obj_MTS2.predict(h=5)
+print(preds2)
+print(f" Predictive simulations #1 {obj_MTS2.sims_[0]}") 
+print(f" Predictive simulations #2 {obj_MTS2.sims_[1]}") 
+print(f" Predictive simulations #3 {obj_MTS2.sims_[2]}") 
+
+print("\n\n Example: MTS with GaussianProcessRegressor() sampling -----------------")
+
 obj_MTS = ns.MTS(regr, lags = 1, n_hidden_features=5, verbose = 1,
                  replications=4)
-
 obj_MTS.fit(df_train.values)
 
 print("\n")
 preds = obj_MTS.predict(h=5, sampling=True)
 print(len(preds))
 print(preds)
+print(f" Predictive simulations #1 {obj_MTS.sims_[0]}") 
+print(f" Predictive simulations #2 {obj_MTS.sims_[1]}") 
+print(f" Predictive simulations #3 {obj_MTS.sims_[2]}") 
+
