@@ -1,3 +1,9 @@
+# version 0.18.0
+
+- Bayesian `CustomRegressor`
+- Conformalized `CustomRegressor` (`splitconformal` and `localconformal` for now)
+- See [this example](./examples/conformal_preds.py), [this example](./examples/custom_bayesian_regression.py), and [this notebook](./nnetsauce/demo/thierrymoudiki_20240317_conformal_regression.ipynb)
+
 # version 0.17.2
 
 - `self.n_classes_ = len(np.unique(y))` # for compatibility with sklearn 
