@@ -6,8 +6,10 @@ import numpy as np
 import sklearn.metrics as skm2
 from .custom import Custom
 from ..utils import matrixops as mo
+from ..predictioninterval import PredictionInterval
 from sklearn.base import RegressorMixin
 from functools import partial
+from scipy.stats import norm
 
 
 class CustomRegressor(Custom, RegressorMixin):
@@ -166,9 +168,15 @@ class CustomRegressor(Custom, RegressorMixin):
 
         self.obj.fit(scaled_Z, centered_y, **kwargs)
 
+        self.X_ = X
+
+        self.y_ = y        
+
         return self
 
-    def predict(self, X, **kwargs):
+    def predict(self, X, level=95, 
+                method="splitconformal", 
+                **kwargs):
         """Predict test data X.
 
         Parameters:
@@ -176,8 +184,15 @@ class CustomRegressor(Custom, RegressorMixin):
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number
                 of samples and n_features is the number of features.
+            
+            level: int
+                Level of confidence (default = 95)
+            
+            method: str
+                "splitconformal", "localconformal" (for now, and if 
+                you specify `return_pi = True`)
 
-                **kwargs: additional parameters to be passed to
+            **kwargs: additional parameters to be passed to
                     self.cook_test_set
 
         Returns:
@@ -186,7 +201,53 @@ class CustomRegressor(Custom, RegressorMixin):
 
         """
 
+        if "return_std" in kwargs:
+
+            alpha = 100 - level
+            pi_multiplier = norm.ppf(1 - alpha / 200)
+
+            if len(X.shape) == 1:
+
+                n_features = X.shape[0]
+                new_X = mo.rbind(
+                    X.reshape(1, n_features),
+                    np.ones(n_features).reshape(1, n_features),
+                )
+
+                mean_, std_ = self.obj.predict(
+                        self.cook_test_set(new_X, **kwargs), return_std=True
+                    )[0]
+                
+                preds = self.y_mean_ + mean_                 
+                lower = self.y_mean_ + (mean_ - pi_multiplier*std_)
+                upper = self.y_mean_ + (mean_ + pi_multiplier*std_)
+
+                return preds, std_, lower, upper
+
+            # len(X.shape) > 1
+            mean_, std_ = self.obj.predict(
+                        self.cook_test_set(X, **kwargs), return_std=True
+                    )
+                
+            preds = self.y_mean_ + mean_                 
+            lower = self.y_mean_ + (mean_ - pi_multiplier*std_)
+            upper = self.y_mean_ + (mean_ + pi_multiplier*std_)
+
+            return preds, std_, lower, upper
+
+        if "return_pi" in kwargs:
+            self.pi = PredictionInterval(obj = self, 
+                                         method=method, 
+                                         level=level/100)            
+            self.pi.fit(self.X_, self.y_)
+            self.X_ = None
+            self.y_ = None 
+            preds = self.pi.predict(X, return_pi=True)
+            return preds
+
+        # "return_std" not in kwargs
         if len(X.shape) == 1:
+
             n_features = X.shape[0]
             new_X = mo.rbind(
                 X.reshape(1, n_features),
@@ -200,67 +261,7 @@ class CustomRegressor(Custom, RegressorMixin):
                 )
             )[0]
 
+        # len(X.shape) > 1
         return self.y_mean_ + self.obj.predict(
             self.cook_test_set(X, **kwargs), **kwargs
         )
-
-    def score(self, X, y, scoring=None, **kwargs):
-        """ Score the model on test set features X and response y. 
-
-        Parameters: 
-
-            X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number 
-                of samples and n_features is the number of features
-
-            y: array-like, shape = [n_samples]
-                Target values
-
-            scoring: str
-                must be in ('explained_variance', 'neg_mean_absolute_error', \
-                    'neg_mean_squared_error', 'neg_mean_squared_log_error', \
-                    'neg_median_absolute_error', 'r2')
-
-            **kwargs: 
-                additional parameters to be passed to scoring functions
-
-        Returns:
-
-            model scores: {array-like}
-
-        """
-
-        preds = self.predict(X)
-
-        if type(preds) == tuple:  # if there are std. devs in the predictions
-            preds = preds[0]
-
-        if scoring is None:
-            scoring = "neg_root_mean_squared_error"
-
-        # check inputs
-        assert scoring in (
-            "explained_variance",
-            "neg_mean_absolute_error",
-            "neg_mean_squared_error",
-            "neg_mean_squared_log_error",
-            "neg_median_absolute_error",
-            "r2",
-            "neg_root_mean_squared_error",
-        ), "'scoring' should be in ('explained_variance', 'neg_mean_absolute_error', \
-                           'neg_mean_squared_error', 'neg_mean_squared_log_error', \
-                           'neg_median_absolute_error', 'r2', 'neg_root_mean_squared_error')"
-
-        scoring_options = {
-            "explained_variance": skm2.explained_variance_score,
-            "neg_mean_absolute_error": skm2.mean_absolute_error,
-            "neg_mean_squared_error": skm2.mean_squared_error,
-            "neg_mean_squared_log_error": skm2.mean_squared_log_error,
-            "neg_median_absolute_error": skm2.median_absolute_error,
-            "r2": skm2.r2_score,
-            "neg_root_mean_squared_error": partial(
-                skm2.mean_squared_error, squared=False
-            ),
-        }
-
-        return scoring_options[scoring](y, preds, **kwargs)

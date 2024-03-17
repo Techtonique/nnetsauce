@@ -252,7 +252,6 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
         if sample_weight is None:
             w_m = np.repeat(1.0 / n, n)
-
         else:
             w_m = np.asarray(sample_weight)
 
@@ -469,72 +468,3 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         sum_ensemble = expit_ensemble_learner.sum(axis=1)
 
         return expit_ensemble_learner / sum_ensemble[:, None]
-
-    def score(self, X, y, scoring=None, **kwargs):
-        """Score the model on test set features X and response y.
-
-        Parameters:
-
-            X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number
-                of samples and n_features is the number of features
-
-            y: array-like, shape = [n_samples]
-                Target values
-
-            scoring: str
-                must be in ('accuracy', 'average_precision',
-                           'brier_score_loss', 'f1', 'f1_micro',
-                           'f1_macro', 'f1_weighted',  'f1_samples',
-                           'neg_log_loss', 'precision', 'recall',
-                           'roc_auc')
-
-            **kwargs: additional parameters to be passed to scoring functions
-
-        Returns:
-
-            model scores: {array-like}
-
-        """
-
-        preds = self.predict(X)
-
-        if scoring is None:
-            scoring = "accuracy"
-
-        # check inputs
-        assert scoring in (
-            "accuracy",
-            "average_precision",
-            "brier_score_loss",
-            "f1",
-            "f1_micro",
-            "f1_macro",
-            "f1_weighted",
-            "f1_samples",
-            "neg_log_loss",
-            "precision",
-            "recall",
-            "roc_auc",
-        ), "'scoring' should be in ('accuracy', 'average_precision', \
-                           'brier_score_loss', 'f1', 'f1_micro', \
-                           'f1_macro', 'f1_weighted',  'f1_samples', \
-                           'neg_log_loss', 'precision', 'recall', \
-                           'roc_auc')"
-
-        scoring_options = {
-            "accuracy": skm2.accuracy_score,
-            "average_precision": skm2.average_precision_score,
-            "brier_score_loss": skm2.brier_score_loss,
-            "f1": skm2.f1_score,
-            "f1_micro": skm2.f1_score,
-            "f1_macro": skm2.f1_score,
-            "f1_weighted": skm2.f1_score,
-            "f1_samples": skm2.f1_score,
-            "neg_log_loss": skm2.log_loss,
-            "precision": skm2.precision_score,
-            "recall": skm2.recall_score,
-            "roc_auc": skm2.roc_auc_score,
-        }
-
-        return scoring_options[scoring](y, preds, **kwargs)

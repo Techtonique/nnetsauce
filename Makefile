@@ -47,11 +47,8 @@ clean-test: ## remove test and coverage artifacts
 lint: ## check style with flake8
 	flake8 nnetsauce tests
 
-coverage: ## check code coverage quickly with the default Python
-	coverage run --source nnetsauce setup.py test
-	coverage report -m
-	coverage html
-	$(BROWSER) htmlcov/index.html
+coverage: ## check code coverage quickly with the default Python	
+	coverage report --omit="venv/*,nnetsauce/tests/*" --show-missing
 
 docs: ## generate docs		
 	pip install autopep8 black pdoc 
@@ -93,8 +90,6 @@ run-lazy: ## run all lazy examples with one command
 	find examples -maxdepth 2 -name "lazy*.py" -exec  python3 {} \;
 
 run-tests: install ## run all the tests with one command
-	pip install coverage
-	python3 -m coverage run -m unittest discover -s nnetsauce/tests -p "*.py"
-	python3 -m coverage report --omit="venv/*,nnetsauce/tests/*"
-	python3 -m coverage html --omit="venv/*,nnetsauce/tests/*"
-	$(BROWSER) htmlcov/index.html
+	pip3 install coverage nose2
+	python3 -m coverage run -m unittest discover -s nnetsauce/tests -p "*.py"	
+

@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 
 print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
-print(f"\n ----- Exemple 1 ----- \n")
+print(f"\n ----- Example 1 ----- \n")
 
 url = "https://raw.githubusercontent.com/thierrymoudiki/mts-data/master/heater-ice-cream/ice_cream_vs_heater.csv"
 #url = "https://raw.githubusercontent.com/selva86/datasets/master/Raotbl6.csv"

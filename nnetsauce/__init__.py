@@ -19,6 +19,7 @@ from .mts.mts import MTS
 from .multitask.multitaskClassifier import MultitaskClassifier
 from .multitask.simplemultitaskClassifier import SimpleMultitaskClassifier
 from .optimizers.optimizer import Optimizer
+from .predictioninterval import PredictionInterval
 from .randombag.randomBagClassifier import RandomBagClassifier
 from .randombag.randomBagRegressor import RandomBagRegressor
 from .ridge2.ridge2Classifier import Ridge2Classifier
@@ -50,6 +51,7 @@ __all__ = [
     "LazyDeepMTS",
     "MTS",
     "MultitaskClassifier",
+    "PredictionInterval",
     "SimpleMultitaskClassifier",
     "Optimizer",
     "RandomBagRegressor",

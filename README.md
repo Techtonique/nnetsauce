@@ -151,26 +151,11 @@ pip install nose2
 pip install coverage
 ```
 
-- Run tests and print coverage:
+- Run tests (in cloned repo) and print coverage:
 
 ```bash
-git clone https://github.com/Techtonique/nnetsauce.git
-cd nnetsauce
-nose2 -v --with-coverage
-```
-
-- Obtain coverage reports:
-
-At the command line:
-
-```bash
-coverage report -m
-```
-
-  or an html report:
-
-```bash
-coverage html
+make run-tests
+make coverage
 ```
 
 ## API Documentation
