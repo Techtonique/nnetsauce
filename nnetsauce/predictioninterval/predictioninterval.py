@@ -1,9 +1,15 @@
 from locale import normalize
 import numpy as np
 import pickle
+from collections import namedtuple
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import ExtraTreesRegressor
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KernelDensity
+from sklearn.model_selection import GridSearchCV
+from scipy.stats import norm 
+from tqdm import tqdm
 from ..nonconformist import IcpRegressor
 from ..nonconformist import RegressorNc 
 from ..nonconformist import RegressorNormalizer, AbsErrorErrFunc
@@ -23,21 +29,38 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             Currently "splitconformal" (default) and "localconformal"
 
         level: a float;                
-            Confidence level for prediction intervals. Default is 0.95, 
-            equivalent to a miscoverage error of 0.05
+            Confidence level for prediction intervals. Default is 95, 
+            equivalent to a miscoverage error of 5 (%)
+        
+        replications: an integer;
+            Number of replications for simulated conformal (default is `None`)
+        
+        type_pi: a string;
+            type of prediction interval: currently "kde" or "bootstrap"
         
         seed: an integer;
             Reproducibility of fit (there's a random split between fitting and calibration data)
     """
 
-    def __init__(self, obj, method="splitconformal", level=0.95, seed=123):
+    def __init__(self, obj, 
+                 method="splitconformal", 
+                 level=95,
+                 replications=None, 
+                 type_pi = "bootstrap",
+                 seed=123):
 
         self.obj = obj
         self.method = method
         self.level = level
+        self.replications = replications
+        self.type_pi = type_pi
         self.seed = seed
+        self.alpha_ = 1 - self.level/100
         self.quantile_ = None
         self.icp_ = None
+        self.calibrated_residuals_ = None
+        self.scaled_calibrated_residuals_ = None 
+        self.calibrated_residuals_scaler_ = None
 
 
     def fit(self, X, y):
@@ -54,15 +77,19 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
         """       
 
         X_train, X_calibration, y_train, y_calibration = train_test_split(X, y, 
-                                                    test_size=0.5, random_state=self.seed)
+                                                                          test_size=0.5, 
+                                                                          random_state=self.seed)
 
         if self.method == "splitconformal": 
 
-            n_samples_calibration = X_calibration.shape[0]
-            q = self.level*(1 + 1/n_samples_calibration) 
+            n_samples_calibration = X_calibration.shape[0]            
+            q = (self.level/100)*(1 + 1/n_samples_calibration)             
             self.obj.fit(X_train, y_train)
             preds_calibration = self.obj.predict(X_calibration)
-            absolute_residuals = np.abs(y_calibration - preds_calibration)         
+            self.calibrated_residuals_ = y_calibration - preds_calibration
+            absolute_residuals = np.abs(self.calibrated_residuals_)   
+            self.calibrated_residuals_scaler_ = StandardScaler(with_mean=True, with_std=True)
+            self.scaled_calibrated_residuals_ = self.calibrated_residuals_scaler_.fit_transform(self.calibrated_residuals_.reshape(-1, 1)).ravel()
             try: 
                 # numpy version >= 1.22
                 self.quantile_ = np.quantile(a = absolute_residuals, q = q, 
@@ -77,8 +104,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
 
             mad_estimator = ExtraTreesRegressor()
             normalizer = RegressorNormalizer(self.obj, mad_estimator, AbsErrorErrFunc())
-            nc = RegressorNc(self.obj, AbsErrorErrFunc(), normalizer)
-        
+            nc = RegressorNc(self.obj, AbsErrorErrFunc(), normalizer)        
             self.icp_ = IcpRegressor(nc)
             self.icp_.fit(X_train, y_train) 
             self.icp_.calibrate(X_calibration, y_calibration)
@@ -107,13 +133,29 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
 
         if self.method == "splitconformal":
 
-            if return_pi:
-                
-                return pred, (pred - self.quantile_), (pred + self.quantile_)
+            if self.replications is None: 
 
-            else: 
+                if return_pi:
+                    
+                    return pred, (pred - self.quantile_), (pred + self.quantile_)
 
-                return pred
+                else: 
+
+                    return pred
+            
+            else: #  if self.replications is not None
+
+                if self.type_pi == "bootstrap":     
+                    np.random.seed(self.seed)               
+                    self.residuals_sims_ = np.asarray([np.random.choice(a = self.scaled_calibrated_residuals_, 
+                                                            size = X.shape[0]) for _ in range(self.replications)]).T
+                    self.sims_ = np.asarray([pred + self.calibrated_residuals_scaler_.scale_[0]*self.residuals_sims_[:, i].ravel() for i in tqdm(range(self.replications))]).T
+                    DescribeResult = namedtuple("DescribeResult", ("mean", "sims", "lower", "upper"))
+                    self.mean_ = np.mean(self.sims_, axis=1)
+                    self.lower_ = np.quantile(self.sims_, q=self.alpha_ / 200, axis=1)
+                    self.upper_ = np.quantile(self.sims_, q=1 - self.alpha_ / 200, axis=1)
+
+                return DescribeResult(self.mean_, self.sims_, self.lower_, self.upper_) 
 
         if self.method == "localconformal":
 
