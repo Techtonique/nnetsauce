@@ -8,7 +8,7 @@ from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
-from scipy.stats import norm 
+from scipy.stats import gaussian_kde
 from tqdm import tqdm
 from ..nonconformist import IcpRegressor
 from ..nonconformist import RegressorNc 
@@ -36,7 +36,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             Number of replications for simulated conformal (default is `None`)
         
         type_pi: a string;
-            type of prediction interval: currently "kde" or "bootstrap"
+            type of prediction interval: currently "kde" (default) or "bootstrap"
         
         seed: an integer;
             Reproducibility of fit (there's a random split between fitting and calibration data)
@@ -61,6 +61,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
         self.calibrated_residuals_ = None
         self.scaled_calibrated_residuals_ = None 
         self.calibrated_residuals_scaler_ = None
+        self.kde_ = None 
 
 
     def fit(self, X, y):
@@ -145,15 +146,20 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             
             else: #  if self.replications is not None
 
-                if self.type_pi == "bootstrap":     
+                DescribeResult = namedtuple("DescribeResult", ("mean", "sims", "lower", "upper"))                    
+
+                if self.type_pi == "bootstrap":         
                     np.random.seed(self.seed)               
                     self.residuals_sims_ = np.asarray([np.random.choice(a = self.scaled_calibrated_residuals_, 
                                                             size = X.shape[0]) for _ in range(self.replications)]).T
-                    self.sims_ = np.asarray([pred + self.calibrated_residuals_scaler_.scale_[0]*self.residuals_sims_[:, i].ravel() for i in tqdm(range(self.replications))]).T
-                    DescribeResult = namedtuple("DescribeResult", ("mean", "sims", "lower", "upper"))
-                    self.mean_ = np.mean(self.sims_, axis=1)
-                    self.lower_ = np.quantile(self.sims_, q=self.alpha_ / 200, axis=1)
-                    self.upper_ = np.quantile(self.sims_, q=1 - self.alpha_ / 200, axis=1)
+                    self.sims_ = np.asarray([pred + self.calibrated_residuals_scaler_.scale_[0]*self.residuals_sims_[:, i].ravel() for i in tqdm(range(self.replications))]).T                                        
+                elif self.type_pi == "kde":
+                    self.kde_ = gaussian_kde(dataset=self.scaled_calibrated_residuals_)
+                    self.sims_ = np.asarray([pred + self.calibrated_residuals_scaler_.scale_[0]*self.kde_.resample(size = X.shape[0], seed=self.seed+i).ravel() for i in tqdm(range(self.replications))]).T                
+                
+                self.mean_ = np.mean(self.sims_, axis=1)
+                self.lower_ = np.quantile(self.sims_, q=self.alpha_ / 200, axis=1)
+                self.upper_ = np.quantile(self.sims_, q=1 - self.alpha_ / 200, axis=1)                    
 
                 return DescribeResult(self.mean_, self.sims_, self.lower_, self.upper_) 
 
