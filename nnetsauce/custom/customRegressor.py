@@ -238,7 +238,7 @@ class CustomRegressor(Custom, RegressorMixin):
         if "return_pi" in kwargs:
             self.pi = PredictionInterval(obj = self, 
                                          method=method, 
-                                         level=level/100)            
+                                         level=level)            
             self.pi.fit(self.X_, self.y_)
             self.X_ = None
             self.y_ = None 
