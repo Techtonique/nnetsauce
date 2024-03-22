@@ -45,15 +45,19 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
     def __init__(self, obj, 
                  method="splitconformal", 
                  level=95,
-                 replications=None, 
                  type_pi = "bootstrap",
+                 replications=None,   
+                 kernel=None,
+                 agg="mean",               
                  seed=123):
 
         self.obj = obj
         self.method = method
         self.level = level
-        self.replications = replications
         self.type_pi = type_pi
+        self.replications = replications
+        self.kernel = kernel 
+        self.agg = agg 
         self.seed = seed
         self.alpha_ = 1 - self.level/100
         self.quantile_ = None
@@ -145,6 +149,9 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                     return pred
             
             else: #  if self.replications is not None
+
+                assert self.type_pi in ("bootstrap", "kde"),\
+                "`self.type_pi` must be in ('bootstrap', 'kde')"                    
 
                 DescribeResult = namedtuple("DescribeResult", ("mean", "sims", "lower", "upper"))                    
 
