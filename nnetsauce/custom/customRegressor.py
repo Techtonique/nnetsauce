@@ -225,7 +225,9 @@ class CustomRegressor(Custom, RegressorMixin):
             model predictions:
                 an array if uncertainty quantification is not requested,
                   or a tuple if with prediction intervals and simulations 
-                  if `return_std = True` or `return_pi = True`
+                  if `return_std = True` (mean, standard deviation, 
+                  lower and upper prediction interval) or `return_pi = True` 
+                  ()
 
         """
 
