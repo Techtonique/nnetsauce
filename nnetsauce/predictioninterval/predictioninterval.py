@@ -45,15 +45,19 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
     def __init__(self, obj, 
                  method="splitconformal", 
                  level=95,
-                 replications=None, 
                  type_pi = "bootstrap",
+                 replications=None,   
+                 kernel=None,
+                 agg="mean",               
                  seed=123):
 
         self.obj = obj
         self.method = method
         self.level = level
-        self.replications = replications
         self.type_pi = type_pi
+        self.replications = replications
+        self.kernel = kernel 
+        self.agg = agg 
         self.seed = seed
         self.alpha_ = 1 - self.level/100
         self.quantile_ = None
@@ -109,6 +113,12 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             self.icp_ = IcpRegressor(nc)
             self.icp_.fit(X_train, y_train) 
             self.icp_.calibrate(X_calibration, y_calibration)
+            preds_calibration = self.icp_.predict(X_calibration)
+            print(f"\n\n preds_calibration: \n {preds_calibration} \n\n")
+            self.calibrated_residuals_ = y_calibration - preds_calibration
+            absolute_residuals = np.abs(self.calibrated_residuals_)   
+            self.calibrated_residuals_scaler_ = StandardScaler(with_mean=True, with_std=True)
+            self.scaled_calibrated_residuals_ = self.calibrated_residuals_scaler_.fit_transform(self.calibrated_residuals_.reshape(-1, 1)).ravel()
 
         return self
 
@@ -137,8 +147,10 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             if self.replications is None: 
 
                 if return_pi:
+
+                    DescribeResult = namedtuple("DescribeResult", ("mean", "lower", "upper"))                    
                     
-                    return pred, (pred - self.quantile_), (pred + self.quantile_)
+                    return DescribeResult(pred, pred - self.quantile_, pred + self.quantile_) 
 
                 else: 
 
@@ -146,7 +158,8 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             
             else: #  if self.replications is not None
 
-                DescribeResult = namedtuple("DescribeResult", ("mean", "sims", "lower", "upper"))                    
+                assert self.type_pi in ("bootstrap", "kde"),\
+                "`self.type_pi` must be in ('bootstrap', 'kde')"                                    
 
                 if self.type_pi == "bootstrap":         
                     np.random.seed(self.seed)               
@@ -159,18 +172,44 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                 
                 self.mean_ = np.mean(self.sims_, axis=1)
                 self.lower_ = np.quantile(self.sims_, q=self.alpha_ / 200, axis=1)
-                self.upper_ = np.quantile(self.sims_, q=1 - self.alpha_ / 200, axis=1)                    
+                self.upper_ = np.quantile(self.sims_, q=1 - self.alpha_ / 200, axis=1) 
+
+                DescribeResult = namedtuple("DescribeResult", ("mean", "sims", "lower", "upper"))                                       
 
                 return DescribeResult(self.mean_, self.sims_, self.lower_, self.upper_) 
 
         if self.method == "localconformal":
 
-            if return_pi:
+            if self.replications is None: 
 
-                predictions_bounds = self.icp_.predict(X, significance = 1-self.level)
-                return pred, predictions_bounds[:, 0], predictions_bounds[:, 1]
+                if return_pi:
 
-            else:
+                    predictions_bounds = self.icp_.predict(X, significance = 1-self.level)
+                    DescribeResult = namedtuple("DescribeResult", ("mean", "lower", "upper")) 
+                    return DescribeResult(pred, predictions_bounds[:, 0], predictions_bounds[:, 1])                    
+
+                else:
+                    
+                    return pred
+            
+            else: #  if self.replications is not None
+
+                assert self.type_pi in ("bootstrap", "kde"),\
+                "`self.type_pi` must be in ('bootstrap', 'kde')"                                    
+
+                if self.type_pi == "bootstrap":         
+                    np.random.seed(self.seed)               
+                    self.residuals_sims_ = np.asarray([np.random.choice(a = self.scaled_calibrated_residuals_, 
+                                                            size = X.shape[0]) for _ in range(self.replications)]).T
+                    self.sims_ = np.asarray([pred + self.calibrated_residuals_scaler_.scale_[0]*self.residuals_sims_[:, i].ravel() for i in tqdm(range(self.replications))]).T                                        
+                elif self.type_pi == "kde":
+                    self.kde_ = gaussian_kde(dataset=self.scaled_calibrated_residuals_)
+                    self.sims_ = np.asarray([pred + self.calibrated_residuals_scaler_.scale_[0]*self.kde_.resample(size = X.shape[0], seed=self.seed+i).ravel() for i in tqdm(range(self.replications))]).T                
                 
-                return pred
+                self.mean_ = np.mean(self.sims_, axis=1)
+                self.lower_ = np.quantile(self.sims_, q=self.alpha_ / 200, axis=1)
+                self.upper_ = np.quantile(self.sims_, q=1 - self.alpha_ / 200, axis=1) 
 
+                DescribeResult = namedtuple("DescribeResult", ("mean", "sims", "lower", "upper"))                                       
+
+                return DescribeResult(self.mean_, self.sims_, self.lower_, self.upper_) 
