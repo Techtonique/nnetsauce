@@ -72,6 +72,9 @@ class MTS(Base):
 
         lags: int.
             number of lags used for each time series.
+        
+        type_pi: str.            
+            type of prediction interval: currently "kde" (default) or "bootstrap"
 
         replications: int.
             number of replications (if needed, for predictive simulation). Default is 'None'.
