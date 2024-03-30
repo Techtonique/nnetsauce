@@ -88,7 +88,8 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
         if self.method == "splitconformal": 
 
             n_samples_calibration = X_calibration.shape[0]            
-            q = (self.level/100)*(1 + 1/n_samples_calibration)             
+            q = (self.level/100)*(1 + 1/n_samples_calibration) 
+            print(f"q: {q}")            
             self.obj.fit(X_train, y_train)
             preds_calibration = self.obj.predict(X_calibration)
             self.calibrated_residuals_ = y_calibration - preds_calibration
@@ -113,8 +114,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             self.icp_ = IcpRegressor(nc)
             self.icp_.fit(X_train, y_train) 
             self.icp_.calibrate(X_calibration, y_calibration)
-            preds_calibration = self.icp_.predict(X_calibration)
-            print(f"\n\n preds_calibration: \n {preds_calibration} \n\n")
+            preds_calibration = self.icp_.predict(X_calibration)            
             self.calibrated_residuals_ = y_calibration - preds_calibration
             absolute_residuals = np.abs(self.calibrated_residuals_)   
             self.calibrated_residuals_scaler_ = StandardScaler(with_mean=True, with_std=True)
