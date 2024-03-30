@@ -88,7 +88,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
         if self.method == "splitconformal": 
 
             n_samples_calibration = X_calibration.shape[0]            
-            q = (self.level/100)*(1 + 1/n_samples_calibration) 
+            q = ((n_samples_calibration + 1)*(1 - self.alpha_))/n_samples_calibration
             print(f"q: {q}")            
             self.obj.fit(X_train, y_train)
             preds_calibration = self.obj.predict(X_calibration)
