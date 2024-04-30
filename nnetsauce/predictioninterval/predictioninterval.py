@@ -96,12 +96,10 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             self.scaled_calibrated_residuals_ = self.calibrated_residuals_scaler_.fit_transform(self.calibrated_residuals_.reshape(-1, 1)).ravel()
             try: 
                 # numpy version >= 1.22
-                self.quantile_ = np.quantile(a = absolute_residuals, q = self.level/100, 
-                method="higher")                                       
+                self.quantile_ = np.quantile(a = absolute_residuals, q = self.level/100, method="higher")                                       
             except:
                 # numpy version < 1.22
-                self.quantile_ = np.quantile(a = absolute_residuals, q = self.level/100, 
-                interpolation="higher")           
+                self.quantile_ = np.quantile(a = absolute_residuals, q = self.level/100, interpolation="higher")           
                 
 
         if self.method == "localconformal":
