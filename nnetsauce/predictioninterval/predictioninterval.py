@@ -161,10 +161,10 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                     np.random.seed(self.seed)               
                     self.residuals_sims_ = np.asarray([np.random.choice(a = self.scaled_calibrated_residuals_, 
                                                             size = X.shape[0]) for _ in range(self.replications)]).T
-                    self.sims_ = np.asarray([pred + self.calibrated_residuals_scaler_.scale_[0]*self.residuals_sims_[:, i].ravel() for i in tqdm(range(self.replications))]).T                                        
+                    self.sims_ = np.asarray([pred + self.calibrated_residuals_scaler_.scale_[0]*self.residuals_sims_[:, i].ravel() for i in range(self.replications)]).T                                        
                 elif self.type_pi == "kde":
                     self.kde_ = gaussian_kde(dataset=self.scaled_calibrated_residuals_)
-                    self.sims_ = np.asarray([pred + self.calibrated_residuals_scaler_.scale_[0]*self.kde_.resample(size = X.shape[0], seed=self.seed+i).ravel() for i in tqdm(range(self.replications))]).T                
+                    self.sims_ = np.asarray([pred + self.calibrated_residuals_scaler_.scale_[0]*self.kde_.resample(size = X.shape[0], seed=self.seed+i).ravel() for i in range(self.replications)]).T                
                 
                 self.mean_ = np.mean(self.sims_, axis=1)
                 self.lower_ = np.quantile(self.sims_, q=self.alpha_ / 200, axis=1)
