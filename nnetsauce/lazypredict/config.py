@@ -10,8 +10,6 @@ removed_classifiers = [
     "GaussianProcessClassifier",
     "GradientBoostingClassifier",
     "HistGradientBoostingClassifier",
-    # "LogisticRegression",
-    # "LogisticRegressionCV",
     "MultiOutputClassifier",
     "MultinomialNB",
     "OneVsOneClassifier",

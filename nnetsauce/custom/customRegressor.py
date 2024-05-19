@@ -195,7 +195,7 @@ class CustomRegressor(Custom, RegressorMixin):
 
     def predict(self, X, 
                 level=95, 
-                method=None,                 
+                method=None,  
                 **kwargs):
         """Predict test data X.
 

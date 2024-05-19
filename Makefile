@@ -50,15 +50,15 @@ lint: ## check style with flake8
 coverage: ## check code coverage quickly with the default Python	
 	coverage report --omit="venv/*,nnetsauce/tests/*" --show-missing
 
-docs: ## generate docs		
-	pip install autopep8 black pdoc 
+docs: install ## generate docs		
+	pip install black pdoc 
 	black nnetsauce/* --line-length=80	
 	find nnetsauce/ -name "*.py" -exec autopep8 --max-line-length=80 --in-place {} +
 	pdoc -t docs nnetsauce/* --output-dir nnetsauce-docs
 	find . -name '__pycache__' -exec rm -fr {} +
 
-servedocs: ## compile the docs watching for change	 	
-	pip install autopep8 black pdoc 
+servedocs: install ## compile the docs watching for change	 	
+	pip install black pdoc 
 	black nnetsauce/* --line-length=80	
 	find nnetsauce/ -name "*.py" -exec autopep8 --max-line-length=80 --in-place {} +
 	pdoc -t docs nnetsauce/* 
