@@ -12,6 +12,7 @@ Randomized and Quasi-Randomized (neural) networks.
 [![HitCount](https://hits.dwyl.com/Techtonique/nnetsauce.svg?style=flat-square)](http://hits.dwyl.com/Techtonique/nnetsauce)
 [![CodeFactor](https://www.codefactor.io/repository/github/techtonique/nnetsauce/badge)](https://www.codefactor.io/repository/github/techtonique/nnetsauce)
 [![Documentation](https://img.shields.io/badge/documentation-is_here-green)](https://techtonique.github.io/nnetsauce/)
+<iframe src="https://github.com/sponsors/Techtonique/card" title="Sponsor Techtonique" height="225" width="600" style="border: 0;"></iframe>
 
 
 ## Contents 
