@@ -159,8 +159,8 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
 
         return self.obj
 
-    def predict(self, X):
-        return self.obj.predict(X)
+    def predict(self, X, **kwargs):
+        return self.obj.predict(X, **kwargs)
 
     def score(self, X, y, scoring=None):
         return self.obj.score(X, y, scoring)
