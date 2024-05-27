@@ -253,6 +253,8 @@ class MTS(Base):
         self.residuals_sims_ = None
         self.kde_ = None
         self.sims_ = None
+        self.n_obs = None
+        self.level = None
 
     def fit(self, X, xreg=None, **kwargs):
         """Fit MTS model to training data X, with optional regressors xreg
@@ -318,6 +320,8 @@ class MTS(Base):
             # univariate time series
             n = X.shape[0]
             p = 1
+        
+        self.n_obs = n
 
         rep_1_n = np.repeat(1, n)
 
@@ -425,6 +429,8 @@ class MTS(Base):
         """
 
         self.output_dates_, frequency = ts.compute_output_dates(self.df_, h)
+
+        self.level = level
 
         self.return_std_ = False  # do not remove (/!\)
 
