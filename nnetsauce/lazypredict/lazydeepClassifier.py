@@ -4,7 +4,7 @@ from copy import deepcopy
 from functools import partial
 from tqdm import tqdm
 import time
-from sklearn.utils.discovery import all_estimators
+from sklearn.utils import all_estimators
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder

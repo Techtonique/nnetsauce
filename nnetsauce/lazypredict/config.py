@@ -1,6 +1,6 @@
 from functools import partial
 from sklearn.base import ClassifierMixin, RegressorMixin
-from sklearn.utils.discovery import all_estimators
+from sklearn.utils import all_estimators
 from ..multitask import MultitaskClassifier, SimpleMultitaskClassifier
 
 

@@ -1,3 +1,8 @@
+
+# version 0.20.5
+
+- Import `all_estimators` from `sklearn.utils` 
+
 # version 0.18.0
 
 - Bayesian `CustomRegressor`
