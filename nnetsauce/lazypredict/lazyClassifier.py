@@ -419,11 +419,12 @@ class LazyClassifier(Custom, ClassifierMixin):
                     if self.predictions:
                         predictions[name] = y_pred
                 except Exception as exception:
-                    if self.ignore_warnings is False:
-                        print(name + " model failed to execute")
-                        print(exception)
-                finally:
-                    continue
+                    try: 
+                        if self.ignore_warnings is False:
+                            print(name + " model failed to execute")
+                            print(exception)                
+                    except Exception as exception:
+                        pass 
 
         else:  # if self.preprocess is False:
 
@@ -532,11 +533,12 @@ class LazyClassifier(Custom, ClassifierMixin):
                     if self.predictions:
                         predictions[name] = y_pred
                 except Exception as exception:
-                    if self.ignore_warnings is False:
-                        print(name + " model failed to execute")
-                        print(exception)
-                finally:
-                    continue
+                    try: 
+                        if self.ignore_warnings is False:
+                            print(name + " model failed to execute")
+                            print(exception)
+                    except Exception as exception:
+                        pass
 
         if self.custom_metric is None:
             scores = pd.DataFrame(
