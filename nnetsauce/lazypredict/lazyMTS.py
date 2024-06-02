@@ -32,15 +32,26 @@ numeric_transformer = Pipeline(
     ]
 )
 
-categorical_transformer_low = Pipeline(
-    steps=[
-        ("imputer", SimpleImputer(strategy="constant", fill_value="missing")),
-        (
-            "encoding",
-            OneHotEncoder(handle_unknown="ignore", sparse_output=False),
-        ),
-    ]
-)
+try: 
+    categorical_transformer_low = Pipeline(
+        steps=[
+            ("imputer", SimpleImputer(strategy="constant", fill_value="missing")),
+            (
+                "encoding",
+                OneHotEncoder(handle_unknown="ignore", sparse_output=False),
+            ),
+        ]
+    )
+except TypeError:
+    categorical_transformer_low = Pipeline(
+        steps=[
+            ("imputer", SimpleImputer(strategy="constant", fill_value="missing")),
+            (
+                "encoding",
+                OneHotEncoder(handle_unknown="ignore", sparse=False),
+            ),
+        ]
+    )
 
 categorical_transformer_high = Pipeline(
     steps=[

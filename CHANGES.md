@@ -1,7 +1,9 @@
 
-# version 0.20.5
+# version 0.20.6
 
+Technical:
 - Import `all_estimators` from `sklearn.utils` 
+- Use both `sparse` and `sparse_output` in `OneHotEncoder` (for compatibility with older versions of sklearn)
 
 # version 0.18.0
 
