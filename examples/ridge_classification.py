@@ -47,6 +47,27 @@ print(f"Elapsed {time() - start}")
 print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
 
 
+# create the model with nnetsauce
+fit_obj = ns.Ridge2Classifier(lambda1 = 6.90185578e+04, 
+                             lambda2 = 3.17392781e+02, 
+                             n_hidden_features=95, 
+                             n_clusters=2, 
+                             dropout = 3.62817383e-01,
+                             type_clust = "gmm")
+
+# fit the model on training set
+start = time()
+fit_obj.fit(X_train, y_train, solver="L-BFGS-B-lstsq")
+print(f"Elapsed {time() - start}") 
+
+# get the accuracy on test set
+start = time()
+print(fit_obj.score(X_test, y_test))
+print(f"Elapsed {time() - start}") 
+
+# get area under the curve on test set (auc)
+print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
+
 # dataset no. 2 ----------
 
 wine = load_wine()
@@ -69,6 +90,20 @@ fit_obj.fit(Z_train, y_train)
 # get the accuracy on test set
 print(fit_obj.score(Z_test, y_test))
 
+
+# create the model with nnetsauce
+fit_obj = ns.Ridge2Classifier(lambda1 = 8.64135756e+04, 
+                             lambda2 = 8.27514666e+04, 
+                             n_hidden_features=109, 
+                             n_clusters=3, 
+                             dropout = 1.84484863e-01,
+                             type_clust = "gmm")
+
+# fit the model on training set
+fit_obj.fit(Z_train, y_train, solver="L-BFGS-B-lstsq")
+
+# get the accuracy on test set
+print(fit_obj.score(Z_test, y_test))
 
 # dataset no. 3 ----------
 
@@ -96,6 +131,23 @@ start = time()
 print(fit_obj.score(Z_test, y_test))
 print(f"Elapsed {time() - start}") 
 
+# create the model with nnetsauce
+fit_obj = ns.Ridge2Classifier(lambda1 = 1.87500081e+04, 
+                             lambda2 = 3.12500069e+04, 
+                             n_hidden_features=47, 
+                             n_clusters=3, 
+                             dropout = 1.31250000e-01,
+                             type_clust = "gmm")
+
+# fit the model on training set
+start = time()
+fit_obj.fit(Z_train, y_train, solver="L-BFGS-B-lstsq")
+print(f"Elapsed {time() - start}") 
+
+# get the accuracy on test set
+start = time()
+print(fit_obj.score(Z_test, y_test))
+print(f"Elapsed {time() - start}") 
 
 # dataset no. 4 ----------
 
@@ -115,6 +167,20 @@ fit_obj = ns.Ridge2Classifier(lambda1 = 7.11914091e+04,
 
 # fit the model on training set
 fit_obj.fit(Z_train, y_train)
+
+# get the accuracy on test set
+print(fit_obj.score(Z_test, y_test))
+
+# create the model with nnetsauce
+fit_obj = ns.Ridge2Classifier(lambda1 = 7.11914091e+04, 
+                             lambda2 = 4.63867241e+04, 
+                             n_hidden_features=13, 
+                             n_clusters=0, 
+                             dropout = 5.21582031e-01,
+                             type_clust = "gmm")
+
+# fit the model on training set
+fit_obj.fit(Z_train, y_train, solver="L-BFGS-B-lstsq")
 
 # get the accuracy on test set
 print(fit_obj.score(Z_test, y_test))

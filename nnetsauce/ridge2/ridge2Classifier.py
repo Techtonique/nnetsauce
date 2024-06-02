@@ -350,7 +350,34 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
                 hess=hessian_func,
                 method=solver,
             ).x
+        if solver == "L-BFGS-B-lstsq":            
+            self.beta_ = minimize(
+                fun=loglik_func,
+                x0=np.linalg.lstsq(scaled_Z, Y, rcond=None)[0].flatten(order="F"),
+                jac=grad_func,
+                method="L-BFGS-B",
+            ).x
+
+        if solver in "Newton-CG-lstsq":
+            self.beta_ = minimize(
+                fun=loglik_func,
+                x0=np.linalg.lstsq(scaled_Z, Y, rcond=None)[0].flatten(order="F"),
+                jac=grad_func,
+                hess=hessian_func,
+                method="Newton-CG",
+            ).x
+        
+        if solver in "trust-ncg-lstsq":
+            self.beta_ = minimize(
+                fun=loglik_func,
+                x0=np.linalg.lstsq(scaled_Z, Y, rcond=None)[0].flatten(order="F"),
+                jac=grad_func,
+                hess=hessian_func,
+                method="trust-ncg",
+            ).x
+
         self.classes_ = np.unique(y)
+        
         return self
 
     def predict(self, X, **kwargs):
