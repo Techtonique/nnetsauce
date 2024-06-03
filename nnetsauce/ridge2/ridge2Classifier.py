@@ -67,6 +67,13 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
         lambda2: float
             regularization parameter on hidden layer
 
+        solver: str
+            optimization function "L-BFGS-B",  "Newton-CG", 
+            "trust-ncg", "L-BFGS-B-lstsq", "Newton-CG-lstsq", 
+            "trust-ncg-lstsq" (see scipy.optimize.minimize)
+            When using "L-BFGS-B-lstsq", "Newton-CG-lstsq", or "trust-ncg-lstsq",
+            the initial value for the optimization is set to the least squares solution
+
         seed: int
             reproducibility seed for nodes_sim=='uniform'
 
@@ -77,7 +84,12 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
 
         beta_: {array-like}
             regression coefficients
+        
+        classes_: {array-like}
+            unique classes in the target variable
 
+        minloglik_: float
+            minimum value of the negative log-likelihood
 
     Examples:
 
@@ -141,6 +153,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
         type_scaling=("std", "std", "std"),
         lambda1=0.1,
         lambda2=0.1,
+        solver="L-BFGS-B",
         seed=123,
         backend="cpu",
     ):
@@ -163,6 +176,10 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
         )
 
         self.type_fit = "classification"
+        self.solver = solver
+        self.beta_ = None
+        self.classes_ = None
+        self.minloglik_ = None
 
     def loglik(self, X, Y, **kwargs):
         """Log-likelihood for training data (X, Y).
@@ -297,7 +314,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
 
     # newton-cg
     # L-BFGS-B
-    def fit(self, X, y, solver="L-BFGS-B", **kwargs):
+    def fit(self, X, y, **kwargs):
         """Fit Ridge model to training data (X, y).
 
         for beta: regression coeffs (beta11, ..., beta1p, ..., betaK1, ..., betaKp)
@@ -334,50 +351,61 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
         # optimize for beta, minimize self.loglik (maximize loglik) -----
         loglik_func, grad_func, hessian_func = self.loglik(X=scaled_Z, Y=Y)
 
-        if solver == "L-BFGS-B":
-            self.beta_ = minimize(
+        if self.solver == "L-BFGS-B":
+            opt = minimize(
                 fun=loglik_func,
                 x0=np.zeros(scaled_Z.shape[1] * self.n_classes),
                 jac=grad_func,
-                method=solver,
-            ).x
+                method=self.solver,
+            )
+            self.beta_ = opt.x
+            self.minloglik_ = opt.fun
 
-        if solver in ("Newton-CG", "trust-ncg"):
-            self.beta_ = minimize(
+        if self.solver in ("Newton-CG", "trust-ncg"):
+            opt = minimize(
                 fun=loglik_func,
                 x0=np.zeros(scaled_Z.shape[1] * self.n_classes),
                 jac=grad_func,
                 hess=hessian_func,
-                method=solver,
-            ).x
-        if solver == "L-BFGS-B-lstsq":            
-            self.beta_ = minimize(
+                method=self.solver,
+            )
+            self.beta_ = opt.x
+            self.minloglik_ = opt.fun
+
+        if self.solver == "L-BFGS-B-lstsq": 
+            opt = minimize(
                 fun=loglik_func,
                 x0=np.linalg.lstsq(scaled_Z, Y, rcond=None)[0].flatten(order="F"),
                 jac=grad_func,
                 method="L-BFGS-B",
-            ).x
+            )         
+            self.beta_ = opt.x
+            self.minloglik_ = opt.fun
 
-        if solver in "Newton-CG-lstsq":
-            self.beta_ = minimize(
+        if self.solver in "Newton-CG-lstsq":
+            opt = minimize(
                 fun=loglik_func,
                 x0=np.linalg.lstsq(scaled_Z, Y, rcond=None)[0].flatten(order="F"),
                 jac=grad_func,
                 hess=hessian_func,
                 method="Newton-CG",
-            ).x
+            )
+            self.beta_ = opt.x
+            self.minloglik_ = opt.fun
         
-        if solver in "trust-ncg-lstsq":
-            self.beta_ = minimize(
+        if self.solver in "trust-ncg-lstsq":
+            opt = minimize(
                 fun=loglik_func,
                 x0=np.linalg.lstsq(scaled_Z, Y, rcond=None)[0].flatten(order="F"),
                 jac=grad_func,
                 hess=hessian_func,
                 method="trust-ncg",
-            ).x
+            )
+            self.beta_ = opt.x
+            self.minloglik_ = opt.fun
 
         self.classes_ = np.unique(y)
-        
+
         return self
 
     def predict(self, X, **kwargs):
