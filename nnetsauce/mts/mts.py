@@ -694,7 +694,7 @@ class MTS(Base):
         # else:
         return scoring_options[scoring](X_test, preds)
 
-    def plot(self, series, type_axis="dates", type_plot="pi"):
+    def plot(self, series=None, type_axis="dates", type_plot="pi"):
         """Plot time series forecast
 
         Parameters:
@@ -711,6 +711,12 @@ class MTS(Base):
                 self.output_dates_ is not None,
             ]
         ), "model forecasting must be obtained first (with predict)"
+
+        if series is None:
+            assert (
+                self.n_series == 1
+            ), "please specify series index or name (n_series > 1)"
+            series = 0
 
         if isinstance(series, str):
             assert (
