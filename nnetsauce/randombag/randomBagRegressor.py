@@ -285,4 +285,3 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
         self.weights = weights
 
         return calculate_preds(self.voter_, weights)
-

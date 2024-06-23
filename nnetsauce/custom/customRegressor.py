@@ -64,20 +64,20 @@ class CustomRegressor(Custom, RegressorMixin):
             scaling methods for inputs, hidden layer, and clustering respectively
             (and when relevant).
             Currently available: standardization ('std') or MinMax scaling ('minmax')
-        
-        type_pi: str.            
+
+        type_pi: str.
             type of prediction interval; currently "kde" (default) or "bootstrap".
-            Used only in `self.predict`, for `self.replications` > 0 and `self.kernel` 
+            Used only in `self.predict`, for `self.replications` > 0 and `self.kernel`
             in ('gaussian', 'tophat'). Default is `None`.
-        
+
         replications: int.
-            number of replications (if needed) for predictive simulation. 
-            Used only in `self.predict`, for `self.kernel` in ('gaussian', 
+            number of replications (if needed) for predictive simulation.
+            Used only in `self.predict`, for `self.kernel` in ('gaussian',
             'tophat') and `self.type_pi = 'kde'`. Default is `None`.
 
         kernel: str.
-            the kernel to use for kernel density estimation (used for predictive 
-            simulation in `self.predict`, with `method='splitconformal'` and 
+            the kernel to use for kernel density estimation (used for predictive
+            simulation in `self.predict`, with `method='splitconformal'` and
             `type_pi = 'kde'`). Currently, either 'gaussian' or 'tophat'.
 
         col_sample: float
@@ -117,9 +117,9 @@ class CustomRegressor(Custom, RegressorMixin):
         cluster_encode=True,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
-        type_pi=None,  
-        replications=None,              
-        kernel=None,        
+        type_pi=None,
+        replications=None,
+        kernel=None,
         col_sample=1,
         row_sample=1,
         seed=123,
@@ -145,9 +145,9 @@ class CustomRegressor(Custom, RegressorMixin):
         )
 
         self.type_fit = "regression"
-        self.type_pi=type_pi
-        self.replications=replications
-        self.kernel=kernel        
+        self.type_pi = type_pi
+        self.replications = replications
+        self.kernel = kernel
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit custom model to training data (X, y).
@@ -189,14 +189,11 @@ class CustomRegressor(Custom, RegressorMixin):
 
         self.X_ = X
 
-        self.y_ = y        
+        self.y_ = y
 
         return self
 
-    def predict(self, X, 
-                level=95, 
-                method=None,  
-                **kwargs):
+    def predict(self, X, level=95, method=None, **kwargs):
         """Predict test data X.
 
         Parameters:
@@ -204,29 +201,29 @@ class CustomRegressor(Custom, RegressorMixin):
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number
                 of samples and n_features is the number of features.
-            
+
             level: int
                 Level of confidence (default = 95)
-            
+
             method: str
-                `None`, or 'splitconformal', 'localconformal'  
+                `None`, or 'splitconformal', 'localconformal'
                 prediction (if you specify `return_pi = True`)
-            
-            **kwargs: additional parameters 
-                    `return_pi = True` for conformal prediction, 
-                    with `method` in ('splitconformal', 'localconformal') 
-                    or `return_std = True` for `self.obj` in 
-                    (`sklearn.linear_model.BayesianRidge`, 
-                    `sklearn.linear_model.ARDRegressor`,  
+
+            **kwargs: additional parameters
+                    `return_pi = True` for conformal prediction,
+                    with `method` in ('splitconformal', 'localconformal')
+                    or `return_std = True` for `self.obj` in
+                    (`sklearn.linear_model.BayesianRidge`,
+                    `sklearn.linear_model.ARDRegressor`,
                     `sklearn.gaussian_process.GaussianProcessRegressor`)`
 
         Returns:
 
             model predictions:
                 an array if uncertainty quantification is not requested,
-                  or a tuple if with prediction intervals and simulations 
-                  if `return_std = True` (mean, standard deviation, 
-                  lower and upper prediction interval) or `return_pi = True` 
+                  or a tuple if with prediction intervals and simulations
+                  if `return_std = True` (mean, standard deviation,
+                  lower and upper prediction interval) or `return_pi = True`
                   ()
 
         """
@@ -245,39 +242,42 @@ class CustomRegressor(Custom, RegressorMixin):
                 )
 
                 mean_, std_ = self.obj.predict(
-                        self.cook_test_set(new_X, **kwargs), return_std=True
-                    )[0]
-                
-                preds = self.y_mean_ + mean_                 
-                lower = self.y_mean_ + (mean_ - pi_multiplier*std_)
-                upper = self.y_mean_ + (mean_ + pi_multiplier*std_)
+                    self.cook_test_set(new_X, **kwargs), return_std=True
+                )[0]
+
+                preds = self.y_mean_ + mean_
+                lower = self.y_mean_ + (mean_ - pi_multiplier * std_)
+                upper = self.y_mean_ + (mean_ + pi_multiplier * std_)
 
                 return preds, std_, lower, upper
 
             # len(X.shape) > 1
             mean_, std_ = self.obj.predict(
-                        self.cook_test_set(X, **kwargs), return_std=True
-                    )
-                
-            preds = self.y_mean_ + mean_                 
-            lower = self.y_mean_ + (mean_ - pi_multiplier*std_)
-            upper = self.y_mean_ + (mean_ + pi_multiplier*std_)
+                self.cook_test_set(X, **kwargs), return_std=True
+            )
+
+            preds = self.y_mean_ + mean_
+            lower = self.y_mean_ + (mean_ - pi_multiplier * std_)
+            upper = self.y_mean_ + (mean_ + pi_multiplier * std_)
 
             return preds, std_, lower, upper
 
         if "return_pi" in kwargs:
-            assert method in ('splitconformal', 'localconformal'), \
-                "method must be in ('splitconformal', 'localconformal')"
-            self.pi = PredictionInterval(obj = self, 
-                                         method=method, 
-                                         level=level,
-                                         type_pi=self.type_pi,
-                                         replications=self.replications,   
-                                         kernel=self.kernel,
-                                         )            
+            assert method in (
+                "splitconformal",
+                "localconformal",
+            ), "method must be in ('splitconformal', 'localconformal')"
+            self.pi = PredictionInterval(
+                obj=self,
+                method=method,
+                level=level,
+                type_pi=self.type_pi,
+                replications=self.replications,
+                kernel=self.kernel,
+            )
             self.pi.fit(self.X_, self.y_)
             self.X_ = None
-            self.y_ = None 
+            self.y_ = None
             preds = self.pi.predict(X, return_pi=True)
             return preds
 

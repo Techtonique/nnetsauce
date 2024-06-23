@@ -254,4 +254,3 @@ class BayesianRVFLRegressor(Base, RegressorMixin):
             )
 
             return (self.y_mean_ + pred_obj["preds"], pred_obj["preds_std"])
-

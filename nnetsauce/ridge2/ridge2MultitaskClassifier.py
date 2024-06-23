@@ -178,7 +178,7 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
 
         assert mx.is_factor(y), "y must contain only integers"
 
-        self.n_classes_ = len(np.unique(y)) # for compatibility with sklearn 
+        self.n_classes_ = len(np.unique(y))  # for compatibility with sklearn
 
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 

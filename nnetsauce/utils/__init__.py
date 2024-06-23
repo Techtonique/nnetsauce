@@ -40,5 +40,5 @@ __all__ = [
     "reformat_response",
     "tuple_map",
     "TimeSeriesSplit",
-    "Progbar",    
+    "Progbar",
 ]

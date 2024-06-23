@@ -37,20 +37,26 @@ numeric_transformer = Pipeline(
     ]
 )
 
-try: 
+try:
     categorical_transformer_low = Pipeline(
         steps=[
-            ("imputer", SimpleImputer(strategy="constant", fill_value="missing")),
+            (
+                "imputer",
+                SimpleImputer(strategy="constant", fill_value="missing"),
+            ),
             (
                 "encoding",
                 OneHotEncoder(handle_unknown="ignore", sparse_output=False),
             ),
         ]
     )
-except TypeError: 
+except TypeError:
     categorical_transformer_low = Pipeline(
         steps=[
-            ("imputer", SimpleImputer(strategy="constant", fill_value="missing")),
+            (
+                "imputer",
+                SimpleImputer(strategy="constant", fill_value="missing"),
+            ),
             (
                 "encoding",
                 OneHotEncoder(handle_unknown="ignore", sparse=False),
@@ -430,12 +436,12 @@ class LazyClassifier(Custom, ClassifierMixin):
                     if self.predictions:
                         predictions[name] = y_pred
                 except Exception as exception:
-                    try: 
+                    try:
                         if self.ignore_warnings is False:
                             print(name + " model failed to execute")
-                            print(exception)                
+                            print(exception)
                     except Exception as exception:
-                        pass 
+                        pass
 
         else:  # if self.preprocess is False:
 
@@ -544,7 +550,7 @@ class LazyClassifier(Custom, ClassifierMixin):
                     if self.predictions:
                         predictions[name] = y_pred
                 except Exception as exception:
-                    try: 
+                    try:
                         if self.ignore_warnings is False:
                             print(name + " model failed to execute")
                             print(exception)

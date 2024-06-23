@@ -1,4 +1,4 @@
-import os 
+import os
 import numpy as np
 import unittest as ut
 import nnetsauce as ns
@@ -285,10 +285,7 @@ class TestBase(ut.TestCase):
         print(f"r2: {r2}")
         print(f"rmse: {rmse}")
 
-        self.assertTrue(
-            test_check(r2, 0.93)
-            & test_check(rmse, 39.95)
-        )
+        self.assertTrue(test_check(r2, 0.93) & test_check(rmse, 39.95))
 
 
 if __name__ == "__main__":

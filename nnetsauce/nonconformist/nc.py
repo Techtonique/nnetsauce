@@ -21,8 +21,7 @@ from .base import OobClassifierAdapter, OobRegressorAdapter
 
 
 class ClassificationErrFunc(object):
-    """Base class for classification model error functions.
-    """
+    """Base class for classification model error functions."""
 
     __metaclass__ = abc.ABCMeta
 
@@ -50,8 +49,7 @@ class ClassificationErrFunc(object):
 
 
 class RegressionErrFunc(object):
-    """Base class for regression model error functions.
-    """
+    """Base class for regression model error functions."""
 
     __metaclass__ = abc.ABCMeta
 
@@ -59,7 +57,7 @@ class RegressionErrFunc(object):
         super(RegressionErrFunc, self).__init__()
 
     @abc.abstractmethod
-    def apply(self, prediction, y):#, norm=None, beta=0):
+    def apply(self, prediction, y):  # , norm=None, beta=0):
         """Apply the nonconformity function.
 
         Parameters
@@ -78,7 +76,7 @@ class RegressionErrFunc(object):
         pass
 
     @abc.abstractmethod
-    def apply_inverse(self, nc, significance):#, norm=None, beta=0):
+    def apply_inverse(self, nc, significance):  # , norm=None, beta=0):
         """Apply the inverse of the nonconformity function (i.e.,
         calculate prediction interval).
 
@@ -147,10 +145,10 @@ class MarginErrFunc(ClassificationErrFunc):
 class AbsErrorErrFunc(RegressionErrFunc):
     """Calculates absolute error nonconformity for regression problems.
 
-        For each correct output in ``y``, nonconformity is defined as
+    For each correct output in ``y``, nonconformity is defined as
 
-        .. math::
-            | y_i - \hat{y}_i |
+    .. math::
+        | y_i - \hat{y}_i |
     """
 
     def __init__(self):
@@ -186,82 +184,87 @@ class SignErrorErrFunc(RegressionErrFunc):
         super(SignErrorErrFunc, self).__init__()
 
     def apply(self, prediction, y):
-        return (prediction - y)
+        return prediction - y
 
     def apply_inverse(self, nc, significance):
-        
+
         err_high = -nc
         err_low = nc
-        
-        err_high = np.reshape(err_high, (nc.shape[0],1))
-        err_low = np.reshape(err_low, (nc.shape[0],1))
-        
-        nc = np.concatenate((err_low,err_high),1)
-        
-        nc = np.sort(nc,0)
+
+        err_high = np.reshape(err_high, (nc.shape[0], 1))
+        err_low = np.reshape(err_low, (nc.shape[0], 1))
+
+        nc = np.concatenate((err_low, err_high), 1)
+
+        nc = np.sort(nc, 0)
         index = int(np.ceil((1 - significance / 2) * (nc.shape[0] + 1))) - 1
         index = min(max(index, 0), nc.shape[0] - 1)
-        return np.vstack([nc[index,0], nc[index,1]])
+        return np.vstack([nc[index, 0], nc[index, 1]])
+
 
 # CQR symmetric error function
 class QuantileRegErrFunc(RegressionErrFunc):
     """Calculates conformalized quantile regression error.
-    
+
     For each correct output in ``y``, nonconformity is defined as
-    
+
     .. math::
         max{\hat{q}_low - y, y - \hat{q}_high}
-    
+
     """
+
     def __init__(self):
         super(QuantileRegErrFunc, self).__init__()
 
     def apply(self, prediction, y):
-        y_lower = prediction[:,0]
-        y_upper = prediction[:,-1]
+        y_lower = prediction[:, 0]
+        y_upper = prediction[:, -1]
         error_low = y_lower - y
         error_high = y - y_upper
-        err = np.maximum(error_high,error_low)
+        err = np.maximum(error_high, error_low)
         return err
 
     def apply_inverse(self, nc, significance):
-        nc = np.sort(nc,0)
+        nc = np.sort(nc, 0)
         index = int(np.ceil((1 - significance) * (nc.shape[0] + 1))) - 1
         index = min(max(index, 0), nc.shape[0] - 1)
         return np.vstack([nc[index], nc[index]])
 
-# CQR asymmetric error function 
+
+# CQR asymmetric error function
 class QuantileRegAsymmetricErrFunc(RegressionErrFunc):
     """Calculates conformalized quantile regression asymmetric error function.
-    
+
     For each correct output in ``y``, nonconformity is defined as
-    
+
     .. math::
         E_low = \hat{q}_low - y
         E_high = y - \hat{q}_high
-    
+
     """
+
     def __init__(self):
         super(QuantileRegAsymmetricErrFunc, self).__init__()
 
     def apply(self, prediction, y):
-        y_lower = prediction[:,0]
-        y_upper = prediction[:,-1]
-        
-        error_high = y - y_upper 
-        error_low = y_lower - y
-        
-        err_high = np.reshape(error_high, (y_upper.shape[0],1))
-        err_low = np.reshape(error_low, (y_lower.shape[0],1))
+        y_lower = prediction[:, 0]
+        y_upper = prediction[:, -1]
 
-        return np.concatenate((err_low,err_high),1)
+        error_high = y - y_upper
+        error_low = y_lower - y
+
+        err_high = np.reshape(error_high, (y_upper.shape[0], 1))
+        err_low = np.reshape(error_low, (y_lower.shape[0], 1))
+
+        return np.concatenate((err_low, err_high), 1)
 
     def apply_inverse(self, nc, significance):
-        nc = np.sort(nc,0)
+        nc = np.sort(nc, 0)
         index = int(np.ceil((1 - significance / 2) * (nc.shape[0] + 1))) - 1
         index = min(max(index, 0), nc.shape[0] - 1)
-        return np.vstack([nc[index,0], nc[index,1]])
-    
+        return np.vstack([nc[index, 0], nc[index, 1]])
+
+
 # -----------------------------------------------------------------------------
 # Base nonconformity scorer
 # -----------------------------------------------------------------------------
@@ -330,20 +333,20 @@ class NcFactory(object):
             if oob:
                 c = sklearn.base.clone(model)
                 c.fit([[0], [1]], [0, 1])
-                if hasattr(c, 'oob_decision_function_'):
+                if hasattr(c, "oob_decision_function_"):
                     adapter = OobClassifierAdapter(model)
                 else:
-                    raise AttributeError('Cannot use out-of-bag '
-                                          'calibration with {}'.format(
-                        model.__class__.__name__
-                    ))
+                    raise AttributeError(
+                        "Cannot use out-of-bag "
+                        "calibration with {}".format(model.__class__.__name__)
+                    )
             else:
                 adapter = ClassifierAdapter(model)
 
             if normalizer_adapter is not None:
-                normalizer = RegressorNormalizer(adapter,
-                                                 normalizer_adapter,
-                                                 err_func)
+                normalizer = RegressorNormalizer(
+                    adapter, normalizer_adapter, err_func
+                )
                 return ClassifierNc(adapter, err_func, normalizer)
             else:
                 return ClassifierNc(adapter, err_func)
@@ -353,20 +356,20 @@ class NcFactory(object):
             if oob:
                 c = sklearn.base.clone(model)
                 c.fit([[0], [1]], [0, 1])
-                if hasattr(c, 'oob_prediction_'):
+                if hasattr(c, "oob_prediction_"):
                     adapter = OobRegressorAdapter(model)
                 else:
-                    raise AttributeError('Cannot use out-of-bag '
-                                         'calibration with {}'.format(
-                        model.__class__.__name__
-                    ))
+                    raise AttributeError(
+                        "Cannot use out-of-bag "
+                        "calibration with {}".format(model.__class__.__name__)
+                    )
             else:
                 adapter = RegressorAdapter(model)
 
             if normalizer_adapter is not None:
-                normalizer = RegressorNormalizer(adapter,
-                                                 normalizer_adapter,
-                                                 err_func)
+                normalizer = RegressorNormalizer(
+                    adapter, normalizer_adapter, err_func
+                )
                 return RegressorNc(adapter, err_func, normalizer)
             else:
                 return RegressorNc(adapter, err_func)
@@ -392,6 +395,7 @@ class BaseModelNc(BaseScorer):
         the normalized nonconformity function approaches a non-normalized
         equivalent.
     """
+
     def __init__(self, model, err_func, normalizer=None, beta=1e-6):
         super(BaseModelNc, self).__init__()
         self.err_func = err_func
@@ -402,8 +406,9 @@ class BaseModelNc(BaseScorer):
         # If we use sklearn.base.clone (e.g., during cross-validation),
         # object references get jumbled, so we need to make sure that the
         # normalizer has a reference to the proper model adapter, if applicable.
-        if (self.normalizer is not None and
-            hasattr(self.normalizer, 'base_model')):
+        if self.normalizer is not None and hasattr(
+            self.normalizer, "base_model"
+        ):
             self.normalizer.base_model = self.model
 
         self.last_x, self.last_y = None, None
@@ -453,7 +458,7 @@ class BaseModelNc(BaseScorer):
         else:
             norm = np.ones(n_test)
         if prediction.ndim > 1:
-            ret_val = self.err_func.apply(prediction, y) 
+            ret_val = self.err_func.apply(prediction, y)
         else:
             ret_val = self.err_func.apply(prediction, y) / norm
         return ret_val
@@ -495,15 +500,11 @@ class ClassifierNc(BaseModelNc):
     --------
     RegressorNc, NormalizedRegressorNc
     """
-    def __init__(self,
-                 model,
-                 err_func=MarginErrFunc(),
-                 normalizer=None,
-                 beta=1e-6):
-        super(ClassifierNc, self).__init__(model,
-                                           err_func,
-                                           normalizer,
-                                           beta)
+
+    def __init__(
+        self, model, err_func=MarginErrFunc(), normalizer=None, beta=1e-6
+    ):
+        super(ClassifierNc, self).__init__(model, err_func, normalizer, beta)
 
 
 # -----------------------------------------------------------------------------
@@ -540,15 +541,11 @@ class RegressorNc(BaseModelNc):
     --------
     ProbEstClassifierNc, NormalizedRegressorNc
     """
-    def __init__(self,
-                 model,
-                 err_func=AbsErrorErrFunc(),
-                 normalizer=None,
-                 beta=1e-6):
-        super(RegressorNc, self).__init__(model,
-                                          err_func,
-                                          normalizer,
-                                          beta)
+
+    def __init__(
+        self, model, err_func=AbsErrorErrFunc(), normalizer=None, beta=1e-6
+    ):
+        super(RegressorNc, self).__init__(model, err_func, normalizer, beta)
 
     def predict(self, x, nc, significance=None):
         """Constructs prediction intervals for a set of test examples.
@@ -589,16 +586,16 @@ class RegressorNc(BaseModelNc):
             intervals = np.zeros((x.shape[0], 2))
             err_dist = self.err_func.apply_inverse(nc, significance)
             err_dist = np.hstack([err_dist] * n_test)
-            if prediction.ndim > 1: # CQR
-                intervals[:, 0] = prediction[:,0] - err_dist[0, :]
-                intervals[:, 1] = prediction[:,-1] + err_dist[1, :]
-            else: # regular conformal prediction
+            if prediction.ndim > 1:  # CQR
+                intervals[:, 0] = prediction[:, 0] - err_dist[0, :]
+                intervals[:, 1] = prediction[:, -1] + err_dist[1, :]
+            else:  # regular conformal prediction
                 err_dist *= norm
                 intervals[:, 0] = prediction - err_dist[0, :]
                 intervals[:, 1] = prediction + err_dist[1, :]
 
             return intervals
-        else: # Not tested for CQR
+        else:  # Not tested for CQR
             significance = np.arange(0.01, 1.0, 0.01)
             intervals = np.zeros((x.shape[0], 2, significance.size))
 

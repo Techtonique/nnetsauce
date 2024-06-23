@@ -1,5 +1,5 @@
 import numpy as np
-import os 
+import os
 from sklearn import datasets, linear_model, gaussian_process
 import unittest as ut
 import nnetsauce as ns

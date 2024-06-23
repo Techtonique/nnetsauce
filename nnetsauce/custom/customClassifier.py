@@ -187,7 +187,7 @@ class CustomClassifier(Custom, ClassifierMixin):
         """
 
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
-        self.n_classes_ = len(np.unique(y)) # for compatibility with sklearn 
+        self.n_classes_ = len(np.unique(y))  # for compatibility with sklearn
 
         # if sample_weights, else: (must use self.row_index)
         if sample_weight is not None:

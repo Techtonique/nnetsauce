@@ -72,8 +72,8 @@ class MTS(Base):
 
         lags: int.
             number of lags used for each time series.
-        
-        type_pi: str.            
+
+        type_pi: str.
             type of prediction interval: currently "kde" (default) or "bootstrap"
 
         replications: int.
@@ -320,7 +320,7 @@ class MTS(Base):
             # univariate time series
             n = X.shape[0]
             p = 1
-        
+
         self.n_obs = n
 
         rep_1_n = np.repeat(1, n)
@@ -757,7 +757,7 @@ class MTS(Base):
                 alpha=0.2,
                 color="orange",
             )
-            if self.n_series > 1: 
+            if self.n_series > 1:
                 plt.title(
                     f"prediction intervals for {self.replications} simulations of {series}",
                     loc="left",
@@ -793,7 +793,7 @@ class MTS(Base):
             plt.plot(x_all, y_all, "-", color="black")
             plt.plot(x_test, y_test, "-", color="blue")
             # Add titles
-            if self.n_series > 1: 
+            if self.n_series > 1:
                 plt.title(
                     f"{self.replications} simulations of {series}",
                     loc="left",

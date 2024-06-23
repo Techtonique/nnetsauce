@@ -221,7 +221,7 @@ class GLMClassifier(GLM, ClassifierMixin):
             y
         ), "y must contain only integers"  # change is_factor and subsampling everywhere
 
-        self.n_classes_ = len(np.unique(y)) # for compatibility with sklearn 
+        self.n_classes_ = len(np.unique(y))  # for compatibility with sklearn
 
         self.beta_ = None
 

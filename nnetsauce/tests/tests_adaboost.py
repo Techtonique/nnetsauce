@@ -1,4 +1,4 @@
-import os 
+import os
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_breast_cancer, load_wine
 
 print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
+
 
 class TestAdaBoost(ut.TestCase):
     def test_AdaBoost(self):
@@ -130,8 +131,11 @@ class TestAdaBoost(ut.TestCase):
         fit_obj4.fit(Z_train, t_train)
         preds4 = fit_obj4.predict_proba(Z_test)
 
-        fit_obj5.fit(Z_train, t_train, 
-                     sample_weight = np.repeat(1.0/len(t_train), len(t_train)))
+        fit_obj5.fit(
+            Z_train,
+            t_train,
+            sample_weight=np.repeat(1.0 / len(t_train), len(t_train)),
+        )
         preds5 = fit_obj5.predict_proba(Z_test)
 
         print(preds1[0, 0])

@@ -120,7 +120,7 @@ class Base(BaseEstimator):
                 "No GPU/TPU computing on Windows yet, backend set to 'cpu'"
             )
             backend = "cpu"
-        
+
         assert activation_name in (
             "relu",
             "tanh",
@@ -171,9 +171,9 @@ class Base(BaseEstimator):
         self.col_sample = col_sample
         self.row_sample = row_sample
         self.n_clusters = n_clusters
-        if isinstance(self, RegressorMixin):   
+        if isinstance(self, RegressorMixin):
             self.type_fit = "regression"
-        elif isinstance(self, ClassifierMixin):   
+        elif isinstance(self, ClassifierMixin):
             self.type_fit = "classification"
         self.subsampler_ = None
         self.index_col_ = None
@@ -693,7 +693,6 @@ class Base(BaseEstimator):
 
         # if no hidden layer
         return self.scaler_.transform(augmented_X)
-    
 
     def score(self, X, y, scoring=None, **kwargs):
         """Score the model on test set features X and response y.
@@ -798,4 +797,3 @@ class Base(BaseEstimator):
             }
 
             return scoring_options[scoring](y, preds, **kwargs)
-

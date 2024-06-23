@@ -161,9 +161,9 @@ class TestMTS(ut.TestCase):
         err = fit_obj.predict() - X_test
         rmse = np.sqrt(np.mean(err**2))
 
-        #fit_obj.fit(X_train, xreg=Xreg_train)
-        #err_xreg = fit_obj.predict() - X_test
-        #rmse_xreg = np.sqrt(np.mean(err_xreg**2))
+        # fit_obj.fit(X_train, xreg=Xreg_train)
+        # err_xreg = fit_obj.predict() - X_test
+        # rmse_xreg = np.sqrt(np.mean(err_xreg**2))
 
         fit_obj2.fit(X_train)
         err2 = fit_obj2.predict() - X_test
@@ -200,7 +200,7 @@ class TestMTS(ut.TestCase):
         preds6 = fit_obj10.predict(return_std=True)
 
         self.assertTrue(np.allclose(rmse, 10.395403649098926))
-        #self.assertTrue(np.allclose(rmse_xreg, 10.401634671488587))
+        # self.assertTrue(np.allclose(rmse_xreg, 10.401634671488587))
         self.assertTrue(np.allclose(rmse2, 10.395285391773202))
         self.assertTrue(np.allclose(rmse3, 10.394290838542101))
         self.assertTrue(np.allclose(rmse4, 10.371173921434293))

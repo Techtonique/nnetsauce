@@ -68,8 +68,8 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
             regularization parameter on hidden layer
 
         solver: str
-            optimization function "L-BFGS-B",  "Newton-CG", 
-            "trust-ncg", "L-BFGS-B-lstsq", "Newton-CG-lstsq", 
+            optimization function "L-BFGS-B",  "Newton-CG",
+            "trust-ncg", "L-BFGS-B-lstsq", "Newton-CG-lstsq",
             "trust-ncg-lstsq" (see scipy.optimize.minimize)
             When using "L-BFGS-B-lstsq", "Newton-CG-lstsq", or "trust-ncg-lstsq",
             the initial value for the optimization is set to the least squares solution
@@ -84,7 +84,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
 
         beta_: {array-like}
             regression coefficients
-        
+
         classes_: {array-like}
             unique classes in the target variable
 
@@ -340,7 +340,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
 
         assert mx.is_factor(y), "y must contain only integers"
 
-        self.n_classes_ = len(np.unique(y)) # for compatibility with sklearn 
+        self.n_classes_ = len(np.unique(y))  # for compatibility with sklearn
 
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
@@ -372,31 +372,37 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
             self.beta_ = opt.x
             self.minloglik_ = opt.fun
 
-        if self.solver == "L-BFGS-B-lstsq": 
+        if self.solver == "L-BFGS-B-lstsq":
             opt = minimize(
                 fun=loglik_func,
-                x0=np.linalg.lstsq(scaled_Z, Y, rcond=None)[0].flatten(order="F"),
+                x0=np.linalg.lstsq(scaled_Z, Y, rcond=None)[0].flatten(
+                    order="F"
+                ),
                 jac=grad_func,
                 method="L-BFGS-B",
-            )         
+            )
             self.beta_ = opt.x
             self.minloglik_ = opt.fun
 
         if self.solver in "Newton-CG-lstsq":
             opt = minimize(
                 fun=loglik_func,
-                x0=np.linalg.lstsq(scaled_Z, Y, rcond=None)[0].flatten(order="F"),
+                x0=np.linalg.lstsq(scaled_Z, Y, rcond=None)[0].flatten(
+                    order="F"
+                ),
                 jac=grad_func,
                 hess=hessian_func,
                 method="Newton-CG",
             )
             self.beta_ = opt.x
             self.minloglik_ = opt.fun
-        
+
         if self.solver in "trust-ncg-lstsq":
             opt = minimize(
                 fun=loglik_func,
-                x0=np.linalg.lstsq(scaled_Z, Y, rcond=None)[0].flatten(order="F"),
+                x0=np.linalg.lstsq(scaled_Z, Y, rcond=None)[0].flatten(
+                    order="F"
+                ),
                 jac=grad_func,
                 hess=hessian_func,
                 method="trust-ncg",

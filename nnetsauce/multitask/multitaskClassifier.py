@@ -189,7 +189,7 @@ class MultitaskClassifier(Base, ClassifierMixin):
 
         assert mx.is_factor(y), "y must contain only integers"
 
-        self.n_classes_ = len(np.unique(y)) # for compatibility with sklearn 
+        self.n_classes_ = len(np.unique(y))  # for compatibility with sklearn
 
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
@@ -273,4 +273,3 @@ class MultitaskClassifier(Base, ClassifierMixin):
         expit_raw_probs = expit(probs)
 
         return expit_raw_probs / expit_raw_probs.sum(axis=1)[:, None]
-
