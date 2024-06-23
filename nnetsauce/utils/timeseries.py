@@ -8,14 +8,14 @@ import numpy as np
 import pandas as pd
 
 # basic block bootstrap
-def block_bootstrap(x, h, block_size, B):
+def block_bootstrap(x, h, size, B):
     """
     Generates block bootstrap indices for a given time series.
 
     Parameters:
     - x: numpy array, the original time series (univariate or multivariate).
     - h: int, output length 
-    - block_size: int, the size of the blocks to resample.
+    - size: int, the size of the blocks to resample.
     - B: int, the number of bootstrap samples to generate.
 
     Returns:
@@ -27,7 +27,7 @@ def block_bootstrap(x, h, block_size, B):
     else:
       time_series_length = x.shape[0]
       ndim = x.shape[1]
-    num_blocks = (time_series_length + block_size - 1) // block_size
+    num_blocks = (time_series_length + size - 1) // size
     all_indices = np.arange(time_series_length)
     resamples = []
 
@@ -35,16 +35,16 @@ def block_bootstrap(x, h, block_size, B):
       for _ in range(B):
           indices = []
           for _ in range(num_blocks):
-              start_index = np.random.randint(0, time_series_length - block_size + 1)
-              block_indices = all_indices[start_index:start_index + block_size]
+              start_index = np.random.randint(0, time_series_length - size + 1)
+              block_indices = all_indices[start_index:start_index + size]
               indices.extend(block_indices)
           resamples.append(x[np.array(indices[:h])])
     else: # ndim >= 2 
       for _ in range(B):
           indices = []
           for _ in range(num_blocks):
-              start_index = np.random.randint(0, time_series_length - block_size + 1)
-              block_indices = all_indices[start_index:start_index + block_size]
+              start_index = np.random.randint(0, time_series_length - size + 1)
+              block_indices = all_indices[start_index:start_index + size]
               indices.extend(block_indices)
           resamples.append(x[np.array(indices[:h]), :])
 
