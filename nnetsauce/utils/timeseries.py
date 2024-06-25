@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 # basic block bootstrap
-def block_bootstrap(x, h, size, B):
+def block_bootstrap(x, h, size, B, seed):
     """
     Generates block bootstrap indices for a given time series.
 
@@ -17,6 +17,7 @@ def block_bootstrap(x, h, size, B):
     - h: int, output length 
     - size: int, the size of the blocks to resample.
     - B: int, the number of bootstrap samples to generate.
+    - seed: int, reproducibility seed.
 
     Returns:
     - resampled_indices: list of numpy arrays, each containing indices for a resampled time series.

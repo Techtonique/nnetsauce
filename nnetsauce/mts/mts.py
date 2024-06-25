@@ -330,7 +330,7 @@ class MTS(Base):
         self.n_series = p
         self.fit_objs_.clear()
         self.y_means_.clear()
-        residuals_ = []
+        residuals_ = []        
         self.residuals_ = None
         self.residuals_sims_ = None
         self.kde_ = None
@@ -366,20 +366,42 @@ class MTS(Base):
         else:
             iterator = range(p)
 
-        for i in iterator:
-            y_mean = np.mean(self.y_[:, i])
-            self.y_means_[i] = y_mean
-            centered_y_i = self.y_[:, i] - y_mean
-            self.centered_y_is_.append(centered_y_i)
-            self.obj.fit(X=scaled_Z, y=centered_y_i)
-            self.fit_objs_[i] = deepcopy(self.obj)
-            residuals_.append(
-                (centered_y_i - self.fit_objs_[i].predict(scaled_Z)).tolist()
-            )
+        if self.type_pi in ("kde", "bootstrap"):
+            for i in iterator:
+                y_mean = np.mean(self.y_[:, i])
+                self.y_means_[i] = y_mean
+                centered_y_i = self.y_[:, i] - y_mean
+                self.centered_y_is_.append(centered_y_i)
+                self.obj.fit(X=scaled_Z, y=centered_y_i)
+                self.fit_objs_[i] = deepcopy(self.obj)
+                residuals_.append(
+                    (centered_y_i - self.fit_objs_[i].predict(scaled_Z)).tolist()
+                )
+        
+        if self.type_pi in ("scp-kde", "scp-bootstrap"):
+            # split conformal prediction
+            for i in iterator:
+                n_y = self.y_.shape[0]
+                n_y_half = int(0.5*n_y)
+                first_half_idx = range(0, n_y_half)
+                second_half_idx = range(n_y_half, n_y)
+                y_mean_temp = np.mean(self.y_[first_half_idx, i])
+                centered_y_i_temp = self.y_[first_half_idx, i] - y_mean_temp
+                self.obj.fit(X=scaled_Z[first_half_idx,:], y=centered_y_i_temp)
+                # calibrated residuals actually
+                residuals_.append(
+                    (self.y_[second_half_idx, i] - (y_mean_temp + self.obj.predict(scaled_Z[second_half_idx,:]))).tolist()
+                )
+                # fit on the second half
+                y_mean = np.mean(self.y_[second_half_idx, i])
+                self.y_means_[i] = y_mean
+                centered_y_i = self.y_[second_half_idx, i] - y_mean
+                self.obj.fit(X=scaled_Z[second_half_idx,:], y=centered_y_i)
+                self.fit_objs_[i] = deepcopy(self.obj)
 
         self.residuals_ = np.asarray(residuals_).T
 
-        if self.replications != None and self.type_pi == "kde":
+        if self.replications != None and self.type_pi in ("kde", "scp-kde"):
             if self.verbose > 0:
                 print(f"\n Simulate residuals using {self.kernel} kernel... \n")
             assert self.kernel in (
@@ -458,7 +480,7 @@ class MTS(Base):
                 "DescribeResult", ("mean", "lower", "upper")
             )  # to be updated
 
-        if self.kde_ != None and self.type_pi == "kde":
+        if self.kde_ != None and self.type_pi in ("kde", "scp-kde"):
             pi_multiplier = norm.ppf(1 - self.alpha_ / 200)
             self.residuals_sims_ = tuple(
                 self.kde_.sample(n_samples=h, random_state=self.seed + 100 * i)
