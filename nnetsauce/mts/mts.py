@@ -382,7 +382,7 @@ class MTS(Base):
             # split conformal prediction
             for i in iterator:
                 n_y = self.y_.shape[0]
-                n_y_half = int(0.5*n_y)
+                n_y_half = n_y//2
                 first_half_idx = range(0, n_y_half)
                 second_half_idx = range(n_y_half, n_y)
                 y_mean_temp = np.mean(self.y_[first_half_idx, i])
