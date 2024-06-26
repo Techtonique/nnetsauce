@@ -101,3 +101,65 @@ print(obj_MTS3.kde_)
 print(f" Predictive simulations #1 {obj_MTS3.sims_[0]}") 
 print(f" Predictive simulations #2 {obj_MTS3.sims_[1]}") 
 print(f" Predictive simulations #3 {obj_MTS3.sims_[2]}") 
+
+
+print(f"\n 3. fit ElasticNet bootstrap: ------- \n")
+
+regr3 = linear_model.ElasticNet()
+obj_MTS3 = ns.MTS(regr3, lags = 3, n_hidden_features=7, 
+                  replications=10, kernel='gaussian', 
+                  seed=24, verbose = 1, type_pi="bootstrap")
+start = time()
+obj_MTS3.fit(df_train)
+print(f"Elapsed {time()-start} s")
+print("\n\n")
+print(f"obj_MTS3.predict(h=5): {obj_MTS3.predict(h=5)}")
+print(f" Predictive simulations #1 {obj_MTS3.sims_[0]}") 
+print(f" Predictive simulations #2 {obj_MTS3.sims_[1]}") 
+print(f" Predictive simulations #3 {obj_MTS3.sims_[2]}") 
+
+print(f"\n 4. fit ElasticNet SCP bootstrap: ------- \n")
+
+regr3 = linear_model.ElasticNet()
+obj_MTS3 = ns.MTS(regr3, lags = 3, n_hidden_features=7, 
+                  replications=10, kernel='gaussian', 
+                  seed=24, verbose = 1, type_pi="scp-bootstrap")
+start = time()
+obj_MTS3.fit(df_train)
+print(f"Elapsed {time()-start} s")
+print("\n\n")
+print(f"obj_MTS3.predict(h=5): {obj_MTS3.predict(h=5)}")
+print(f" Predictive simulations #1 {obj_MTS3.sims_[0]}") 
+print(f" Predictive simulations #2 {obj_MTS3.sims_[1]}") 
+print(f" Predictive simulations #3 {obj_MTS3.sims_[2]}") 
+
+
+print(f"\n 3. fit ElasticNet block bootstrap: ------- \n")
+
+regr3 = linear_model.ElasticNet()
+obj_MTS3 = ns.MTS(regr3, lags = 3, n_hidden_features=7, 
+                  replications=10, kernel='gaussian', 
+                  seed=24, verbose = 1, type_pi="block-bootstrap")
+start = time()
+obj_MTS3.fit(df_train)
+print(f"Elapsed {time()-start} s")
+print("\n\n")
+print(f"obj_MTS3.predict(h=5): {obj_MTS3.predict(h=5)}")
+print(f" Predictive simulations #1 {obj_MTS3.sims_[0]}") 
+print(f" Predictive simulations #2 {obj_MTS3.sims_[1]}") 
+print(f" Predictive simulations #3 {obj_MTS3.sims_[2]}") 
+
+print(f"\n 4. fit ElasticNet SCP block bootstrap: ------- \n")
+
+regr3 = linear_model.ElasticNet()
+obj_MTS3 = ns.MTS(regr3, lags = 3, n_hidden_features=7, 
+                  replications=10, kernel='gaussian', 
+                  seed=24, verbose = 1, type_pi="scp-block-bootstrap")
+start = time()
+obj_MTS3.fit(df_train)
+print(f"Elapsed {time()-start} s")
+print("\n\n")
+print(f"obj_MTS3.predict(h=5): {obj_MTS3.predict(h=5)}")
+print(f" Predictive simulations #1 {obj_MTS3.sims_[0]}") 
+print(f" Predictive simulations #2 {obj_MTS3.sims_[1]}") 
+print(f" Predictive simulations #3 {obj_MTS3.sims_[2]}") 

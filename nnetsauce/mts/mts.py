@@ -366,7 +366,7 @@ class MTS(Base):
         else:
             iterator = range(p)
 
-        if self.type_pi in ("kde", "bootstrap"):
+        if self.type_pi in ("kde", "bootstrap", "block-bootstrap"):
             for i in iterator:
                 y_mean = np.mean(self.y_[:, i])
                 self.y_means_[i] = y_mean
@@ -378,7 +378,7 @@ class MTS(Base):
                     (centered_y_i - self.fit_objs_[i].predict(scaled_Z)).tolist()
                 )
         
-        if self.type_pi in ("scp-kde", "scp-bootstrap"):
+        if self.type_pi in ("scp-kde", "scp-bootstrap", "scp-block-bootstrap"):
             # split conformal prediction
             for i in iterator:
                 n_y = self.y_.shape[0]
@@ -489,6 +489,7 @@ class MTS(Base):
             )
 
         if self.type_pi in ("bootstrap", "scp-bootstrap"): 
+            assert self.replications is not None and isinstance(self.replications, int), "'replications' must be provided and be an integer"
             self.residuals_sims_ = tuple(
                 ts.bootstrap(self.residuals_, 
                              h=h, 
@@ -498,6 +499,7 @@ class MTS(Base):
             )
 
         if self.type_pi in ("block-bootstrap", "scp-block-bootstrap"): 
+            assert self.replications is not None and isinstance(self.replications, int), "'replications' must be provided and be an integer"
             self.residuals_sims_ = tuple(
                 ts.bootstrap(self.residuals_, 
                              h=h, 
@@ -545,10 +547,10 @@ class MTS(Base):
         )
         if "return_std" not in kwargs:
 
-            if self.kde_ is None:
+            if self.replications is None:
                 return self.mean_
 
-            # if "return_std" not in kwargs and self.kde_ is not None
+            # if "return_std" not in kwargs and self.replications is not None
             meanf = []
             lower = []
             upper = []
