@@ -7,20 +7,20 @@
 import numpy as np
 import pandas as pd
 
-# basic block bootstrap
-def block_bootstrap(x, h, size, B, seed):
+
+# (block) bootstrap
+def bootstrap(x, h, block_size=None, seed=123):
     """
     Generates block bootstrap indices for a given time series.
 
     Parameters:
     - x: numpy array, the original time series (univariate or multivariate).
     - h: int, output length 
-    - size: int, the size of the blocks to resample.
-    - B: int, the number of bootstrap samples to generate.
+    - block_size: int, the size of the blocks to resample (if None, independent bootstrap).
     - seed: int, reproducibility seed.
 
     Returns:
-    - resampled_indices: list of numpy arrays, each containing indices for a resampled time series.
+    - numpy arrays containing resampled time series.
     """
     if (len(x.shape) == 1):
       time_series_length = len(x)
@@ -28,28 +28,28 @@ def block_bootstrap(x, h, size, B, seed):
     else:
       time_series_length = x.shape[0]
       ndim = x.shape[1]
-    num_blocks = (time_series_length + size - 1) // size
-    all_indices = np.arange(time_series_length)
-    resamples = []
 
+    if block_size is not None: 
+
+      num_blocks = (time_series_length + block_size - 1) // block_size
+      all_indices = np.arange(time_series_length)
+      
+      indices = []                              
+      for i in range(num_blocks):
+          np.random.seed(seed + i*100)
+          start_index = np.random.randint(0, time_series_length - block_size + 1)
+          block_indices = all_indices[start_index:start_index + block_size]
+          indices.extend(block_indices)       
+
+    else: # block_size is None
+
+      indices = np.random.choice(range(time_series_length), size=h, replace=True)
+    
     if ndim == 1:
-      for _ in range(B):
-          indices = []
-          for _ in range(num_blocks):
-              start_index = np.random.randint(0, time_series_length - size + 1)
-              block_indices = all_indices[start_index:start_index + size]
-              indices.extend(block_indices)
-          resamples.append(x[np.array(indices[:h])])
-    else: # ndim >= 2 
-      for _ in range(B):
-          indices = []
-          for _ in range(num_blocks):
-              start_index = np.random.randint(0, time_series_length - size + 1)
-              block_indices = all_indices[start_index:start_index + size]
-              indices.extend(block_indices)
-          resamples.append(x[np.array(indices[:h]), :])
+      return x[np.array(indices[:h])]
+    else: 
+      return x[np.array(indices[:h]), :]
 
-    return resamples
 
 # compute input dates from data frame's index
 def compute_input_dates(df):
