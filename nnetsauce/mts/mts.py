@@ -472,18 +472,37 @@ class MTS(Base):
 
         self.alpha_ = 100 - level
 
-        if "return_std" in kwargs:
+        pi_multiplier = norm.ppf(1 - self.alpha_ / 200)
+
+        if "return_std" in kwargs: # bayesian forecasting 
             self.return_std_ = True
             self.preds_std_ = []
-            pi_multiplier = norm.ppf(1 - self.alpha_ / 200)
+            
             DescribeResult = namedtuple(
                 "DescribeResult", ("mean", "lower", "upper")
             )  # to be updated
 
-        if self.kde_ != None and self.type_pi in ("kde", "scp-kde"):
-            pi_multiplier = norm.ppf(1 - self.alpha_ / 200)
+        if self.kde_ != None and self.type_pi in ("kde", "scp-kde"): # kde 
             self.residuals_sims_ = tuple(
                 self.kde_.sample(n_samples=h, random_state=self.seed + 100 * i)
+                for i in tqdm(range(self.replications))
+            )
+
+        if self.type_pi in ("bootstrap", "scp-bootstrap"): 
+            self.residuals_sims_ = tuple(
+                ts.bootstrap(self.residuals_, 
+                             h=h, 
+                             block_size=None, 
+                             seed=self.seed + 100 * i)                
+                for i in tqdm(range(self.replications))
+            )
+
+        if self.type_pi in ("block-bootstrap", "scp-block-bootstrap"): 
+            self.residuals_sims_ = tuple(
+                ts.bootstrap(self.residuals_, 
+                             h=h, 
+                             block_size=h, 
+                             seed=self.seed + 100 * i)                
                 for i in tqdm(range(self.replications))
             )
 
