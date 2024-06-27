@@ -405,10 +405,9 @@ class MTS(Base):
         if self.type_pi in ("scp2-kde", "scp2-bootstrap", "scp2-block-bootstrap"):
             # Calculate mean and standard deviation for each column
             data_mean = np.mean(self.residuals_, axis=0)
-            data_std_dev = np.std(self.residuals_, axis=0)
+            self.residuals_std_dev_ = np.std(self.residuals_, axis=0)
             # Center and scale the array using broadcasting
-            self.residuals_ = (self.residuals_ - data_mean[np.newaxis, :]) / data_std_dev[np.newaxis, :]             
-            self.residuals_std_dev_ = data_std_dev
+            self.residuals_ = (self.residuals_ - data_mean[np.newaxis, :]) / self.residuals_std_dev_[np.newaxis, :]                          
 
         if self.replications != None and self.type_pi in ("kde", "scp-kde", "scp2-kde"):
             if self.verbose > 0:
