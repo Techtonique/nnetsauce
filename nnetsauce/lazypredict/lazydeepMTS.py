@@ -238,7 +238,7 @@ class LazyDeepMTS(MTS):
         MAE = []
         MPE = []
         MAPE = []
-        WINKLERSCORE = [] 
+        WINKLERSCORE = []
 
         # WIN = []
         names = []
@@ -372,11 +372,13 @@ class LazyDeepMTS(MTS):
                     )
 
                     if self.replications is not None:
-                        rmse = mean_squared_error(X_test, X_pred.mean, squared=False)
+                        rmse = mean_squared_error(
+                            X_test, X_pred.mean, squared=False
+                        )
                         mae = mean_absolute_error(X_test, X_pred.mean)
                         mpl = mean_pinball_loss(X_test, X_pred.mean)
                         winklerscore = winkler_score(X_pred, X_test, level=95)
-                    else: 
+                    else:
                         rmse = mean_squared_error(X_test, X_pred, squared=False)
                         mae = mean_absolute_error(X_test, X_pred)
                         mpl = mean_pinball_loss(X_test, X_pred)
@@ -407,7 +409,7 @@ class LazyDeepMTS(MTS):
                                 "WINKLERSCORE": winklerscore,
                                 "Time taken": time.time() - start,
                             }
-                        else: 
+                        else:
                             scores_verbose = {
                                 "Model": name,
                                 # "R-Squared": r_squared,
@@ -494,13 +496,15 @@ class LazyDeepMTS(MTS):
                         X_pred = pipe.predict(
                             h=X_test.shape[0], **kwargs
                         )  # X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg) ## DO xreg like in `ahead`
-                    
+
                     if self.replications is not None:
-                        rmse = mean_squared_error(X_test, X_pred.mean, squared=False)
+                        rmse = mean_squared_error(
+                            X_test, X_pred.mean, squared=False
+                        )
                         mae = mean_absolute_error(X_test, X_pred.mean)
                         mpl = mean_pinball_loss(X_test, X_pred.mean)
                         winklerscore = winkler_score(X_pred, X_test, level=95)
-                    else: 
+                    else:
                         rmse = mean_squared_error(X_test, X_pred, squared=False)
                         mae = mean_absolute_error(X_test, X_pred)
                         mpl = mean_pinball_loss(X_test, X_pred)
@@ -531,7 +535,7 @@ class LazyDeepMTS(MTS):
                                 "WINKLERSCORE": winklerscore,
                                 "Time taken": time.time() - start,
                             }
-                        else: 
+                        else:
                             scores_verbose = {
                                 "Model": name,
                                 # "R-Squared": r_squared,
@@ -557,7 +561,7 @@ class LazyDeepMTS(MTS):
                         print(name + " model failed to execute")
                         print(exception)
 
-        if self.replications is not None: 
+        if self.replications is not None:
             scores = {
                 "Model": names,
                 # "Adjusted R-Squared": ADJR2,
@@ -570,7 +574,7 @@ class LazyDeepMTS(MTS):
                 "WINKLERSCORE": WINKLERSCORE,
                 "Time Taken": TIME,
             }
-        else: 
+        else:
             scores = {
                 "Model": names,
                 # "Adjusted R-Squared": ADJR2,

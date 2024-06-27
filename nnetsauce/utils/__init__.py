@@ -17,7 +17,7 @@ from .timeseries import (
     create_lags,
     create_train_inputs,
     reformat_response,
-    winkler_score
+    winkler_score,
 )
 
 
@@ -42,5 +42,5 @@ __all__ = [
     "tuple_map",
     "TimeSeriesSplit",
     "Progbar",
-    "winkler_score"
+    "winkler_score",
 ]

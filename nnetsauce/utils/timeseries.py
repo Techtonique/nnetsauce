@@ -15,40 +15,44 @@ def bootstrap(x, h, block_size=None, seed=123):
 
     Parameters:
     - x: numpy array, the original time series (univariate or multivariate).
-    - h: int, output length 
+    - h: int, output length
     - block_size: int, the size of the blocks to resample (if None, independent bootstrap).
     - seed: int, reproducibility seed.
 
     Returns:
     - numpy arrays containing resampled time series.
     """
-    if (len(x.shape) == 1):
-      time_series_length = len(x)
-      ndim = 1
+    if len(x.shape) == 1:
+        time_series_length = len(x)
+        ndim = 1
     else:
-      time_series_length = x.shape[0]
-      ndim = x.shape[1]
+        time_series_length = x.shape[0]
+        ndim = x.shape[1]
 
-    if block_size is not None: 
+    if block_size is not None:
 
-      num_blocks = (time_series_length + block_size - 1) // block_size
-      all_indices = np.arange(time_series_length)
-      
-      indices = []                              
-      for i in range(num_blocks):
-          np.random.seed(seed + i*100)
-          start_index = np.random.randint(0, time_series_length - block_size + 1)
-          block_indices = all_indices[start_index:start_index + block_size]
-          indices.extend(block_indices)       
+        num_blocks = (time_series_length + block_size - 1) // block_size
+        all_indices = np.arange(time_series_length)
 
-    else: # block_size is None
+        indices = []
+        for i in range(num_blocks):
+            np.random.seed(seed + i * 100)
+            start_index = np.random.randint(
+                0, time_series_length - block_size + 1
+            )
+            block_indices = all_indices[start_index: start_index + block_size]
+            indices.extend(block_indices)
 
-      indices = np.random.choice(range(time_series_length), size=h, replace=True)
-    
+    else:  # block_size is None
+
+        indices = np.random.choice(
+            range(time_series_length), size=h, replace=True
+        )
+
     if ndim == 1:
-      return x[np.array(indices[:h])]
-    else: 
-      return x[np.array(indices[:h]), :]
+        return x[np.array(indices[:h])]
+    else:
+        return x[np.array(indices[:h]), :]
 
 
 # compute input dates from data frame's index
@@ -140,25 +144,29 @@ def winkler_score(obj, actual, level=95):
     n_points = actual.shape[0]
 
     # Ensure the arrays have the same length
-    assert n_points == lt.shape[0] == ut.shape[0],\
-          "actual, lower and upper bounds have different shapes"
-    
+    assert (
+        n_points == lt.shape[0] == ut.shape[0]
+    ), "actual, lower and upper bounds have different shapes"
+
     if isinstance(lt, pd.DataFrame) and isinstance(actual, pd.DataFrame):
         diff_lt = lt.values - actual.values
     else:
-       diff_lt = lt - actual
-    if isinstance(lt, pd.DataFrame) and isinstance(ut, pd.DataFrame):       
+        diff_lt = lt - actual
+    if isinstance(lt, pd.DataFrame) and isinstance(ut, pd.DataFrame):
         diff_bounds = ut.values - lt.values
-    else: 
-       diff_bounds = ut - lt
-    if isinstance(lt, pd.DataFrame) and isinstance(ut, pd.DataFrame):       
+    else:
+        diff_bounds = ut - lt
+    if isinstance(lt, pd.DataFrame) and isinstance(ut, pd.DataFrame):
         diff_ut = actual.values - ut.values
-    else: 
-       diff_ut = actual - ut
-    
-    score = diff_bounds + (2 / alpha) * (np.maximum(diff_lt, 0) + np.maximum(diff_ut, 0))
-    
+    else:
+        diff_ut = actual - ut
+
+    score = diff_bounds + (2 / alpha) * (
+        np.maximum(diff_lt, 0) + np.maximum(diff_ut, 0)
+    )
+
     return np.mean(score)
+
 
 # create k lags for series x
 # def create_lags(x, k):

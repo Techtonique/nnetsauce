@@ -74,16 +74,16 @@ class MTS(Base):
             number of lags used for each time series.
 
         type_pi: str.
-            type of prediction interval; currently: 
-            - "kde": based on Kernel Density Estimation of in-sample residuals 
-            - "bootstrap": based on independent bootstrap of in-sample residuals 
-            - "block-bootstrap": based on basic block bootstrap of in-sample residuals  
-            - "scp-kde": Split conformal prediction with Kernel Density Estimation of calibrated residuals 
-            - "scp-bootstrap": Split conformal prediction with independent bootstrap of calibrated residuals   
-            - "scp-block-bootstrap": Split conformal prediction with basic block bootstrap of calibrated residuals  
-            - "scp2-kde": Split conformal prediction with Kernel Density Estimation of standardized calibrated residuals 
-            - "scp2-bootstrap": Split conformal prediction with independent bootstrap of standardized calibrated residuals    
-            - "scp2-block-bootstrap": Split conformal prediction with basic block bootstrap of standardized calibrated residuals  
+            type of prediction interval; currently:
+            - "kde": based on Kernel Density Estimation of in-sample residuals
+            - "bootstrap": based on independent bootstrap of in-sample residuals
+            - "block-bootstrap": based on basic block bootstrap of in-sample residuals
+            - "scp-kde": Split conformal prediction with Kernel Density Estimation of calibrated residuals
+            - "scp-bootstrap": Split conformal prediction with independent bootstrap of calibrated residuals
+            - "scp-block-bootstrap": Split conformal prediction with basic block bootstrap of calibrated residuals
+            - "scp2-kde": Split conformal prediction with Kernel Density Estimation of standardized calibrated residuals
+            - "scp2-bootstrap": Split conformal prediction with independent bootstrap of standardized calibrated residuals
+            - "scp2-block-bootstrap": Split conformal prediction with basic block bootstrap of standardized calibrated residuals
 
         replications: int.
             number of replications (if needed, for predictive simulation). Default is 'None'.
@@ -262,7 +262,7 @@ class MTS(Base):
         self.residuals_sims_ = None
         self.kde_ = None
         self.sims_ = None
-        self.residuals_std_dev_ = None 
+        self.residuals_std_dev_ = None
         self.n_obs = None
         self.level = None
 
@@ -340,7 +340,7 @@ class MTS(Base):
         self.n_series = p
         self.fit_objs_.clear()
         self.y_means_.clear()
-        residuals_ = []        
+        residuals_ = []
         self.residuals_ = None
         self.residuals_sims_ = None
         self.kde_ = None
@@ -385,40 +385,64 @@ class MTS(Base):
                 self.obj.fit(X=scaled_Z, y=centered_y_i)
                 self.fit_objs_[i] = deepcopy(self.obj)
                 residuals_.append(
-                    (centered_y_i - self.fit_objs_[i].predict(scaled_Z)).tolist()
+                    (
+                        centered_y_i - self.fit_objs_[i].predict(scaled_Z)
+                    ).tolist()
                 )
-        
-        if self.type_pi in ("scp-kde", "scp-bootstrap", "scp-block-bootstrap", 
-                            "scp2-kde", "scp2-bootstrap", "scp2-block-bootstrap"):
+
+        if self.type_pi in (
+            "scp-kde",
+            "scp-bootstrap",
+            "scp-block-bootstrap",
+            "scp2-kde",
+            "scp2-bootstrap",
+            "scp2-block-bootstrap",
+        ):
             # split conformal prediction
             for i in iterator:
                 n_y = self.y_.shape[0]
-                n_y_half = n_y//2
+                n_y_half = n_y // 2
                 first_half_idx = range(0, n_y_half)
                 second_half_idx = range(n_y_half, n_y)
                 y_mean_temp = np.mean(self.y_[first_half_idx, i])
                 centered_y_i_temp = self.y_[first_half_idx, i] - y_mean_temp
-                self.obj.fit(X=scaled_Z[first_half_idx,:], y=centered_y_i_temp)
+                self.obj.fit(X=scaled_Z[first_half_idx, :], y=centered_y_i_temp)
                 # calibrated residuals actually
                 residuals_.append(
-                    (self.y_[second_half_idx, i] - (y_mean_temp + self.obj.predict(scaled_Z[second_half_idx,:]))).tolist()
+                    (
+                        self.y_[second_half_idx, i]
+                        - (
+                            y_mean_temp
+                            + self.obj.predict(scaled_Z[second_half_idx, :])
+                        )
+                    ).tolist()
                 )
                 # fit on the second half
                 y_mean = np.mean(self.y_[second_half_idx, i])
                 self.y_means_[i] = y_mean
                 centered_y_i = self.y_[second_half_idx, i] - y_mean
-                self.obj.fit(X=scaled_Z[second_half_idx,:], y=centered_y_i)
+                self.obj.fit(X=scaled_Z[second_half_idx, :], y=centered_y_i)
                 self.fit_objs_[i] = deepcopy(self.obj)
 
         self.residuals_ = np.asarray(residuals_).T
-        if self.type_pi in ("scp2-kde", "scp2-bootstrap", "scp2-block-bootstrap"):
+        if self.type_pi in (
+            "scp2-kde",
+            "scp2-bootstrap",
+            "scp2-block-bootstrap",
+        ):
             # Calculate mean and standard deviation for each column
             data_mean = np.mean(self.residuals_, axis=0)
             self.residuals_std_dev_ = np.std(self.residuals_, axis=0)
             # Center and scale the array using broadcasting
-            self.residuals_ = (self.residuals_ - data_mean[np.newaxis, :]) / self.residuals_std_dev_[np.newaxis, :]                          
+            self.residuals_ = (
+                self.residuals_ - data_mean[np.newaxis, :]
+            ) / self.residuals_std_dev_[np.newaxis, :]
 
-        if self.replications != None and self.type_pi in ("kde", "scp-kde", "scp2-kde"):
+        if self.replications != None and self.type_pi in (
+            "kde",
+            "scp-kde",
+            "scp2-kde",
+        ):
             if self.verbose > 0:
                 print(f"\n Simulate residuals using {self.kernel} kernel... \n")
             assert self.kernel in (
@@ -491,37 +515,50 @@ class MTS(Base):
 
         pi_multiplier = norm.ppf(1 - self.alpha_ / 200)
 
-        if "return_std" in kwargs: # bayesian forecasting 
+        if "return_std" in kwargs:  # bayesian forecasting
             self.return_std_ = True
             self.preds_std_ = []
-            
+
             DescribeResult = namedtuple(
                 "DescribeResult", ("mean", "lower", "upper")
             )  # to be updated
 
-        if self.kde_ != None and self.type_pi in ("kde", "scp-kde", "scp2-kde"): # kde 
+        if self.kde_ != None and self.type_pi in (
+            "kde",
+            "scp-kde",
+            "scp2-kde",
+        ):  # kde
             self.residuals_sims_ = tuple(
                 self.kde_.sample(n_samples=h, random_state=self.seed + 100 * i)
                 for i in tqdm(range(self.replications))
             )
 
-        if self.type_pi in ("bootstrap", "scp-bootstrap", "scp2-bootstrap"): 
-            assert self.replications is not None and isinstance(self.replications, int), "'replications' must be provided and be an integer"
+        if self.type_pi in ("bootstrap", "scp-bootstrap", "scp2-bootstrap"):
+            assert self.replications is not None and isinstance(
+                self.replications, int
+            ), "'replications' must be provided and be an integer"
             self.residuals_sims_ = tuple(
-                ts.bootstrap(self.residuals_, 
-                             h=h, 
-                             block_size=None, 
-                             seed=self.seed + 100 * i)                
+                ts.bootstrap(
+                    self.residuals_,
+                    h=h,
+                    block_size=None,
+                    seed=self.seed + 100 * i,
+                )
                 for i in tqdm(range(self.replications))
             )
 
-        if self.type_pi in ("block-bootstrap", "scp-block-bootstrap", "scp2-block-bootstrap"): 
-            assert self.replications is not None and isinstance(self.replications, int), "'replications' must be provided and be an integer"
+        if self.type_pi in (
+            "block-bootstrap",
+            "scp-block-bootstrap",
+            "scp2-block-bootstrap",
+        ):
+            assert self.replications is not None and isinstance(
+                self.replications, int
+            ), "'replications' must be provided and be an integer"
             self.residuals_sims_ = tuple(
-                ts.bootstrap(self.residuals_, 
-                             h=h, 
-                             block_size=h, 
-                             seed=self.seed + 100 * i)                
+                ts.bootstrap(
+                    self.residuals_, h=h, block_size=h, seed=self.seed + 100 * i
+                )
                 for i in tqdm(range(self.replications))
             )
 
@@ -571,15 +608,21 @@ class MTS(Base):
             meanf = []
             lower = []
             upper = []
-            
-            if self.type_pi in ("scp2-kde", "scp2-bootstrap", "scp2-block-bootstrap"):
+
+            if self.type_pi in (
+                "scp2-kde",
+                "scp2-bootstrap",
+                "scp2-block-bootstrap",
+            ):
                 self.sims_ = tuple(
                     (
-                        self.mean_ + self.residuals_sims_[i] * self.residuals_std_dev_[np.newaxis,:]
+                        self.mean_
+                        + self.residuals_sims_[i]
+                        * self.residuals_std_dev_[np.newaxis, :]
                         for i in tqdm(range(self.replications))
                     )
                 )
-            else: 
+            else:
                 self.sims_ = tuple(
                     (
                         self.mean_ + self.residuals_sims_[i]

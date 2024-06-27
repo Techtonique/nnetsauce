@@ -234,7 +234,7 @@ class LazyMTS(MTS):
         MAE = []
         MPE = []
         MAPE = []
-        WINKLERSCORE = [] 
+        WINKLERSCORE = []
 
         # WIN = []
         names = []
@@ -365,24 +365,25 @@ class LazyMTS(MTS):
                     X_pred = pipe["regressor"].predict(
                         h=X_test.shape[0], **kwargs
                     )
-                    
+
                     if self.replications is not None:
-                        rmse = mean_squared_error(X_test, X_pred.mean, squared=False)
+                        rmse = mean_squared_error(
+                            X_test, X_pred.mean, squared=False
+                        )
                         mae = mean_absolute_error(X_test, X_pred.mean)
                         mpl = mean_pinball_loss(X_test, X_pred.mean)
                         winklerscore = winkler_score(X_pred, X_test, level=95)
-                    else: 
+                    else:
                         rmse = mean_squared_error(X_test, X_pred, squared=False)
                         mae = mean_absolute_error(X_test, X_pred)
                         mpl = mean_pinball_loss(X_test, X_pred)
-
 
                     names.append(name)
                     RMSE.append(rmse)
                     MAE.append(mae)
                     MPL.append(mpl)
                     if self.replications is not None:
-                        WINKLERSCORE.append(winklerscore)                    
+                        WINKLERSCORE.append(winklerscore)
                     TIME.append(time.time() - start)
 
                     if self.custom_metric:
@@ -403,7 +404,7 @@ class LazyMTS(MTS):
                                 "WINKLERSCORE": winklerscore,
                                 "Time taken": time.time() - start,
                             }
-                        else: 
+                        else:
                             scores_verbose = {
                                 "Model": name,
                                 # "R-Squared": r_squared,
@@ -493,11 +494,13 @@ class LazyMTS(MTS):
                         )  # X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg) ## DO xreg like in `ahead`
 
                     if self.replications is not None:
-                        rmse = mean_squared_error(X_test, X_pred.mean, squared=False)
+                        rmse = mean_squared_error(
+                            X_test, X_pred.mean, squared=False
+                        )
                         mae = mean_absolute_error(X_test, X_pred.mean)
                         mpl = mean_pinball_loss(X_test, X_pred.mean)
                         winklerscore = winkler_score(X_pred, X_test, level=95)
-                    else: 
+                    else:
                         rmse = mean_squared_error(X_test, X_pred, squared=False)
                         mae = mean_absolute_error(X_test, X_pred)
                         mpl = mean_pinball_loss(X_test, X_pred)
@@ -528,7 +531,7 @@ class LazyMTS(MTS):
                                 "WINKLERSCORE": winklerscore,
                                 "Time taken": time.time() - start,
                             }
-                        else: 
+                        else:
                             scores_verbose = {
                                 "Model": name,
                                 # "R-Squared": r_squared,
@@ -554,7 +557,7 @@ class LazyMTS(MTS):
                         print(name + " model failed to execute")
                         print(exception)
 
-        if self.replications is not None: 
+        if self.replications is not None:
             scores = {
                 "Model": names,
                 # "Adjusted R-Squared": ADJR2,
@@ -567,7 +570,7 @@ class LazyMTS(MTS):
                 "WINKLERSCORE": WINKLERSCORE,
                 "Time Taken": TIME,
             }
-        else: 
+        else:
             scores = {
                 "Model": names,
                 # "Adjusted R-Squared": ADJR2,
