@@ -74,7 +74,16 @@ class MTS(Base):
             number of lags used for each time series.
 
         type_pi: str.
-            type of prediction interval: currently "kde" (default) or "bootstrap"
+            type of prediction interval; currently: 
+            - "kde": based on Kernel Density Estimation of in-sample residuals 
+            - "bootstrap": based on independent bootstrap of in-sample residuals 
+            - "block-bootstrap": based on basic block bootstrap of in-sample residuals  
+            - "scp-kde": Split conformal prediction with Kernel Density Estimation of calibrated residuals 
+            - "scp-bootstrap": Split conformal prediction with independent bootstrap of calibrated residuals   
+            - "scp-block-bootstrap": Split conformal prediction with basic block bootstrap of calibrated residuals  
+            - "scp2-kde": Split conformal prediction with Kernel Density Estimation of standardized calibrated residuals 
+            - "scp2-bootstrap": Split conformal prediction with independent bootstrap of standardized calibrated residuals    
+            - "scp2-block-bootstrap": Split conformal prediction with basic block bootstrap of standardized calibrated residuals  
 
         replications: int.
             number of replications (if needed, for predictive simulation). Default is 'None'.
