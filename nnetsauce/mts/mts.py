@@ -253,6 +253,7 @@ class MTS(Base):
         self.residuals_sims_ = None
         self.kde_ = None
         self.sims_ = None
+        self.residuals_std_dev_ = None 
         self.n_obs = None
         self.level = None
 
@@ -378,7 +379,8 @@ class MTS(Base):
                     (centered_y_i - self.fit_objs_[i].predict(scaled_Z)).tolist()
                 )
         
-        if self.type_pi in ("scp-kde", "scp-bootstrap", "scp-block-bootstrap"):
+        if self.type_pi in ("scp-kde", "scp-bootstrap", "scp-block-bootstrap", 
+                            "scp2-kde", "scp2-bootstrap", "scp2-block-bootstrap"):
             # split conformal prediction
             for i in iterator:
                 n_y = self.y_.shape[0]
@@ -400,8 +402,15 @@ class MTS(Base):
                 self.fit_objs_[i] = deepcopy(self.obj)
 
         self.residuals_ = np.asarray(residuals_).T
+        if self.type_pi in ("scp2-kde", "scp2-bootstrap", "scp2-block-bootstrap"):
+            # Calculate mean and standard deviation for each column
+            data_mean = np.mean(self.residuals_, axis=0)
+            data_std_dev = np.std(self.residuals_, axis=0)
+            # Center and scale the array using broadcasting
+            self.residuals_ = (self.residuals_ - data_mean[np.newaxis, :]) / data_std_dev[np.newaxis, :]             
+            self.residuals_std_dev_ = data_std_dev
 
-        if self.replications != None and self.type_pi in ("kde", "scp-kde"):
+        if self.replications != None and self.type_pi in ("kde", "scp-kde", "scp2-kde"):
             if self.verbose > 0:
                 print(f"\n Simulate residuals using {self.kernel} kernel... \n")
             assert self.kernel in (
@@ -482,13 +491,13 @@ class MTS(Base):
                 "DescribeResult", ("mean", "lower", "upper")
             )  # to be updated
 
-        if self.kde_ != None and self.type_pi in ("kde", "scp-kde"): # kde 
+        if self.kde_ != None and self.type_pi in ("kde", "scp-kde", "scp2-kde"): # kde 
             self.residuals_sims_ = tuple(
                 self.kde_.sample(n_samples=h, random_state=self.seed + 100 * i)
                 for i in tqdm(range(self.replications))
             )
 
-        if self.type_pi in ("bootstrap", "scp-bootstrap"): 
+        if self.type_pi in ("bootstrap", "scp-bootstrap", "scp2-bootstrap"): 
             assert self.replications is not None and isinstance(self.replications, int), "'replications' must be provided and be an integer"
             self.residuals_sims_ = tuple(
                 ts.bootstrap(self.residuals_, 
@@ -498,7 +507,7 @@ class MTS(Base):
                 for i in tqdm(range(self.replications))
             )
 
-        if self.type_pi in ("block-bootstrap", "scp-block-bootstrap"): 
+        if self.type_pi in ("block-bootstrap", "scp-block-bootstrap", "scp2-block-bootstrap"): 
             assert self.replications is not None and isinstance(self.replications, int), "'replications' must be provided and be an integer"
             self.residuals_sims_ = tuple(
                 ts.bootstrap(self.residuals_, 
@@ -554,13 +563,21 @@ class MTS(Base):
             meanf = []
             lower = []
             upper = []
-
-            self.sims_ = tuple(
-                (
-                    self.mean_ + self.residuals_sims_[i]
-                    for i in tqdm(range(self.replications))
+            
+            if self.type_pi in ("scp2-kde", "scp2-bootstrap", "scp2-block-bootstrap"):
+                self.sims_ = tuple(
+                    (
+                        self.mean_ + self.residuals_sims_[i] * self.residuals_std_dev_[np.newaxis,:]
+                        for i in tqdm(range(self.replications))
+                    )
                 )
-            )
+            else: 
+                self.sims_ = tuple(
+                    (
+                        self.mean_ + self.residuals_sims_[i]
+                        for i in tqdm(range(self.replications))
+                    )
+                )
 
             DescribeResult = namedtuple(
                 "DescribeResult", ("mean", "sims", "lower", "upper")
