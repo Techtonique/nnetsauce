@@ -132,6 +132,34 @@ def reformat_response(X, k):
     return np.concatenate([X[i, :] for i in range(k)])
 
 
+def winkler_score(obj, actual, level=95):
+
+    alpha = 1 - level / 100
+    lt = obj.lower
+    ut = obj.upper
+    n_points = actual.shape[0]
+
+    # Ensure the arrays have the same length
+    assert n_points == lt.shape[0] == ut.shape[0],\
+          "actual, lower and upper bounds have different shapes"
+    
+    if isinstance(lt, pd.DataFrame) and isinstance(actual, pd.DataFrame):
+        diff_lt = lt.values - actual.values
+    else:
+       diff_lt = lt - actual
+    if isinstance(lt, pd.DataFrame) and isinstance(ut, pd.DataFrame):       
+        diff_bounds = ut.values - lt.values
+    else: 
+       diff_bounds = ut - lt
+    if isinstance(lt, pd.DataFrame) and isinstance(ut, pd.DataFrame):       
+        diff_ut = actual.values - ut.values
+    else: 
+       diff_ut = actual - ut
+    
+    score = diff_bounds + (2 / alpha) * (np.maximum(diff_lt, 0) + np.maximum(diff_ut, 0))
+    
+    return np.mean(score)
+
 # create k lags for series x
 # def create_lags(x, k):
 #

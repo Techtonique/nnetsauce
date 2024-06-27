@@ -55,5 +55,14 @@ model_dictionary = regr_mts.provide_models(df_train, df_test)
 print(models)
 print(model_dictionary["DeepMTS(LinearSVR)"])
 
+regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=False, custom_metric=None,
+                      lags = 4, n_hidden_features=7, n_clusters=2,
+                      replications=10, kernel="gaussian",
+                      show_progress=False, preprocess=False)
+models, predictions = regr_mts3.fit(df_train, df_test)
+model_dictionary = regr_mts3.provide_models(df_train, df_test)
+print(models)
+print(models["WINKLERSCORE"])
+
 
 

@@ -18,7 +18,7 @@ from sklearn.metrics import (
 from .config import DEEPREGRESSORSMTS
 from ..mts import MTS
 from ..deep import DeepMTS
-from ..utils import convert_df_to_numeric
+from ..utils import convert_df_to_numeric, winkler_score
 
 import warnings
 
@@ -165,6 +165,7 @@ class LazyDeepMTS(MTS):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         lags=1,
+        type_pi="kde",
         replications=None,
         kernel=None,
         agg="mean",
@@ -197,6 +198,7 @@ class LazyDeepMTS(MTS):
             seed=seed,
             backend=backend,
             lags=lags,
+            type_pi=type_pi,
             replications=replications,
             kernel=kernel,
             agg=agg,
@@ -236,6 +238,7 @@ class LazyDeepMTS(MTS):
         MAE = []
         MPE = []
         MAPE = []
+        WINKLERSCORE = [] 
 
         # WIN = []
         names = []
@@ -316,6 +319,7 @@ class LazyDeepMTS(MTS):
                                         type_clust=self.type_clust,
                                         type_scaling=self.type_scaling,
                                         lags=self.lags,
+                                        type_pi=self.type_pi,
                                         replications=self.replications,
                                         kernel=self.kernel,
                                         agg=self.agg,
@@ -347,6 +351,7 @@ class LazyDeepMTS(MTS):
                                         type_clust=self.type_clust,
                                         type_scaling=self.type_scaling,
                                         lags=self.lags,
+                                        type_pi=self.type_pi,
                                         replications=self.replications,
                                         kernel=self.kernel,
                                         agg=self.agg,
@@ -362,22 +367,26 @@ class LazyDeepMTS(MTS):
                     # pipe.fit(X_train, xreg=xreg)
 
                     self.models[name] = pipe
-                    if xreg is not None:
-                        assert (
-                            new_xreg is not None
-                        ), "xreg and new_xreg must be provided"
-                    # X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg)
                     X_pred = pipe["regressor"].predict(
                         h=X_test.shape[0], **kwargs
                     )
-                    rmse = mean_squared_error(X_test, X_pred, squared=False)
-                    mae = mean_absolute_error(X_test, X_pred)
-                    mpl = mean_pinball_loss(X_test, X_pred)
+
+                    if self.replications is not None:
+                        rmse = mean_squared_error(X_test, X_pred.mean, squared=False)
+                        mae = mean_absolute_error(X_test, X_pred.mean)
+                        mpl = mean_pinball_loss(X_test, X_pred.mean)
+                        winklerscore = winkler_score(X_pred, X_test, level=95)
+                    else: 
+                        rmse = mean_squared_error(X_test, X_pred, squared=False)
+                        mae = mean_absolute_error(X_test, X_pred)
+                        mpl = mean_pinball_loss(X_test, X_pred)
 
                     names.append(name)
                     RMSE.append(rmse)
                     MAE.append(mae)
                     MPL.append(mpl)
+                    if self.replications is not None:
+                        WINKLERSCORE.append(winklerscore)
                     TIME.append(time.time() - start)
 
                     if self.custom_metric:
@@ -385,17 +394,31 @@ class LazyDeepMTS(MTS):
                         CUSTOM_METRIC.append(custom_metric)
 
                     if self.verbose > 0:
-                        scores_verbose = {
-                            "Model": name,
-                            # "R-Squared": r_squared,
-                            # "Adjusted R-Squared": adj_rsquared,
-                            "RMSE": rmse,
-                            "MAE": mae,
-                            "MPL": mpl,
-                            # "MPE": mpe,
-                            # "MAPE": mape,
-                            "Time taken": time.time() - start,
-                        }
+                        if self.replications is not None:
+                            scores_verbose = {
+                                "Model": name,
+                                # "R-Squared": r_squared,
+                                # "Adjusted R-Squared": adj_rsquared,
+                                "RMSE": rmse,
+                                "MAE": mae,
+                                "MPL": mpl,
+                                # "MPE": mpe,
+                                # "MAPE": mape,
+                                "WINKLERSCORE": winklerscore,
+                                "Time taken": time.time() - start,
+                            }
+                        else: 
+                            scores_verbose = {
+                                "Model": name,
+                                # "R-Squared": r_squared,
+                                # "Adjusted R-Squared": adj_rsquared,
+                                "RMSE": rmse,
+                                "MAE": mae,
+                                "MPL": mpl,
+                                # "MPE": mpe,
+                                # "MAPE": mape,
+                                "Time taken": time.time() - start,
+                            }
 
                         if self.custom_metric:
                             scores_verbose[self.custom_metric.__name__] = (
@@ -463,11 +486,6 @@ class LazyDeepMTS(MTS):
                     # pipe.fit(X_train, xreg=xreg) # DO xreg like in `ahead`
 
                     self.models[name] = pipe
-                    if xreg is not None:
-                        assert (
-                            new_xreg is not None
-                        ), "xreg and new_xreg must be provided"
-
                     if self.preprocess is True:
                         X_pred = pipe["regressor"].predict(
                             h=X_test.shape[0], **kwargs
@@ -476,15 +494,23 @@ class LazyDeepMTS(MTS):
                         X_pred = pipe.predict(
                             h=X_test.shape[0], **kwargs
                         )  # X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg) ## DO xreg like in `ahead`
-
-                    rmse = mean_squared_error(X_test, X_pred, squared=False)
-                    mae = mean_absolute_error(X_test, X_pred)
-                    mpl = mean_pinball_loss(X_test, X_pred)
+                    
+                    if self.replications is not None:
+                        rmse = mean_squared_error(X_test, X_pred.mean, squared=False)
+                        mae = mean_absolute_error(X_test, X_pred.mean)
+                        mpl = mean_pinball_loss(X_test, X_pred.mean)
+                        winklerscore = winkler_score(X_pred, X_test, level=95)
+                    else: 
+                        rmse = mean_squared_error(X_test, X_pred, squared=False)
+                        mae = mean_absolute_error(X_test, X_pred)
+                        mpl = mean_pinball_loss(X_test, X_pred)
 
                     names.append(name)
                     RMSE.append(rmse)
                     MAE.append(mae)
                     MPL.append(mpl)
+                    if self.replications is not None:
+                        WINKLERSCORE.append(winklerscore)
                     TIME.append(time.time() - start)
 
                     if self.custom_metric:
@@ -492,17 +518,31 @@ class LazyDeepMTS(MTS):
                         CUSTOM_METRIC.append(custom_metric)
 
                     if self.verbose > 0:
-                        scores_verbose = {
-                            "Model": name,
-                            # "R-Squared": r_squared,
-                            # "Adjusted R-Squared": adj_rsquared,
-                            "RMSE": rmse,
-                            "MAE": mae,
-                            "MPL": mpl,
-                            # "MPE": mpe,
-                            # "MAPE": mape,
-                            "Time taken": time.time() - start,
-                        }
+                        if self.replications is not None:
+                            scores_verbose = {
+                                "Model": name,
+                                # "R-Squared": r_squared,
+                                # "Adjusted R-Squared": adj_rsquared,
+                                "RMSE": rmse,
+                                "MAE": mae,
+                                "MPL": mpl,
+                                # "MPE": mpe,
+                                # "MAPE": mape,
+                                "WINKLERSCORE": winklerscore,
+                                "Time taken": time.time() - start,
+                            }
+                        else: 
+                            scores_verbose = {
+                                "Model": name,
+                                # "R-Squared": r_squared,
+                                # "Adjusted R-Squared": adj_rsquared,
+                                "RMSE": rmse,
+                                "MAE": mae,
+                                "MPL": mpl,
+                                # "MPE": mpe,
+                                # "MAPE": mape,
+                                "Time taken": time.time() - start,
+                            }
 
                         if self.custom_metric:
                             scores_verbose[self.custom_metric.__name__] = (
@@ -517,17 +557,31 @@ class LazyDeepMTS(MTS):
                         print(name + " model failed to execute")
                         print(exception)
 
-        scores = {
-            "Model": names,
-            # "Adjusted R-Squared": ADJR2,
-            # "R-Squared": R2,
-            "RMSE": RMSE,
-            "MAE": MAE,
-            "MPL": MPL,
-            # "MPE": MPE,
-            # "MAPE": MAPE,
-            "Time Taken": TIME,
-        }
+        if self.replications is not None: 
+            scores = {
+                "Model": names,
+                # "Adjusted R-Squared": ADJR2,
+                # "R-Squared": R2,
+                "RMSE": RMSE,
+                "MAE": MAE,
+                "MPL": MPL,
+                # "MPE": MPE,
+                # "MAPE": MAPE,
+                "WINKLERSCORE": WINKLERSCORE,
+                "Time Taken": TIME,
+            }
+        else: 
+            scores = {
+                "Model": names,
+                # "Adjusted R-Squared": ADJR2,
+                # "R-Squared": R2,
+                "RMSE": RMSE,
+                "MAE": MAE,
+                "MPL": MPL,
+                # "MPE": MPE,
+                # "MAPE": MAPE,
+                "Time Taken": TIME,
+            }
 
         if self.custom_metric:
             scores[self.custom_metric.__name__] = CUSTOM_METRIC
