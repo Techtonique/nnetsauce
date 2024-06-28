@@ -22,7 +22,7 @@ from ..utils import timeseries as ts
 
 
 class MTS(Base):
-    """Univariate and multivariate time series (MTS) forecasting with Quasi-Randomized networks (Work in progress /!\)
+    """Univariate and multivariate time series (MTS) forecasting with Quasi-Randomized networks
 
     Parameters:
 
@@ -134,6 +134,24 @@ class MTS(Base):
 
         df_: data frame
             the input data frame, in case a data.frame is provided to `fit`
+
+        n_obs_: int
+            number of time series observations (number of rows for multivariate)
+
+        level_: int
+            level of confidence for prediction intervals (default is 95)
+
+        residuals_: {array-like}
+            in-sample residuals (for `type_pi` not conformal prediction) or calibrated residuals
+            (for `type_pi` in conformal prediction)
+
+        residuals_sims_: tuple of {array-like}
+            simulations of in-sample residuals (for `type_pi` not conformal prediction) or
+            calibrated residuals (for `type_pi` in conformal prediction)
+
+        kde_: A scikit-learn object, see https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KernelDensity.html
+
+        residuals_std_dev_: residuals standard deviation
 
     Examples:
 
@@ -263,28 +281,28 @@ class MTS(Base):
         self.kde_ = None
         self.sims_ = None
         self.residuals_std_dev_ = None
-        self.n_obs = None
-        self.level = None
+        self.n_obs_ = None
+        self.level_ = None
 
     def fit(self, X, xreg=None, **kwargs):
         """Fit MTS model to training data X, with optional regressors xreg
 
         Parameters:
 
-            X: {array-like}, shape = [n_samples, n_features]
-                Training time series, where n_samples is the number
-                of samples and n_features is the number of features;
-                X must be in increasing order (most recent observations last)
+        X: {array-like}, shape = [n_samples, n_features]
+            Training time series, where n_samples is the number
+            of samples and n_features is the number of features;
+            X must be in increasing order (most recent observations last)
 
-            xreg: {array-like}, shape = [n_samples, n_features_xreg]
-                Additional (external) regressors to be passed to self.obj
-                xreg must be in 'increasing' order (most recent observations last)
+        xreg: {array-like}, shape = [n_samples, n_features_xreg]
+            Additional (external) regressors to be passed to self.obj
+            xreg must be in 'increasing' order (most recent observations last)
 
-            **kwargs: for now, additional parameters to be passed to for kernel density estimation, when needed (see sklearn.neighbors.KernelDensity)
+        **kwargs: for now, additional parameters to be passed to for kernel density estimation, when needed (see sklearn.neighbors.KernelDensity)
 
         Returns:
 
-            self: object
+        self: object
         """
 
         if (
@@ -331,7 +349,7 @@ class MTS(Base):
             n = X.shape[0]
             p = 1
 
-        self.n_obs = n
+        self.n_obs_ = n
 
         rep_1_n = np.repeat(1, n)
 
@@ -470,30 +488,31 @@ class MTS(Base):
 
         Parameters:
 
-            h: {integer}
-                Forecasting horizon
+        h: {integer}
+            Forecasting horizon
 
-            level: {integer}
-                Level of confidence (if obj has option 'return_std' and the
-                posterior is gaussian)
+        level: {integer}
+            Level of confidence (if obj has option 'return_std' and the
+            posterior is gaussian)
 
-            new_xreg: {array-like}, shape = [n_samples = h, n_new_xreg]
-                New values of additional (deterministic) regressors on horizon = h
-                new_xreg must be in increasing order (most recent observations last)
+        new_xreg: {array-like}, shape = [n_samples = h, n_new_xreg]
+            New values of additional (deterministic) regressors on horizon = h
+            new_xreg must be in increasing order (most recent observations last)
 
-            **kwargs: additional parameters to be passed to
-                    self.cook_test_set
+        **kwargs: additional parameters to be passed to
+                self.cook_test_set
 
         Returns:
 
-            model predictions for horizon = h: {array-like}, data frame or tuple.
-            Standard deviation and prediction intervals are returned when
-            `obj.predict` can return standard deviation
+        model predictions for horizon = h: {array-like}, data frame or tuple.
+        Standard deviation and prediction intervals are returned when
+        `obj.predict` can return standard deviation
+
         """
 
         self.output_dates_, frequency = ts.compute_output_dates(self.df_, h)
 
-        self.level = level
+        self.level_ = level
 
         self.return_std_ = False  # do not remove (/!\)
 
@@ -810,8 +829,9 @@ class MTS(Base):
 
         Parameters:
 
-            series: {integer} or {string}
-                series index or name
+        series: {integer} or {string}
+            series index or name
+
         """
 
         assert all(
