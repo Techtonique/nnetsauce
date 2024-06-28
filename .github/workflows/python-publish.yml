@@ -30,8 +30,8 @@ jobs:
       - name: Run examples 
         run: pip install .&&find examples -maxdepth 2 -name "*.py" -exec  python3 {} \;
 
-      #- name: Publish to PyPI                
-      #  uses: pypa/gh-action-pypi-publish@release/v1
-      #  with:
-      #    password: ${{ secrets.PYPI_GLOBAL }}
-      #   repository-url: https://upload.pypi.org/legacy/
+      - name: Publish to PyPI                
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_GLOBAL }}
+          repository-url: https://upload.pypi.org/legacy/
