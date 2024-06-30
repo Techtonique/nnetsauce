@@ -18,6 +18,7 @@ df = pd.read_csv(url)
 # ice cream vs heater (I don't own the copyright)
 df.set_index('Month', inplace=True) 
 df.index.rename('date')
+df2 = df.diff().dropna()
 # gnp dataset
 #df.set_index('date', inplace=True) 
 
@@ -26,6 +27,11 @@ idx_train = int(df.shape[0]*0.8)
 idx_end = df.shape[0]
 df_train = df.iloc[0:idx_train,]
 df_test = df.iloc[idx_train:idx_end,]
+
+idx_train = int(df2.shape[0]*0.8)
+idx_end = df2.shape[0]
+df2_train = df2.iloc[0:idx_train,]
+df2_test = df2.iloc[idx_train:idx_end,]
 
 print(f"----- df_train: {df_train} -----")
 print(f"----- df_train.dtypes: {df_train.dtypes} -----")
@@ -61,6 +67,17 @@ regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=False, custom_metric=None,
                       show_progress=False, preprocess=False)
 models, predictions = regr_mts3.fit(df_train, df_test)
 model_dictionary = regr_mts3.provide_models(df_train, df_test)
+print(models)
+print(models["WINKLERSCORE"])
+
+
+regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=False, custom_metric=None,
+                      lags = 15, n_hidden_features=7, n_clusters=2,
+                      replications=100, kernel="gaussian",
+                      type_pi="scp2-kde",
+                      show_progress=False, preprocess=False)
+models, predictions = regr_mts3.fit(df2_train, df2_test)
+model_dictionary = regr_mts3.provide_models(df2_train, df2_test)
 print(models)
 print(models["WINKLERSCORE"])
 

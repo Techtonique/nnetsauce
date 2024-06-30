@@ -14,6 +14,7 @@ from .progress_bar import Progbar
 from .psdcheck import isPD, nearestPD
 from .timeseries import (
     compute_output_dates,
+    coverage,
     create_lags,
     create_train_inputs,
     reformat_response,
@@ -42,5 +43,6 @@ __all__ = [
     "tuple_map",
     "TimeSeriesSplit",
     "Progbar",
+    "coverage",
     "winkler_score",
 ]

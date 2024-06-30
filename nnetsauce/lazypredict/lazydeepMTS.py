@@ -18,7 +18,7 @@ from sklearn.metrics import (
 from .config import DEEPREGRESSORSMTS
 from ..mts import MTS
 from ..deep import DeepMTS
-from ..utils import convert_df_to_numeric, winkler_score
+from ..utils import convert_df_to_numeric, coverage, winkler_score
 
 import warnings
 
@@ -239,6 +239,7 @@ class LazyDeepMTS(MTS):
         MPE = []
         MAPE = []
         WINKLERSCORE = []
+        COVERAGE = []
 
         # WIN = []
         names = []
@@ -378,6 +379,7 @@ class LazyDeepMTS(MTS):
                         mae = mean_absolute_error(X_test, X_pred.mean)
                         mpl = mean_pinball_loss(X_test, X_pred.mean)
                         winklerscore = winkler_score(X_pred, X_test, level=95)
+                        coveragecalc = coverage(X_pred, X_test, level=95)
                     else:
                         rmse = mean_squared_error(X_test, X_pred, squared=False)
                         mae = mean_absolute_error(X_test, X_pred)
@@ -389,6 +391,7 @@ class LazyDeepMTS(MTS):
                     MPL.append(mpl)
                     if self.replications is not None:
                         WINKLERSCORE.append(winklerscore)
+                        COVERAGE.append(coveragecalc)
                     TIME.append(time.time() - start)
 
                     if self.custom_metric:
@@ -407,6 +410,7 @@ class LazyDeepMTS(MTS):
                                 # "MPE": mpe,
                                 # "MAPE": mape,
                                 "WINKLERSCORE": winklerscore,
+                                "COVERAGE": coveragecalc, 
                                 "Time taken": time.time() - start,
                             }
                         else:
@@ -504,6 +508,7 @@ class LazyDeepMTS(MTS):
                         mae = mean_absolute_error(X_test, X_pred.mean)
                         mpl = mean_pinball_loss(X_test, X_pred.mean)
                         winklerscore = winkler_score(X_pred, X_test, level=95)
+                        coveragecalc = coverage(X_pred, X_test, level=95)
                     else:
                         rmse = mean_squared_error(X_test, X_pred, squared=False)
                         mae = mean_absolute_error(X_test, X_pred)
@@ -515,6 +520,7 @@ class LazyDeepMTS(MTS):
                     MPL.append(mpl)
                     if self.replications is not None:
                         WINKLERSCORE.append(winklerscore)
+                        COVERAGE.append(coveragecalc)
                     TIME.append(time.time() - start)
 
                     if self.custom_metric:
@@ -533,6 +539,7 @@ class LazyDeepMTS(MTS):
                                 # "MPE": mpe,
                                 # "MAPE": mape,
                                 "WINKLERSCORE": winklerscore,
+                                "COVERAGE": coveragecalc,
                                 "Time taken": time.time() - start,
                             }
                         else:
@@ -572,6 +579,7 @@ class LazyDeepMTS(MTS):
                 # "MPE": MPE,
                 # "MAPE": MAPE,
                 "WINKLERSCORE": WINKLERSCORE,
+                "COVERAGE": COVERAGE,
                 "Time Taken": TIME,
             }
         else:
