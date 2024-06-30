@@ -71,7 +71,7 @@ for est in all_estimators():
         print(f"Estimator: {est[0]}")        
         obj0 = ns.PredictionInterval(obj=est[1](),
                                 method="splitconformal",
-                                type_split="random",
+                                type_split="sequential",
                                 level=95,
                                 seed=312)
         
