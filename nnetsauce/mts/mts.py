@@ -537,7 +537,14 @@ class MTS(Base):
         if "return_std" in kwargs:  # bayesian forecasting
             self.return_std_ = True
             self.preds_std_ = []
+            DescribeResult = namedtuple(
+                "DescribeResult", ("mean", "lower", "upper")
+            )  # to be updated
 
+        if "return_pi" in kwargs: # split conformal, without simulation
+            mean_pi_ = []
+            lower_pi_ = []
+            upper_pi_ = []
             DescribeResult = namedtuple(
                 "DescribeResult", ("mean", "lower", "upper")
             )  # to be updated
@@ -600,6 +607,15 @@ class MTS(Base):
                         for i in range(self.n_series)
                     ]
                 )
+            
+            if "return_pi" in kwargs:
+                for i in range(self.n_series): 
+                    preds_pi = self.fit_objs_[i].predict(
+                                cooked_new_X, return_pi=True
+                            )                    
+                    mean_pi_.append(preds_pi.mean[0])
+                    lower_pi_.append(preds_pi.lower[0])
+                    upper_pi_.append(preds_pi.upper[0])
 
             predicted_cooked_new_X = np.asarray(
                 [
@@ -618,7 +634,7 @@ class MTS(Base):
             columns=self.df_.columns,
             index=self.output_dates_,
         )
-        if "return_std" not in kwargs:
+        if ("return_std" not in kwargs) and ("return_pi" not in kwargs):
 
             if self.replications is None:
                 return self.mean_
@@ -708,7 +724,7 @@ class MTS(Base):
 
                 return res
 
-        if "return_std" in kwargs:
+        if ("return_std" in kwargs) or ("return_pi" in kwargs):
             DescribeResult = namedtuple(
                 "DescribeResult", ("mean", "lower", "upper")
             )
@@ -719,19 +735,37 @@ class MTS(Base):
                 index=self.output_dates_,
             )
 
-            self.preds_std_ = np.asarray(self.preds_std_)
+            if "return_std" in kwargs:
 
-            self.lower_ = pd.DataFrame(
-                self.mean_.values - pi_multiplier * self.preds_std_,
-                columns=self.series_names,  # self.df_.columns,
-                index=self.output_dates_,
-            )
+                self.preds_std_ = np.asarray(self.preds_std_)
 
-            self.upper_ = pd.DataFrame(
-                self.mean_.values + pi_multiplier * self.preds_std_,
-                columns=self.series_names,  # self.df_.columns,
-                index=self.output_dates_,
-            )
+                self.lower_ = pd.DataFrame(
+                    self.mean_.values - pi_multiplier * self.preds_std_,
+                    columns=self.series_names,  # self.df_.columns,
+                    index=self.output_dates_,
+                )
+
+                self.upper_ = pd.DataFrame(
+                    self.mean_.values + pi_multiplier * self.preds_std_,
+                    columns=self.series_names,  # self.df_.columns,
+                    index=self.output_dates_,
+                )
+            
+            if "return_pi" in kwargs: 
+
+                self.lower_ = pd.DataFrame(
+                    np.asarray(lower_pi_).reshape(h, self.n_series) + y_means_[np.newaxis, :],
+                    columns=self.series_names,  # self.df_.columns,
+                    index=self.output_dates_,
+                )
+
+                self.upper_ = pd.DataFrame(
+                    np.asarray(upper_pi_).reshape(h, self.n_series) + y_means_[np.newaxis, :],
+                    columns=self.series_names,  # self.df_.columns,
+                    index=self.output_dates_,
+                )
+
+
             res = DescribeResult(self.mean_, self.lower_, self.upper_)
 
             if self.xreg_ is not None:
