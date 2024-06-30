@@ -410,7 +410,7 @@ class LazyDeepMTS(MTS):
                                 # "MPE": mpe,
                                 # "MAPE": mape,
                                 "WINKLERSCORE": winklerscore,
-                                "COVERAGE": coveragecalc, 
+                                "COVERAGE": coveragecalc,
                                 "Time taken": time.time() - start,
                             }
                         else:

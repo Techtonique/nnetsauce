@@ -37,10 +37,10 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
 
         type_pi: a string;
             type of prediction interval: currently "kde" (default) or "bootstrap"
-        
-        type_split: a string;            
+
+        type_split: a string;
             "random" (random split of data) or "sequential" (sequential split of data)
-        
+
         seed: an integer;
             Reproducibility of fit (there's a random split between fitting and calibration data)
     """
@@ -88,7 +88,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
 
         """
 
-        if self.type_split == "random": 
+        if self.type_split == "random":
             X_train, X_calibration, y_train, y_calibration = train_test_split(
                 X, y, test_size=0.5, random_state=self.seed
             )
@@ -97,11 +97,10 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             n_x_half = n_x // 2
             first_half_idx = range(0, n_x_half)
             second_half_idx = range(n_x_half, n_x)
-            X_train = X[first_half_idx,:]
-            X_calibration = X[second_half_idx,:] 
+            X_train = X[first_half_idx, :]
+            X_calibration = X[second_half_idx, :]
             y_train = y[first_half_idx]
             y_calibration = y[second_half_idx]
-            
 
         if self.method == "splitconformal":
 

@@ -81,7 +81,7 @@ class CustomRegressor(Custom, RegressorMixin):
             `type_pi = 'kde'`). Currently, either 'gaussian' or 'tophat'.
 
         type_split: str.
-            Type of splitting for conformal prediction. None (default), or 
+            Type of splitting for conformal prediction. None (default), or
             "random" (random split of data) or "sequential" (sequential split of data)
 
         col_sample: float
@@ -124,7 +124,7 @@ class CustomRegressor(Custom, RegressorMixin):
         type_pi=None,
         replications=None,
         kernel=None,
-        type_split=None, 
+        type_split=None,
         col_sample=1,
         row_sample=1,
         seed=123,

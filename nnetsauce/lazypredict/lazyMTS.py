@@ -535,7 +535,7 @@ class LazyMTS(MTS):
                                 # "MPE": mpe,
                                 # "MAPE": mape,
                                 "WINKLERSCORE": winklerscore,
-                                "COVERAGE": coveragecalc, 
+                                "COVERAGE": coveragecalc,
                                 "Time taken": time.time() - start,
                             }
                         else:
@@ -575,7 +575,7 @@ class LazyMTS(MTS):
                 # "MPE": MPE,
                 # "MAPE": MAPE,
                 "WINKLERSCORE": WINKLERSCORE,
-                "COVERAGE": COVERAGE, 
+                "COVERAGE": COVERAGE,
                 "Time Taken": TIME,
             }
         else:
