@@ -541,7 +541,7 @@ class MTS(Base):
                 "DescribeResult", ("mean", "lower", "upper")
             )  # to be updated
 
-        if "return_pi" in kwargs: # split conformal, without simulation
+        if "return_pi" in kwargs:  # split conformal, without simulation
             mean_pi_ = []
             lower_pi_ = []
             upper_pi_ = []
@@ -607,12 +607,12 @@ class MTS(Base):
                         for i in range(self.n_series)
                     ]
                 )
-            
+
             if "return_pi" in kwargs:
-                for i in range(self.n_series): 
+                for i in range(self.n_series):
                     preds_pi = self.fit_objs_[i].predict(
-                                cooked_new_X, return_pi=True
-                            )                    
+                        cooked_new_X, return_pi=True
+                    )
                     mean_pi_.append(preds_pi.mean[0])
                     lower_pi_.append(preds_pi.lower[0])
                     upper_pi_.append(preds_pi.upper[0])
@@ -750,21 +750,22 @@ class MTS(Base):
                     columns=self.series_names,  # self.df_.columns,
                     index=self.output_dates_,
                 )
-            
-            if "return_pi" in kwargs: 
+
+            if "return_pi" in kwargs:
 
                 self.lower_ = pd.DataFrame(
-                    np.asarray(lower_pi_).reshape(h, self.n_series) + y_means_[np.newaxis, :],
+                    np.asarray(lower_pi_).reshape(h, self.n_series)
+                    + y_means_[np.newaxis, :],
                     columns=self.series_names,  # self.df_.columns,
                     index=self.output_dates_,
                 )
 
                 self.upper_ = pd.DataFrame(
-                    np.asarray(upper_pi_).reshape(h, self.n_series) + y_means_[np.newaxis, :],
+                    np.asarray(upper_pi_).reshape(h, self.n_series)
+                    + y_means_[np.newaxis, :],
                     columns=self.series_names,  # self.df_.columns,
                     index=self.output_dates_,
                 )
-
 
             res = DescribeResult(self.mean_, self.lower_, self.upper_)
 
@@ -922,23 +923,42 @@ class MTS(Base):
                 alpha=0.2,
                 color="orange",
             )
-            if self.n_series > 1:
-                plt.title(
-                    f"prediction intervals for {self.replications} simulations of {series}",
-                    loc="left",
-                    fontsize=12,
-                    fontweight=0,
-                    color="black",
-                )
-            else:
-                plt.title(
-                    f"prediction intervals for {self.replications} simulations of input time series",
-                    loc="left",
-                    fontsize=12,
-                    fontweight=0,
-                    color="black",
-                )
-            plt.show()
+            if self.replications is None: 
+                if self.n_series > 1:
+                    plt.title(
+                        f"prediction intervals for {series}",
+                        loc="left",
+                        fontsize=12,
+                        fontweight=0,
+                        color="black",
+                    )
+                else:
+                    plt.title(
+                        f"prediction intervals for input time series",
+                        loc="left",
+                        fontsize=12,
+                        fontweight=0,
+                        color="black",
+                    )
+                plt.show()
+            else: # self.replications is not None
+                if self.n_series > 1:
+                    plt.title(
+                        f"prediction intervals for {self.replications} simulations of {series}",
+                        loc="left",
+                        fontsize=12,
+                        fontweight=0,
+                        color="black",
+                    )
+                else:
+                    plt.title(
+                        f"prediction intervals for {self.replications} simulations of input time series",
+                        loc="left",
+                        fontsize=12,
+                        fontweight=0,
+                        color="black",
+                    )
+                plt.show()
 
         if type_plot == "spaghetti":
             palette = plt.get_cmap("Set1")

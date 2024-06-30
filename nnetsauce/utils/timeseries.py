@@ -99,6 +99,7 @@ def compute_output_dates(df, horizon):
 
     return output_dates, frequency
 
+
 def coverage(obj, actual, level=95):
 
     alpha = 1 - level / 100
@@ -107,7 +108,7 @@ def coverage(obj, actual, level=95):
     n_points = actual.shape[0]
 
     if isinstance(lt, pd.DataFrame):
-        actual = actual.values 
+        actual = actual.values
 
     # Ensure the arrays have the same length
     assert (
@@ -115,11 +116,11 @@ def coverage(obj, actual, level=95):
     ), "actual, lower and upper bounds have different shapes"
 
     if isinstance(lt, pd.DataFrame) and isinstance(ut, pd.DataFrame):
-        diff_lt = (lt.values <= actual)*(ut.values >= actual)
+        diff_lt = (lt.values <= actual) * (ut.values >= actual)
     else:
-        diff_lt = (lt <= actual)*(ut >= actual)
+        diff_lt = (lt <= actual) * (ut >= actual)
 
-    return np.mean(diff_lt)*100
+    return np.mean(diff_lt) * 100
 
 
 # create lags for one series
