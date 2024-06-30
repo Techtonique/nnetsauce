@@ -754,13 +754,13 @@ class MTS(Base):
             if "return_pi" in kwargs: 
 
                 self.lower_ = pd.DataFrame(
-                    np.asarray(lower_pi_).reshape(h, self.n_series)+y_means_[np.newaxis, :],
+                    np.asarray(lower_pi_).reshape(h, self.n_series) + y_means_[np.newaxis, :],
                     columns=self.series_names,  # self.df_.columns,
                     index=self.output_dates_,
                 )
 
                 self.upper_ = pd.DataFrame(
-                    np.asarray(upper_pi_).reshape(h, self.n_series)+y_means_[np.newaxis, :],
+                    np.asarray(upper_pi_).reshape(h, self.n_series) + y_means_[np.newaxis, :],
                     columns=self.series_names,  # self.df_.columns,
                     index=self.output_dates_,
                 )
