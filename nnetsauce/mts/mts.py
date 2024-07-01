@@ -75,7 +75,7 @@ class MTS(Base):
 
         type_pi: str.
             type of prediction interval; currently:
-            - "gaussian": most basic, fast, but: assumes stationarity of Gaussian residuals and independence in the multivariate case
+            - "gaussian": simple, fast, but: assumes stationarity of Gaussian in-sample residuals and independence in the multivariate case
             - "kde": based on Kernel Density Estimation of in-sample residuals
             - "bootstrap": based on independent bootstrap of in-sample residuals
             - "block-bootstrap": based on basic block bootstrap of in-sample residuals
@@ -129,9 +129,9 @@ class MTS(Base):
 
         preds_std_: {array-like}
             standard deviation around the predictions for Bayesian base learners (`obj`)
-        
+
         gaussian_preds_std_: {array-like}
-            standard deviation around the predictions for `type_pi='gaussian'` 
+            standard deviation around the predictions for `type_pi='gaussian'`
 
         return_std_: boolean
             return uncertainty or not (set in predict)
@@ -277,7 +277,7 @@ class MTS(Base):
         self.lower_ = None
         self.output_dates_ = None
         self.preds_std_ = []
-        self.gaussian_preds_std_ = None 
+        self.gaussian_preds_std_ = None
         self.alpha_ = None
         self.return_std_ = None
         self.df_ = None
@@ -451,7 +451,7 @@ class MTS(Base):
 
         if self.type_pi == "gaussian":
             self.gaussian_preds_std_ = np.std(self.residuals_, axis=0)
-            
+
         if self.type_pi in (
             "scp2-kde",
             "scp2-bootstrap",
@@ -567,7 +567,7 @@ class MTS(Base):
                 self.kde_.sample(n_samples=h, random_state=self.seed + 100 * i)
                 for i in tqdm(range(self.replications))
             )
-        
+
         if self.type_pi in ("bootstrap", "scp-bootstrap", "scp2-bootstrap"):
             assert self.replications is not None and isinstance(
                 self.replications, int
@@ -643,7 +643,9 @@ class MTS(Base):
             columns=self.df_.columns,
             index=self.output_dates_,
         )
-        if (("return_std" not in kwargs) and ("return_pi" not in kwargs)) and (self.type_pi != "gaussian"):
+        if (("return_std" not in kwargs) and ("return_pi" not in kwargs)) and (
+            self.type_pi != "gaussian"
+        ):
 
             if self.replications is None:
                 return self.mean_
@@ -733,7 +735,9 @@ class MTS(Base):
 
                 return res
 
-        if (("return_std" in kwargs) or ("return_pi" in kwargs)) and (self.type_pi != "gaussian"):
+        if (("return_std" in kwargs) or ("return_pi" in kwargs)) and (
+            self.type_pi != "gaussian"
+        ):
             DescribeResult = namedtuple(
                 "DescribeResult", ("mean", "lower", "upper")
             )
@@ -836,7 +840,6 @@ class MTS(Base):
 
             return res
 
-        
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):
         """Train on training_index, score on testing_index."""
 
@@ -975,7 +978,7 @@ class MTS(Base):
                 alpha=0.2,
                 color="orange",
             )
-            if self.replications is None: 
+            if self.replications is None:
                 if self.n_series > 1:
                     plt.title(
                         f"prediction intervals for {series}",
@@ -993,7 +996,7 @@ class MTS(Base):
                         color="black",
                     )
                 plt.show()
-            else: # self.replications is not None
+            else:  # self.replications is not None
                 if self.n_series > 1:
                     plt.title(
                         f"prediction intervals for {self.replications} simulations of {series}",
