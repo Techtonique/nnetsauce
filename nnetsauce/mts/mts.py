@@ -75,6 +75,7 @@ class MTS(Base):
 
         type_pi: str.
             type of prediction interval; currently:
+            - "gaussian": simple, fast, but: assumes stationarity of Gaussian in-sample residuals and independence in the multivariate case
             - "kde": based on Kernel Density Estimation of in-sample residuals
             - "bootstrap": based on independent bootstrap of in-sample residuals
             - "block-bootstrap": based on basic block bootstrap of in-sample residuals
@@ -127,7 +128,10 @@ class MTS(Base):
             successive model predictions
 
         preds_std_: {array-like}
-            standard deviation around the predictions
+            standard deviation around the predictions for Bayesian base learners (`obj`)
+
+        gaussian_preds_std_: {array-like}
+            standard deviation around the predictions for `type_pi='gaussian'`
 
         return_std_: boolean
             return uncertainty or not (set in predict)
@@ -273,6 +277,7 @@ class MTS(Base):
         self.lower_ = None
         self.output_dates_ = None
         self.preds_std_ = []
+        self.gaussian_preds_std_ = None
         self.alpha_ = None
         self.return_std_ = None
         self.df_ = None
@@ -394,7 +399,7 @@ class MTS(Base):
         else:
             iterator = range(p)
 
-        if self.type_pi in ("kde", "bootstrap", "block-bootstrap"):
+        if self.type_pi in ("gaussian", "kde", "bootstrap", "block-bootstrap"):
             for i in iterator:
                 y_mean = np.mean(self.y_[:, i])
                 self.y_means_[i] = y_mean
@@ -443,6 +448,10 @@ class MTS(Base):
                 self.fit_objs_[i] = deepcopy(self.obj)
 
         self.residuals_ = np.asarray(residuals_).T
+
+        if self.type_pi == "gaussian":
+            self.gaussian_preds_std_ = np.std(self.residuals_, axis=0)
+
         if self.type_pi in (
             "scp2-kde",
             "scp2-bootstrap",
@@ -634,7 +643,9 @@ class MTS(Base):
             columns=self.df_.columns,
             index=self.output_dates_,
         )
-        if ("return_std" not in kwargs) and ("return_pi" not in kwargs):
+        if (("return_std" not in kwargs) and ("return_pi" not in kwargs)) and (
+            self.type_pi != "gaussian"
+        ):
 
             if self.replications is None:
                 return self.mean_
@@ -724,7 +735,9 @@ class MTS(Base):
 
                 return res
 
-        if ("return_std" in kwargs) or ("return_pi" in kwargs):
+        if (("return_std" in kwargs) or ("return_pi" in kwargs)) and (
+            self.type_pi != "gaussian"
+        ):
             DescribeResult = namedtuple(
                 "DescribeResult", ("mean", "lower", "upper")
             )
@@ -766,6 +779,48 @@ class MTS(Base):
                     columns=self.series_names,  # self.df_.columns,
                     index=self.output_dates_,
                 )
+
+            res = DescribeResult(self.mean_, self.lower_, self.upper_)
+
+            if self.xreg_ is not None:
+                if len(self.xreg_.shape) > 1:
+                    res2 = mx.tuple_map(
+                        res,
+                        lambda x: mo.delete_last_columns(
+                            x, num_columns=self.xreg_.shape[1]
+                        ),
+                    )
+                else:
+                    res2 = mx.tuple_map(
+                        res, lambda x: mo.delete_last_columns(x, num_columns=1)
+                    )
+                return DescribeResult(res2[0], res2[1], res2[2])
+
+            return res
+
+        if self.type_pi == "gaussian":
+
+            DescribeResult = namedtuple(
+                "DescribeResult", ("mean", "lower", "upper")
+            )
+
+            self.mean_ = pd.DataFrame(
+                np.asarray(self.mean_),
+                columns=self.series_names,  # self.df_.columns,
+                index=self.output_dates_,
+            )
+
+            self.lower_ = pd.DataFrame(
+                self.mean_.values - pi_multiplier * self.gaussian_preds_std_,
+                columns=self.series_names,  # self.df_.columns,
+                index=self.output_dates_,
+            )
+
+            self.upper_ = pd.DataFrame(
+                self.mean_.values + pi_multiplier * self.gaussian_preds_std_,
+                columns=self.series_names,  # self.df_.columns,
+                index=self.output_dates_,
+            )
 
             res = DescribeResult(self.mean_, self.lower_, self.upper_)
 
@@ -923,7 +978,7 @@ class MTS(Base):
                 alpha=0.2,
                 color="orange",
             )
-            if self.replications is None: 
+            if self.replications is None:
                 if self.n_series > 1:
                     plt.title(
                         f"prediction intervals for {series}",
@@ -941,7 +996,7 @@ class MTS(Base):
                         color="black",
                     )
                 plt.show()
-            else: # self.replications is not None
+            else:  # self.replications is not None
                 if self.n_series > 1:
                     plt.title(
                         f"prediction intervals for {self.replications} simulations of {series}",
