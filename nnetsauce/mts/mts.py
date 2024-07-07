@@ -79,12 +79,13 @@ class MTS(Base):
             - "kde": based on Kernel Density Estimation of in-sample residuals
             - "bootstrap": based on independent bootstrap of in-sample residuals
             - "block-bootstrap": based on basic block bootstrap of in-sample residuals
-            - "scp-kde": Split conformal prediction with Kernel Density Estimation of calibrated residuals
-            - "scp-bootstrap": Split conformal prediction with independent bootstrap of calibrated residuals
-            - "scp-block-bootstrap": Split conformal prediction with basic block bootstrap of calibrated residuals
-            - "scp2-kde": Split conformal prediction with Kernel Density Estimation of standardized calibrated residuals
-            - "scp2-bootstrap": Split conformal prediction with independent bootstrap of standardized calibrated residuals
-            - "scp2-block-bootstrap": Split conformal prediction with basic block bootstrap of standardized calibrated residuals
+            - "scp": Sequential split conformal prediction
+            - "scp-kde": Sequential split conformal prediction with Kernel Density Estimation of calibrated residuals
+            - "scp-bootstrap": Sequential split conformal prediction with independent bootstrap of calibrated residuals
+            - "scp-block-bootstrap": Sequential split conformal prediction with basic block bootstrap of calibrated residuals
+            - "scp2-kde": Sequential split conformal prediction with Kernel Density Estimation of standardized calibrated residuals
+            - "scp2-bootstrap": Sequential split conformal prediction with independent bootstrap of standardized calibrated residuals
+            - "scp2-block-bootstrap": Sequential split conformal prediction with basic block bootstrap of standardized calibrated residuals
 
         replications: int.
             number of replications (if needed, for predictive simulation). Default is 'None'.
@@ -282,6 +283,8 @@ class MTS(Base):
         self.return_std_ = None
         self.df_ = None
         self.residuals_ = []
+        self.abs_calib_residuals_ = None 
+        self.calib_residuals_quantile_ = None 
         self.residuals_sims_ = None
         self.kde_ = None
         self.sims_ = None
@@ -413,7 +416,7 @@ class MTS(Base):
                     ).tolist()
                 )
 
-        if self.type_pi in (
+        if self.type_pi in (            
             "scp-kde",
             "scp-bootstrap",
             "scp-block-bootstrap",
@@ -447,12 +450,12 @@ class MTS(Base):
                 self.obj.fit(X=scaled_Z[second_half_idx, :], y=centered_y_i)
                 self.fit_objs_[i] = deepcopy(self.obj)
 
-        self.residuals_ = np.asarray(residuals_).T
+        self.residuals_ = np.asarray(residuals_).T        
 
         if self.type_pi == "gaussian":
             self.gaussian_preds_std_ = np.std(self.residuals_, axis=0)
 
-        if self.type_pi in (
+        if self.type_pi in (            
             "scp2-kde",
             "scp2-bootstrap",
             "scp2-block-bootstrap",
@@ -669,8 +672,9 @@ class MTS(Base):
             columns=self.df_.columns,
             index=self.output_dates_,
         )
+
         if (("return_std" not in kwargs) and ("return_pi" not in kwargs)) and (
-            self.type_pi != "gaussian"
+            self.type_pi not in ("gaussian", "scp")
         ):
 
             if self.replications is None:
@@ -781,7 +785,7 @@ class MTS(Base):
                 return res
 
         if (("return_std" in kwargs) or ("return_pi" in kwargs)) and (
-            self.type_pi != "gaussian"
+            self.type_pi not in ("gaussian", "scp")
         ):
             DescribeResult = namedtuple(
                 "DescribeResult", ("mean", "lower", "upper")
