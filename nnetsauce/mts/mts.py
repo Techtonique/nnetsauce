@@ -231,7 +231,7 @@ class MTS(Base):
         lags=1,
         type_pi="kde",
         replications=None,
-        kernel=None,
+        kernel="gaussian",
         agg="mean",
         seed=123,
         backend="cpu",

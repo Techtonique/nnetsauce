@@ -151,7 +151,7 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
             backend=backend,
         )
 
-        self.type_fit = "regression"
+        self.type_fit = "classification"
 
     def fit(self, X, y, **kwargs):
         """Fit Ridge model to training data (X, y).
