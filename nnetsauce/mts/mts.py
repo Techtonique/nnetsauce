@@ -563,24 +563,42 @@ class MTS(Base):
             "scp-kde",
             "scp2-kde",
         ):  # kde
-            self.residuals_sims_ = tuple(
-                self.kde_.sample(n_samples=h, random_state=self.seed + 100 * i)
-                for i in tqdm(range(self.replications))
-            )
+            if self.verbose == 1: 
+                self.residuals_sims_ = tuple(
+                    self.kde_.sample(n_samples=h, random_state=self.seed + 100 * i)
+                    for i in tqdm(range(self.replications))
+                )
+            elif self.verbose == 0: 
+                self.residuals_sims_ = tuple(
+                    self.kde_.sample(n_samples=h, random_state=self.seed + 100 * i)
+                    for i in range(self.replications)
+                )
 
         if self.type_pi in ("bootstrap", "scp-bootstrap", "scp2-bootstrap"):
             assert self.replications is not None and isinstance(
                 self.replications, int
             ), "'replications' must be provided and be an integer"
-            self.residuals_sims_ = tuple(
-                ts.bootstrap(
-                    self.residuals_,
-                    h=h,
-                    block_size=None,
-                    seed=self.seed + 100 * i,
+            if self.verbose == 1: 
+                self.residuals_sims_ = tuple(
+                    ts.bootstrap(
+                        self.residuals_,
+                        h=h,
+                        block_size=None,
+                        seed=self.seed + 100 * i,
+                    )
+                    for i in tqdm(range(self.replications))
                 )
-                for i in tqdm(range(self.replications))
-            )
+            elif self.verbose == 0:
+                self.residuals_sims_ = tuple(
+                    ts.bootstrap(
+                        self.residuals_,
+                        h=h,
+                        block_size=None,
+                        seed=self.seed + 100 * i,
+                    )
+                    for i in range(self.replications)
+                )
+
 
         if self.type_pi in (
             "block-bootstrap",
@@ -590,12 +608,20 @@ class MTS(Base):
             assert self.replications is not None and isinstance(
                 self.replications, int
             ), "'replications' must be provided and be an integer"
-            self.residuals_sims_ = tuple(
-                ts.bootstrap(
-                    self.residuals_, h=h, block_size=h, seed=self.seed + 100 * i
+            if self.verbose == 1: 
+                self.residuals_sims_ = tuple(
+                    ts.bootstrap(
+                        self.residuals_, h=h, block_size=h, seed=self.seed + 100 * i
+                    )
+                    for i in tqdm(range(self.replications))
                 )
-                for i in tqdm(range(self.replications))
-            )
+            elif self.verbose == 0: 
+                self.residuals_sims_ = tuple(
+                    ts.bootstrap(
+                        self.residuals_, h=h, block_size=h, seed=self.seed + 100 * i
+                    )
+                    for i in range(self.replications)
+                )            
 
         for _ in range(h):
 
@@ -654,27 +680,46 @@ class MTS(Base):
             meanf = []
             lower = []
             upper = []
-
+            
             if self.type_pi in (
                 "scp2-kde",
                 "scp2-bootstrap",
                 "scp2-block-bootstrap",
             ):
-                self.sims_ = tuple(
-                    (
-                        self.mean_
-                        + self.residuals_sims_[i]
-                        * self.residuals_std_dev_[np.newaxis, :]
-                        for i in tqdm(range(self.replications))
+                
+                if self.verbose == 1: 
+                    self.sims_ = tuple(
+                        (
+                            self.mean_
+                            + self.residuals_sims_[i]
+                            * self.residuals_std_dev_[np.newaxis, :]
+                            for i in tqdm(range(self.replications))
+                        )
                     )
-                )
+                elif self.verbose == 0:
+                     self.sims_ = tuple(
+                        (
+                            self.mean_
+                            + self.residuals_sims_[i]
+                            * self.residuals_std_dev_[np.newaxis, :]
+                            for i in range(self.replications)
+                        )
+                    )
             else:
-                self.sims_ = tuple(
-                    (
-                        self.mean_ + self.residuals_sims_[i]
-                        for i in tqdm(range(self.replications))
+                if self.verbose == 1: 
+                    self.sims_ = tuple(
+                        (
+                            self.mean_ + self.residuals_sims_[i]
+                            for i in tqdm(range(self.replications))
+                        )
                     )
-                )
+                elif self.verbose == 0:
+                    self.sims_ = tuple(
+                        (
+                            self.mean_ + self.residuals_sims_[i]
+                            for i in range(self.replications)
+                        )
+                    )
 
             DescribeResult = namedtuple(
                 "DescribeResult", ("mean", "sims", "lower", "upper")

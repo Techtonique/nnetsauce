@@ -326,7 +326,7 @@ class LazyMTS(MTS):
                                 ),
                             ]
                         )
-                    else:
+                    else: # "random_state" in model().get_params().keys()
                         pipe = Pipeline(
                             steps=[
                                 ("preprocessor", preprocessor),
@@ -365,9 +365,9 @@ class LazyMTS(MTS):
 
                     X_pred = pipe["regressor"].predict(
                         h=X_test.shape[0], **kwargs
-                    )
+                    )                    
 
-                    if self.replications is not None:
+                    if (self.replications is not None) or (self.type_pi=="gaussian"):                        
                         rmse = mean_squared_error(
                             X_test, X_pred.mean, squared=False
                         )
@@ -384,7 +384,8 @@ class LazyMTS(MTS):
                     RMSE.append(rmse)
                     MAE.append(mae)
                     MPL.append(mpl)
-                    if self.replications is not None:
+
+                    if (self.replications is not None) or (self.type_pi=="gaussian"):
                         WINKLERSCORE.append(winklerscore)
                         COVERAGE.append(coveragecalc)
                     TIME.append(time.time() - start)
@@ -394,16 +395,12 @@ class LazyMTS(MTS):
                         CUSTOM_METRIC.append(custom_metric)
 
                     if self.verbose > 0:
-                        if self.replications is not None:
+                        if (self.replications is not None) or (self.type_pi=="gaussian"):
                             scores_verbose = {
                                 "Model": name,
-                                # "R-Squared": r_squared,
-                                # "Adjusted R-Squared": adj_rsquared,
                                 "RMSE": rmse,
                                 "MAE": mae,
                                 "MPL": mpl,
-                                # "MPE": mpe,
-                                # "MAPE": mape,
                                 "WINKLERSCORE": winklerscore,
                                 "COVERAGE": coveragecalc,
                                 "Time taken": time.time() - start,
@@ -411,13 +408,9 @@ class LazyMTS(MTS):
                         else:
                             scores_verbose = {
                                 "Model": name,
-                                # "R-Squared": r_squared,
-                                # "Adjusted R-Squared": adj_rsquared,
                                 "RMSE": rmse,
                                 "MAE": mae,
                                 "MPL": mpl,
-                                # "MPE": mpe,
-                                # "MAPE": mape,
                                 "Time taken": time.time() - start,
                             }
 
@@ -453,6 +446,7 @@ class LazyMTS(MTS):
                             type_clust=self.type_clust,
                             type_scaling=self.type_scaling,
                             lags=self.lags,
+                            type_pi=self.type_pi,
                             replications=self.replications,
                             kernel=self.kernel,
                             agg=self.agg,
@@ -475,6 +469,7 @@ class LazyMTS(MTS):
                             type_clust=self.type_clust,
                             type_scaling=self.type_scaling,
                             lags=self.lags,
+                            type_pi=self.type_pi,
                             replications=self.replications,
                             kernel=self.kernel,
                             agg=self.agg,
@@ -482,22 +477,25 @@ class LazyMTS(MTS):
                             backend=self.backend,
                             show_progress=self.show_progress,
                         )
-
+                    
                     pipe.fit(X_train, xreg, **kwargs)
                     # pipe.fit(X_train, xreg=xreg) # DO xreg like in `ahead`
-
+                    
                     self.models[name] = pipe
 
                     if self.preprocess is True:
+
                         X_pred = pipe["regressor"].predict(
                             h=X_test.shape[0], **kwargs
                         )
+
                     else:
+
                         X_pred = pipe.predict(
                             h=X_test.shape[0], **kwargs
                         )  # X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg) ## DO xreg like in `ahead`
 
-                    if self.replications is not None:
+                    if (self.replications is not None) or (self.type_pi=="gaussian"):                        
                         rmse = mean_squared_error(
                             X_test, X_pred.mean, squared=False
                         )
@@ -506,15 +504,15 @@ class LazyMTS(MTS):
                         winklerscore = winkler_score(X_pred, X_test, level=95)
                         coveragecalc = coverage(X_pred, X_test, level=95)
                     else:
-                        rmse = mean_squared_error(X_test, X_pred, squared=False)
-                        mae = mean_absolute_error(X_test, X_pred)
-                        mpl = mean_pinball_loss(X_test, X_pred)
+                        rmse = mean_squared_error(X_test, X_pred.mean, squared=False)
+                        mae = mean_absolute_error(X_test, X_pred.mean)
+                        mpl = mean_pinball_loss(X_test, X_pred.mean)
 
                     names.append(name)
                     RMSE.append(rmse)
                     MAE.append(mae)
                     MPL.append(mpl)
-                    if self.replications is not None:
+                    if (self.replications is not None) or (self.type_pi=="gaussian"):
                         WINKLERSCORE.append(winklerscore)
                         COVERAGE.append(coveragecalc)
                     TIME.append(time.time() - start)
@@ -524,16 +522,12 @@ class LazyMTS(MTS):
                         CUSTOM_METRIC.append(custom_metric)
 
                     if self.verbose > 0:
-                        if self.replications is not None:
+                        if (self.replications is not None) or (self.type_pi=="gaussian"):
                             scores_verbose = {
                                 "Model": name,
-                                # "R-Squared": r_squared,
-                                # "Adjusted R-Squared": adj_rsquared,
                                 "RMSE": rmse,
                                 "MAE": mae,
                                 "MPL": mpl,
-                                # "MPE": mpe,
-                                # "MAPE": mape,
                                 "WINKLERSCORE": winklerscore,
                                 "COVERAGE": coveragecalc,
                                 "Time taken": time.time() - start,
@@ -541,13 +535,9 @@ class LazyMTS(MTS):
                         else:
                             scores_verbose = {
                                 "Model": name,
-                                # "R-Squared": r_squared,
-                                # "Adjusted R-Squared": adj_rsquared,
                                 "RMSE": rmse,
                                 "MAE": mae,
                                 "MPL": mpl,
-                                # "MPE": mpe,
-                                # "MAPE": mape,
                                 "Time taken": time.time() - start,
                             }
 
@@ -564,16 +554,12 @@ class LazyMTS(MTS):
                         print(name + " model failed to execute")
                         print(exception)
 
-        if self.replications is not None:
+        if (self.replications is not None) or (self.type_pi=="gaussian"):
             scores = {
                 "Model": names,
-                # "Adjusted R-Squared": ADJR2,
-                # "R-Squared": R2,
                 "RMSE": RMSE,
                 "MAE": MAE,
                 "MPL": MPL,
-                # "MPE": MPE,
-                # "MAPE": MAPE,
                 "WINKLERSCORE": WINKLERSCORE,
                 "COVERAGE": COVERAGE,
                 "Time Taken": TIME,
@@ -581,13 +567,9 @@ class LazyMTS(MTS):
         else:
             scores = {
                 "Model": names,
-                # "Adjusted R-Squared": ADJR2,
-                # "R-Squared": R2,
                 "RMSE": RMSE,
                 "MAE": MAE,
                 "MPL": MPL,
-                # "MPE": MPE,
-                # "MAPE": MAPE,
                 "Time Taken": TIME,
             }
 

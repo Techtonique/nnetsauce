@@ -66,7 +66,7 @@ class CustomRegressor(Custom, RegressorMixin):
             Currently available: standardization ('std') or MinMax scaling ('minmax')
 
         type_pi: str.
-            type of prediction interval; currently "kde" (default) or "bootstrap".
+            type of prediction interval; currently "kde" (default).
             Used only in `self.predict`, for `self.replications` > 0 and `self.kernel`
             in ('gaussian', 'tophat'). Default is `None`.
 
