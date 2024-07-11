@@ -5,7 +5,7 @@ nnetsauce
 
 <hr>
 
-Randomized and Quasi-Randomized (neural) networks.  
+Randomized and Quasi-Randomized (neural) networks. 
 
 ![PyPI](https://img.shields.io/pypi/v/nnetsauce) [![PyPI - License](https://img.shields.io/pypi/l/nnetsauce)](https://github.com/thierrymoudiki/nnetsauce/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/nnetsauce)](https://pepy.tech/project/nnetsauce) 
 [![Downloads](https://anaconda.org/conda-forge/nnetsauce/badges/downloads.svg)](https://anaconda.org/conda-forge/nnetsauce)
@@ -178,6 +178,8 @@ year={2019--2024}
 ```
 
 ## References
+
+- Probabilistic Forecasting with Randomized/Quasi-Randomized networks at the International Symposium on Forecasting_2024 https://www.researchgate.net/publication/381957724_Probabilistic_Forecasting_with_RandomizedQuasi-Randomized_networks_presentation_at_the_International_Symposium_on_Forecasting_2024
 
 - Moudiki, T. (2024). Regression-based machine learning classifiers. Available at: https://www.researchgate.net/publication/377227280_Regression-based_machine_learning_classifiers
 
