@@ -613,7 +613,7 @@ class MTS(Base):
             "scp2-block-bootstrap",
         ):
             if self.block_size is None:
-                self.block_size = np.ceil(3.15*(self.residuals_.shape[0]**(1/3)))
+                self.block_size = int(np.ceil(3.15*(self.residuals_.shape[0]**(1/3))))
 
             assert self.replications is not None and isinstance(
                 self.replications, int
