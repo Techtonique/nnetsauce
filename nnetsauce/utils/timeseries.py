@@ -106,7 +106,7 @@ def coverage(obj, actual, level=95):
     lt = obj.lower
     ut = obj.upper
     n_points = actual.shape[0]
-    
+
     if isinstance(lt, pd.DataFrame):
         actual = actual.values
 
@@ -165,7 +165,7 @@ def winkler_score(obj, actual, level=95):
     lt = obj.lower
     ut = obj.upper
     n_points = actual.shape[0]
-  
+
     # Ensure the arrays have the same length
     assert (
         n_points == lt.shape[0] == ut.shape[0]

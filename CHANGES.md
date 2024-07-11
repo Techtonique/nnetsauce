@@ -1,9 +1,10 @@
-# version 0.22.4
+# version 0.22.7
 
 - Implement new types of predictive simulation intervals (`type_pi`s): independent bootstrap, block bootstrap, 2 variants of split conformal prediction in class `MTS` (see updated docs)
 - Gaussian prediction intervals `type_pi == "gaussian"` in class `MTS`
 - Implement Winkler score in `LazyMTS` and `LazyDeepMTS` for probabilistic forecasts
 - Use conformalized `Estimator`s in `MTS` (see `examples/mts_conformal_not_sims.py`)
+- Include `block_size` for block bootstrapping methods for `*MTS` classes 
 
 # version 0.20.6
 

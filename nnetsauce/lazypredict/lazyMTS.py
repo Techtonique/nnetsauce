@@ -162,6 +162,7 @@ class LazyMTS(MTS):
         type_scaling=("std", "std", "std"),
         lags=1,
         type_pi="kde",
+        block_size=None,
         replications=None,
         kernel=None,
         agg="mean",
@@ -194,6 +195,7 @@ class LazyMTS(MTS):
             backend=backend,
             lags=lags,
             type_pi=type_pi,
+            block_size=block_size,
             replications=replications,
             kernel=kernel,
             agg=agg,
@@ -205,11 +207,11 @@ class LazyMTS(MTS):
 
         Parameters:
 
-            X_train: array-like,
+            X_train: array-like or data frame,
                 Training vectors, where rows is the number of samples
                 and columns is the number of features.
 
-            X_test: array-like,
+            X_test: array-like or data frame,
                 Testing vectors, where rows is the number of samples
                 and columns is the number of features.
 
@@ -316,6 +318,7 @@ class LazyMTS(MTS):
                                         type_scaling=self.type_scaling,
                                         lags=self.lags,
                                         type_pi=self.type_pi,
+                                        block_size=self.block_size,
                                         replications=self.replications,
                                         kernel=self.kernel,
                                         agg=self.agg,
@@ -326,7 +329,7 @@ class LazyMTS(MTS):
                                 ),
                             ]
                         )
-                    else: # "random_state" in model().get_params().keys()
+                    else:  # "random_state" in model().get_params().keys()
                         pipe = Pipeline(
                             steps=[
                                 ("preprocessor", preprocessor),
@@ -347,6 +350,7 @@ class LazyMTS(MTS):
                                         type_scaling=self.type_scaling,
                                         lags=self.lags,
                                         type_pi=self.type_pi,
+                                        block_size=self.block_size,
                                         replications=self.replications,
                                         kernel=self.kernel,
                                         agg=self.agg,
@@ -365,9 +369,11 @@ class LazyMTS(MTS):
 
                     X_pred = pipe["regressor"].predict(
                         h=X_test.shape[0], **kwargs
-                    )                    
+                    )
 
-                    if (self.replications is not None) or (self.type_pi=="gaussian"):                        
+                    if (self.replications is not None) or (
+                        self.type_pi == "gaussian"
+                    ):
                         rmse = mean_squared_error(
                             X_test, X_pred.mean, squared=False
                         )
@@ -385,7 +391,9 @@ class LazyMTS(MTS):
                     MAE.append(mae)
                     MPL.append(mpl)
 
-                    if (self.replications is not None) or (self.type_pi=="gaussian"):
+                    if (self.replications is not None) or (
+                        self.type_pi == "gaussian"
+                    ):
                         WINKLERSCORE.append(winklerscore)
                         COVERAGE.append(coveragecalc)
                     TIME.append(time.time() - start)
@@ -395,7 +403,9 @@ class LazyMTS(MTS):
                         CUSTOM_METRIC.append(custom_metric)
 
                     if self.verbose > 0:
-                        if (self.replications is not None) or (self.type_pi=="gaussian"):
+                        if (self.replications is not None) or (
+                            self.type_pi == "gaussian"
+                        ):
                             scores_verbose = {
                                 "Model": name,
                                 "RMSE": rmse,
@@ -447,6 +457,7 @@ class LazyMTS(MTS):
                             type_scaling=self.type_scaling,
                             lags=self.lags,
                             type_pi=self.type_pi,
+                            block_size=self.block_size,
                             replications=self.replications,
                             kernel=self.kernel,
                             agg=self.agg,
@@ -470,6 +481,7 @@ class LazyMTS(MTS):
                             type_scaling=self.type_scaling,
                             lags=self.lags,
                             type_pi=self.type_pi,
+                            block_size=self.block_size,
                             replications=self.replications,
                             kernel=self.kernel,
                             agg=self.agg,
@@ -477,10 +489,10 @@ class LazyMTS(MTS):
                             backend=self.backend,
                             show_progress=self.show_progress,
                         )
-                    
+
                     pipe.fit(X_train, xreg, **kwargs)
                     # pipe.fit(X_train, xreg=xreg) # DO xreg like in `ahead`
-                    
+
                     self.models[name] = pipe
 
                     if self.preprocess is True:
@@ -495,7 +507,9 @@ class LazyMTS(MTS):
                             h=X_test.shape[0], **kwargs
                         )  # X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg) ## DO xreg like in `ahead`
 
-                    if (self.replications is not None) or (self.type_pi=="gaussian"):                        
+                    if (self.replications is not None) or (
+                        self.type_pi == "gaussian"
+                    ):
                         rmse = mean_squared_error(
                             X_test, X_pred.mean, squared=False
                         )
@@ -504,7 +518,9 @@ class LazyMTS(MTS):
                         winklerscore = winkler_score(X_pred, X_test, level=95)
                         coveragecalc = coverage(X_pred, X_test, level=95)
                     else:
-                        rmse = mean_squared_error(X_test, X_pred.mean, squared=False)
+                        rmse = mean_squared_error(
+                            X_test, X_pred.mean, squared=False
+                        )
                         mae = mean_absolute_error(X_test, X_pred.mean)
                         mpl = mean_pinball_loss(X_test, X_pred.mean)
 
@@ -512,7 +528,9 @@ class LazyMTS(MTS):
                     RMSE.append(rmse)
                     MAE.append(mae)
                     MPL.append(mpl)
-                    if (self.replications is not None) or (self.type_pi=="gaussian"):
+                    if (self.replications is not None) or (
+                        self.type_pi == "gaussian"
+                    ):
                         WINKLERSCORE.append(winklerscore)
                         COVERAGE.append(coveragecalc)
                     TIME.append(time.time() - start)
@@ -522,7 +540,9 @@ class LazyMTS(MTS):
                         CUSTOM_METRIC.append(custom_metric)
 
                     if self.verbose > 0:
-                        if (self.replications is not None) or (self.type_pi=="gaussian"):
+                        if (self.replications is not None) or (
+                            self.type_pi == "gaussian"
+                        ):
                             scores_verbose = {
                                 "Model": name,
                                 "RMSE": rmse,
@@ -554,7 +574,7 @@ class LazyMTS(MTS):
                         print(name + " model failed to execute")
                         print(exception)
 
-        if (self.replications is not None) or (self.type_pi=="gaussian"):
+        if (self.replications is not None) or (self.type_pi == "gaussian"):
             scores = {
                 "Model": names,
                 "RMSE": RMSE,

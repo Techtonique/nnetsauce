@@ -166,6 +166,7 @@ class LazyDeepMTS(MTS):
         type_scaling=("std", "std", "std"),
         lags=1,
         type_pi="kde",
+        block_size=None,
         replications=None,
         kernel=None,
         agg="mean",
@@ -199,6 +200,7 @@ class LazyDeepMTS(MTS):
             backend=backend,
             lags=lags,
             type_pi=type_pi,
+            block_size=block_size,
             replications=replications,
             kernel=kernel,
             agg=agg,
@@ -210,11 +212,11 @@ class LazyDeepMTS(MTS):
 
         Parameters:
 
-            X_train : array-like,
+            X_train : array-like or data frame,
                 Training vectors, where rows is the number of samples
                 and columns is the number of features.
 
-            X_test : array-like,
+            X_test : array-like or data frame,
                 Testing vectors, where rows is the number of samples
                 and columns is the number of features.
 
@@ -321,6 +323,7 @@ class LazyDeepMTS(MTS):
                                         type_scaling=self.type_scaling,
                                         lags=self.lags,
                                         type_pi=self.type_pi,
+                                        block_size=self.block_size,
                                         replications=self.replications,
                                         kernel=self.kernel,
                                         agg=self.agg,
@@ -353,6 +356,7 @@ class LazyDeepMTS(MTS):
                                         type_scaling=self.type_scaling,
                                         lags=self.lags,
                                         type_pi=self.type_pi,
+                                        block_size=self.block_size,
                                         replications=self.replications,
                                         kernel=self.kernel,
                                         agg=self.agg,
@@ -458,6 +462,8 @@ class LazyDeepMTS(MTS):
                             type_clust=self.type_clust,
                             type_scaling=self.type_scaling,
                             lags=self.lags,
+                            type_pi=self.type_pi,
+                            block_size=self.block_size,
                             replications=self.replications,
                             kernel=self.kernel,
                             agg=self.agg,
@@ -480,6 +486,8 @@ class LazyDeepMTS(MTS):
                             type_clust=self.type_clust,
                             type_scaling=self.type_scaling,
                             lags=self.lags,
+                            type_pi=self.type_pi,
+                            block_size=self.block_size,
                             replications=self.replications,
                             kernel=self.kernel,
                             agg=self.agg,

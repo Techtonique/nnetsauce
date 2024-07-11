@@ -61,6 +61,23 @@ class DeepMTS(MTS):
         lags: int.
             number of lags used for each time series.
 
+        type_pi: str.
+            type of prediction interval; currently:
+            - "gaussian": simple, fast, but: assumes stationarity of Gaussian in-sample residuals and independence in the multivariate case
+            - "kde": based on Kernel Density Estimation of in-sample residuals
+            - "bootstrap": based on independent bootstrap of in-sample residuals
+            - "block-bootstrap": based on basic block bootstrap of in-sample residuals
+            - "scp-kde": Sequential split conformal prediction with Kernel Density Estimation of calibrated residuals
+            - "scp-bootstrap": Sequential split conformal prediction with independent bootstrap of calibrated residuals
+            - "scp-block-bootstrap": Sequential split conformal prediction with basic block bootstrap of calibrated residuals
+            - "scp2-kde": Sequential split conformal prediction with Kernel Density Estimation of standardized calibrated residuals
+            - "scp2-bootstrap": Sequential split conformal prediction with independent bootstrap of standardized calibrated residuals
+            - "scp2-block-bootstrap": Sequential split conformal prediction with basic block bootstrap of standardized calibrated residuals
+
+        block_size: int.
+            size of block for 'type_pi' in ("block-bootstrap", "scp-block-bootstrap", "scp2-block-bootstrap").
+            Default is round(3.15*(n_residuals^1/3))
+
         replications: int.
             number of replications (if needed, for predictive simulation). Default is 'None'.
 
@@ -186,6 +203,7 @@ class DeepMTS(MTS):
         type_scaling=("std", "std", "std"),
         lags=1,
         type_pi="kde",
+        block_size=None,
         replications=None,
         kernel=None,
         agg="mean",
@@ -232,6 +250,7 @@ class DeepMTS(MTS):
             type_scaling=type_scaling,
             seed=seed,
             type_pi=type_pi,
+            block_size=block_size,
             replications=replications,
             kernel=kernel,
             agg=agg,
