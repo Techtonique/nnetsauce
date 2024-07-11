@@ -79,13 +79,15 @@ class MTS(Base):
             - "kde": based on Kernel Density Estimation of in-sample residuals
             - "bootstrap": based on independent bootstrap of in-sample residuals
             - "block-bootstrap": based on basic block bootstrap of in-sample residuals
-            - "scp": Sequential split conformal prediction
             - "scp-kde": Sequential split conformal prediction with Kernel Density Estimation of calibrated residuals
             - "scp-bootstrap": Sequential split conformal prediction with independent bootstrap of calibrated residuals
             - "scp-block-bootstrap": Sequential split conformal prediction with basic block bootstrap of calibrated residuals
             - "scp2-kde": Sequential split conformal prediction with Kernel Density Estimation of standardized calibrated residuals
             - "scp2-bootstrap": Sequential split conformal prediction with independent bootstrap of standardized calibrated residuals
             - "scp2-block-bootstrap": Sequential split conformal prediction with basic block bootstrap of standardized calibrated residuals
+        
+        block_size: int.
+            size of block for 'type_pi' in ("block-bootstrap", "scp-block-bootstrap", "scp2-block-bootstrap")
 
         replications: int.
             number of replications (if needed, for predictive simulation). Default is 'None'.
@@ -231,6 +233,7 @@ class MTS(Base):
         type_scaling=("std", "std", "std"),
         lags=1,
         type_pi="kde",
+        block_size=None,
         replications=None,
         kernel="gaussian",
         agg="mean",
@@ -261,6 +264,7 @@ class MTS(Base):
         self.n_series = None
         self.lags = lags
         self.type_pi = type_pi
+        self.block_size = block_size
         self.replications = replications
         self.kernel = kernel
         self.agg = agg
@@ -608,20 +612,27 @@ class MTS(Base):
             "scp-block-bootstrap",
             "scp2-block-bootstrap",
         ):
+            if self.block_size is None:
+                self.block_size = np.ceil(3.15*(self.residuals_.shape[0]**(1/3)))
+
             assert self.replications is not None and isinstance(
                 self.replications, int
             ), "'replications' must be provided and be an integer"
             if self.verbose == 1: 
                 self.residuals_sims_ = tuple(
                     ts.bootstrap(
-                        self.residuals_, h=h, block_size=h, seed=self.seed + 100 * i
+                        self.residuals_, h=h, 
+                        block_size=self.block_size, 
+                        seed=self.seed + 100 * i
                     )
                     for i in tqdm(range(self.replications))
                 )
             elif self.verbose == 0: 
                 self.residuals_sims_ = tuple(
                     ts.bootstrap(
-                        self.residuals_, h=h, block_size=h, seed=self.seed + 100 * i
+                        self.residuals_, h=h, 
+                        block_size=self.block_size, 
+                        seed=self.seed + 100 * i
                     )
                     for i in range(self.replications)
                 )            
