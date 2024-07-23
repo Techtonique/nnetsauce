@@ -69,6 +69,7 @@ nnetsauce/rvfl/__init__.py
 nnetsauce/rvfl/bayesianrvfl2Regressor.py
 nnetsauce/rvfl/bayesianrvflRegressor.py
 nnetsauce/sampling/__init__.py
+nnetsauce/sampling/copulas.py
 nnetsauce/sampling/helpers.py
 nnetsauce/sampling/rowsubsampling.py
 nnetsauce/simulation/__init__.py

@@ -16,6 +16,7 @@ from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
 from tqdm import tqdm
 from ..base import Base
+from ..sampling import vinecopula_sample
 from ..simulation import getsims
 from ..utils import matrixops as mo
 from ..utils import misc as mx
@@ -89,6 +90,12 @@ class MTS(Base):
             - "scp2-kde": Sequential split conformal prediction with Kernel Density Estimation of standardized calibrated residuals
             - "scp2-bootstrap": Sequential split conformal prediction with independent bootstrap of standardized calibrated residuals
             - "scp2-block-bootstrap": Sequential split conformal prediction with basic block bootstrap of standardized calibrated residuals
+            - based on copulas of in-sample residuals: 'vine-tll' (default), 'vine-bb1', 'vine-bb6', 'vine-bb7', 'vine-bb8', 'vine-clayton', 
+            'vine-frank', 'vine-gaussian', 'vine-gumbel', 'vine-indep', 'vine-joe', 'vine-student'
+            - 'scp-vine-tll' (default), 'scp-vine-bb1', 'scp-vine-bb6', 'scp-vine-bb7', 'scp-vine-bb8', 'scp-vine-clayton', 
+            'scp-vine-frank', 'scp-vine-gaussian', 'scp-vine-gumbel', 'scp-vine-indep', 'scp-vine-joe', 'scp-vine-student'
+            - 'scp2-vine-tll' (default), 'scp2-vine-bb1', 'scp2-vine-bb6', 'scp2-vine-bb7', 'scp2-vine-bb8', 'scp2-vine-clayton', 
+            'scp2-vine-frank', 'scp2-vine-gaussian', 'scp2-vine-gumbel', 'scp2-vine-indep', 'scp2-vine-joe', 'scp2-vine-student'
 
         block_size: int.
             size of block for 'type_pi' in ("block-bootstrap", "scp-block-bootstrap", "scp2-block-bootstrap").
@@ -411,7 +418,7 @@ class MTS(Base):
         else:
             iterator = range(p)
 
-        if self.type_pi in ("gaussian", "kde", "bootstrap", "block-bootstrap"):
+        if self.type_pi in ("gaussian", "kde", "bootstrap", "block-bootstrap") or self.type_pi.startswith('vine'):
             for i in iterator:
                 y_mean = np.mean(self.y_[:, i])
                 self.y_means_[i] = y_mean
@@ -425,14 +432,7 @@ class MTS(Base):
                     ).tolist()
                 )
 
-        if self.type_pi in (
-            "scp-kde",
-            "scp-bootstrap",
-            "scp-block-bootstrap",
-            "scp2-kde",
-            "scp2-bootstrap",
-            "scp2-block-bootstrap",
-        ):
+        if self.type_pi.startswith("scp"):
             # split conformal prediction
             for i in iterator:
                 n_y = self.y_.shape[0]
@@ -464,11 +464,7 @@ class MTS(Base):
         if self.type_pi == "gaussian":
             self.gaussian_preds_std_ = np.std(self.residuals_, axis=0)
 
-        if self.type_pi in (
-            "scp2-kde",
-            "scp2-bootstrap",
-            "scp2-block-bootstrap",
-        ):
+        if self.type_pi.startswith("scp2"):
             # Calculate mean and standard deviation for each column
             data_mean = np.mean(self.residuals_, axis=0)
             self.residuals_std_dev_ = np.std(self.residuals_, axis=0)
@@ -477,11 +473,7 @@ class MTS(Base):
                 self.residuals_ - data_mean[np.newaxis, :]
             ) / self.residuals_std_dev_[np.newaxis, :]
 
-        if self.replications != None and self.type_pi in (
-            "kde",
-            "scp-kde",
-            "scp2-kde",
-        ):
+        if self.replications != None and "kde" in self.type_pi:
             if self.verbose > 0:
                 print(f"\n Simulate residuals using {self.kernel} kernel... \n")
             assert self.kernel in (
@@ -570,11 +562,7 @@ class MTS(Base):
                 "DescribeResult", ("mean", "lower", "upper")
             )  # to be updated
 
-        if self.kde_ != None and self.type_pi in (
-            "kde",
-            "scp-kde",
-            "scp2-kde",
-        ):  # kde
+        if self.kde_ != None and "kde" in self.type_pi:  # kde
             if self.verbose == 1:
                 self.residuals_sims_ = tuple(
                     self.kde_.sample(
@@ -613,7 +601,7 @@ class MTS(Base):
                         seed=self.seed + 100 * i,
                     )
                     for i in range(self.replications)
-                )
+                )                
 
         if self.type_pi in (
             "block-bootstrap",
@@ -648,6 +636,22 @@ class MTS(Base):
                     )
                     for i in range(self.replications)
                 )
+
+        if "vine" in self.type_pi:            
+            if self.verbose == 1:                
+                self.residuals_sims_ = tuple(
+                    vinecopula_sample(x=self.residuals_, 
+                                      n_samples=h, method=self.type_pi, 
+                                      random_state=self.seed + 100 * i)
+                    for i in tqdm(range(self.replications))
+                )
+            elif self.verbose == 0:
+                self.residuals_sims_ = tuple(
+                    vinecopula_sample(x=self.residuals_, 
+                                      n_samples=h, method=self.type_pi, 
+                                      random_state=self.seed + 100 * i)
+                    for i in range(self.replications)
+                )            
 
         for _ in range(h):
 
@@ -696,9 +700,8 @@ class MTS(Base):
             index=self.output_dates_,
         )
 
-        if (("return_std" not in kwargs) and ("return_pi" not in kwargs)) and (
-            self.type_pi not in ("gaussian", "scp")
-        ):
+        if ((("return_std" not in kwargs) and ("return_pi" not in kwargs)) and (
+            self.type_pi not in ("gaussian", "scp"))) or ("vine" in self.type_pi):
 
             if self.replications is None:
                 return self.mean_
@@ -708,11 +711,7 @@ class MTS(Base):
             lower = []
             upper = []
 
-            if self.type_pi in (
-                "scp2-kde",
-                "scp2-bootstrap",
-                "scp2-block-bootstrap",
-            ):
+            if "scp2" in self.type_pi:
 
                 if self.verbose == 1:
                     self.sims_ = tuple(
@@ -733,6 +732,7 @@ class MTS(Base):
                         )
                     )
             else:
+
                 if self.verbose == 1:
                     self.sims_ = tuple(
                         (
@@ -807,9 +807,9 @@ class MTS(Base):
 
                 return res
 
-        if (("return_std" in kwargs) or ("return_pi" in kwargs)) and (
+        if ((("return_std" in kwargs) or ("return_pi" in kwargs)) and (
             self.type_pi not in ("gaussian", "scp")
-        ):
+        )) or "vine" in self.type_pi:
             DescribeResult = namedtuple(
                 "DescribeResult", ("mean", "lower", "upper")
             )
