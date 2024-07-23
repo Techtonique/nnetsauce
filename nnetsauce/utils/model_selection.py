@@ -207,7 +207,7 @@ def cross_val_score(estimator, X,
         errors = []
 
         if show_progress is True:
-            iterator = tqdm(tscv_obj)
+            iterator = tqdm(tscv_obj, total=tscv.n_splits)
         else:
             iterator = tscv_obj
 
@@ -232,6 +232,6 @@ def cross_val_score(estimator, X,
 
         res = np.asarray(errors)
 
-        return describe(res), res
+        return res, describe(res)
 
 
