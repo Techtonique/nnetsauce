@@ -19,7 +19,7 @@ from .timeseries import (
     create_train_inputs,
     reformat_response,
     winkler_score,
-    mean_errors, 
+    mean_errors,
 )
 
 
@@ -47,5 +47,5 @@ __all__ = [
     "coverage",
     "winkler_score",
     "mean_errors",
-    "cross_val_score"
+    "cross_val_score",
 ]

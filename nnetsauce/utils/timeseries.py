@@ -191,34 +191,40 @@ def winkler_score(obj, actual, level=95):
     return np.mean(score)
 
 
-def mean_errors(pred, actual, 
-                scoring=('root_mean_squared_error', 'mean_squared_error', 
-                         'mean_error', 'mean_absolute_error', 
-                         'mean_percentage_error', 'mean_absolute_percentage_error')):
-    
+def mean_errors(
+    pred,
+    actual,
+    scoring=(
+        "root_mean_squared_error",
+        "mean_squared_error",
+        "mean_error",
+        "mean_absolute_error",
+        "mean_percentage_error",
+        "mean_absolute_percentage_error",
+    ),
+):
+
     n_points = actual.shape[0]
 
     # Ensure the arrays have the same length
-    assert (
-        n_points == pred.shape[0]
-    ), "'actual', 'pred' have different shapes"
+    assert n_points == pred.shape[0], "'actual', 'pred' have different shapes"
 
     if isinstance(pred, pd.DataFrame):
         pred = pred.values
-    
+
     if isinstance(actual, pd.DataFrame):
         actual = actual.values
-        
+
     diff = pred - actual
 
-    if scoring == "mean_error": 
+    if scoring == "mean_error":
         return np.mean(diff)
-    elif scoring == 'mean_absolute_error':
+    elif scoring == "mean_absolute_error":
         return np.mean(np.abs(diff))
-    elif scoring == 'mean_percentage_error':
-        return np.mean(diff/actual)*100
-    elif scoring == 'mean_absolute_percentage_error':
-        return np.mean(np.abs(diff/actual))*100
+    elif scoring == "mean_percentage_error":
+        return np.mean(diff / actual) * 100
+    elif scoring == "mean_absolute_percentage_error":
+        return np.mean(np.abs(diff / actual)) * 100
     elif scoring == "root_mean_squared_error":
         return np.sqrt(np.mean(np.square(diff)))
     elif scoring == "mean_squared_error":
