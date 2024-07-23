@@ -1,3 +1,8 @@
+# version 0.23.0
+
+- Copula simulation for time series residuals in classes `MTS` and `DeepMTS`
+- `cross_val_score`: time series cross-validation for `MTS` and `DeepMTS`
+
 # version 0.22.7
 
 - Implement new types of predictive simulation intervals (`type_pi`s): independent bootstrap, block bootstrap, 2 variants of split conformal prediction in class `MTS` (see updated docs)
