@@ -5,7 +5,6 @@
   - `scp-vine-tll` (default), `scp-vine-bb1`, `scp-vine-bb6`, `scp-vine-bb7`, `scp-vine-bb8`, `scp-vine-clayton`, `scp-vine-frank`, `scp-vine-gaussian`, `scp-vine-gumbel`, `scp-vine-indep`, `scp-vine-joe`, `scp-vine-student`
   - `scp2-vine-tll`, `scp2-vine-bb1`, `scp2-vine-bb6`, `scp2-vine-bb7`, `scp2-vine-bb8`, `scp2-vine-clayton`,
   `scp2-vine-frank`, `scp2-vine-gaussian`, `scp2-vine-gumbel`, `scp2-vine-indep`, `scp2-vine-joe`, `scp2-vine-student`
-  - return AIC
 - `cross_val_score`: time series cross-validation for `MTS` and `DeepMTS`
 
 # version 0.22.7
