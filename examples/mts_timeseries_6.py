@@ -13,7 +13,7 @@ print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 # Example 1 
 
 np.random.seed(1235)
-M = np.random.rand(10, 3)
+M = np.random.rand(100, 3)
 M[:,0] = 10*M[:,0]
 M[:,2] = 25*M[:,2]
 

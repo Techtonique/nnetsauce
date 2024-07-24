@@ -1,3 +1,12 @@
+# version 0.23.0
+
+- Copula simulation for time series residuals in classes `MTS` and `DeepMTS`
+  - based on copulas of in-sample residuals: `vine-tll` (default), `vine-bb1`, `vine-bb6`, `vine-bb7`, `vine-bb8`, `vine-clayton`, `vine-frank`, `vine-gaussian`, `vine-gumbel`, `vine-indep`, `vine-joe`, `vine-student`
+  - `scp-vine-tll` (default), `scp-vine-bb1`, `scp-vine-bb6`, `scp-vine-bb7`, `scp-vine-bb8`, `scp-vine-clayton`, `scp-vine-frank`, `scp-vine-gaussian`, `scp-vine-gumbel`, `scp-vine-indep`, `scp-vine-joe`, `scp-vine-student`
+  - `scp2-vine-tll`, `scp2-vine-bb1`, `scp2-vine-bb6`, `scp2-vine-bb7`, `scp2-vine-bb8`, `scp2-vine-clayton`,
+  `scp2-vine-frank`, `scp2-vine-gaussian`, `scp2-vine-gumbel`, `scp2-vine-indep`, `scp2-vine-joe`, `scp2-vine-student`
+- `cross_val_score`: time series cross-validation for `MTS` and `DeepMTS`
+
 # version 0.22.7
 
 - Implement new types of predictive simulation intervals (`type_pi`s): independent bootstrap, block bootstrap, 2 variants of split conformal prediction in class `MTS` (see updated docs)

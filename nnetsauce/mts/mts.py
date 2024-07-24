@@ -10,15 +10,23 @@ import matplotlib.pyplot as plt
 from collections import namedtuple
 from copy import deepcopy
 from functools import partial
-from scipy.stats import norm
+from scipy.stats import describe, norm
+from sklearn.metrics import (
+    mean_squared_error,
+    mean_absolute_error,
+    mean_absolute_percentage_error,
+)
 from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
 from tqdm import tqdm
 from ..base import Base
+from ..sampling import vinecopula_sample
 from ..simulation import getsims
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 from ..utils import timeseries as ts
+from ..utils import convert_df_to_numeric, coverage, winkler_score, mean_errors
+from ..utils import TimeSeriesSplit
 
 
 class MTS(Base):
@@ -85,6 +93,12 @@ class MTS(Base):
             - "scp2-kde": Sequential split conformal prediction with Kernel Density Estimation of standardized calibrated residuals
             - "scp2-bootstrap": Sequential split conformal prediction with independent bootstrap of standardized calibrated residuals
             - "scp2-block-bootstrap": Sequential split conformal prediction with basic block bootstrap of standardized calibrated residuals
+            - based on copulas of in-sample residuals: 'vine-tll' (default), 'vine-bb1', 'vine-bb6', 'vine-bb7', 'vine-bb8', 'vine-clayton',
+            'vine-frank', 'vine-gaussian', 'vine-gumbel', 'vine-indep', 'vine-joe', 'vine-student'
+            - 'scp-vine-tll' (default), 'scp-vine-bb1', 'scp-vine-bb6', 'scp-vine-bb7', 'scp-vine-bb8', 'scp-vine-clayton',
+            'scp-vine-frank', 'scp-vine-gaussian', 'scp-vine-gumbel', 'scp-vine-indep', 'scp-vine-joe', 'scp-vine-student'
+            - 'scp2-vine-tll' (default), 'scp2-vine-bb1', 'scp2-vine-bb6', 'scp2-vine-bb7', 'scp2-vine-bb8', 'scp2-vine-clayton',
+            'scp2-vine-frank', 'scp2-vine-gaussian', 'scp2-vine-gumbel', 'scp2-vine-indep', 'scp2-vine-joe', 'scp2-vine-student'
 
         block_size: int.
             size of block for 'type_pi' in ("block-bootstrap", "scp-block-bootstrap", "scp2-block-bootstrap").
@@ -407,7 +421,12 @@ class MTS(Base):
         else:
             iterator = range(p)
 
-        if self.type_pi in ("gaussian", "kde", "bootstrap", "block-bootstrap"):
+        if self.type_pi in (
+            "gaussian",
+            "kde",
+            "bootstrap",
+            "block-bootstrap",
+        ) or self.type_pi.startswith("vine"):
             for i in iterator:
                 y_mean = np.mean(self.y_[:, i])
                 self.y_means_[i] = y_mean
@@ -421,14 +440,7 @@ class MTS(Base):
                     ).tolist()
                 )
 
-        if self.type_pi in (
-            "scp-kde",
-            "scp-bootstrap",
-            "scp-block-bootstrap",
-            "scp2-kde",
-            "scp2-bootstrap",
-            "scp2-block-bootstrap",
-        ):
+        if self.type_pi.startswith("scp"):
             # split conformal prediction
             for i in iterator:
                 n_y = self.y_.shape[0]
@@ -460,11 +472,7 @@ class MTS(Base):
         if self.type_pi == "gaussian":
             self.gaussian_preds_std_ = np.std(self.residuals_, axis=0)
 
-        if self.type_pi in (
-            "scp2-kde",
-            "scp2-bootstrap",
-            "scp2-block-bootstrap",
-        ):
+        if self.type_pi.startswith("scp2"):
             # Calculate mean and standard deviation for each column
             data_mean = np.mean(self.residuals_, axis=0)
             self.residuals_std_dev_ = np.std(self.residuals_, axis=0)
@@ -473,11 +481,7 @@ class MTS(Base):
                 self.residuals_ - data_mean[np.newaxis, :]
             ) / self.residuals_std_dev_[np.newaxis, :]
 
-        if self.replications != None and self.type_pi in (
-            "kde",
-            "scp-kde",
-            "scp2-kde",
-        ):
+        if self.replications != None and "kde" in self.type_pi:
             if self.verbose > 0:
                 print(f"\n Simulate residuals using {self.kernel} kernel... \n")
             assert self.kernel in (
@@ -566,11 +570,7 @@ class MTS(Base):
                 "DescribeResult", ("mean", "lower", "upper")
             )  # to be updated
 
-        if self.kde_ != None and self.type_pi in (
-            "kde",
-            "scp-kde",
-            "scp2-kde",
-        ):  # kde
+        if self.kde_ != None and "kde" in self.type_pi:  # kde
             if self.verbose == 1:
                 self.residuals_sims_ = tuple(
                     self.kde_.sample(
@@ -645,6 +645,28 @@ class MTS(Base):
                     for i in range(self.replications)
                 )
 
+        if "vine" in self.type_pi:
+            if self.verbose == 1:
+                self.residuals_sims_ = tuple(
+                    vinecopula_sample(
+                        x=self.residuals_,
+                        n_samples=h,
+                        method=self.type_pi,
+                        random_state=self.seed + 100 * i,
+                    )
+                    for i in tqdm(range(self.replications))
+                )
+            elif self.verbose == 0:
+                self.residuals_sims_ = tuple(
+                    vinecopula_sample(
+                        x=self.residuals_,
+                        n_samples=h,
+                        method=self.type_pi,
+                        random_state=self.seed + 100 * i,
+                    )
+                    for i in range(self.replications)
+                )
+
         for _ in range(h):
 
             new_obs = ts.reformat_response(self.mean_, self.lags)
@@ -692,9 +714,10 @@ class MTS(Base):
             index=self.output_dates_,
         )
 
-        if (("return_std" not in kwargs) and ("return_pi" not in kwargs)) and (
-            self.type_pi not in ("gaussian", "scp")
-        ):
+        if (
+            (("return_std" not in kwargs) and ("return_pi" not in kwargs))
+            and (self.type_pi not in ("gaussian", "scp"))
+        ) or ("vine" in self.type_pi):
 
             if self.replications is None:
                 return self.mean_
@@ -704,11 +727,7 @@ class MTS(Base):
             lower = []
             upper = []
 
-            if self.type_pi in (
-                "scp2-kde",
-                "scp2-bootstrap",
-                "scp2-block-bootstrap",
-            ):
+            if "scp2" in self.type_pi:
 
                 if self.verbose == 1:
                     self.sims_ = tuple(
@@ -729,6 +748,7 @@ class MTS(Base):
                         )
                     )
             else:
+
                 if self.verbose == 1:
                     self.sims_ = tuple(
                         (
@@ -803,9 +823,10 @@ class MTS(Base):
 
                 return res
 
-        if (("return_std" in kwargs) or ("return_pi" in kwargs)) and (
-            self.type_pi not in ("gaussian", "scp")
-        ):
+        if (
+            (("return_std" in kwargs) or ("return_pi" in kwargs))
+            and (self.type_pi not in ("gaussian", "scp"))
+        ) or "vine" in self.type_pi:
             DescribeResult = namedtuple(
                 "DescribeResult", ("mean", "lower", "upper")
             )
@@ -1121,3 +1142,143 @@ class MTS(Base):
             plt.ylabel("Values")
             # Show the graph
             plt.show()
+
+    def cross_val_score(
+        self,
+        X,
+        scoring="root_mean_squared_error",
+        n_jobs=None,
+        verbose=0,
+        xreg=None,
+        initial_window=5,
+        horizon=3,
+        fixed_window=False,
+        show_progress=True,
+        level=95,
+        **kwargs,
+    ):
+        """Evaluate a score by time series cross-validation.
+
+        Parameters:
+
+            X: {array-like, sparse matrix} of shape (n_samples, n_features)
+                The data to fit.
+
+            scoring: str or a function
+                A str in ('root_mean_squared_error', 'mean_squared_error', 'mean_error',
+                'mean_absolute_error', 'mean_error', 'mean_percentage_error',
+                'mean_absolute_percentage_error',  'winkler_score', 'coverage')
+                Or a function defined as 'coverage' and 'winkler_score' in `utils.timeseries`
+
+            n_jobs: int, default=None
+                Number of jobs to run in parallel.
+
+            verbose: int, default=0
+                The verbosity level.
+
+            xreg: array-like, optional (default=None)
+                Additional (external) regressors to be passed to `fit`
+                xreg must be in 'increasing' order (most recent observations last)
+
+            initial_window: int
+                initial number of consecutive values in each training set sample
+
+            horizon: int
+                number of consecutive values in test set sample
+
+            fixed_window: boolean
+                if False, all training samples start at index 0, and the training
+                window's size is increasing.
+                if True, the training window's size is fixed, and the window is
+                rolling forward
+
+            show_progress: boolean
+                if True, a progress bar is printed
+
+            **kwargs: dict
+                additional parameters to be passed to `fit` and `predict`
+
+        Returns:
+
+            A tuple: descriptive statistics or errors and raw errors
+
+        """
+        tscv = TimeSeriesSplit()
+
+        tscv_obj = tscv.split(
+            X,
+            initial_window=initial_window,
+            horizon=horizon,
+            fixed_window=fixed_window,
+        )
+
+        if isinstance(scoring, str):
+
+            assert scoring in (
+                "root_mean_squared_error",
+                "mean_squared_error",
+                "mean_error",
+                "mean_absolute_error",
+                "mean_percentage_error",
+                "mean_absolute_percentage_error",
+                "winkler_score",
+                "coverage",
+            ), "must have scoring in ('root_mean_squared_error', 'mean_squared_error', 'mean_error', 'mean_absolute_error', 'mean_error', 'mean_percentage_error', 'mean_absolute_percentage_error',  'winkler_score', 'coverage')"
+
+            def err_func(X_test, X_pred, scoring):
+                if (self.replications is not None) or (
+                    self.type_pi == "gaussian"
+                ):  # probabilistic
+                    if scoring == "winkler_score":
+                        return winkler_score(X_pred, X_test, level=level)
+                    elif scoring == "coverage":
+                        return coverage(X_pred, X_test, level=level)
+                    else:
+                        return mean_errors(
+                            pred=X_pred.mean, actual=X_test, scoring=scoring
+                        )
+                else:  # not probabilistic
+                    return mean_errors(
+                        pred=X_pred, actual=X_test, scoring=scoring
+                    )
+
+        else:  # isinstance(scoring, str) = False
+
+            err_func = scoring
+
+        errors = []
+
+        train_indices = []
+
+        test_indices = []
+
+        for train_index, test_index in tscv_obj:
+            train_indices.append(train_index)
+            test_indices.append(test_index)
+
+        if show_progress is True:
+            iterator = tqdm(
+                zip(train_indices, test_indices), total=len(train_indices)
+            )
+        else:
+            iterator = zip(train_indices, test_indices)
+
+        for train_index, test_index in iterator:
+
+            if verbose == 1:
+                print(f"TRAIN: {train_index}")
+                print(f"TEST: {test_index}")
+
+            if isinstance(X, pd.DataFrame):
+                self.fit(X.iloc[train_index, :], xreg=xreg, **kwargs)
+                X_test = X.iloc[test_index, :]
+            else:
+                self.fit(X[train_index, :], xreg=xreg, **kwargs)
+                X_test = X[test_index, :]
+            X_pred = self.predict(h=int(len(test_index)), level=level, **kwargs)
+
+            errors.append(err_func(X_test, X_pred, scoring))
+
+        res = np.asarray(errors)
+
+        return res, describe(res)

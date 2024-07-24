@@ -9,7 +9,7 @@ from .matrixops import (
     to_np_array,
 )
 from .misc import merge_two_dicts, is_factor, tuple_map
-from .model_selection import TimeSeriesSplit
+from .model_selection import TimeSeriesSplit, cross_val_score
 from .progress_bar import Progbar
 from .psdcheck import isPD, nearestPD
 from .timeseries import (
@@ -19,6 +19,7 @@ from .timeseries import (
     create_train_inputs,
     reformat_response,
     winkler_score,
+    mean_errors,
 )
 
 
@@ -45,4 +46,6 @@ __all__ = [
     "Progbar",
     "coverage",
     "winkler_score",
+    "mean_errors",
+    "cross_val_score",
 ]

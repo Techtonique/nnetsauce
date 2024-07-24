@@ -8,3 +8,5 @@ scipy
 scikit-learn
 threadpoolctl
 tqdm
+jax
+jaxlib

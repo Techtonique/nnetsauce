@@ -81,3 +81,18 @@ for est in all_estimators():
         print(regr.predict(h=10, return_pi=True))
       except:
         pass
+
+      try:
+        print(f"Estimator: {est[0]}")        
+        obj0 = ns.PredictionInterval(obj=est[1](),
+                                method="localconformal",
+                                type_split="sequential",
+                                level=95,
+                                seed=312)
+        
+        regr = ns.MTS(obj=obj0,                
+                lags=25)
+        regr.fit(df_train)
+        print(regr.predict(h=10, return_pi=True))
+      except:
+        pass
