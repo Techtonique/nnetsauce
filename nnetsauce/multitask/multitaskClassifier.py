@@ -187,13 +187,12 @@ class MultitaskClassifier(Base, ClassifierMixin):
 
         """
 
-        assert mx.is_factor(y), "y must contain only integers"
-
-        self.n_classes_ = len(np.unique(y))  # for compatibility with sklearn
+        assert mx.is_factor(y), "y must contain only integers"        
 
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
-        self.n_classes_ = len(np.unique(y))
+        self.classes_ = np.unique(y) # for compatibility with sklearn
+        self.n_classes_ = len(self.classes_)  # for compatibility with sklearn
 
         # multitask response
         Y = mo.one_hot_encode2(output_y, self.n_classes_)
