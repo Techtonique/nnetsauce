@@ -93,11 +93,11 @@ class MTS(Base):
             - "scp2-kde": Sequential split conformal prediction with Kernel Density Estimation of standardized calibrated residuals
             - "scp2-bootstrap": Sequential split conformal prediction with independent bootstrap of standardized calibrated residuals
             - "scp2-block-bootstrap": Sequential split conformal prediction with basic block bootstrap of standardized calibrated residuals
-            - based on copulas of in-sample residuals: 'vine-tll' (default), 'vine-bb1', 'vine-bb6', 'vine-bb7', 'vine-bb8', 'vine-clayton',
+            - based on copulas of in-sample residuals: 'vine-tll', 'vine-bb1', 'vine-bb6', 'vine-bb7', 'vine-bb8', 'vine-clayton',
             'vine-frank', 'vine-gaussian', 'vine-gumbel', 'vine-indep', 'vine-joe', 'vine-student'
-            - 'scp-vine-tll' (default), 'scp-vine-bb1', 'scp-vine-bb6', 'scp-vine-bb7', 'scp-vine-bb8', 'scp-vine-clayton',
+            - 'scp-vine-tll', 'scp-vine-bb1', 'scp-vine-bb6', 'scp-vine-bb7', 'scp-vine-bb8', 'scp-vine-clayton',
             'scp-vine-frank', 'scp-vine-gaussian', 'scp-vine-gumbel', 'scp-vine-indep', 'scp-vine-joe', 'scp-vine-student'
-            - 'scp2-vine-tll' (default), 'scp2-vine-bb1', 'scp2-vine-bb6', 'scp2-vine-bb7', 'scp2-vine-bb8', 'scp2-vine-clayton',
+            - 'scp2-vine-tll', 'scp2-vine-bb1', 'scp2-vine-bb6', 'scp2-vine-bb7', 'scp2-vine-bb8', 'scp2-vine-clayton',
             'scp2-vine-frank', 'scp2-vine-gaussian', 'scp2-vine-gumbel', 'scp2-vine-indep', 'scp2-vine-joe', 'scp2-vine-student'
 
         block_size: int.

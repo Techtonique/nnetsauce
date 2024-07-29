@@ -118,3 +118,20 @@ preds = fit_obj.predict(X_test)
 print(f"Elapsed {time() - start}") 
 print(metrics.classification_report(preds, y_test))
 
+# Linear Regression is used 
+regr = LinearRegression()
+fit_obj = ns.MultitaskClassifier(regr, n_hidden_features=5, 
+                                 n_clusters=2, type_clust="gmm", 
+                                 type_scaling=('maxabs', 'maxabs', 'maxabs'))
+
+start = time()
+fit_obj.fit(X_train, y_train)
+print(f"Elapsed {time() - start}") 
+
+print(fit_obj.score(X_test, y_test))
+
+start = time()
+preds = fit_obj.predict(X_test)
+print(f"Elapsed {time() - start}") 
+print(metrics.classification_report(preds, y_test))
+

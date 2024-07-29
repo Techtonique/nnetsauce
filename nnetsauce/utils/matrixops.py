@@ -4,7 +4,7 @@ import pandas as pd
 import platform
 from jax import device_put
 from scipy import sparse
-from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler, MaxAbsScaler
 from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
 
@@ -298,15 +298,26 @@ def scale_covariates(X, choice="std", training=True, scaler=None):
 
         # scaler must be not None
         if choice == "std":
-            scaler = StandardScaler(copy=True, with_mean=True, with_std=True)
+            if sparse.issparse(X):
+                scaler = StandardScaler(copy=True, with_mean=False, with_std=True)
+            else: 
+                scaler = StandardScaler(copy=True, with_mean=True, with_std=True)
 
         elif choice == "minmax":
             scaler = MinMaxScaler()
+        
+        elif choice == "maxabs":
+            scaler = MaxAbsScaler()
 
-        else:
-            scaler = RobustScaler(
-                copy=True, with_centering=True, with_scaling=True
-            )
+        else: # 'robust'
+            if sparse.issparse(X):
+                scaler = RobustScaler(
+                    copy=True, with_centering=False, with_scaling=True
+                )
+            else: 
+                scaler = RobustScaler(
+                    copy=True, with_centering=True, with_scaling=True
+                )
 
         scaled_X = scaler.fit_transform(X)
 

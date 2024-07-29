@@ -1,4 +1,4 @@
-# version 0.23.0
+# version 0.23.1
 
 - Copula simulation for time series residuals in classes `MTS` and `DeepMTS`
   - based on copulas of in-sample residuals: `vine-tll` (default), `vine-bb1`, `vine-bb6`, `vine-bb7`, `vine-bb8`, `vine-clayton`, `vine-frank`, `vine-gaussian`, `vine-gumbel`, `vine-indep`, `vine-joe`, `vine-student`
@@ -6,6 +6,9 @@
   - `scp2-vine-tll`, `scp2-vine-bb1`, `scp2-vine-bb6`, `scp2-vine-bb7`, `scp2-vine-bb8`, `scp2-vine-clayton`,
   `scp2-vine-frank`, `scp2-vine-gaussian`, `scp2-vine-gumbel`, `scp2-vine-indep`, `scp2-vine-joe`, `scp2-vine-student`
 - `cross_val_score`: time series cross-validation for `MTS` and `DeepMTS`
+Technical:
+- Do not scale sparse matrices before training 
+- Add `MaxAbsScaler`
 
 # version 0.22.7
 

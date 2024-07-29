@@ -75,7 +75,7 @@ class Base(BaseEstimator):
         type_scaling: a tuple of 3 strings
             scaling methods for inputs, hidden layer, and clustering respectively
             (and when relevant).
-            Currently available: standardization ('std') or MinMax scaling ('minmax') or robust scaling ('robust')
+            Currently available: standardization ('std') or MinMax scaling ('minmax') or robust scaling ('robust') or  max absolute scaling ('maxabs')
 
         col_sample: float
             percentage of features randomly chosen for training
@@ -142,9 +142,9 @@ class Base(BaseEstimator):
         ), "'type_clust' must be in ('kmeans', 'gmm')"
 
         assert (len(type_scaling) == 3) & all(
-            type_scaling[i] in ("minmax", "std", "robust")
+            type_scaling[i] in ("minmax", "std", "robust", "maxabs")
             for i in range(len(type_scaling))
-        ), "'type_scaling' must have length 3, and available scaling methods are 'minmax' scaling, standardization ('std') and robust scaling ('robust')"
+        ), "'type_scaling' must have length 3, and available scaling methods are 'minmax' scaling, standardization ('std'), robust scaling ('robust') and max absolute ('maxabs')"
 
         assert (col_sample >= 0) & (
             col_sample <= 1
