@@ -11,5 +11,5 @@ __all__ = [
     "LazyMTS",
     "LazyDeepClassifier",
     "LazyDeepRegressor",
-    "LazyDeepMTS",
+    "LazyDeepMTS",    
 ]

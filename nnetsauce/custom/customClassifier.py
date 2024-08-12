@@ -209,6 +209,57 @@ class CustomClassifier(Custom, ClassifierMixin):
 
         return self
 
+    def partial_fit(self, X, y, sample_weight=None, **kwargs):
+        """Partial fit custom model to training data (X, y).
+
+        Parameters:
+
+            X: {array-like}, shape = [n_samples, n_features]
+                Subset of training vectors, where n_samples is the number
+                of samples and n_features is the number of features.
+
+            y: array-like, shape = [n_samples]
+                Subset of target values.
+
+            **kwargs: additional parameters to be passed to
+                        self.cook_training_set or self.obj.fit
+
+        Returns:
+
+            self: object
+        """
+
+        output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
+        self.n_classes_ = len(np.unique(y))  # for compatibility with sklearn
+
+        # if sample_weights, else: (must use self.row_index)
+        if sample_weight is not None:
+            try: 
+                self.obj.partial_fit(
+                    scaled_Z,
+                    output_y,
+                    sample_weight=np.ravel(sample_weight, order="C")[
+                        self.index_row_
+                    ],
+                    # **kwargs
+                )
+            except: 
+                NotImplementedError 
+
+            return self
+
+        # if sample_weight is None:
+        try: 
+            self.obj.fit(scaled_Z, output_y)
+        except: 
+            raise NotImplementedError
+        
+        self.classes_ = np.unique(y) # for compatibility with sklearn
+        self.n_classes_ = len(self.classes_)  # for compatibility with sklearn        
+
+        return self
+
+
     def predict(self, X, **kwargs):
         """Predict test data X.
 
