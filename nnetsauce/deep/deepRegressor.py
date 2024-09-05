@@ -14,8 +14,16 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
 
     Parameters:
 
+        obj: an object
+            A base learner, see also https://www.researchgate.net/publication/380701207_Deep_Quasi-Randomized_neural_Networks_for_classification
+
         verbose : int, optional (default=0)
             Monitor progress when fitting.
+        
+        n_layers: int (default=3)
+            Number of layers. `n_layers = 1` is a simple `CustomRegressor`
+        
+        All the other parameters are nnetsauce `CustomRegressor`'s
 
     Examples:
 
@@ -35,13 +43,12 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
         ```
 
     """
-
     def __init__(
         self,
         obj,
-        verbose=0,
         # Defining depth
         n_layers=3,
+        verbose=0,
         # CustomRegressor attributes
         n_hidden_features=5,
         activation_name="relu",
@@ -78,7 +85,7 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
             backend=backend,
         )
 
-        #assert n_layers >= 2, "must have n_layers >= 2"
+        assert n_layers >= 1, "must have n_layers >= 1"
 
         self.stacked_obj = obj
         self.verbose = verbose
@@ -122,8 +129,6 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
             backend=self.backend,
         )
 
-        # self.stacked_obj.fit(X, y)
-
         if self.verbose > 0:
             iterator = tqdm(range(self.n_layers - 1))
         else:
@@ -150,8 +155,6 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
                     backend=self.backend,
                 )
             )
-
-            # self.stacked_obj.fit(X, y)
 
         self.stacked_obj.fit(X, y)
 

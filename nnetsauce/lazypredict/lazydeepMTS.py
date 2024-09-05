@@ -16,7 +16,6 @@ from sklearn.metrics import (
     mean_absolute_percentage_error,
 )
 from .config import DEEPREGRESSORSMTS
-from ..mts import MTS
 from ..deep import DeepMTS
 from ..utils import convert_df_to_numeric, coverage, winkler_score
 
@@ -70,6 +69,8 @@ categorical_transformer_high = Pipeline(
 
 
 # Helper function
+
+
 def get_card_split(df, cols, n=11):
     cond = df[cols].nunique() > n
     card_high = cols[cond]
@@ -87,12 +88,12 @@ def adjusted_rsquared(r2, n, p):
 #     return np.average(pe)
 
 
-class LazyDeepMTS(MTS):
+class LazyDeepMTS(DeepMTS):
     """
 
-        Fitting -- almost -- all the regression algorithms with layers of
-        nnetsauce's CustomRegressor to multivariate time series
-        and returning their scores.
+    Fitting -- almost -- all the regression algorithms with layers of
+    nnetsauce's CustomRegressor to multivariate time series
+    and returning their scores.
 
     Parameters:
 
@@ -104,39 +105,36 @@ class LazyDeepMTS(MTS):
             able to run are ignored.
 
         custom_metric: function, optional (default=None)
-            When function is provided, models are evaluated based on the
-            custom evaluation metric provided.
+            When function is provided, models are evaluated based on the custom
+              evaluation metric provided.
 
         predictions: bool, optional (default=False)
-            When set to True, the predictions of all the models models are
-            returned as dataframe.
+            When set to True, the predictions of all the models models are returned as dataframe.
 
         sort_by: string, optional (default='RMSE')
-            Sort models by a metric. Available options are 'RMSE', 'MAE',
-            'MPL', 'MPE', 'MAPE', 'R-Squared', 'Adjusted R-Squared' or
-            a custom metric identified by its name and
+            Sort models by a metric. Available options are 'RMSE', 'MAE', 'MPL', 'MPE', 'MAPE',
+            'R-Squared', 'Adjusted R-Squared' or a custom metric identified by its name and
             provided by custom_metric.
 
         random_state: int, optional (default=42)
             Reproducibiility seed.
 
         estimators: list, optional (default='all')
-            list of Estimators (regression algorithms) names or just
-            'all' (default='all')
+            list of Estimators (regression algorithms) names or just 'all' (default='all')
 
         preprocess: bool, preprocessing is done when set to True
 
-        n_jobs : int, when possible, run in parallel
-            For now, only used by individual models that support it.
-
         n_layers: int, optional (default=3)
-            Number of layers of CustomRegressors to be used.
+            Number of layers in the network.
+
+        h: int, optional (default=None)
+            Number of steps ahead to predict (when used, must be > 0 and < X_test.shape[0]).
 
         All the other parameters are the same as MTS's.
 
-    Examples
+    Examples:
 
-        See https://github.com/Techtonique/nnetsauce/blob/master/nnetsauce/demo/thierrymoudiki_20240106_LazyDeepMTS.ipynb
+        See https://thierrymoudiki.github.io/blog/2023/10/29/python/quasirandomizednn/MTS-LazyPredict
 
     """
 
@@ -149,8 +147,8 @@ class LazyDeepMTS(MTS):
         random_state=42,
         estimators="all",
         preprocess=False,
-        # Defining depth
         n_layers=3,
+        h=None,        
         # MTS attributes
         obj=None,
         n_hidden_features=5,
@@ -164,7 +162,7 @@ class LazyDeepMTS(MTS):
         cluster_encode=True,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
-        lags=1,
+        lags=1,        
         type_pi="kde",
         block_size=None,
         replications=None,
@@ -182,9 +180,10 @@ class LazyDeepMTS(MTS):
         self.random_state = random_state
         self.estimators = estimators
         self.preprocess = preprocess
-        self.n_layers = n_layers
+        self.h = h
         super().__init__(
             obj=obj,
+            n_layers=n_layers,
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,
             a=a,
@@ -212,25 +211,26 @@ class LazyDeepMTS(MTS):
 
         Parameters:
 
-            X_train : array-like or data frame,
+            X_train: array-like or data frame,
                 Training vectors, where rows is the number of samples
                 and columns is the number of features.
 
-            X_test : array-like or data frame,
+            X_test: array-like or data frame,
                 Testing vectors, where rows is the number of samples
-                and columns is the number of features.
+                and columns is the number of features.                
 
-            xreg: {array-like}, shape = [n_samples, n_features_xreg]
+            xreg: array-like, optional (default=None)
                 Additional (external) regressors to be passed to self.obj
                 xreg must be in 'increasing' order (most recent observations last)
 
         Returns:
 
-            scores : Pandas DataFrame
+            scores: Pandas DataFrame
                 Returns metrics of all the models in a Pandas DataFrame.
 
-            predictions : Pandas DataFrame
+            predictions: Pandas DataFrame
                 Returns predictions of all the models in a Pandas DataFrame.
+
         """
         R2 = []
         ADJR2 = []
@@ -250,6 +250,9 @@ class LazyDeepMTS(MTS):
 
         if self.custom_metric:
             CUSTOM_METRIC = []
+        
+        if self.h is None: 
+            assert X_test is not None, "If h is None, X_test must be provided."
 
         if isinstance(X_train, np.ndarray):
             X_train = pd.DataFrame(X_train)
@@ -334,7 +337,7 @@ class LazyDeepMTS(MTS):
                                 ),
                             ]
                         )
-                    else:
+                    else:  # "random_state" in model().get_params().keys()
                         pipe = Pipeline(
                             steps=[
                                 ("preprocessor", preprocessor),
@@ -372,11 +375,22 @@ class LazyDeepMTS(MTS):
                     # pipe.fit(X_train, xreg=xreg)
 
                     self.models[name] = pipe
-                    X_pred = pipe["regressor"].predict(
-                        h=X_test.shape[0], **kwargs
-                    )
 
-                    if self.replications is not None:
+                    if self.h is None:
+                        X_pred = pipe["regressor"].predict(
+                            h=self.h, **kwargs
+                        )
+                    else:
+                        assert self.h > 0, "h must be > 0"
+                        X_pred = pipe["regressor"].predict(
+                            h=self.h, **kwargs
+                        )
+                    
+                    
+
+                    if (self.replications is not None) or (
+                        self.type_pi == "gaussian"
+                    ):
                         rmse = mean_squared_error(
                             X_test, X_pred.mean, squared=False
                         )
@@ -393,7 +407,10 @@ class LazyDeepMTS(MTS):
                     RMSE.append(rmse)
                     MAE.append(mae)
                     MPL.append(mpl)
-                    if self.replications is not None:
+
+                    if (self.replications is not None) or (
+                        self.type_pi == "gaussian"
+                    ):
                         WINKLERSCORE.append(winklerscore)
                         COVERAGE.append(coveragecalc)
                     TIME.append(time.time() - start)
@@ -403,16 +420,14 @@ class LazyDeepMTS(MTS):
                         CUSTOM_METRIC.append(custom_metric)
 
                     if self.verbose > 0:
-                        if self.replications is not None:
+                        if (self.replications is not None) or (
+                            self.type_pi == "gaussian"
+                        ):
                             scores_verbose = {
                                 "Model": name,
-                                # "R-Squared": r_squared,
-                                # "Adjusted R-Squared": adj_rsquared,
                                 "RMSE": rmse,
                                 "MAE": mae,
                                 "MPL": mpl,
-                                # "MPE": mpe,
-                                # "MAPE": mape,
                                 "WINKLERSCORE": winklerscore,
                                 "COVERAGE": coveragecalc,
                                 "Time taken": time.time() - start,
@@ -420,13 +435,9 @@ class LazyDeepMTS(MTS):
                         else:
                             scores_verbose = {
                                 "Model": name,
-                                # "R-Squared": r_squared,
-                                # "Adjusted R-Squared": adj_rsquared,
                                 "RMSE": rmse,
                                 "MAE": mae,
                                 "MPL": mpl,
-                                # "MPE": mpe,
-                                # "MAPE": mape,
                                 "Time taken": time.time() - start,
                             }
 
@@ -450,6 +461,7 @@ class LazyDeepMTS(MTS):
                     if "random_state" in model().get_params().keys():
                         pipe = DeepMTS(
                             obj=model(random_state=self.random_state, **kwargs),
+                            n_layers=self.n_layers,
                             n_hidden_features=self.n_hidden_features,
                             activation_name=self.activation_name,
                             a=self.a,
@@ -474,6 +486,7 @@ class LazyDeepMTS(MTS):
                     else:
                         pipe = DeepMTS(
                             obj=model(**kwargs),
+                            n_layers=self.n_layers,
                             n_hidden_features=self.n_hidden_features,
                             activation_name=self.activation_name,
                             a=self.a,
@@ -496,56 +509,122 @@ class LazyDeepMTS(MTS):
                             show_progress=self.show_progress,
                         )
 
-                    pipe.fit(X_train, **kwargs)
+                    pipe.fit(X_train, xreg, **kwargs)
                     # pipe.fit(X_train, xreg=xreg) # DO xreg like in `ahead`
 
                     self.models[name] = pipe
+
                     if self.preprocess is True:
-                        X_pred = pipe["regressor"].predict(
-                            h=X_test.shape[0], **kwargs
-                        )
+                        if self.h is None:
+                            X_pred = pipe["regressor"].predict(
+                                h=X_test.shape[0], **kwargs
+                            )
+                        else:
+                            assert self.h > 0 and self.h < X_test.shape[0], "h must be > 0 and < X_test.shape[0]"
+                            X_pred = pipe["regressor"].predict(
+                                h=self.h, **kwargs
+                            )
+                        
+                        
+
                     else:
-                        X_pred = pipe.predict(
+                        if self.h is None:
+                            X_pred = pipe.predict(
                             h=X_test.shape[0], **kwargs
                         )  # X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg) ## DO xreg like in `ahead`
+                        else:
+                            assert self.h > 0 and self.h < X_test.shape[0], "h must be > 0 and < X_test.shape[0]"
+                            X_pred = pipe.predict(
+                                h=self.h, **kwargs
+                            )
+                        
+                        
 
-                    if self.replications is not None:
-                        rmse = mean_squared_error(
-                            X_test, X_pred.mean, squared=False
-                        )
-                        mae = mean_absolute_error(X_test, X_pred.mean)
-                        mpl = mean_pinball_loss(X_test, X_pred.mean)
-                        winklerscore = winkler_score(X_pred, X_test, level=95)
-                        coveragecalc = coverage(X_pred, X_test, level=95)
-                    else:
-                        rmse = mean_squared_error(X_test, X_pred, squared=False)
-                        mae = mean_absolute_error(X_test, X_pred)
-                        mpl = mean_pinball_loss(X_test, X_pred)
+                    if self.h is None:
+                        if (self.replications is not None) or (
+                            self.type_pi == "gaussian"
+                        ):                            
+                            rmse = mean_squared_error(
+                                X_test, X_pred.mean, squared=False
+                            )
+                            mae = mean_absolute_error(X_test, X_pred.mean)
+                            mpl = mean_pinball_loss(X_test, X_pred.mean)
+                            winklerscore = winkler_score(X_pred, X_test, level=95)
+                            coveragecalc = coverage(X_pred, X_test, level=95)
+                        else:                            
+                            rmse = mean_squared_error(
+                                X_test, X_pred, squared=False
+                            )
+                            mae = mean_absolute_error(X_test, X_pred)
+                            mpl = mean_pinball_loss(X_test, X_pred)
+                    else: # self.h is not None
+                        if (self.replications is not None) or (
+                            self.type_pi == "gaussian"
+                        ):
+                            if isinstance(X_test, pd.DataFrame) == False:
+                                X_test_h = X_test[0:self.h,:]                                
+                                rmse = mean_squared_error(
+                                    X_test_h, X_pred.mean, squared=False
+                                )
+                                mae = mean_absolute_error(X_test_h, X_pred.mean)
+                                mpl = mean_pinball_loss(X_test_h, X_pred.mean)
+                                winklerscore = winkler_score(X_pred, X_test, level=95)
+                                coveragecalc = coverage(X_pred, X_test, level=95)
+                            else:
+                                X_test_h = X_test.iloc[0:self.h,:]                               
+                                rmse = mean_squared_error(
+                                    X_test_h, X_pred.mean, squared=False
+                                )
+                                mae = mean_absolute_error(X_test_h, X_pred.mean)
+                                mpl = mean_pinball_loss(X_test_h, X_pred.mean)
+                                winklerscore = winkler_score(X_pred, X_test_h, level=95)
+                                coveragecalc = coverage(X_pred, X_test_h, level=95)
+                        
+                        else: # self.h is not None and (self.replications is not None) or (self.type_pi == "gaussian") is False                            
+                            if isinstance(X_test, pd.DataFrame):
+                                X_test_h = X_test.iloc[0:self.h,:]
+                                rmse = mean_squared_error(
+                                    X_test_h, X_pred, squared=False
+                                )
+                                mae = mean_absolute_error(X_test_h, X_pred)
+                                mpl = mean_pinball_loss(X_test_h, X_pred)
+                            else: 
+                                X_test_h = X_test[0:self.h,:]
+                                rmse = mean_squared_error(
+                                    X_test_h, X_pred, squared=False
+                                )
+                                mae = mean_absolute_error(X_test_h, X_pred)
+                                mpl = mean_pinball_loss(X_test_h, X_pred)
+                        
 
                     names.append(name)
                     RMSE.append(rmse)
                     MAE.append(mae)
                     MPL.append(mpl)
-                    if self.replications is not None:
+                    if (self.replications is not None) or (
+                        self.type_pi == "gaussian"
+                    ):
                         WINKLERSCORE.append(winklerscore)
                         COVERAGE.append(coveragecalc)
                     TIME.append(time.time() - start)
 
                     if self.custom_metric:
-                        custom_metric = self.custom_metric(X_test, X_pred)
+                        if self.h is None: 
+                            custom_metric = self.custom_metric(X_test, X_pred)                            
+                        else:                             
+                            custom_metric = self.custom_metric(X_test_h, X_pred)
+                            
                         CUSTOM_METRIC.append(custom_metric)
 
                     if self.verbose > 0:
-                        if self.replications is not None:
+                        if (self.replications is not None) or (
+                            self.type_pi == "gaussian"
+                        ):
                             scores_verbose = {
                                 "Model": name,
-                                # "R-Squared": r_squared,
-                                # "Adjusted R-Squared": adj_rsquared,
                                 "RMSE": rmse,
                                 "MAE": mae,
                                 "MPL": mpl,
-                                # "MPE": mpe,
-                                # "MAPE": mape,
                                 "WINKLERSCORE": winklerscore,
                                 "COVERAGE": coveragecalc,
                                 "Time taken": time.time() - start,
@@ -553,13 +632,9 @@ class LazyDeepMTS(MTS):
                         else:
                             scores_verbose = {
                                 "Model": name,
-                                # "R-Squared": r_squared,
-                                # "Adjusted R-Squared": adj_rsquared,
                                 "RMSE": rmse,
                                 "MAE": mae,
                                 "MPL": mpl,
-                                # "MPE": mpe,
-                                # "MAPE": mape,
                                 "Time taken": time.time() - start,
                             }
 
@@ -576,16 +651,12 @@ class LazyDeepMTS(MTS):
                         print(name + " model failed to execute")
                         print(exception)
 
-        if self.replications is not None:
+        if (self.replications is not None) or (self.type_pi == "gaussian"):
             scores = {
                 "Model": names,
-                # "Adjusted R-Squared": ADJR2,
-                # "R-Squared": R2,
                 "RMSE": RMSE,
                 "MAE": MAE,
                 "MPL": MPL,
-                # "MPE": MPE,
-                # "MAPE": MAPE,
                 "WINKLERSCORE": WINKLERSCORE,
                 "COVERAGE": COVERAGE,
                 "Time Taken": TIME,
@@ -593,13 +664,9 @@ class LazyDeepMTS(MTS):
         else:
             scores = {
                 "Model": names,
-                # "Adjusted R-Squared": ADJR2,
-                # "R-Squared": R2,
                 "RMSE": RMSE,
                 "MAE": MAE,
                 "MPL": MPL,
-                # "MPE": MPE,
-                # "MAPE": MAPE,
                 "Time Taken": TIME,
             }
 
@@ -628,15 +695,23 @@ class LazyDeepMTS(MTS):
 
             X_test : array-like,
                 Testing vectors, where rows is the number of samples
-                and columns is the number of features.
+                and columns is the number of features.                
 
         Returns:
 
             models: dict-object,
                 Returns a dictionary with each model pipeline as value
                 with key as name of models.
+
         """
-        if len(self.models.keys()) == 0:
-            self.fit(X_train, X_test)
+        if self.h is None:
+            if len(self.models.keys()) == 0:
+                self.fit(X_train, X_test)
+        else: 
+            if len(self.models.keys()) == 0:
+                if isinstance(X_test, pd.DataFrame):
+                    self.fit(X_train, X_test.iloc[0:self.h,:])
+                else:
+                    self.fit(X_train, X_test[0:self.h,:])
 
         return self.models

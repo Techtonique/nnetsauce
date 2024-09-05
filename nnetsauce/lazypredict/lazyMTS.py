@@ -91,7 +91,7 @@ def adjusted_rsquared(r2, n, p):
 class LazyMTS(MTS):
     """
 
-    Fitting -- almost -- all the regression algorithms with layers of
+    Fitting -- almost -- all the regression algorithms with 1 layer of
     nnetsauce's CustomRegressor to multivariate time series
     and returning their scores.
 
@@ -124,11 +124,8 @@ class LazyMTS(MTS):
 
         preprocess: bool, preprocessing is done when set to True
 
-        n_jobs : int, when possible, run in parallel
-            For now, only used by individual models that support it.
-
-        n_layers: int, optional (default=3)
-            Number of layers of CustomRegressors to be used.
+        h: int, optional (default=None)
+            Number of steps ahead to predict (when used, must be > 0 and < X_test.shape[0]).
 
         All the other parameters are the same as MTS's.
 
@@ -147,6 +144,7 @@ class LazyMTS(MTS):
         random_state=42,
         estimators="all",
         preprocess=False,
+        h=None,
         # MTS attributes
         obj=None,
         n_hidden_features=5,
@@ -160,7 +158,7 @@ class LazyMTS(MTS):
         cluster_encode=True,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
-        lags=1,
+        lags=1,        
         type_pi="kde",
         block_size=None,
         replications=None,
@@ -178,6 +176,7 @@ class LazyMTS(MTS):
         self.random_state = random_state
         self.estimators = estimators
         self.preprocess = preprocess
+        self.h = h
         super().__init__(
             obj=obj,
             n_hidden_features=n_hidden_features,
@@ -213,7 +212,7 @@ class LazyMTS(MTS):
 
             X_test: array-like or data frame,
                 Testing vectors, where rows is the number of samples
-                and columns is the number of features.
+                and columns is the number of features.                
 
             xreg: array-like, optional (default=None)
                 Additional (external) regressors to be passed to self.obj
@@ -246,6 +245,9 @@ class LazyMTS(MTS):
 
         if self.custom_metric:
             CUSTOM_METRIC = []
+        
+        if self.h is None: 
+            assert X_test is not None, "If h is None, X_test must be provided."
 
         if isinstance(X_train, np.ndarray):
             X_train = pd.DataFrame(X_train)
@@ -367,9 +369,15 @@ class LazyMTS(MTS):
 
                     self.models[name] = pipe
 
-                    X_pred = pipe["regressor"].predict(
-                        h=X_test.shape[0], **kwargs
-                    )
+                    if self.h is None:
+                        X_pred = pipe["regressor"].predict(
+                            h=self.h, **kwargs
+                        )
+                    else:
+                        assert self.h > 0, "h must be > 0"
+                        X_pred = pipe["regressor"].predict(
+                            h=self.h, **kwargs
+                        )
 
                     if (self.replications is not None) or (
                         self.type_pi == "gaussian"
@@ -496,33 +504,82 @@ class LazyMTS(MTS):
                     self.models[name] = pipe
 
                     if self.preprocess is True:
-
-                        X_pred = pipe["regressor"].predict(
-                            h=X_test.shape[0], **kwargs
-                        )
+                        if self.h is None:
+                            X_pred = pipe["regressor"].predict(
+                                h=X_test.shape[0], **kwargs
+                            )
+                        else:
+                            assert self.h > 0 and self.h < X_test.shape[0], "h must be > 0 and < X_test.shape[0]"
+                            X_pred = pipe["regressor"].predict(
+                                h=self.h, **kwargs
+                            )
 
                     else:
-
-                        X_pred = pipe.predict(
+                        if self.h is None:
+                            X_pred = pipe.predict(
                             h=X_test.shape[0], **kwargs
                         )  # X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg) ## DO xreg like in `ahead`
+                        else:
+                            assert self.h > 0 and self.h < X_test.shape[0], "h must be > 0 and < X_test.shape[0]"
+                            X_pred = pipe.predict(
+                                h=self.h, **kwargs
+                            )
 
-                    if (self.replications is not None) or (
-                        self.type_pi == "gaussian"
-                    ):
-                        rmse = mean_squared_error(
-                            X_test, X_pred.mean, squared=False
-                        )
-                        mae = mean_absolute_error(X_test, X_pred.mean)
-                        mpl = mean_pinball_loss(X_test, X_pred.mean)
-                        winklerscore = winkler_score(X_pred, X_test, level=95)
-                        coveragecalc = coverage(X_pred, X_test, level=95)
-                    else:
-                        rmse = mean_squared_error(
-                            X_test, X_pred.mean, squared=False
-                        )
-                        mae = mean_absolute_error(X_test, X_pred.mean)
-                        mpl = mean_pinball_loss(X_test, X_pred.mean)
+                    if self.h is None:
+                        if (self.replications is not None) or (
+                            self.type_pi == "gaussian"
+                        ):
+                            rmse = mean_squared_error(
+                                X_test, X_pred.mean, squared=False
+                            )
+                            mae = mean_absolute_error(X_test, X_pred.mean)
+                            mpl = mean_pinball_loss(X_test, X_pred.mean)
+                            winklerscore = winkler_score(X_pred, X_test, level=95)
+                            coveragecalc = coverage(X_pred, X_test, level=95)
+                        else:
+                            rmse = mean_squared_error(
+                                X_test, X_pred, squared=False
+                            )
+                            mae = mean_absolute_error(X_test, X_pred)
+                            mpl = mean_pinball_loss(X_test, X_pred)
+                    else: # self.h is not None
+                        if (self.replications is not None) or (
+                            self.type_pi == "gaussian"
+                        ):
+                            if isinstance(X_test, pd.DataFrame) == False:
+                                X_test_h = X_test[0:self.h,:]
+                                rmse = mean_squared_error(
+                                    X_test_h, X_pred.mean, squared=False
+                                )
+                                mae = mean_absolute_error(X_test_h, X_pred.mean)
+                                mpl = mean_pinball_loss(X_test_h, X_pred.mean)
+                                winklerscore = winkler_score(X_pred, X_test, level=95)
+                                coveragecalc = coverage(X_pred, X_test, level=95)
+                            else:
+                                X_test_h = X_test.iloc[0:self.h,:]
+                                rmse = mean_squared_error(
+                                    X_test_h, X_pred.mean, squared=False
+                                )
+                                mae = mean_absolute_error(X_test_h, X_pred.mean)
+                                mpl = mean_pinball_loss(X_test_h, X_pred.mean)
+                                winklerscore = winkler_score(X_pred, X_test_h, level=95)
+                                coveragecalc = coverage(X_pred, X_test_h, level=95)
+                        else: # self.h is not None and (self.replications is not None) or (self.type_pi == "gaussian") is False                            
+                            if isinstance(X_test, pd.DataFrame):
+                                X_test_h = X_test.iloc[0:self.h,:]
+                                rmse = mean_squared_error(
+                                    X_test_h, X_pred, squared=False
+                                )
+                                mae = mean_absolute_error(X_test_h, X_pred)
+                                mpl = mean_pinball_loss(X_test_h, X_pred)
+                            else: 
+                                X_test_h = X_test[0:self.h,:]
+                                rmse = mean_squared_error(
+                                    X_test_h, X_pred, squared=False
+                                )
+                                mae = mean_absolute_error(X_test_h, X_pred)
+                                mpl = mean_pinball_loss(X_test_h, X_pred)
+                        
 
                     names.append(name)
                     RMSE.append(rmse)
@@ -536,7 +593,11 @@ class LazyMTS(MTS):
                     TIME.append(time.time() - start)
 
                     if self.custom_metric:
-                        custom_metric = self.custom_metric(X_test, X_pred)
+                        if self.h is None: 
+                            custom_metric = self.custom_metric(X_test, X_pred)                            
+                        else:                             
+                            custom_metric = self.custom_metric(X_test_h, X_pred)
+                            
                         CUSTOM_METRIC.append(custom_metric)
 
                     if self.verbose > 0:
@@ -618,7 +679,7 @@ class LazyMTS(MTS):
 
             X_test : array-like,
                 Testing vectors, where rows is the number of samples
-                and columns is the number of features.
+                and columns is the number of features.                
 
         Returns:
 
@@ -627,7 +688,14 @@ class LazyMTS(MTS):
                 with key as name of models.
 
         """
-        if len(self.models.keys()) == 0:
-            self.fit(X_train, X_test)
+        if self.h is None:
+            if len(self.models.keys()) == 0:
+                self.fit(X_train, X_test)
+        else: 
+            if len(self.models.keys()) == 0:
+                if isinstance(X_test, pd.DataFrame):
+                    self.fit(X_train, X_test.iloc[0:self.h,:])
+                else:
+                    self.fit(X_train, X_test[0:self.h,:])
 
         return self.models

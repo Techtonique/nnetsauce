@@ -14,115 +14,119 @@ from sklearn.base import ClassifierMixin, RegressorMixin
 from sklearn.utils import all_estimators
 
 
-removed_classifiers = [
-    "ClassifierChain",
-    "ComplementNB",
-    "GaussianProcessClassifier",
-    "GradientBoostingClassifier",
-    "HistGradientBoostingClassifier",
-    "MultiOutputClassifier",
-    "MultinomialNB",
-    "OneVsOneClassifier",
-    "OneVsRestClassifier",
-    "OutputCodeClassifier",
-    "RadiusNeighborsClassifier",
-    "StackingClassifier",
-    "VotingClassifier",
-]
+# removed_classifiers = [
+#     "ClassifierChain",
+#     "ComplementNB",
+#     "GaussianProcessClassifier",
+#     "GradientBoostingClassifier",
+#     "HistGradientBoostingClassifier",
+#     "MultiOutputClassifier",
+#     "MultinomialNB",
+#     "OneVsOneClassifier",
+#     "OneVsRestClassifier",
+#     "OutputCodeClassifier",
+#     "RadiusNeighborsClassifier",
+#     "StackingClassifier",
+#     "VotingClassifier",
+# ]
 
-removed_regressors = [
-    "TheilSenRegressor",
-    "ARDRegression",
-    "CCA",
-    "GaussianProcessRegressor",
-    "GradientBoostingRegressor",
-    "HistGradientBoostingRegressor",
-    "IsotonicRegression",
-    "KernelRidge",
-    "MultiOutputRegressor",
-    "MultiTaskElasticNet",
-    "MultiTaskElasticNetCV",
-    "MultiTaskLasso",
-    "MultiTaskLassoCV",
-    "NuSVR",
-    "OrthogonalMatchingPursuit",
-    "OrthogonalMatchingPursuitCV",
-    "PLSCanonical",
-    "PLSRegression",
-    "RadiusNeighborsRegressor",
-    "RegressorChain",
-    "StackingRegressor",
-    "SVR",
-    "VotingRegressor",
-]
+# removed_regressors = [
+#     "TheilSenRegressor",
+#     "ARDRegression",
+#     "CCA",
+#     "GaussianProcessRegressor",
+#     "GradientBoostingRegressor",
+#     "HistGradientBoostingRegressor",
+#     "IsotonicRegression",
+#     "KernelRidge",
+#     "MultiOutputRegressor",
+#     "MultiTaskElasticNet",
+#     "MultiTaskElasticNetCV",
+#     "MultiTaskLasso",
+#     "MultiTaskLassoCV",
+#     "NuSVR",
+#     "OrthogonalMatchingPursuit",
+#     "OrthogonalMatchingPursuitCV",
+#     "PLSCanonical",
+#     "PLSRegression",
+#     "RadiusNeighborsRegressor",
+#     "RegressorChain",
+#     "StackingRegressor",
+#     "SVR",
+#     "VotingRegressor",
+# ]
 
-CLASSIFIERS = [
-    (est[0], est[1])
-    for est in all_estimators()
-    if (
-        issubclass(est[1], ClassifierMixin)
-        and (est[0] not in removed_classifiers)
-    )
-]
+# CLASSIFIERS = [
+#     ("CustomClassifier(" + est[0] + ")", est[1])
+#     for est in all_estimators()
+#     if (
+#         issubclass(est[1], ClassifierMixin)
+#         and (est[0] not in removed_classifiers)
+#     )
+# ]
 
-SIMPLEMULTITASKCLASSIFIERS = [
-    (
-        "SimpleMultitaskClassifier(" + est[0] + ")",
-        partial(ns.SimpleMultitaskClassifier, obj=est[1]()),
-    )
-    for est in all_estimators()
-    if (
-        issubclass(est[1], RegressorMixin)
-        and (est[0] not in removed_regressors)
-    )
-]
+# SIMPLEMULTITASKCLASSIFIERS = [
+#     (
+#         "SimpleMultitaskClassifier(" + est[0] + ")",
+#         partial(ns.SimpleMultitaskClassifier, obj=est[1]()),
+#     )
+#     for est in all_estimators()
+#     if (
+#         issubclass(est[1], RegressorMixin)
+#         and (est[0] not in removed_regressors)
+#     )
+# ]
 
 
-print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
+# print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
-load_datasets = [load_wine, load_iris, load_breast_cancer, load_digits]
+# load_datasets = [load_wine, load_iris, load_breast_cancer, load_digits]
 
-classifiers = CLASSIFIERS + SIMPLEMULTITASKCLASSIFIERS            
+# classifiers = CLASSIFIERS + SIMPLEMULTITASKCLASSIFIERS            
 
-dataset_names = ["wine", "iris", "breast_cancer", "digits"]
+# dataset_names = ["wine", "iris", "breast_cancer", "digits"]
 
-model_names = []
+# model_names = []
 
-results_df = pd.DataFrame(np.zeros((100, len(dataset_names))), columns=dataset_names)
+# results_df = pd.DataFrame(np.zeros((100, len(dataset_names))), columns=dataset_names)
 
-results_df.index = ["None" for idx in range(100)]
+# results_df['clf_name'] = ["None" for _ in range(100)]
 
-for j, dataset in enumerate(load_datasets): 
+# print(results_df.head())
 
-    print(f"\n\n {j+1}/{len(dataset_names)} - dataset name: {dataset_names[j]} ---------- \n")
+# for j, dataset in enumerate(load_datasets): 
 
-    data = dataset()
-    X = data.data
-    y= data.target
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = .2, 
-                                                        random_state = 123)
+#     print(f"\n\n {j+1}/{len(dataset_names)} - dataset name: {dataset_names[j]} ---------- \n")
 
-    for i, obj in enumerate(classifiers):
+#     data = dataset()
+#     X = data.data
+#     y= data.target
+#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = .2, 
+#                                                         random_state = 123)
+
+#     for i, obj in enumerate(classifiers):
         
-        try: 
+#         try: 
 
-            clf_name = type(obj[1]()).__name__
+#             clf_name = obj[0]
 
-            print(f"\n {i+1}/{len(classifiers)} - base learner: {clf_name} ----------")
+#             print(f"\n data set #{j+1}/{len(dataset_names)} - {i+1}/{len(classifiers)} - base learner: {clf_name} ----------")
 
-            clf = ns.DeepClassifier(obj=obj[1]())
-            
-            res = clf.cross_val_optim(X_train, y_train, X_test, y_test, verbose=1)
+#             clf = ns.DeepClassifier(obj=obj[1]())
+                
+#             res = clf.cross_val_optim(X_train, y_train, X_test, y_test, verbose=1, 
+#                                       n_jobs=5, scoring="balanced_accuracy")
 
-            print(res)
+#             print(res)
 
-            results_df.iloc[i, j] = res.test_accuracy
-            results_df.index[i] = clf_name 
+#             results_df.iloc[i, j] = res.test_balanced_accuracy
+#             results_df['clf_name'][i] = clf_name 
+#             print(results_df)
         
-        except: 
+#         except: 
 
-            pass 
+#             pass 
 
-print(results_df)
+# print(results_df)
 
-joblib.dump(results_df, 'results_df.pkl')
+# joblib.dump(results_df, 'results_df.pkl')
