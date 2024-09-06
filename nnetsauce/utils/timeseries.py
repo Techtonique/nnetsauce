@@ -6,6 +6,7 @@
 
 import numpy as np
 import pandas as pd
+from sklearn.metrics import mean_pinball_loss
 
 
 # (block) bootstrap
@@ -100,7 +101,7 @@ def compute_output_dates(df, horizon):
     return output_dates, frequency
 
 
-def coverage(obj, actual, level=95):
+def coverage(obj, actual, level=95, per_series=False):
 
     alpha = 1 - level / 100
     lt = obj.lower
@@ -120,7 +121,10 @@ def coverage(obj, actual, level=95):
     else:
         diff_lt = (lt <= actual) * (ut >= actual)
 
-    return np.mean(diff_lt) * 100
+    if per_series: 
+        return np.mean(diff_lt, axis=0) * 100
+    else: 
+        return np.mean(diff_lt) * 100
 
 
 # create lags for one series
@@ -159,7 +163,7 @@ def reformat_response(X, k):
     return np.concatenate([X[i, :] for i in range(k)])
 
 
-def winkler_score(obj, actual, level=95):
+def winkler_score(obj, actual, level=95, per_series=False):
 
     alpha = 1 - level / 100
     lt = obj.lower
@@ -188,47 +192,61 @@ def winkler_score(obj, actual, level=95):
         np.maximum(diff_lt, 0) + np.maximum(diff_ut, 0)
     )
 
-    return np.mean(score)
+    if per_series == True: 
+        return np.mean(score, axis=0)
+    else: 
+        return np.mean(score)
 
 
 def mean_errors(
     pred,
     actual,
-    scoring=(
-        "root_mean_squared_error",
-        "mean_squared_error",
-        "mean_error",
-        "mean_absolute_error",
-        "mean_percentage_error",
-        "mean_absolute_percentage_error",
-    ),
-):
-
-    n_points = actual.shape[0]
-
-    # Ensure the arrays have the same length
-    assert n_points == pred.shape[0], "'actual', 'pred' have different shapes"
+    scoring="root_mean_squared_error",
+    per_series=False):
 
     if isinstance(pred, pd.DataFrame):
         pred = pred.values
+    else:
+        pred = pred.mean.values
 
     if isinstance(actual, pd.DataFrame):
         actual = actual.values
-
+        
     diff = pred - actual
 
-    if scoring == "mean_error":
-        return np.mean(diff)
-    elif scoring == "mean_absolute_error":
-        return np.mean(np.abs(diff))
-    elif scoring == "mean_percentage_error":
-        return np.mean(diff / actual) * 100
-    elif scoring == "mean_absolute_percentage_error":
-        return np.mean(np.abs(diff / actual)) * 100
-    elif scoring == "root_mean_squared_error":
-        return np.sqrt(np.mean(np.square(diff)))
-    elif scoring == "mean_squared_error":
-        return np.mean(np.square(diff))
+    if per_series == True: 
+
+        if scoring == "mean_error":
+            return np.mean(diff, axis=0).tolist()
+        elif scoring == "mean_absolute_error":
+            return np.mean(np.abs(diff), axis=0).tolist()
+        elif scoring == "mean_percentage_error":
+            return np.asarray(np.mean(diff / actual, axis=0) * 100).tolist()
+        elif scoring == "mean_absolute_percentage_error":
+            return np.asarray(np.mean(np.abs(diff / actual), axis=0) * 100).tolist()
+        elif scoring == "root_mean_squared_error":
+            return np.sqrt(np.mean(np.square(diff), axis=0)).tolist()
+        elif scoring == "mean_squared_error":
+            return np.mean(np.square(diff), axis=0).tolist()
+        elif scoring == "mean_pinball_loss":
+            return [mean_pinball_loss(actual[:, i], pred[:, i]) for i in range(actual.shape[1])]
+
+    else: 
+
+        if scoring == "mean_error":
+            return np.mean(diff)
+        elif scoring == "mean_absolute_error":
+            return np.mean(np.abs(diff))
+        elif scoring == "mean_percentage_error":
+            return np.mean(diff / actual) * 100
+        elif scoring == "mean_absolute_percentage_error":
+            return np.mean(np.abs(diff / actual)) * 100
+        elif scoring == "root_mean_squared_error":
+            return np.sqrt(np.mean(np.square(diff)))
+        elif scoring == "mean_squared_error":
+            return np.mean(np.square(diff))
+        elif scoring == "mean_pinball_loss":
+            return mean_pinball_loss(actual, pred)
 
 
 # create k lags for series x

@@ -17,7 +17,7 @@ from sklearn.metrics import (
 )
 from .config import DEEPREGRESSORSMTS
 from ..deep import DeepMTS
-from ..utils import convert_df_to_numeric, coverage, winkler_score
+from ..utils import convert_df_to_numeric, coverage, dict_to_dataframe_series, mean_errors, winkler_score
 
 import warnings
 
@@ -253,10 +253,12 @@ class LazyDeepMTS(DeepMTS):
         
         if self.h is None: 
             assert X_test is not None, "If h is None, X_test must be provided."
-
+        
         if isinstance(X_train, np.ndarray):
             X_train = pd.DataFrame(X_train)
             X_test = pd.DataFrame(X_test)
+        
+        self.series_names = X_train.columns.tolist()
 
         X_train = convert_df_to_numeric(X_train)
         X_test = convert_df_to_numeric(X_test)
@@ -523,10 +525,7 @@ class LazyDeepMTS(DeepMTS):
                             assert self.h > 0 and self.h < X_test.shape[0], "h must be > 0 and < X_test.shape[0]"
                             X_pred = pipe["regressor"].predict(
                                 h=self.h, **kwargs
-                            )
-                        
-                        
-
+                            )                                                
                     else:
                         if self.h is None:
                             X_pred = pipe.predict(

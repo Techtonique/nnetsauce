@@ -126,3 +126,26 @@ models, predictions = regr_mts5.fit(df_train, df_test)
 model_dictionary = regr_mts5.provide_models(df_train, df_test)
 print(models)
 
+print(f"\n ----- Example 8 ----- \n")
+
+regr_mts5 = ns.LazyMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+                        lags = 20, n_hidden_features=7, n_clusters=2,
+                        type_pi = "gaussian",
+                        estimators = ["Ridge", "Lasso", "LarsCV", "LassoCV", "LassoLarsCV"],
+                        show_progress=False, preprocess=False,
+                         h=5, )
+models, predictions = regr_mts5.fit(df_train, df_test, per_series=True)
+model_dictionary = regr_mts5.provide_models(df_train, df_test)
+print(models)
+
+
+print(f"\n ----- Example 9 ----- \n")
+
+regr_mts5 = ns.LazyMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+                    lags = 20, n_hidden_features=7, n_clusters=2,
+                    #type_pi = "gaussian",
+                    show_progress=False, preprocess=False,
+                    h=5, )
+models, predictions = regr_mts5.fit(df_train, df_test, per_series=True)
+model_dictionary = regr_mts5.provide_models(df_train, df_test)
+print(models)

@@ -8,7 +8,7 @@ from .matrixops import (
     tcrossprod,
     to_np_array,
 )
-from .misc import merge_two_dicts, is_factor, tuple_map
+from .misc import dict_to_dataframe_series, merge_two_dicts, is_factor, tuple_map
 from .model_selection import TimeSeriesSplit, cross_val_score
 from .progress_bar import Progbar
 from .psdcheck import isPD, nearestPD
@@ -28,6 +28,7 @@ __all__ = [
     "inv_penalized_cov",
     "cbind",
     "delete_last_columns",
+    "dict_to_dataframe_series",
     "rbind",
     "convert_df_to_numeric",
     "crossprod",
