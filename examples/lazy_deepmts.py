@@ -38,7 +38,7 @@ print(f"----- df_train.dtypes: {df_train.dtypes} -----")
 
 regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
                            n_layers=3,
-                      lags = 4, n_hidden_features=7, n_clusters=2,
+                      lags = 20, n_hidden_features=7, n_clusters=2,
                       show_progress=False, preprocess=False, 
                       estimators=["ElasticNetCV", "RidgeCV"])
 models, predictions = regr_mts3.fit(df_train, df_test)
@@ -48,7 +48,7 @@ print(model_dictionary["DeepMTS(ElasticNetCV)"])
 
 regr_mts = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
                           n_layers=3,
-                      lags = 4, n_hidden_features=7, n_clusters=2,
+                      lags = 20, n_hidden_features=7, n_clusters=2,
                       show_progress=False, preprocess=False)
 models, predictions = regr_mts.fit(df_train, df_test)
 model_dictionary = regr_mts.provide_models(df_train, df_test)
@@ -57,7 +57,7 @@ print(model_dictionary["DeepMTS(LinearSVR)"])
 
 regr_mts2 = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
                            n_layers=3,
-                      lags = 4, n_hidden_features=7, n_clusters=2,
+                      lags = 20, n_hidden_features=7, n_clusters=2,
                       show_progress=False, preprocess=True)
 models, predictions = regr_mts2.fit(df_train, df_test)
 model_dictionary = regr_mts.provide_models(df_train, df_test)
@@ -66,7 +66,7 @@ print(model_dictionary["DeepMTS(LinearSVR)"])
 
 regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=False, custom_metric=None,
                            n_layers=3,
-                      lags = 4, n_hidden_features=7, n_clusters=2,
+                      lags = 20, n_hidden_features=7, n_clusters=2,
                       replications=10, kernel="gaussian",
                       show_progress=False, preprocess=False)
 models, predictions = regr_mts3.fit(df_train, df_test)

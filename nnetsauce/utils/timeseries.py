@@ -121,9 +121,9 @@ def coverage(obj, actual, level=95, per_series=False):
     else:
         diff_lt = (lt <= actual) * (ut >= actual)
 
-    if per_series: 
+    if per_series:
         return np.mean(diff_lt, axis=0) * 100
-    else: 
+    else:
         return np.mean(diff_lt) * 100
 
 
@@ -192,17 +192,15 @@ def winkler_score(obj, actual, level=95, per_series=False):
         np.maximum(diff_lt, 0) + np.maximum(diff_ut, 0)
     )
 
-    if per_series == True: 
+    if per_series == True:
         return np.mean(score, axis=0)
-    else: 
+    else:
         return np.mean(score)
 
 
 def mean_errors(
-    pred,
-    actual,
-    scoring="root_mean_squared_error",
-    per_series=False):
+    pred, actual, scoring="root_mean_squared_error", per_series=False
+):
 
     if isinstance(pred, pd.DataFrame):
         pred = pred.values
@@ -211,10 +209,10 @@ def mean_errors(
 
     if isinstance(actual, pd.DataFrame):
         actual = actual.values
-        
+
     diff = pred - actual
 
-    if per_series == True: 
+    if per_series == True:
 
         if scoring == "mean_error":
             return np.mean(diff, axis=0).tolist()
@@ -223,15 +221,20 @@ def mean_errors(
         elif scoring == "mean_percentage_error":
             return np.asarray(np.mean(diff / actual, axis=0) * 100).tolist()
         elif scoring == "mean_absolute_percentage_error":
-            return np.asarray(np.mean(np.abs(diff / actual), axis=0) * 100).tolist()
+            return np.asarray(
+                np.mean(np.abs(diff / actual), axis=0) * 100
+            ).tolist()
         elif scoring == "root_mean_squared_error":
             return np.sqrt(np.mean(np.square(diff), axis=0)).tolist()
         elif scoring == "mean_squared_error":
             return np.mean(np.square(diff), axis=0).tolist()
         elif scoring == "mean_pinball_loss":
-            return [mean_pinball_loss(actual[:, i], pred[:, i]) for i in range(actual.shape[1])]
+            return [
+                mean_pinball_loss(actual[:, i], pred[:, i])
+                for i in range(actual.shape[1])
+            ]
 
-    else: 
+    else:
 
         if scoring == "mean_error":
             return np.mean(diff)

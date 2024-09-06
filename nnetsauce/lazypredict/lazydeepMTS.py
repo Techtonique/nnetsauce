@@ -18,7 +18,13 @@ from sklearn.metrics import (
 from .config import DEEPREGRESSORSMTS, REGRESSORSMTS
 from ..deep import DeepMTS
 from ..mts import MTS
-from ..utils import convert_df_to_numeric, coverage, dict_to_dataframe_series, mean_errors, winkler_score
+from ..utils import (
+    convert_df_to_numeric,
+    coverage,
+    dict_to_dataframe_series,
+    mean_errors,
+    winkler_score,
+)
 
 import warnings
 
@@ -149,7 +155,7 @@ class LazyDeepMTS(MTS):
         estimators="all",
         preprocess=False,
         n_layers=1,
-        h=None,        
+        h=None,
         # MTS attributes
         obj=None,
         n_hidden_features=5,
@@ -163,7 +169,7 @@ class LazyDeepMTS(MTS):
         cluster_encode=True,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
-        lags=1,        
+        lags=1,
         type_pi="kde",
         block_size=None,
         replications=None,
@@ -182,9 +188,9 @@ class LazyDeepMTS(MTS):
         self.estimators = estimators
         self.preprocess = preprocess
         self.n_layers = n_layers
-        self.h = h        
+        self.h = h
         super().__init__(
-            obj=obj,            
+            obj=obj,
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,
             a=a,
@@ -207,8 +213,7 @@ class LazyDeepMTS(MTS):
             show_progress=show_progress,
         )
 
-    def fit(self, X_train, X_test, xreg=None, 
-            per_series=False, **kwargs):
+    def fit(self, X_train, X_test, xreg=None, per_series=False, **kwargs):
         """Fit Regression algorithms to X_train, predict and score on X_test.
 
         Parameters:
@@ -219,15 +224,15 @@ class LazyDeepMTS(MTS):
 
             X_test: array-like or data frame,
                 Testing vectors, where rows is the number of samples
-                and columns is the number of features.                
+                and columns is the number of features.
 
             xreg: array-like, optional (default=None)
                 Additional (external) regressors to be passed to self.obj
                 xreg must be in 'increasing' order (most recent observations last)
-            
+
             per_series: bool, optional (default=False)
                 When set to True, the metrics are computed series by series.
-            
+
             **kwargs: dict, optional (default=None)
                 Additional parameters to be passed to `fit` method of `obj`.
 
@@ -258,10 +263,10 @@ class LazyDeepMTS(MTS):
 
         if self.custom_metric:
             CUSTOM_METRIC = []
-        
-        if self.h is None: 
+
+        if self.h is None:
             assert X_test is not None, "If h is None, X_test must be provided."
-                
+
         if isinstance(X_train, np.ndarray):
             X_train = pd.DataFrame(X_train)
             X_test = pd.DataFrame(X_test)
@@ -296,27 +301,28 @@ class LazyDeepMTS(MTS):
             )
 
         if self.estimators == "all":
-            if self.n_layers <= 1: 
+            if self.n_layers <= 1:
                 self.regressors = REGRESSORSMTS
-            else: 
+            else:
                 self.regressors = DEEPREGRESSORSMTS
         else:
-            if self.n_layers <= 1: 
+            if self.n_layers <= 1:
                 self.regressors = [
                     ("MTS(" + est[0] + ")", est[1])
-                for est in all_estimators()
-                if (
-                    issubclass(est[1], RegressorMixin)
-                    and (est[0] in self.estimators)
-                )]
-            else: # self.n_layers > 1
+                    for est in all_estimators()
+                    if (
+                        issubclass(est[1], RegressorMixin)
+                        and (est[0] in self.estimators)
+                    )
+                ]
+            else:  # self.n_layers > 1
                 self.regressors = [
                     ("DeepMTS(" + est[0] + ")", est[1])
-                for est in all_estimators()
-                if (
-                    issubclass(est[1], RegressorMixin)
-                    and (est[0] in self.estimators)
-                )
+                    for est in all_estimators()
+                    if (
+                        issubclass(est[1], RegressorMixin)
+                        and (est[0] in self.estimators)
+                    )
                 ]
 
         if self.preprocess is True:
@@ -399,39 +405,78 @@ class LazyDeepMTS(MTS):
                     self.models[name] = pipe
 
                     if self.h is None:
-                        X_pred = pipe["regressor"].predict(
-                            h=self.h, **kwargs
-                        )
+                        X_pred = pipe["regressor"].predict(h=self.h, **kwargs)
                     else:
                         assert self.h > 0, "h must be > 0"
-                        X_pred = pipe["regressor"].predict(
-                            h=self.h, **kwargs
-                        )
+                        X_pred = pipe["regressor"].predict(h=self.h, **kwargs)
 
                     if (self.replications is not None) or (
                         self.type_pi == "gaussian"
-                    ):                        
-                        if per_series == False: 
-                            rmse = mean_squared_error(X_test, X_pred.mean, squared=False)
+                    ):
+                        if per_series == False:
+                            rmse = mean_squared_error(
+                                X_test, X_pred.mean, squared=False
+                            )
                             mae = mean_absolute_error(X_test, X_pred.mean)
                             mpl = mean_pinball_loss(X_test, X_pred.mean)
-                            winklerscore = winkler_score(obj=X_pred, actual=X_test, level=95)
+                            winklerscore = winkler_score(
+                                obj=X_pred, actual=X_test, level=95
+                            )
                             coveragecalc = coverage(X_pred, X_test, level=95)
                         else:
-                            rmse = mean_errors(actual=X_test, pred=X_pred, scoring="root_mean_squared_error", per_series=True)
-                            mae = mean_errors(actual=X_test, pred=X_pred, scoring="mean_absolute_error", per_series=True)
-                            mpl = mean_errors(actual=X_test, pred=X_pred, scoring="mean_pinball_loss", per_series=True)
-                            winklerscore = winkler_score(obj=X_pred, actual=X_test, level=95, per_series=True)
-                            coveragecalc = coverage(X_pred, X_test, level=95, per_series=True)
-                    else: 
-                        if per_series == False: 
-                            rmse = mean_squared_error(X_test, X_pred, squared=False)
+                            rmse = mean_errors(
+                                actual=X_test,
+                                pred=X_pred,
+                                scoring="root_mean_squared_error",
+                                per_series=True,
+                            )
+                            mae = mean_errors(
+                                actual=X_test,
+                                pred=X_pred,
+                                scoring="mean_absolute_error",
+                                per_series=True,
+                            )
+                            mpl = mean_errors(
+                                actual=X_test,
+                                pred=X_pred,
+                                scoring="mean_pinball_loss",
+                                per_series=True,
+                            )
+                            winklerscore = winkler_score(
+                                obj=X_pred,
+                                actual=X_test,
+                                level=95,
+                                per_series=True,
+                            )
+                            coveragecalc = coverage(
+                                X_pred, X_test, level=95, per_series=True
+                            )
+                    else:
+                        if per_series == False:
+                            rmse = mean_squared_error(
+                                X_test, X_pred, squared=False
+                            )
                             mae = mean_absolute_error(X_test, X_pred)
                             mpl = mean_pinball_loss(X_test, X_pred)
-                        else: 
-                            rmse = mean_errors(actual=X_test, pred=X_pred, scoring="root_mean_squared_error", per_series=True)
-                            mae = mean_errors(actual=X_test, pred=X_pred, scoring="mean_absolute_error", per_series=True)
-                            mpl = mean_errors(actual=X_test, pred=X_pred, scoring="mean_pinball_loss", per_series=True)
+                        else:
+                            rmse = mean_errors(
+                                actual=X_test,
+                                pred=X_pred,
+                                scoring="root_mean_squared_error",
+                                per_series=True,
+                            )
+                            mae = mean_errors(
+                                actual=X_test,
+                                pred=X_pred,
+                                scoring="mean_absolute_error",
+                                per_series=True,
+                            )
+                            mpl = mean_errors(
+                                actual=X_test,
+                                pred=X_pred,
+                                scoring="mean_pinball_loss",
+                                per_series=True,
+                            )
 
                     names.append(name)
                     RMSE.append(rmse)
@@ -551,7 +596,9 @@ class LazyDeepMTS(MTS):
                                 h=X_test.shape[0], **kwargs
                             )
                         else:
-                            assert self.h > 0 and self.h < X_test.shape[0], "h must be > 0 and < X_test.shape[0]"
+                            assert (
+                                self.h > 0 and self.h < X_test.shape[0]
+                            ), "h must be > 0 and < X_test.shape[0]"
                             X_pred = pipe["regressor"].predict(
                                 h=self.h, **kwargs
                             )
@@ -559,96 +606,241 @@ class LazyDeepMTS(MTS):
                     else:
                         if self.h is None:
                             X_pred = pipe.predict(
-                            h=X_test.shape[0], **kwargs
-                        )  # X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg) ## DO xreg like in `ahead`
+                                h=X_test.shape[0], **kwargs
+                            )  # X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg) ## DO xreg like in `ahead`
                         else:
-                            assert self.h > 0 and self.h < X_test.shape[0], "h must be > 0 and < X_test.shape[0]"
-                            X_pred = pipe.predict(
-                                h=self.h, **kwargs
-                            )
+                            assert (
+                                self.h > 0 and self.h < X_test.shape[0]
+                            ), "h must be > 0 and < X_test.shape[0]"
+                            X_pred = pipe.predict(h=self.h, **kwargs)
 
                     if self.h is None:
                         if (self.replications is not None) or (
                             self.type_pi == "gaussian"
                         ):
-                            
-                            if per_series == True: 
-                                rmse = mean_errors(actual=X_test, pred=X_pred.mean, scoring="root_mean_squared_error", per_series=True)
-                                mae = mean_errors(actual=X_test, pred=X_pred.mean, scoring="mean_absolute_error", per_series=True)
-                                mpl = mean_errors(actual=X_test, pred=X_pred.mean, scoring="mean_pinball_loss", per_series=True)
-                                winklerscore = winkler_score(obj=X_pred, actual=X_test, level=95, per_series=True)
-                                coveragecalc = coverage(X_pred, X_test, level=95, per_series=True)
-                            else: 
-                                rmse = mean_squared_error(X_test, X_pred.mean, squared=False)
+
+                            if per_series == True:
+                                rmse = mean_errors(
+                                    actual=X_test,
+                                    pred=X_pred.mean,
+                                    scoring="root_mean_squared_error",
+                                    per_series=True,
+                                )
+                                mae = mean_errors(
+                                    actual=X_test,
+                                    pred=X_pred.mean,
+                                    scoring="mean_absolute_error",
+                                    per_series=True,
+                                )
+                                mpl = mean_errors(
+                                    actual=X_test,
+                                    pred=X_pred.mean,
+                                    scoring="mean_pinball_loss",
+                                    per_series=True,
+                                )
+                                winklerscore = winkler_score(
+                                    obj=X_pred,
+                                    actual=X_test,
+                                    level=95,
+                                    per_series=True,
+                                )
+                                coveragecalc = coverage(
+                                    X_pred, X_test, level=95, per_series=True
+                                )
+                            else:
+                                rmse = mean_squared_error(
+                                    X_test, X_pred.mean, squared=False
+                                )
                                 mae = mean_absolute_error(X_test, X_pred.mean)
                                 mpl = mean_pinball_loss(X_test, X_pred.mean)
-                                winklerscore = winkler_score(obj=X_pred, actual=X_test, level=95)
-                                coveragecalc = coverage(X_pred, X_test, level=95)
-                        else: # no prediction interval
-                            if per_series == True: 
-                                rmse = mean_errors(actual=X_test, pred=X_pred, scoring="root_mean_squared_error", per_series=True)
-                                mae = mean_errors(actual=X_test, pred=X_pred, scoring="mean_absolute_error", per_series=True)
-                                mpl = mean_errors(actual=X_test, pred=X_pred, scoring="mean_pinball_loss", per_series=True)                                
-                            else: 
-                                rmse = mean_squared_error(X_test, X_pred, squared=False)
+                                winklerscore = winkler_score(
+                                    obj=X_pred, actual=X_test, level=95
+                                )
+                                coveragecalc = coverage(
+                                    X_pred, X_test, level=95
+                                )
+                        else:  # no prediction interval
+                            if per_series == True:
+                                rmse = mean_errors(
+                                    actual=X_test,
+                                    pred=X_pred,
+                                    scoring="root_mean_squared_error",
+                                    per_series=True,
+                                )
+                                mae = mean_errors(
+                                    actual=X_test,
+                                    pred=X_pred,
+                                    scoring="mean_absolute_error",
+                                    per_series=True,
+                                )
+                                mpl = mean_errors(
+                                    actual=X_test,
+                                    pred=X_pred,
+                                    scoring="mean_pinball_loss",
+                                    per_series=True,
+                                )
+                            else:
+                                rmse = mean_squared_error(
+                                    X_test, X_pred, squared=False
+                                )
                                 mae = mean_absolute_error(X_test, X_pred)
                                 mpl = mean_pinball_loss(X_test, X_pred)
-                    else: # self.h is not None
-                        if (self.replications is not None) or (self.type_pi == "gaussian"):
-                            
-                            if per_series == False: 
+                    else:  # self.h is not None
+                        if (self.replications is not None) or (
+                            self.type_pi == "gaussian"
+                        ):
+
+                            if per_series == False:
                                 if isinstance(X_test, pd.DataFrame) == False:
-                                    X_test_h = X_test[0:self.h,:]
-                                    rmse = mean_squared_error(X_test_h, X_pred.mean, squared=False)
-                                    mae = mean_absolute_error(X_test_h, X_pred.mean)
-                                    mpl = mean_pinball_loss(X_test_h, X_pred.mean)
-                                    winklerscore = winkler_score(obj=X_pred, actual=X_test_h, level=95)
-                                    coveragecalc = coverage(X_pred, X_test_h, level=95)
+                                    X_test_h = X_test[0: self.h, :]
+                                    rmse = mean_squared_error(
+                                        X_test_h, X_pred.mean, squared=False
+                                    )
+                                    mae = mean_absolute_error(
+                                        X_test_h, X_pred.mean
+                                    )
+                                    mpl = mean_pinball_loss(
+                                        X_test_h, X_pred.mean
+                                    )
+                                    winklerscore = winkler_score(
+                                        obj=X_pred, actual=X_test_h, level=95
+                                    )
+                                    coveragecalc = coverage(
+                                        X_pred, X_test_h, level=95
+                                    )
                                 else:
-                                    X_test_h = X_test.iloc[0:self.h,:]
-                                    rmse = mean_squared_error(X_test_h, X_pred.mean, squared=False)
-                                    mae = mean_absolute_error(X_test_h, X_pred.mean)
-                                    mpl = mean_pinball_loss(X_test_h, X_pred.mean)
-                                    winklerscore = winkler_score(obj=X_pred, actual=X_test_h, level=95)
-                                    coveragecalc = coverage(X_pred, X_test_h, level=95)
-                            else: 
+                                    X_test_h = X_test.iloc[0: self.h, :]
+                                    rmse = mean_squared_error(
+                                        X_test_h, X_pred.mean, squared=False
+                                    )
+                                    mae = mean_absolute_error(
+                                        X_test_h, X_pred.mean
+                                    )
+                                    mpl = mean_pinball_loss(
+                                        X_test_h, X_pred.mean
+                                    )
+                                    winklerscore = winkler_score(
+                                        obj=X_pred, actual=X_test_h, level=95
+                                    )
+                                    coveragecalc = coverage(
+                                        X_pred, X_test_h, level=95
+                                    )
+                            else:
                                 if isinstance(X_test, pd.DataFrame):
-                                    X_test_h = X_test.iloc[0:self.h,:]
-                                    rmse = mean_errors(actual=X_test_h, pred=X_pred, scoring="root_mean_squared_error", per_series=True)
-                                    mae = mean_errors(actual=X_test_h, pred=X_pred, scoring="mean_absolute_error", per_series=True)
-                                    mpl = mean_errors(actual=X_test_h, pred=X_pred, scoring="mean_pinball_loss", per_series=True)
-                                    winklerscore = winkler_score(obj=X_pred, actual=X_test_h, level=95, per_series=True)
-                                    coveragecalc = coverage(X_pred, X_test_h, level=95, per_series=True)
+                                    X_test_h = X_test.iloc[0: self.h, :]
+                                    rmse = mean_errors(
+                                        actual=X_test_h,
+                                        pred=X_pred,
+                                        scoring="root_mean_squared_error",
+                                        per_series=True,
+                                    )
+                                    mae = mean_errors(
+                                        actual=X_test_h,
+                                        pred=X_pred,
+                                        scoring="mean_absolute_error",
+                                        per_series=True,
+                                    )
+                                    mpl = mean_errors(
+                                        actual=X_test_h,
+                                        pred=X_pred,
+                                        scoring="mean_pinball_loss",
+                                        per_series=True,
+                                    )
+                                    winklerscore = winkler_score(
+                                        obj=X_pred,
+                                        actual=X_test_h,
+                                        level=95,
+                                        per_series=True,
+                                    )
+                                    coveragecalc = coverage(
+                                        X_pred,
+                                        X_test_h,
+                                        level=95,
+                                        per_series=True,
+                                    )
                                 else:
-                                    X_test_h = X_test[0:self.h,:]
-                                    rmse = mean_errors(actual=X_test_h, pred=X_pred, scoring="root_mean_squared_error", per_series=True)
-                                    mae = mean_errors(actual=X_test_h, pred=X_pred, scoring="mean_absolute_error", per_series=True)
-                                    mpl = mean_errors(actual=X_test_h, pred=X_pred, scoring="mean_pinball_loss", per_series=True)
-                                    winklerscore = winkler_score(obj=X_pred, actual=X_test_h, level=95, per_series=True)
-                                    coveragecalc = coverage(X_pred, X_test_h, level=95, per_series=True)
-                        else: # no prediction interval
+                                    X_test_h = X_test[0: self.h, :]
+                                    rmse = mean_errors(
+                                        actual=X_test_h,
+                                        pred=X_pred,
+                                        scoring="root_mean_squared_error",
+                                        per_series=True,
+                                    )
+                                    mae = mean_errors(
+                                        actual=X_test_h,
+                                        pred=X_pred,
+                                        scoring="mean_absolute_error",
+                                        per_series=True,
+                                    )
+                                    mpl = mean_errors(
+                                        actual=X_test_h,
+                                        pred=X_pred,
+                                        scoring="mean_pinball_loss",
+                                        per_series=True,
+                                    )
+                                    winklerscore = winkler_score(
+                                        obj=X_pred,
+                                        actual=X_test_h,
+                                        level=95,
+                                        per_series=True,
+                                    )
+                                    coveragecalc = coverage(
+                                        X_pred,
+                                        X_test_h,
+                                        level=95,
+                                        per_series=True,
+                                    )
+                        else:  # no prediction interval
                             if per_series == False:
                                 if isinstance(X_test, pd.DataFrame):
-                                    X_test_h = X_test.iloc[0:self.h,:]
-                                    rmse = mean_squared_error(X_test_h, X_pred, squared=False)
+                                    X_test_h = X_test.iloc[0: self.h, :]
+                                    rmse = mean_squared_error(
+                                        X_test_h, X_pred, squared=False
+                                    )
                                     mae = mean_absolute_error(X_test_h, X_pred)
                                     mpl = mean_pinball_loss(X_test_h, X_pred)
-                                else: 
-                                    X_test_h = X_test[0:self.h,:]
-                                    rmse = mean_squared_error(X_test_h, X_pred, squared=False)
+                                else:
+                                    X_test_h = X_test[0: self.h, :]
+                                    rmse = mean_squared_error(
+                                        X_test_h, X_pred, squared=False
+                                    )
                                     mae = mean_absolute_error(X_test_h, X_pred)
                                     mpl = mean_pinball_loss(X_test_h, X_pred)
                             else:
                                 if isinstance(X_test, pd.DataFrame):
-                                    X_test_h = X_test.iloc[0:self.h,:]
-                                    rmse = mean_errors(actual=X_test_h, pred=X_pred, scoring="root_mean_squared_error", per_series=True)
-                                    mae = mean_errors(actual=X_test_h, pred=X_pred, scoring="mean_absolute_error", per_series=True)
-                                    mpl = mean_errors(actual=X_test_h, pred=X_pred, scoring="mean_pinball_loss", per_series=True)
+                                    X_test_h = X_test.iloc[0: self.h, :]
+                                    rmse = mean_errors(
+                                        actual=X_test_h,
+                                        pred=X_pred,
+                                        scoring="root_mean_squared_error",
+                                        per_series=True,
+                                    )
+                                    mae = mean_errors(
+                                        actual=X_test_h,
+                                        pred=X_pred,
+                                        scoring="mean_absolute_error",
+                                        per_series=True,
+                                    )
+                                    mpl = mean_errors(
+                                        actual=X_test_h,
+                                        pred=X_pred,
+                                        scoring="mean_pinball_loss",
+                                        per_series=True,
+                                    )
                                 else:
-                                    X_test_h = X_test[0:self.h,:]
-                                    rmse = mean_errors(actual=X_test_h, pred=X_pred, scoring="root_mean_squared_error", per_series=True)
-                                    mae = mean_errors(actual=X_test_h, pred=X_pred, scoring="mean_absolute_error", per_series=True)
-                        
+                                    X_test_h = X_test[0: self.h, :]
+                                    rmse = mean_errors(
+                                        actual=X_test_h,
+                                        pred=X_pred,
+                                        scoring="root_mean_squared_error",
+                                        per_series=True,
+                                    )
+                                    mae = mean_errors(
+                                        actual=X_test_h,
+                                        pred=X_pred,
+                                        scoring="mean_absolute_error",
+                                        per_series=True,
+                                    )
 
                     names.append(name)
                     RMSE.append(rmse)
@@ -662,11 +854,11 @@ class LazyDeepMTS(MTS):
                     TIME.append(time.time() - start)
 
                     if self.custom_metric:
-                        if self.h is None: 
-                            custom_metric = self.custom_metric(X_test, X_pred)                            
-                        else:                             
+                        if self.h is None:
+                            custom_metric = self.custom_metric(X_test, X_pred)
+                        else:
                             custom_metric = self.custom_metric(X_test_h, X_pred)
-                            
+
                         CUSTOM_METRIC.append(custom_metric)
 
                     if self.verbose > 0:
@@ -722,20 +914,21 @@ class LazyDeepMTS(MTS):
                 "RMSE": RMSE,
                 "MAE": MAE,
                 "MPL": MPL,
-                "Time Taken": TIME
+                "Time Taken": TIME,
             }
-        
+
         if self.custom_metric:
             scores[self.custom_metric.__name__] = CUSTOM_METRIC
 
         if per_series:
-            scores = dict_to_dataframe_series(scores, 
-                                              self.series_names)
+            scores = dict_to_dataframe_series(scores, self.series_names)
         else:
             scores = pd.DataFrame(scores)
 
         try:
-            scores = scores.sort_values(by=self.sort_by, ascending=True).set_index("Model")
+            scores = scores.sort_values(
+                by=self.sort_by, ascending=True
+            ).set_index("Model")
         except:
             pass
 
@@ -743,7 +936,6 @@ class LazyDeepMTS(MTS):
             predictions_df = pd.DataFrame.from_dict(predictions)
 
         return scores, predictions_df if self.predictions is True else scores
-
 
     def provide_models(self, X_train, X_test):
         """
@@ -758,7 +950,7 @@ class LazyDeepMTS(MTS):
 
             X_test : array-like,
                 Testing vectors, where rows is the number of samples
-                and columns is the number of features.                
+                and columns is the number of features.
 
         Returns:
 
@@ -770,11 +962,11 @@ class LazyDeepMTS(MTS):
         if self.h is None:
             if len(self.models.keys()) == 0:
                 self.fit(X_train, X_test)
-        else: 
+        else:
             if len(self.models.keys()) == 0:
                 if isinstance(X_test, pd.DataFrame):
-                    self.fit(X_train, X_test.iloc[0:self.h,:])
+                    self.fit(X_train, X_test.iloc[0: self.h, :])
                 else:
-                    self.fit(X_train, X_test[0:self.h,:])
+                    self.fit(X_train, X_test[0: self.h, :])
 
         return self.models

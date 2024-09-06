@@ -1,15 +1,16 @@
 import numpy as np
 import pandas as pd
 import sklearn.metrics as skm2
-try: 
-    import nnetsauce as ns 
+
+try:
+    import nnetsauce as ns
 except:
-    pass 
-import GPopt as gp 
+    pass
+import GPopt as gp
 from collections import namedtuple
 from copy import deepcopy
 from tqdm import tqdm
-from sklearn import metrics 
+from sklearn import metrics
 from sklearn.base import ClassifierMixin, RegressorMixin
 from sklearn.utils import all_estimators
 from sklearn.model_selection import cross_val_score
@@ -31,8 +32,8 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
 
         verbose : int, optional (default=0)
             Monitor progress when fitting.
-                
-        All the other parameters are nnetsauce `CustomClassifier`'s 
+
+        All the other parameters are nnetsauce `CustomClassifier`'s
 
     Examples:
 
@@ -51,6 +52,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         print(clf.score(clf.predict(X_test), y_test))
         ```
     """
+
     def __init__(
         self,
         obj,
@@ -117,8 +119,8 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         if isinstance(X, np.ndarray):
             X = pd.DataFrame(X)
 
-        self.classes_ = np.unique(y) # for compatibility with sklearn
-        self.n_classes_ = len(self.classes_)  # for compatibility with sklearn        
+        self.classes_ = np.unique(y)  # for compatibility with sklearn
+        self.n_classes_ = len(self.classes_)  # for compatibility with sklearn
 
         # init layer
         self.stacked_obj = CustomClassifier(
@@ -184,7 +186,8 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
     def score(self, X, y, scoring=None):
         return self.obj.score(X, y, scoring)
 
-    def cross_val_optim(self, 
+    def cross_val_optim(
+        self,
         X_train,
         y_train,
         X_test=None,
@@ -198,7 +201,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         abs_tol=1e-3,
         verbose=2,
         seed=123,
-        **kwargs
+        **kwargs,
     ):
         """Cross-validation function and hyperparameters' search
 
@@ -246,7 +249,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
 
             seed: int
                 reproducibility seed
-            
+
             **kwargs: dict
                 additional parameters to be passed to the estimator
 
@@ -270,22 +273,26 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
             activation_name="relu",
             nodes_sim="sobol",
             dropout=0,
-            n_clusters=2,            
+            n_clusters=2,
             type_clust="kmeans",
             cv=5,
             n_jobs=None,
             scoring="accuracy",
             seed=123,
         ):
-            self.set_params(**{"n_layers": n_layers,
-            # CustomClassifier attributes
-            "n_hidden_features": n_hidden_features,
-            "activation_name": activation_name,
-            "nodes_sim": nodes_sim,
-            "dropout": dropout,
-            "n_clusters": n_clusters,            
-            "type_clust": type_clust,
-            **kwargs})
+            self.set_params(
+                **{
+                    "n_layers": n_layers,
+                    # CustomClassifier attributes
+                    "n_hidden_features": n_hidden_features,
+                    "activation_name": activation_name,
+                    "nodes_sim": nodes_sim,
+                    "dropout": dropout,
+                    "n_clusters": n_clusters,
+                    "type_clust": type_clust,
+                    **kwargs,
+                }
+            )
             return -cross_val_score(
                 estimator=self,
                 X=X_train,
@@ -308,7 +315,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                 activation_name=num_to_activation_name[np.ceil(xx[2])],
                 nodes_sim=num_to_nodes_sim[int(np.ceil(xx[3]))],
                 dropout=xx[4],
-                n_clusters=int(np.ceil(xx[5])),            
+                n_clusters=int(np.ceil(xx[5])),
                 type_clust=num_to_type_clust[int(np.ceil(xx[6]))],
                 cv=cv,
                 n_jobs=n_jobs,
@@ -319,17 +326,17 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         if surrogate_obj is None:
             gp_opt = gp.GPOpt(
                 objective_func=crossval_objective,
-                lower_bound=np.array([0,   3, 0, 0, 0.0, 0, 0]),
+                lower_bound=np.array([0, 3, 0, 0, 0.0, 0, 0]),
                 upper_bound=np.array([5, 100, 3, 3, 0.4, 5, 2]),
                 params_names=[
-                "n_layers",
-                # CustomClassifier attributes
-                "n_hidden_features",
-                "activation_name",
-                "nodes_sim",
-                "dropout",
-                "n_clusters",            
-                "type_clust",
+                    "n_layers",
+                    # CustomClassifier attributes
+                    "n_hidden_features",
+                    "activation_name",
+                    "nodes_sim",
+                    "dropout",
+                    "n_clusters",
+                    "type_clust",
                 ],
                 method="bayesian",
                 n_init=n_init,
@@ -339,17 +346,17 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         else:
             gp_opt = gp.GPOpt(
                 objective_func=crossval_objective,
-                lower_bound=np.array([0,   3, 0, 0, 0.0, 0, 0]),
+                lower_bound=np.array([0, 3, 0, 0, 0.0, 0, 0]),
                 upper_bound=np.array([5, 100, 3, 3, 0.4, 5, 2]),
                 params_names=[
-                "n_layers",
-                # CustomClassifier attributes
-                "n_hidden_features",
-                "activation_name",
-                "nodes_sim",
-                "dropout",
-                "n_clusters",            
-                "type_clust",
+                    "n_layers",
+                    # CustomClassifier attributes
+                    "n_hidden_features",
+                    "activation_name",
+                    "nodes_sim",
+                    "dropout",
+                    "n_clusters",
+                    "type_clust",
                 ],
                 acquisition="ucb",
                 method="splitconformal",
@@ -363,12 +370,22 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
 
         res = gp_opt.optimize(verbose=verbose, abs_tol=abs_tol)
         res.best_params["n_layers"] = int(np.ceil(res.best_params["n_layers"]))
-        res.best_params["n_hidden_features"] = int(np.ceil(res.best_params["n_hidden_features"]))
-        res.best_params["activation_name"] = num_to_activation_name[np.ceil(res.best_params["activation_name"])]
-        res.best_params["nodes_sim"] = num_to_nodes_sim[int(np.ceil(res.best_params["nodes_sim"]))]
+        res.best_params["n_hidden_features"] = int(
+            np.ceil(res.best_params["n_hidden_features"])
+        )
+        res.best_params["activation_name"] = num_to_activation_name[
+            np.ceil(res.best_params["activation_name"])
+        ]
+        res.best_params["nodes_sim"] = num_to_nodes_sim[
+            int(np.ceil(res.best_params["nodes_sim"]))
+        ]
         res.best_params["dropout"] = res.best_params["dropout"]
-        res.best_params["n_clusters"] = int(np.ceil(res.best_params["n_clusters"]))
-        res.best_params["type_clust"] = num_to_type_clust[int(np.ceil(res.best_params["type_clust"]))]        
+        res.best_params["n_clusters"] = int(
+            np.ceil(res.best_params["n_clusters"])
+        )
+        res.best_params["type_clust"] = num_to_type_clust[
+            int(np.ceil(res.best_params["type_clust"]))
+        ]
 
         # out-of-sample error
         if X_test is not None and y_test is not None:
@@ -383,14 +400,14 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         else:
             return res
 
-
-    def lazy_cross_val_optim(self,
+    def lazy_cross_val_optim(
+        self,
         X_train,
         y_train,
         X_test=None,
         y_test=None,
         scoring="accuracy",
-        surrogate_objs=None, 
+        surrogate_objs=None,
         customize=False,
         cv=5,
         n_jobs=None,
@@ -422,13 +439,13 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
 
             scoring: str
                 scoring metric; see https://scikit-learn.org/stable/modules/model_evaluation.html#the-scoring-parameter-defining-model-evaluation-rules
-            
+
             surrogate_objs: object names as a list of strings;
                 ML models for estimating the uncertainty around the objective function
 
             customize: boolean
                 if True, the surrogate is transformed into a quasi-randomized network (default is False)
-                
+
             cv: int;
                 number of cross-validation folds
 
@@ -482,8 +499,8 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         results = []
 
         for est in all_estimators():
-            
-            if surrogate_objs is None: 
+
+            if surrogate_objs is None:
 
                 if issubclass(est[1], RegressorMixin) and (
                     est[0] not in removed_regressors
@@ -492,7 +509,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                         if customize == True:
                             print(f"\n surrogate: CustomRegressor({est[0]})")
                             surr_obj = ns.CustomRegressor(obj=est[1]())
-                        else: 
+                        else:
                             print(f"\n surrogate: {est[0]}")
                             surr_obj = est[1]()
                         res = self.cross_val_optim(
@@ -514,20 +531,22 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                         if customize == True:
                             results.append((f"CustomRegressor({est[0]})", res))
                         else:
-                            results.append((est[0], res))                     
+                            results.append((est[0], res))
                     except:
                         pass
-            
-            else: 
 
-                if issubclass(est[1], RegressorMixin) and (
-                    est[0] not in removed_regressors
-                ) and est[0] in surrogate_objs:
+            else:
+
+                if (
+                    issubclass(est[1], RegressorMixin)
+                    and (est[0] not in removed_regressors)
+                    and est[0] in surrogate_objs
+                ):
                     try:
                         if customize == True:
                             print(f"\n surrogate: CustomRegressor({est[0]})")
                             surr_obj = ns.CustomRegressor(obj=est[1]())
-                        else: 
+                        else:
                             print(f"\n surrogate: {est[0]}")
                             surr_obj = est[1]()
                         res = self.cross_val_optim(
@@ -549,9 +568,8 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                         if customize == True:
                             results.append((f"CustomRegressor({est[0]})", res))
                         else:
-                            results.append((est[0], res))                     
+                            results.append((est[0], res))
                     except:
                         pass
-
 
         return results

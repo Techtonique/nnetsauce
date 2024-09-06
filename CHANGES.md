@@ -1,6 +1,6 @@
 # version 0.24.0
 
-- Update `LazyDeepMTS`: No more `LazyMTS`, instead, use `LazyDeepMTS` with `n_layers=1` 
+- Update `LazyDeepMTS`: **No more `LazyMTS`** class, instead, you canuse `LazyDeepMTS` with `n_layers=1` 
 
 # version 0.23.1
 

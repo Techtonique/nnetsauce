@@ -198,7 +198,6 @@ class CustomRegressor(Custom, RegressorMixin):
         self.y_ = y
 
         return self
-    
 
     def partial_fit(self, X, y, sample_weight=None, **kwargs):
         """Partial fit custom model to training data (X, y).
@@ -225,7 +224,7 @@ class CustomRegressor(Custom, RegressorMixin):
 
         # if sample_weights, else: (must use self.row_index)
         if sample_weight is not None:
-            try: 
+            try:
                 self.obj.partial_fit(
                     scaled_Z,
                     centered_y,
@@ -249,7 +248,6 @@ class CustomRegressor(Custom, RegressorMixin):
         self.y_ = y
 
         return self
-
 
     def predict(self, X, level=95, method=None, **kwargs):
         """Predict test data X.

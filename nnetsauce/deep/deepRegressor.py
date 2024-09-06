@@ -19,10 +19,10 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
 
         verbose : int, optional (default=0)
             Monitor progress when fitting.
-        
+
         n_layers: int (default=3)
             Number of layers. `n_layers = 1` is a simple `CustomRegressor`
-        
+
         All the other parameters are nnetsauce `CustomRegressor`'s
 
     Examples:
@@ -43,6 +43,7 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
         ```
 
     """
+
     def __init__(
         self,
         obj,

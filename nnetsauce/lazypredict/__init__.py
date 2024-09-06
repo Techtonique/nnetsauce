@@ -9,5 +9,5 @@ __all__ = [
     "LazyRegressor",
     "LazyDeepClassifier",
     "LazyDeepRegressor",
-    "LazyDeepMTS",    
+    "LazyDeepMTS",
 ]

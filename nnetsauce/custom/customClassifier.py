@@ -204,8 +204,8 @@ class CustomClassifier(Custom, ClassifierMixin):
 
         # if sample_weight is None:
         self.obj.fit(scaled_Z, output_y)
-        self.classes_ = np.unique(y) # for compatibility with sklearn
-        self.n_classes_ = len(self.classes_)  # for compatibility with sklearn        
+        self.classes_ = np.unique(y)  # for compatibility with sklearn
+        self.n_classes_ = len(self.classes_)  # for compatibility with sklearn
 
         return self
 
@@ -234,7 +234,7 @@ class CustomClassifier(Custom, ClassifierMixin):
 
         # if sample_weights, else: (must use self.row_index)
         if sample_weight is not None:
-            try: 
+            try:
                 self.obj.partial_fit(
                     scaled_Z,
                     output_y,
@@ -243,22 +243,21 @@ class CustomClassifier(Custom, ClassifierMixin):
                     ],
                     # **kwargs
                 )
-            except: 
-                NotImplementedError 
+            except:
+                NotImplementedError
 
             return self
 
         # if sample_weight is None:
-        try: 
+        try:
             self.obj.fit(scaled_Z, output_y)
-        except: 
+        except:
             raise NotImplementedError
-        
-        self.classes_ = np.unique(y) # for compatibility with sklearn
-        self.n_classes_ = len(self.classes_)  # for compatibility with sklearn        
+
+        self.classes_ = np.unique(y)  # for compatibility with sklearn
+        self.n_classes_ = len(self.classes_)  # for compatibility with sklearn
 
         return self
-
 
     def predict(self, X, **kwargs):
         """Predict test data X.
