@@ -1,3 +1,7 @@
+# version 0.24.0
+
+- Update `LazyDeepMTS`: No more `LazyMTS`, instead, use `LazyDeepMTS` with `n_layers=1` 
+
 # version 0.23.1
 
 - Copula simulation for time series residuals in classes `MTS` and `DeepMTS`

@@ -11,7 +11,6 @@ from .glm.glmClassifier import GLMClassifier
 from .glm.glmRegressor import GLMRegressor
 from .lazypredict.lazyClassifier import LazyClassifier
 from .lazypredict.lazyRegressor import LazyRegressor
-from .lazypredict.lazyMTS import LazyMTS
 from .lazypredict.lazydeepClassifier import LazyDeepClassifier
 from .lazypredict.lazydeepRegressor import LazyDeepRegressor
 from .lazypredict.lazydeepMTS import LazyDeepMTS
@@ -45,7 +44,6 @@ __all__ = [
     "GLMRegressor",
     "LazyClassifier",
     "LazyRegressor",
-    "LazyMTS",
     "LazyDeepClassifier",
     "LazyDeepRegressor",
     "LazyDeepMTS",

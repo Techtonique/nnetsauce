@@ -30,7 +30,7 @@ testing_index = np.arange(max_idx_train, n)
 df_train = data.iloc[training_index,:]
 df_test = data.iloc[testing_index,:]
 
-regr_mts4 = ns.LazyMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+regr_mts4 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
                        lags = 4, n_hidden_features=7, n_clusters=2,
                        type_pi = "kde",
                        replications=100, kernel="gaussian",
@@ -42,7 +42,7 @@ print(models[['WINKLERSCORE', 'COVERAGE']])
 
 print(f"\n ----- Example 2 ----- \n")
 
-regr_mts5 = ns.LazyMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
                       lags = 20, n_hidden_features=7, n_clusters=2,
                       type_pi="scp2-kde", 
                       kernel="gaussian",
@@ -55,7 +55,7 @@ print(models[['WINKLERSCORE', 'COVERAGE']])
 
 print(f"\n ----- Example 3 ----- \n")
 
-regr_mts5 = ns.LazyMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
                       lags = 20, n_hidden_features=7, n_clusters=2,
                       type_pi="scp2-block-bootstrap", 
                       kernel="tophat",
@@ -68,7 +68,7 @@ print(models[['WINKLERSCORE', 'COVERAGE']])
 
 print(f"\n ----- Example 4 ----- \n")
 
-regr_mts6 = ns.LazyMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+regr_mts6 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
                       lags = 20, n_hidden_features=7, n_clusters=2,
                       type_pi="scp2-block-bootstrap", 
                       replications=100, show_progress=True, 
@@ -91,7 +91,7 @@ df_train = df.iloc[training_index,:]
 df_test = df.iloc[testing_index,:]
 print(f"horizon={df_test.shape[0]}")
 
-regr_mts4 = ns.LazyMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+regr_mts4 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
                        lags = 20, n_hidden_features=7, n_clusters=2,
                        type_pi = "scp2-block-bootstrap",
                        replications = 100, 
@@ -104,7 +104,7 @@ print(models[['WINKLERSCORE', 'COVERAGE']])
 
 print(f"\n ----- Example 6 ----- \n")
 
-regr_mts5 = ns.LazyMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
                         lags = 20, n_hidden_features=7, n_clusters=2,
                         type_pi = "scp-bootstrap",
                         replications=100, 
@@ -117,7 +117,7 @@ print(models[['WINKLERSCORE', 'COVERAGE']])
 
 print(f"\n ----- Example 7 ----- \n")
 
-regr_mts5 = ns.LazyMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
                     lags = 20, n_hidden_features=7, n_clusters=2,
                     #type_pi = "gaussian",
                     show_progress=False, preprocess=False,
@@ -128,7 +128,7 @@ print(models)
 
 print(f"\n ----- Example 8 ----- \n")
 
-regr_mts5 = ns.LazyMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
                         lags = 20, n_hidden_features=7, n_clusters=2,
                         type_pi = "gaussian",
                         estimators = ["Ridge", "Lasso", "LarsCV", "LassoCV", "LassoLarsCV"],
@@ -141,7 +141,7 @@ print(models)
 
 print(f"\n ----- Example 9 ----- \n")
 
-regr_mts5 = ns.LazyMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
                     lags = 20, n_hidden_features=7, n_clusters=2,
                     #type_pi = "gaussian",
                     show_progress=False, preprocess=False,

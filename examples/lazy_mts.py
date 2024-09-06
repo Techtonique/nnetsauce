@@ -30,7 +30,7 @@ testing_index = np.arange(max_idx_train, n)
 df_train = data.iloc[training_index,:]
 df_test = data.iloc[testing_index,:]
 
-regr_mts4 = ns.LazyMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+regr_mts4 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
                        lags = 4, n_hidden_features=7, n_clusters=2,
                        type_pi = "kde",
                        replications=100, kernel="gaussian",
@@ -40,7 +40,7 @@ model_dictionary = regr_mts4.provide_models(df_train, df_test)
 print(models[['WINKLERSCORE', 'COVERAGE']])
 
 
-regr_mts5 = ns.LazyMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
                       lags = 20, n_hidden_features=7, n_clusters=2,
                       type_pi="scp2-kde", 
                       kernel="gaussian",
@@ -50,7 +50,7 @@ models, predictions = regr_mts5.fit(df_train, df_test)
 model_dictionary = regr_mts5.provide_models(df_train, df_test)
 print(models[['WINKLERSCORE', 'COVERAGE']])
 
-regr_mts5 = ns.LazyMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
                       lags = 20, n_hidden_features=7, n_clusters=2,
                       type_pi="scp2-block-bootstrap", 
                       kernel="tophat",
@@ -84,7 +84,7 @@ df_train = df.iloc[training_index,:]
 df_test = df.iloc[testing_index,:]
 print(f"horizon={df_test.shape[0]}")
 
-regr_mts4 = ns.LazyMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+regr_mts4 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
                        lags = 20, n_hidden_features=7, n_clusters=2,
                        type_pi = "scp2-block-bootstrap",
                        replications = 100, kernel="gaussian",
@@ -104,7 +104,7 @@ models, predictions = regr_mts5.fit(df_train, df_test)
 model_dictionary = regr_mts5.provide_models(df_train, df_test)
 print(models[['WINKLERSCORE', 'COVERAGE']])
 
-regr_mts5 = ns.LazyMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
                     lags = 20, n_hidden_features=7, n_clusters=2,
                     type_pi = "gaussian",
                     show_progress=False, preprocess=False)
