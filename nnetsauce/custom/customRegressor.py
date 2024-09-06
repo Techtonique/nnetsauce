@@ -89,6 +89,12 @@ class CustomRegressor(Custom, RegressorMixin):
 
         row_sample: float
             percentage of rows chosen for training, by stratified bootstrapping
+        
+        level: float
+            confidence level for prediction intervals
+        
+        pi_method: str
+            method for prediction intervals: 'splitconformal' or 'localconformal'
 
         seed: int
             reproducibility seed for nodes_sim=='uniform'
@@ -127,6 +133,8 @@ class CustomRegressor(Custom, RegressorMixin):
         type_split=None,
         col_sample=1,
         row_sample=1,
+        level=None,
+        pi_method=None,
         seed=123,
         backend="cpu",
     ):
@@ -154,6 +162,8 @@ class CustomRegressor(Custom, RegressorMixin):
         self.replications = replications
         self.kernel = kernel
         self.type_split = type_split
+        self.level = level
+        self.pi_method = pi_method
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit custom model to training data (X, y).
@@ -190,6 +200,11 @@ class CustomRegressor(Custom, RegressorMixin):
             )
 
             return self
+
+        if self.level is not None:
+            self.obj = PredictionInterval(obj=self.obj, 
+                                          method=self.pi_method, 
+                                        level=self.level)  
 
         self.obj.fit(scaled_Z, centered_y, **kwargs)
 
