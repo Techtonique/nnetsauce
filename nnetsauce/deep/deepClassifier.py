@@ -15,6 +15,7 @@ from sklearn.base import ClassifierMixin, RegressorMixin
 from sklearn.utils import all_estimators
 from sklearn.model_selection import cross_val_score
 from ..custom import CustomClassifier
+from ..predictionset import PredictionSet
 from ..utils import matrixops as mo
 
 
@@ -73,6 +74,8 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         type_scaling=("std", "std", "std"),
         col_sample=1,
         row_sample=1,
+        level=None,
+        pi_method="icp",
         seed=123,
         backend="cpu",
     ):
@@ -91,6 +94,8 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
             type_scaling=type_scaling,
             col_sample=col_sample,
             row_sample=row_sample,
+            level=level,
+            pi_method=pi_method,
             seed=seed,
             backend=backend,
         )
@@ -170,6 +175,11 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                     backend=self.backend,
                 )
             )
+        
+        if self.level is not None:
+            self.stacked_obj = PredictionSet(obj=self.stacked_obj, 
+                                             method=self.pi_method, 
+                                             level=self.level)
 
         self.stacked_obj.fit(X, y)
 

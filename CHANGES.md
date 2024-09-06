@@ -1,6 +1,7 @@
 # version 0.24.0
 
 - Update `LazyDeepMTS`: **No more `LazyMTS`** class, instead, you canuse `LazyDeepMTS` with `n_layers=1` 
+- `partial_fit` for `CustomClassifier` and `CustomRegressor`
 
 # version 0.23.1
 

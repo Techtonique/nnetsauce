@@ -2,9 +2,11 @@
 #
 # License: BSD 3
 
+import copy
 import numpy as np
 import sklearn.metrics as skm2
 from .bst import Boosting
+from ..predictionset import PredictionSet
 from ..custom import CustomClassifier
 from ..utils import matrixops as mo
 from ..utils import misc as mx
@@ -85,7 +87,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             percentage of rows chosen for training, by stratified bootstrapping
 
         seed: int
-            reproducibility seed for nodes_sim=='uniform'
+            reproducibility seed for nodes_sim=='uniform'                
 
         verbose: int
             0 for no output, 1 for a progress bar (default is 1)
@@ -391,7 +393,6 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
             model predictions: {array-like}
         """
-
         return self.predict_proba(X, **kwargs).argmax(axis=1)
 
     def predict_proba(self, X, **kwargs):

@@ -92,7 +92,7 @@ class PredictionSet(BaseEstimator, ClassifierMixin):
 
         return self
 
-    def predict(self, X):
+    def predict(self, X, **kwargs):
         """Obtain predictions and prediction sets
 
         Args:
@@ -104,10 +104,16 @@ class PredictionSet(BaseEstimator, ClassifierMixin):
         """
 
         if self.method == "icp":
-            return self.icp_.predict(X, significance=self.alpha_)
+            return self.icp_.predict(X, significance=self.alpha_, 
+                                     **kwargs)
 
         elif self.method == "tcp":
-            return self.tcp_.predict(X, significance=self.alpha_)
+            return self.tcp_.predict(X, significance=self.alpha_, 
+                                     **kwargs)
 
         else:
             raise ValueError("`self.method` must be in ('icp', 'tcp')")
+
+    def predict_proba(self, X):        
+        predictions = self.predict(X)
+        return np.eye(len(np.unique(predictions)))[predictions]

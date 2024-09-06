@@ -5,6 +5,7 @@
 import numpy as np
 import sklearn.metrics as skm2
 from .custom import Custom
+from ..predictionset import PredictionSet
 from ..utils import matrixops as mo
 from sklearn.base import ClassifierMixin
 
@@ -65,6 +66,12 @@ class CustomClassifier(Custom, ClassifierMixin):
 
         row_sample: float
             percentage of rows chosen for training, by stratified bootstrapping
+        
+        level: float
+            confidence level for prediction sets. Default is None.
+
+        pi_method: str
+            method for constructing the prediction sets: 'icp', 'tcp' if level is not None. Default is 'icp'.
 
         seed: int
             reproducibility seed for nodes_sim=='uniform'
@@ -142,6 +149,8 @@ class CustomClassifier(Custom, ClassifierMixin):
         type_scaling=("std", "std", "std"),
         col_sample=1,
         row_sample=1,
+        level=None,
+        pi_method="icp",
         seed=123,
         backend="cpu",
     ):
@@ -163,8 +172,13 @@ class CustomClassifier(Custom, ClassifierMixin):
             seed=seed,
             backend=backend,
         )
-
+        self.level = level
+        self.pi_method = pi_method
         self.type_fit = "classification"
+        if self.level is not None:
+            self.obj = PredictionSet(self.obj, 
+                                     level=self.level, 
+                                     method=self.pi_method)
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit custom model to training data (X, y).
