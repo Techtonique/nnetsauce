@@ -38,7 +38,7 @@ print(f"----- df_train.dtypes: {df_train.dtypes} -----")
 
 print(f"\n ----- Exemple 1 - 1 ----- \n")
 
-regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=False, custom_metric=None,
+regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
                       lags = 4, n_hidden_features=7, n_clusters=2,
                       n_layers=3,
                       show_progress=False, preprocess=False, 
@@ -51,7 +51,7 @@ print(model_dictionary["DeepMTS(ElasticNetCV)"])
 
 print(f"\n ----- Exemple 1 - 2 ----- \n")
 
-regr_mts = ns.LazyDeepMTS(verbose=0, ignore_warnings=False , custom_metric=None,
+regr_mts = ns.LazyDeepMTS(verbose=0, ignore_warnings=True , custom_metric=None,
                       lags = 4, n_hidden_features=7, n_clusters=2,
                       n_layers=3,
                       show_progress=False, preprocess=False,
@@ -63,7 +63,7 @@ print(model_dictionary["DeepMTS(LinearSVR)"])
 
 print(f"\n ----- Exemple 1 - 3 ----- \n")
 
-regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=False, custom_metric=None,
+regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
                       lags = 4, n_hidden_features=7, n_clusters=2,
                       n_layers=3,
                       replications=10, kernel="gaussian",
@@ -76,7 +76,7 @@ print(models[['WINKLERSCORE', 'COVERAGE']])
 
 print(f"\n ----- Exemple 1 - 4 ----- \n")
 
-regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=False, custom_metric=None,
+regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
                       lags = 15, n_hidden_features=7, n_clusters=2,
                       n_layers=3,
                       replications=100, kernel="gaussian",

@@ -296,21 +296,20 @@ class LazyDeepMTS(MTS):
             )
 
         if self.estimators == "all":
-            if self.n_layers == 1: 
+            if self.n_layers <= 1: 
                 self.regressors = REGRESSORSMTS
             else: 
                 self.regressors = DEEPREGRESSORSMTS
         else:
-            if self.n_layers == 1: 
+            if self.n_layers <= 1: 
                 self.regressors = [
                     ("MTS(" + est[0] + ")", est[1])
                 for est in all_estimators()
                 if (
                     issubclass(est[1], RegressorMixin)
                     and (est[0] in self.estimators)
-                )
-            ]
-            else: 
+                )]
+            else: # self.n_layers > 1
                 self.regressors = [
                     ("DeepMTS(" + est[0] + ")", est[1])
                 for est in all_estimators()
