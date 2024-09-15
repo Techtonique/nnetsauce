@@ -15,7 +15,7 @@ from sklearn.metrics import (
     mean_pinball_loss,
     mean_absolute_percentage_error,
 )
-from .config import DEEPREGRESSORSMTS, REGRESSORSMTS, CLASSICALMTS
+from .config import DEEPREGRESSORSMTS, REGRESSORSMTS
 from ..deep import DeepMTS
 from ..mts import MTS
 from ..utils import (

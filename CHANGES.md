@@ -2,7 +2,7 @@
 
 - Update `LazyDeepMTS`: **No more `LazyMTS`** class, instead, you can use `LazyDeepMTS` with `n_layers=1` 
 - Specify forecasting horizon in `LazyDeepMTS` (see updated docs and examples/lazy_mts_horizon.py)
-- New class `FactorMTS` for classsical models (for now VAR and VECM adapted from statsmodels) in multivariate time series forecasting
+- New class `ClassicalMTS` for classsical models (for now VAR and VECM adapted from statsmodels) in multivariate time series forecasting (not available in `LazyDeepMTS` yet)
 - [`partial_fit`](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html#sklearn.linear_model.SGDClassifier.partial_fit) for `CustomClassifier` and `CustomRegressor`
 
 # version 0.23.1
