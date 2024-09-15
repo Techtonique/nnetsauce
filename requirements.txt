@@ -7,5 +7,6 @@ pyvinecopulib
 requests
 scipy
 scikit-learn
+statsmodels
 threadpoolctl
 tqdm

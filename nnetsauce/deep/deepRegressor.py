@@ -92,7 +92,7 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
         )
 
         assert n_layers >= 1, "must have n_layers >= 1"
-        
+
         self.stacked_obj = obj
         self.verbose = verbose
         self.n_layers = n_layers
@@ -164,17 +164,17 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
                 )
             )
         if self.level is not None:
-            self.stacked_obj = PredictionInterval(obj=self.stacked_obj, 
-                                          method=self.pi_method, 
-                                          level=self.level)
+            self.stacked_obj = PredictionInterval(
+                obj=self.stacked_obj, method=self.pi_method, level=self.level
+            )
         self.stacked_obj.fit(X, y)
 
-        self.obj = deepcopy(self.stacked_obj)        
+        self.obj = deepcopy(self.stacked_obj)
 
         return self.obj
 
     def predict(self, X, **kwargs):
-        if self.level is not None:            
+        if self.level is not None:
             return self.obj.predict(X, return_pi=True)
         return self.obj.predict(X, **kwargs)
 

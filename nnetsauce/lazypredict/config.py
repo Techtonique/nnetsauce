@@ -2,6 +2,7 @@ from functools import partial
 from sklearn.base import ClassifierMixin, RegressorMixin
 from sklearn.utils import all_estimators
 from ..multitask import MultitaskClassifier, SimpleMultitaskClassifier
+from ..mts import ClassicalMTS
 
 
 removed_classifiers = [
@@ -146,4 +147,10 @@ DEEPREGRESSORSMTS = [
         issubclass(est[1], RegressorMixin)
         and (est[0] not in removed_regressors)
     )
+]
+
+CLASSICALMTS = [
+    ("ClassicalMTS(" + est[0] + ")", est[1])
+    for est in [("VAR", partial(ClassicalMTS, model="VAR")), 
+                ("VECM", partial(ClassicalMTS, model="VECM"))]
 ]

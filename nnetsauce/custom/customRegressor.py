@@ -89,10 +89,10 @@ class CustomRegressor(Custom, RegressorMixin):
 
         row_sample: float
             percentage of rows chosen for training, by stratified bootstrapping
-        
+
         level: float
             confidence level for prediction intervals
-        
+
         pi_method: str
             method for prediction intervals: 'splitconformal' or 'localconformal'
 
@@ -202,9 +202,9 @@ class CustomRegressor(Custom, RegressorMixin):
             return self
 
         if self.level is not None:
-            self.obj = PredictionInterval(obj=self.obj, 
-                                          method=self.pi_method, 
-                                        level=self.level)  
+            self.obj = PredictionInterval(
+                obj=self.obj, method=self.pi_method, level=self.level
+            )
 
         self.obj.fit(scaled_Z, centered_y, **kwargs)
 

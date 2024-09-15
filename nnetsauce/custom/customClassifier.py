@@ -66,7 +66,7 @@ class CustomClassifier(Custom, ClassifierMixin):
 
         row_sample: float
             percentage of rows chosen for training, by stratified bootstrapping
-        
+
         level: float
             confidence level for prediction sets. Default is None.
 
@@ -176,9 +176,9 @@ class CustomClassifier(Custom, ClassifierMixin):
         self.pi_method = pi_method
         self.type_fit = "classification"
         if self.level is not None:
-            self.obj = PredictionSet(self.obj, 
-                                     level=self.level, 
-                                     method=self.pi_method)
+            self.obj = PredictionSet(
+                self.obj, level=self.level, method=self.pi_method
+            )
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit custom model to training data (X, y).

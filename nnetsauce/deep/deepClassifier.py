@@ -175,11 +175,11 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                     backend=self.backend,
                 )
             )
-        
+
         if self.level is not None:
-            self.stacked_obj = PredictionSet(obj=self.stacked_obj, 
-                                             method=self.pi_method, 
-                                             level=self.level)
+            self.stacked_obj = PredictionSet(
+                obj=self.stacked_obj, method=self.pi_method, level=self.level
+            )
 
         self.stacked_obj.fit(X, y)
 

@@ -87,7 +87,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
             percentage of rows chosen for training, by stratified bootstrapping
 
         seed: int
-            reproducibility seed for nodes_sim=='uniform'                
+            reproducibility seed for nodes_sim=='uniform'
 
         verbose: int
             0 for no output, 1 for a progress bar (default is 1)

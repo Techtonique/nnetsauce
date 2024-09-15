@@ -15,6 +15,7 @@ from .lazypredict.lazydeepClassifier import LazyDeepClassifier
 from .lazypredict.lazydeepRegressor import LazyDeepRegressor
 from .lazypredict.lazydeepMTS import LazyDeepMTS
 from .mts.mts import MTS
+from .mts.classical import ClassicalMTS
 from .multitask.multitaskClassifier import MultitaskClassifier
 from .multitask.simplemultitaskClassifier import SimpleMultitaskClassifier
 from .optimizers.optimizer import Optimizer
@@ -34,6 +35,7 @@ __all__ = [
     "BaseRegressor",
     "BayesianRVFLRegressor",
     "BayesianRVFL2Regressor",
+    "ClassicalMTS",
     "CustomClassifier",
     "CustomRegressor",
     "DeepClassifier",
