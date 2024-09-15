@@ -213,7 +213,7 @@ class DeepMTS(MTS):
         show_progress=True,
     ):
         assert int(lags) == lags, "parameter 'lags' should be an integer"
-        assert n_layers >= 2, "must have n_layers >= 2"
+        assert n_layers >= 1, "must have n_layers >= 1"
         self.n_layers = int(n_layers)
 
         self.obj = DeepRegressor(

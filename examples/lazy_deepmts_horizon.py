@@ -36,55 +36,57 @@ df2_test = df2.iloc[idx_train:idx_end,]
 print(f"----- df_train: {df_train} -----")
 print(f"----- df_train.dtypes: {df_train.dtypes} -----")
 
+print(f"\n ----- Exemple 1 - 1 ----- \n")
+
 regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
-                           n_layers=3,
-                      lags = 20, n_hidden_features=7, n_clusters=2,
+                      lags = 4, n_hidden_features=7, n_clusters=2,
+                      n_layers=3,
                       show_progress=False, preprocess=False, 
-                      estimators=["ElasticNetCV", "RidgeCV"])
+                      estimators=["ElasticNetCV", "RidgeCV"],
+                      h=5, )
 models, predictions = regr_mts3.fit(df_train, df_test)
 model_dictionary = regr_mts3.provide_models(df_train, df_test)
 print(models)
 print(model_dictionary["DeepMTS(ElasticNetCV)"])
 
-regr_mts = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
-                          n_layers=3,
-                      lags = 20, n_hidden_features=7, n_clusters=2,
-                      show_progress=False, preprocess=False)
+print(f"\n ----- Exemple 1 - 2 ----- \n")
+
+regr_mts = ns.LazyDeepMTS(verbose=0, ignore_warnings=True , custom_metric=None,
+                      lags = 4, n_hidden_features=7, n_clusters=2,
+                      n_layers=3,
+                      show_progress=False, preprocess=False,
+                      h=5, )
 models, predictions = regr_mts.fit(df_train, df_test)
 model_dictionary = regr_mts.provide_models(df_train, df_test)
 print(models)
 print(model_dictionary["DeepMTS(LinearSVR)"])
 
-regr_mts2 = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
-                           n_layers=3,
-                      lags = 20, n_hidden_features=7, n_clusters=2,
-                      show_progress=False, preprocess=True)
-models, predictions = regr_mts2.fit(df_train, df_test)
-model_dictionary = regr_mts.provide_models(df_train, df_test)
-print(models)
-print(model_dictionary["DeepMTS(LinearSVR)"])
+print(f"\n ----- Exemple 1 - 3 ----- \n")
 
-regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=False, custom_metric=None,
-                           n_layers=3,
-                      lags = 20, n_hidden_features=7, n_clusters=2,
+regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
+                      lags = 4, n_hidden_features=7, n_clusters=2,
+                      n_layers=3,
                       replications=10, kernel="gaussian",
-                      show_progress=False, preprocess=False)
+                      show_progress=False, preprocess=False,
+                      h=5, )
 models, predictions = regr_mts3.fit(df_train, df_test)
 model_dictionary = regr_mts3.provide_models(df_train, df_test)
 print(models)
-print(models["WINKLERSCORE"])
+print(models[['WINKLERSCORE', 'COVERAGE']])
 
+print(f"\n ----- Exemple 1 - 4 ----- \n")
 
-regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=False, custom_metric=None,
-                           n_layers=3,
+regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
                       lags = 15, n_hidden_features=7, n_clusters=2,
+                      n_layers=3,
                       replications=100, kernel="gaussian",
                       type_pi="scp2-kde",
-                      show_progress=False, preprocess=False)
+                      show_progress=False, preprocess=False,
+                      h=5, )
 models, predictions = regr_mts3.fit(df2_train, df2_test)
 model_dictionary = regr_mts3.provide_models(df2_train, df2_test)
 print(models)
-print(models["WINKLERSCORE"])
+print(models[['WINKLERSCORE', 'COVERAGE']])
 
 
 

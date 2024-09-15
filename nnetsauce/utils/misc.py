@@ -1,4 +1,22 @@
 import numpy as np
+import pandas as pd
+
+
+def dict_to_dataframe_series(data, series_names):
+    df = pd.DataFrame(
+        np.zeros((len(data["Model"]), 2)), columns=["Model", "Time Taken"]
+    )
+    for key, value in data.items():
+        if all(hasattr(elt, "__len__") for elt in value) and key not in (
+            "Model",
+            "Time Taken",
+        ):
+            for i, elt1 in enumerate(value):
+                for j, elt2 in enumerate(elt1):
+                    df.loc[i, f"{key}_{series_names[j]}"] = elt2
+        else:
+            df[key] = value
+    return df
 
 
 # flatten list of lists

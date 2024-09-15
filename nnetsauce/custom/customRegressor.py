@@ -90,6 +90,12 @@ class CustomRegressor(Custom, RegressorMixin):
         row_sample: float
             percentage of rows chosen for training, by stratified bootstrapping
 
+        level: float
+            confidence level for prediction intervals
+
+        pi_method: str
+            method for prediction intervals: 'splitconformal' or 'localconformal'
+
         seed: int
             reproducibility seed for nodes_sim=='uniform'
 
@@ -127,6 +133,8 @@ class CustomRegressor(Custom, RegressorMixin):
         type_split=None,
         col_sample=1,
         row_sample=1,
+        level=None,
+        pi_method=None,
         seed=123,
         backend="cpu",
     ):
@@ -154,6 +162,8 @@ class CustomRegressor(Custom, RegressorMixin):
         self.replications = replications
         self.kernel = kernel
         self.type_split = type_split
+        self.level = level
+        self.pi_method = pi_method
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit custom model to training data (X, y).
@@ -191,7 +201,62 @@ class CustomRegressor(Custom, RegressorMixin):
 
             return self
 
+        if self.level is not None:
+            self.obj = PredictionInterval(
+                obj=self.obj, method=self.pi_method, level=self.level
+            )
+
         self.obj.fit(scaled_Z, centered_y, **kwargs)
+
+        self.X_ = X
+
+        self.y_ = y
+
+        return self
+
+    def partial_fit(self, X, y, sample_weight=None, **kwargs):
+        """Partial fit custom model to training data (X, y).
+
+        Parameters:
+
+            X: {array-like}, shape = [n_samples, n_features]
+                Subset of training vectors, where n_samples is the number
+                of samples and n_features is the number of features.
+
+            y: array-like, shape = [n_samples]
+                Subset of target values.
+
+            **kwargs: additional parameters to be passed to
+                self.cook_training_set or self.obj.fit
+
+        Returns:
+
+            self: object
+
+        """
+
+        centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
+
+        # if sample_weights, else: (must use self.row_index)
+        if sample_weight is not None:
+            try:
+                self.obj.partial_fit(
+                    scaled_Z,
+                    centered_y,
+                    sample_weight=np.ravel(sample_weight, order="C")[
+                        self.index_row
+                    ],
+                    **kwargs
+                )
+            except:
+                raise NotImplementedError
+
+            return self
+
+        try:
+            self.obj.partial_fit(scaled_Z, centered_y, **kwargs)
+        except:
+            raise NotImplementedError
 
         self.X_ = X
 

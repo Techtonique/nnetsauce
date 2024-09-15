@@ -16,14 +16,21 @@ from .nc import (
     RegressorNc,
     RegressorNormalizer,
 )
-from .cp import IcpRegressor
-from .base import RegressorAdapter
+from .cp import IcpRegressor, TcpClassifier
+from .icp import IcpClassifier
+from .nc import ClassifierNc, MarginErrFunc
+from .base import RegressorAdapter, ClassifierAdapter
 
 __all__ = [
     "AbsErrorErrFunc",
+    "MarginErrFunc",
     "QuantileRegErrFunc",
     "RegressorAdapter",
+    "ClassifierAdapter",
     "RegressorNc",
+    "ClassifierNc",
     "RegressorNormalizer",
     "IcpRegressor",
+    "IcpClassifier",
+    "TcpClassifier",
 ]

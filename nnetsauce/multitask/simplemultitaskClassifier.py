@@ -105,8 +105,8 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
 
         assert mx.is_factor(y), "y must contain only integers"
 
-        self.classes_ = np.unique(y) # for compatibility with sklearn
-        self.n_classes_ = len(self.classes_)  # for compatibility with sklearn        
+        self.classes_ = np.unique(y)  # for compatibility with sklearn
+        self.n_classes_ = len(self.classes_)  # for compatibility with sklearn
 
         self.scaled_X_ = self.X_scaler_.fit_transform(X)
 

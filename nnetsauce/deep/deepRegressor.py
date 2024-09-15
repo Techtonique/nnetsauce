@@ -5,6 +5,7 @@ from copy import deepcopy
 from tqdm import tqdm
 from sklearn.base import RegressorMixin
 from ..custom import CustomRegressor
+from ..predictioninterval import PredictionInterval
 from ..utils import matrixops as mo
 
 
@@ -14,8 +15,16 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
 
     Parameters:
 
+        obj: an object
+            A base learner, see also https://www.researchgate.net/publication/380701207_Deep_Quasi-Randomized_neural_Networks_for_classification
+
         verbose : int, optional (default=0)
             Monitor progress when fitting.
+
+        n_layers: int (default=3)
+            Number of layers. `n_layers = 1` is a simple `CustomRegressor`
+
+        All the other parameters are nnetsauce `CustomRegressor`'s
 
     Examples:
 
@@ -39,9 +48,9 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
     def __init__(
         self,
         obj,
-        verbose=0,
         # Defining depth
         n_layers=3,
+        verbose=0,
         # CustomRegressor attributes
         n_hidden_features=5,
         activation_name="relu",
@@ -56,6 +65,8 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
         type_scaling=("std", "std", "std"),
         col_sample=1,
         row_sample=1,
+        level=None,
+        pi_method="splitconformal",
         seed=123,
         backend="cpu",
     ):
@@ -74,15 +85,19 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
             type_scaling=type_scaling,
             col_sample=col_sample,
             row_sample=row_sample,
+            level=level,
+            pi_method=pi_method,
             seed=seed,
             backend=backend,
         )
 
-        assert n_layers >= 2, "must have n_layers >= 2"
+        assert n_layers >= 1, "must have n_layers >= 1"
 
         self.stacked_obj = obj
         self.verbose = verbose
         self.n_layers = n_layers
+        self.level = level
+        self.pi_method = pi_method
 
     def fit(self, X, y):
         """Fit Regression algorithms to X and y.
@@ -122,8 +137,6 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
             backend=self.backend,
         )
 
-        # self.stacked_obj.fit(X, y)
-
         if self.verbose > 0:
             iterator = tqdm(range(self.n_layers - 1))
         else:
@@ -150,9 +163,10 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
                     backend=self.backend,
                 )
             )
-
-            # self.stacked_obj.fit(X, y)
-
+        if self.level is not None:
+            self.stacked_obj = PredictionInterval(
+                obj=self.stacked_obj, method=self.pi_method, level=self.level
+            )
         self.stacked_obj.fit(X, y)
 
         self.obj = deepcopy(self.stacked_obj)
@@ -160,6 +174,8 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
         return self.obj
 
     def predict(self, X, **kwargs):
+        if self.level is not None:
+            return self.obj.predict(X, return_pi=True)
         return self.obj.predict(X, **kwargs)
 
     def score(self, X, y, scoring=None):

@@ -2,9 +2,11 @@
 #
 # License: BSD 3
 
+import copy
 import numpy as np
 import sklearn.metrics as skm2
 from .bst import Boosting
+from ..predictionset import PredictionSet
 from ..custom import CustomClassifier
 from ..utils import matrixops as mo
 from ..utils import misc as mx
@@ -248,8 +250,8 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         # training
         n, p = X.shape
         self.n_classes = len(np.unique(y))
-        self.classes_ = np.unique(y) # for compatibility with sklearn
-        self.n_classes_ = len(self.classes_)  # for compatibility with sklearn        
+        self.classes_ = np.unique(y)  # for compatibility with sklearn
+        self.n_classes_ = len(self.classes_)  # for compatibility with sklearn
 
         if sample_weight is None:
             w_m = np.repeat(1.0 / n, n)
@@ -391,7 +393,6 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
             model predictions: {array-like}
         """
-
         return self.predict_proba(X, **kwargs).argmax(axis=1)
 
     def predict_proba(self, X, **kwargs):

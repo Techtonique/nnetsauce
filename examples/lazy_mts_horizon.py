@@ -30,47 +30,58 @@ testing_index = np.arange(max_idx_train, n)
 df_train = data.iloc[training_index,:]
 df_test = data.iloc[testing_index,:]
 
-regr_mts4 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+regr_mts4 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
                        lags = 4, n_hidden_features=7, n_clusters=2,
                        type_pi = "kde",
                        replications=100, kernel="gaussian",
-                       show_progress=True, preprocess=False)
+                       show_progress=True, preprocess=False,
+                       h=5, )
 models, predictions = regr_mts4.fit(df_train, df_test)
 model_dictionary = regr_mts4.provide_models(df_train, df_test)
+print(models)
 print(models[['WINKLERSCORE', 'COVERAGE']])
 
+print(f"\n ----- Example 2 ----- \n")
 
-regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
                       lags = 20, n_hidden_features=7, n_clusters=2,
                       type_pi="scp2-kde", 
                       kernel="gaussian",
                       replications=100, 
-                      show_progress=True, preprocess=False)
+                      show_progress=True, preprocess=False,
+                      h=5, )
 models, predictions = regr_mts5.fit(df_train, df_test)
 model_dictionary = regr_mts5.provide_models(df_train, df_test)
+print(models)
 print(models[['WINKLERSCORE', 'COVERAGE']])
 
-regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+print(f"\n ----- Example 3 ----- \n")
+
+regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
                       lags = 20, n_hidden_features=7, n_clusters=2,
                       type_pi="scp2-block-bootstrap", 
                       kernel="tophat",
                       replications=100, 
-                      show_progress=True, preprocess=False)
+                      show_progress=True, preprocess=False,
+                      h=5, )
 models, predictions = regr_mts5.fit(df_train, df_test)
 model_dictionary = regr_mts5.provide_models(df_train, df_test)
+print(models)
 print(models[['WINKLERSCORE', 'COVERAGE']])
 
-regr_mts6 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+print(f"\n ----- Example 4 ----- \n")
+
+regr_mts6 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
                       lags = 20, n_hidden_features=7, n_clusters=2,
                       type_pi="scp2-block-bootstrap", 
-                      kernel="tophat",
-                      replications=100, 
-                      show_progress=True, preprocess=False)
+                      replications=100, show_progress=True, 
+                      preprocess=False, h=5 )
 models, predictions = regr_mts6.fit(df_train, df_test)
 model_dictionary = regr_mts6.provide_models(df_train, df_test)
+print(models)
 print(models[['WINKLERSCORE', 'COVERAGE']])
 
-print(f"\n ----- Example 2 ----- \n")
+print(f"\n ----- Example 5 ----- \n")
 
 url = "https://raw.githubusercontent.com/Techtonique/datasets/main/time_series/multivariate/uschange.csv"
 df = pd.read_csv(url)
@@ -84,31 +95,62 @@ df_train = df.iloc[training_index,:]
 df_test = df.iloc[testing_index,:]
 print(f"horizon={df_test.shape[0]}")
 
-regr_mts4 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+regr_mts4 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
                        lags = 20, n_hidden_features=7, n_clusters=2,
                        type_pi = "scp2-block-bootstrap",
-                       replications = 100, kernel="gaussian",
+                       replications = 100, 
                        estimators = ["Ridge", "Lasso", "LarsCV", "LassoCV", "LassoLarsCV"],
-                       show_progress=True, preprocess=False)
+                       show_progress=True, preprocess=False,
+                         h=5, )
 models, predictions = regr_mts4.fit(df_train, df_test)
 model_dictionary = regr_mts4.provide_models(df_train, df_test)
+print(models)
 print(models[['WINKLERSCORE', 'COVERAGE']])
 
-regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+print(f"\n ----- Example 6 ----- \n")
+
+regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
                         lags = 20, n_hidden_features=7, n_clusters=2,
                         type_pi = "scp-bootstrap",
-                        replications=100, kernel="gaussian",
+                        replications=100, 
                         estimators = ["Ridge", "Lasso", "LarsCV", "LassoCV", "LassoLarsCV"],
-                        show_progress=False, preprocess=False)
+                        show_progress=False, preprocess=False,
+                         h=5, )
 models, predictions = regr_mts5.fit(df_train, df_test)
 model_dictionary = regr_mts5.provide_models(df_train, df_test)
 print(models[['WINKLERSCORE', 'COVERAGE']])
 
-regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
+print(f"\n ----- Example 7 ----- \n")
+
+regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
                     lags = 20, n_hidden_features=7, n_clusters=2,
-                    type_pi = "gaussian",
-                    show_progress=False, preprocess=False)
+                    #type_pi = "gaussian",
+                    show_progress=False, preprocess=False,
+                    h=5, )
 models, predictions = regr_mts5.fit(df_train, df_test)
 model_dictionary = regr_mts5.provide_models(df_train, df_test)
-print(models[['WINKLERSCORE', 'COVERAGE']])
+print(models)
 
+print(f"\n ----- Example 8 ----- \n")
+
+regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
+                        lags = 20, n_hidden_features=7, n_clusters=2,
+                        type_pi = "gaussian",
+                        estimators = ["Ridge", "Lasso", "LarsCV", "LassoCV", "LassoLarsCV"],
+                        show_progress=False, preprocess=False,
+                         h=5, )
+models, predictions = regr_mts5.fit(df_train, df_test, per_series=True)
+model_dictionary = regr_mts5.provide_models(df_train, df_test)
+print(models)
+
+
+print(f"\n ----- Example 9 ----- \n")
+
+regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
+                    lags = 20, n_hidden_features=7, n_clusters=2,
+                    #type_pi = "gaussian",
+                    show_progress=False, preprocess=False,
+                    h=5, )
+models, predictions = regr_mts5.fit(df_train, df_test, per_series=True)
+model_dictionary = regr_mts5.provide_models(df_train, df_test)
+print(models)

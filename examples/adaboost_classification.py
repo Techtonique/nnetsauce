@@ -46,6 +46,28 @@ print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
 print(metrics.classification_report(preds, y_test))
 
 
+# SAMME.R (conformal)
+clf = LogisticRegression(solver='liblinear', multi_class = 'ovr', 
+                         random_state=123)
+fit_obj = ns.AdaBoostClassifier(clf, 
+                                n_hidden_features=int(11.22338867), 
+                                direct_link=True,
+                                n_estimators=250, learning_rate=0.01126343,
+                                col_sample=0.72684326, row_sample=0.86429443,
+                                dropout=0.63078613, n_clusters=2,
+                                type_clust="gmm",
+                                verbose=1, seed = 123, 
+                                method="SAMME.R", level=95, 
+                                pi_method="tcp")  
+start = time() 
+fit_obj.fit(X_train, y_train) 
+print(f"Elapsed {time() - start}") 
+
+preds = fit_obj.predict(X_test)                        
+
+# accuracy
+print(f"Accuracy: {np.mean(preds.argmax(axis=1) == y_test)}")
+
 # dataset no. 2 ----------
 
 print(" \n wine dataset ----- \n")

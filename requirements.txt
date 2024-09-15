@@ -1,3 +1,4 @@
+GPopt
 joblib
 matplotlib
 numpy
@@ -6,5 +7,6 @@ pyvinecopulib
 requests
 scipy
 scikit-learn
+statsmodels
 threadpoolctl
 tqdm
