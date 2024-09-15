@@ -235,7 +235,7 @@ class ClassicalMTS(Base):
 
     def __init__(
         self,
-        model = "VAR",
+        model="VAR",
         n_hidden_features=5,
         activation_name="relu",
         a=0.01,
@@ -337,11 +337,9 @@ class ClassicalMTS(Base):
 
         if (
             isinstance(X, pd.DataFrame) is False
-        ):  # input data set is a numpy array            
+        ):  # input data set is a numpy array
             X = pd.DataFrame(X)
-            self.series_names = [
-                "series" + str(i) for i in range(X.shape[1])
-            ]
+            self.series_names = ["series" + str(i) for i in range(X.shape[1])]
 
         else:  # input data set is a DataFrame with column names
 
@@ -361,8 +359,8 @@ class ClassicalMTS(Base):
         else:
             self.df_ = pd.DataFrame(X, columns=self.series_names)
             self.input_dates = ts.compute_input_dates(self.df_)
-        
-        self.obj = self.obj(X, **kwargs).fit(**kwargs)    
+
+        self.obj = self.obj(X, **kwargs).fit(**kwargs)
 
         return self
 
@@ -404,31 +402,35 @@ class ClassicalMTS(Base):
         self.alpha_ = 100 - level
 
         # Named tuple for forecast results
-        DescribeResult = namedtuple("DescribeResult", ("mean", "lower", "upper"))
+        DescribeResult = namedtuple(
+            "DescribeResult", ("mean", "lower", "upper")
+        )
 
-        if self.model == 'VAR':            
-            mean_forecast, lower_bound, upper_bound = self.obj.forecast_interval(self.obj.endog, steps=h, 
-                                                                                 alpha=self.alpha_/100, 
-                                                                                 **kwargs)
-                                              
-        elif self.model == 'VECM':
+        if self.model == "VAR":
+            mean_forecast, lower_bound, upper_bound = (
+                self.obj.forecast_interval(
+                    self.obj.endog, steps=h, alpha=self.alpha_ / 100, **kwargs
+                )
+            )
+
+        elif self.model == "VECM":
             forecast_result = self.obj.predict(steps=h)
             mean_forecast = forecast_result
-            lower_bound, upper_bound = self._compute_confidence_intervals(forecast_result, 
-                                                                          alpha=self.alpha_/100,
-                                                                          **kwargs)
-            
+            lower_bound, upper_bound = self._compute_confidence_intervals(
+                forecast_result, alpha=self.alpha_ / 100, **kwargs
+            )
+
         self.mean_ = pd.DataFrame(mean_forecast, columns=self.series_names)
         self.mean_.index = self.output_dates_
         self.lower_ = pd.DataFrame(lower_bound, columns=self.series_names)
         self.lower_.index = self.output_dates_
         self.upper_ = pd.DataFrame(upper_bound, columns=self.series_names)
         self.upper_.index = self.output_dates_
-        
-        return DescribeResult(mean=self.mean_, 
-                              lower=self.lower_, 
-                              upper=self.upper_)
-    
+
+        return DescribeResult(
+            mean=self.mean_, lower=self.lower_, upper=self.upper_
+        )
+
     def _compute_confidence_intervals(self, forecast_result, alpha):
         """
         Compute confidence intervals for VECM forecasts.
@@ -441,7 +443,7 @@ class ClassicalMTS(Base):
         z_value = norm.ppf(1 - alpha / 2)  # Z-score for the given alpha level
         lower_bound = forecast_result - z_value * std_errors
         upper_bound = forecast_result + z_value * std_errors
-        
+
         return lower_bound, upper_bound
 
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):

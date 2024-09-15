@@ -151,6 +151,8 @@ DEEPREGRESSORSMTS = [
 
 CLASSICALMTS = [
     ("ClassicalMTS(" + est[0] + ")", est[1])
-    for est in [("VAR", partial(ClassicalMTS, model="VAR")), 
-                ("VECM", partial(ClassicalMTS, model="VECM"))]
+    for est in [
+        ("VAR", partial(ClassicalMTS, model="VAR")),
+        ("VECM", partial(ClassicalMTS, model="VECM")),
+    ]
 ]
