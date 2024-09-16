@@ -6,7 +6,10 @@ try:
     import nnetsauce as ns
 except:
     pass
-import GPopt as gp
+try: 
+    import GPopt as gp
+except:
+    pass
 from collections import namedtuple
 from copy import deepcopy
 from tqdm import tqdm
