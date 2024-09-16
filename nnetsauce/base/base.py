@@ -23,9 +23,11 @@ from ..simulation import (
 from ..sampling import SubSampler
 
 
-if platform.system() in ("Linux", "Darwin"):
+try:
     import jax.nn as jnn
     import jax.numpy as jnp
+except ImportError:
+    pass
 
 
 class Base(BaseEstimator):
