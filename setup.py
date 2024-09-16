@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
-__version__ = '0.24.0'
+__version__ = '0.24.1'
 
 # get the dependencies and installs
 here = path.abspath(path.dirname(__file__))
@@ -21,10 +21,12 @@ dependency_links = [
     if x.startswith("git+")
 ]
 
-if platform.system() in ('Linux', 'Darwin'):
-    install_jax_requires = ['jax', 'jaxlib']  
-else:
-    install_jax_requires = []
+#if platform.system() in ('Linux', 'Darwin'):
+#    install_jax_requires = ['jax', 'jaxlib']  
+#else:
+#    install_jax_requires = []
+
+install_jax_requires = []
 
 install_requires = [item for sublist in [install_all_requires, install_jax_requires] for item in sublist]
 

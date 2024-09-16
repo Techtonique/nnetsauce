@@ -13,9 +13,10 @@ from sklearn.preprocessing import (
 from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
 
-if platform.system() in ("Linux", "Darwin"):
+try:
     import jax.numpy as jnp
-
+except ImportError:
+    pass
 
 # column bind
 def cbind(x, y, backend="cpu"):

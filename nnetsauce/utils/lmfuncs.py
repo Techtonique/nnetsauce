@@ -2,9 +2,11 @@ import numpy as np
 import platform
 from numpy import linalg as la
 
-if platform.system() in ("Linux", "Darwin"):
+try:
     import jax.numpy as jnp
     from jax.numpy import linalg as jla
+except ImportError:
+    pass
 
 # import .matrixops as mo
 from . import matrixops as mo
