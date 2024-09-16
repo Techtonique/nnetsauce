@@ -39,242 +39,24 @@ class ClassicalMTS(Base):
         model: type of model: str.
             currently, 'VAR' or 'VECM'.
 
-        n_hidden_features: int.
-            number of nodes in the hidden layer.
-
-        activation_name: str.
-            activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'.
-
-        a: float.
-            hyperparameter for 'prelu' or 'elu' activation function.
-
-        nodes_sim: str.
-            type of simulation for the nodes: 'sobol', 'hammersley', 'halton',
-            'uniform'.
-
-        bias: boolean.
-            indicates if the hidden layer contains a bias term (True) or not
-            (False).
-
-        dropout: float.
-            regularization parameter; (random) percentage of nodes dropped out
-            of the training.
-
-        direct_link: boolean.
-            indicates if the original predictors are included (True) in model's fitting or not (False).
-
-        n_clusters: int.
-            number of clusters for 'kmeans' or 'gmm' clustering (could be 0: no clustering).
-
-        cluster_encode: bool.
-            defines how the variable containing clusters is treated (default is one-hot)
-            if `False`, then labels are used, without one-hot encoding.
-
-        type_clust: str.
-            type of clustering method: currently k-means ('kmeans') or Gaussian
-            Mixture Model ('gmm').
-
-        type_scaling: a tuple of 3 strings.
-            scaling methods for inputs, hidden layer, and clustering respectively
-            (and when relevant).
-            Currently available: standardization ('std') or MinMax scaling ('minmax').
-
-        lags: int.
-            number of lags used for each time series.
-
-        type_pi: str.
-            type of prediction interval; currently:
-            - "gaussian": simple, fast, but: assumes stationarity of Gaussian in-sample residuals and independence in the multivariate case
-            - "kde": based on Kernel Density Estimation of in-sample residuals
-            - "bootstrap": based on independent bootstrap of in-sample residuals
-            - "block-bootstrap": based on basic block bootstrap of in-sample residuals
-            - "scp-kde": Sequential split conformal prediction with Kernel Density Estimation of calibrated residuals
-            - "scp-bootstrap": Sequential split conformal prediction with independent bootstrap of calibrated residuals
-            - "scp-block-bootstrap": Sequential split conformal prediction with basic block bootstrap of calibrated residuals
-            - "scp2-kde": Sequential split conformal prediction with Kernel Density Estimation of standardized calibrated residuals
-            - "scp2-bootstrap": Sequential split conformal prediction with independent bootstrap of standardized calibrated residuals
-            - "scp2-block-bootstrap": Sequential split conformal prediction with basic block bootstrap of standardized calibrated residuals
-            - based on copulas of in-sample residuals: 'vine-tll', 'vine-bb1', 'vine-bb6', 'vine-bb7', 'vine-bb8', 'vine-clayton',
-            'vine-frank', 'vine-gaussian', 'vine-gumbel', 'vine-indep', 'vine-joe', 'vine-student'
-            - 'scp-vine-tll', 'scp-vine-bb1', 'scp-vine-bb6', 'scp-vine-bb7', 'scp-vine-bb8', 'scp-vine-clayton',
-            'scp-vine-frank', 'scp-vine-gaussian', 'scp-vine-gumbel', 'scp-vine-indep', 'scp-vine-joe', 'scp-vine-student'
-            - 'scp2-vine-tll', 'scp2-vine-bb1', 'scp2-vine-bb6', 'scp2-vine-bb7', 'scp2-vine-bb8', 'scp2-vine-clayton',
-            'scp2-vine-frank', 'scp2-vine-gaussian', 'scp2-vine-gumbel', 'scp2-vine-indep', 'scp2-vine-joe', 'scp2-vine-student'
-
-        block_size: int.
-            size of block for 'type_pi' in ("block-bootstrap", "scp-block-bootstrap", "scp2-block-bootstrap").
-            Default is round(3.15*(n_residuals^1/3))
-
-        replications: int.
-            number of replications (if needed, for predictive simulation). Default is 'None'.
-
-        kernel: str.
-            the kernel to use for residuals density estimation (used for predictive simulation). Currently, either 'gaussian' or 'tophat'.
-
-        agg: str.
-            either "mean" or "median" for simulation of bootstrap aggregating
-
-        seed: int.
-            reproducibility seed for nodes_sim=='uniform' or predictive simulation.
-
-        backend: str.
-            "cpu" or "gpu" or "tpu".
-
-        verbose: int.
-            0: not printing; 1: printing
-
-        show_progress: bool.
-            True: progress bar when fitting each series; False: no progress bar when fitting each series
-
     Attributes:
-
-        fit_objs_: dict
-            objects adjusted to each individual time series
-
-        y_: {array-like}
-            FactorMTS responses (most recent observations first)
-
-        X_: {array-like}
-            FactorMTS lags
-
-        xreg_: {array-like}
-            external regressors
-
-        y_means_: dict
-            a dictionary of each series mean values
-
-        preds_: {array-like}
-            successive model predictions
-
-        preds_std_: {array-like}
-            standard deviation around the predictions for Bayesian base learners (`obj`)
-
-        gaussian_preds_std_: {array-like}
-            standard deviation around the predictions for `type_pi='gaussian'`
-
-        return_std_: boolean
-            return uncertainty or not (set in predict)
-
+       
         df_: data frame
             the input data frame, in case a data.frame is provided to `fit`
-
-        n_obs_: int
-            number of time series observations (number of rows for multivariate)
 
         level_: int
             level of confidence for prediction intervals (default is 95)
 
-        residuals_: {array-like}
-            in-sample residuals (for `type_pi` not conformal prediction) or calibrated residuals
-            (for `type_pi` in conformal prediction)
-
-        residuals_sims_: tuple of {array-like}
-            simulations of in-sample residuals (for `type_pi` not conformal prediction) or
-            calibrated residuals (for `type_pi` in conformal prediction)
-
-        kde_: A scikit-learn object, see https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KernelDensity.html
-
-        residuals_std_dev_: residuals standard deviation
-
     Examples:
-
-    Example 1:
-
-    ```python
-    import nnetsauce as ns
-    import numpy as np
-    from sklearn import linear_model
-    np.random.seed(123)
-
-    M = np.random.rand(10, 3)
-    M[:,0] = 10*M[:,0]
-    M[:,2] = 25*M[:,2]
-    print(M)
-
-    # Adjust Bayesian Ridge
-    regr4 = linear_model.BayesianRidge()
-    obj_MTS = ns.FactorMTS(regr4, lags = 1, n_hidden_features=5)
-    obj_MTS.fit(M)
-    print(obj_MTS.predict())
-
-    # with credible intervals
-    print(obj_MTS.predict(return_std=True, level=80))
-
-    print(obj_MTS.predict(return_std=True, level=95))
-    ```
-
-    Example 2:
-
-    ```python
-    import nnetsauce as ns
-    import numpy as np
-    from sklearn import linear_model
-
-    dataset = {
-    'date' : ['2001-01-01', '2002-01-01', '2003-01-01', '2004-01-01', '2005-01-01'],
-    'series1' : [34, 30, 35.6, 33.3, 38.1],
-    'series2' : [4, 5.5, 5.6, 6.3, 5.1],
-    'series3' : [100, 100.5, 100.6, 100.2, 100.1]}
-    df = pd.DataFrame(dataset).set_index('date')
-    print(df)
-
-    # Adjust Bayesian Ridge
-    regr5 = linear_model.BayesianRidge()
-    obj_MTS = ns.FactorMTS(regr5, lags = 1, n_hidden_features=5)
-    obj_MTS.fit(df)
-    print(obj_MTS.predict())
-
-    # with credible intervals
-    print(obj_MTS.predict(return_std=True, level=80))
-
-    print(obj_MTS.predict(return_std=True, level=95))
-    ```
+    See examples/classical_mts_timeseries.py
     """
 
     # construct the object -----
 
     def __init__(
         self,
-        model="VAR",
-        n_hidden_features=5,
-        activation_name="relu",
-        a=0.01,
-        nodes_sim="sobol",
-        bias=True,
-        dropout=0,
-        direct_link=True,
-        n_clusters=2,
-        cluster_encode=True,
-        type_clust="kmeans",
-        type_scaling=("std", "std", "std"),
-        lags=1,
-        type_pi="kde",
-        block_size=None,
-        replications=None,
-        kernel="gaussian",
-        agg="mean",
-        seed=123,
-        backend="cpu",
-        verbose=0,
-        show_progress=True,
+        model="VAR"
     ):
-        assert int(lags) == lags, "parameter 'lags' should be an integer"
-
-        super().__init__(
-            n_hidden_features=n_hidden_features,
-            activation_name=activation_name,
-            a=a,
-            nodes_sim=nodes_sim,
-            bias=bias,
-            dropout=dropout,
-            direct_link=direct_link,
-            n_clusters=n_clusters,
-            cluster_encode=cluster_encode,
-            type_clust=type_clust,
-            type_scaling=type_scaling,
-            seed=seed,
-            backend=backend,
-        )
 
         self.model = model
         if self.model == "VAR":
@@ -282,38 +64,14 @@ class ClassicalMTS(Base):
         elif self.model == "VECM":
             self.obj = VECM
         self.n_series = None
-        self.lags = lags
-        self.type_pi = type_pi
-        self.block_size = block_size
-        self.replications = replications
-        self.kernel = kernel
-        self.agg = agg
-        self.verbose = verbose
-        self.show_progress = show_progress
-        self.series_names = None
-        self.input_dates = None
-        self.fit_objs_ = {}
-        self.y_ = None  # FactorMTS responses (most recent observations first)
-        self.X_ = None  # FactorMTS lags
-        self.xreg_ = None
-        self.y_means_ = {}
         self.mean_ = None
         self.upper_ = None
         self.lower_ = None
         self.output_dates_ = None
-        self.preds_std_ = []
-        self.gaussian_preds_std_ = None
         self.alpha_ = None
-        self.return_std_ = None
         self.df_ = None
         self.residuals_ = []
-        self.abs_calib_residuals_ = None
-        self.calib_residuals_quantile_ = None
-        self.residuals_sims_ = None
-        self.kde_ = None
         self.sims_ = None
-        self.residuals_std_dev_ = None
-        self.n_obs_ = None
         self.level_ = None
 
     def fit(self, X, **kwargs):
