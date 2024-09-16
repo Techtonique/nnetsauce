@@ -1,4 +1,3 @@
-GPopt
 joblib
 matplotlib
 numpy
