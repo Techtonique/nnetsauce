@@ -176,6 +176,9 @@ class CustomRegressor(Custom, RegressorMixin):
 
             y: array-like, shape = [n_samples]
                 Target values.
+            
+            sample_weight: array-like, shape = [n_samples]
+                Sample weights.
 
             **kwargs: additional parameters to be passed to
                 self.cook_training_set or self.obj.fit
@@ -188,23 +191,23 @@ class CustomRegressor(Custom, RegressorMixin):
 
         centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
+        if self.level is not None:
+            self.obj = PredictionInterval(
+                obj=self.obj, method=self.pi_method, level=self.level
+            )
+
         # if sample_weights, else: (must use self.row_index)
         if sample_weight is not None:
             self.obj.fit(
                 scaled_Z,
                 centered_y,
-                sample_weight=np.ravel(sample_weight, order="C")[
-                    self.index_row
-                ],
+                sample_weight=sample_weight[
+                    self.index_row_
+                ].ravel(),
                 **kwargs
             )
 
             return self
-
-        if self.level is not None:
-            self.obj = PredictionInterval(
-                obj=self.obj, method=self.pi_method, level=self.level
-            )
 
         self.obj.fit(scaled_Z, centered_y, **kwargs)
 
@@ -225,6 +228,9 @@ class CustomRegressor(Custom, RegressorMixin):
 
             y: array-like, shape = [n_samples]
                 Subset of target values.
+            
+            sample_weight: array-like, shape = [n_samples]
+                Sample weights.
 
             **kwargs: additional parameters to be passed to
                 self.cook_training_set or self.obj.fit
@@ -243,9 +249,7 @@ class CustomRegressor(Custom, RegressorMixin):
                 self.obj.partial_fit(
                     scaled_Z,
                     centered_y,
-                    sample_weight=np.ravel(sample_weight, order="C")[
-                        self.index_row
-                    ],
+                    sample_weight=sample_weight[self.index_row_].ravel(),
                     **kwargs
                 )
             except:

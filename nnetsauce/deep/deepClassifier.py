@@ -109,7 +109,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         self.verbose = verbose
         self.n_layers = n_layers
 
-    def fit(self, X, y):
+    def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit Classification algorithms to X and y.
         Parameters
         ----------
@@ -119,6 +119,8 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         y : array-like,
             Training vectors, where rows is the number of samples
             and columns is the number of features.
+        sample_weight: array-like, shape = [n_samples]
+                Sample weights.
         Returns
         -------
         A fitted object
@@ -126,9 +128,6 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
 
         if isinstance(X, np.ndarray):
             X = pd.DataFrame(X)
-
-        self.classes_ = np.unique(y)  # for compatibility with sklearn
-        self.n_classes_ = len(self.classes_)  # for compatibility with sklearn
 
         # init layer
         self.stacked_obj = CustomClassifier(
@@ -149,8 +148,6 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
             seed=self.seed,
             backend=self.backend,
         )
-
-        self.stacked_obj.fit(X, y)
 
         if self.verbose > 0:
             iterator = tqdm(range(self.n_layers - 1))
@@ -184,12 +181,15 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                 obj=self.stacked_obj, method=self.pi_method, level=self.level
             )
 
-        self.stacked_obj.fit(X, y)
+        try: 
+            self.stacked_obj.fit(X, y, sample_weight=sample_weight, **kwargs)
+        except Exception as e:
+            self.stacked_obj.fit(X, y)
 
         self.obj = deepcopy(self.stacked_obj)
 
         return self.obj
-
+    
     def predict(self, X):
         return self.obj.predict(X)
 
@@ -520,8 +520,8 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                 ):
                     try:
                         if customize == True:
-                            print(f"\n surrogate: CustomRegressor({est[0]})")
-                            surr_obj = ns.CustomRegressor(obj=est[1]())
+                            print(f"\n surrogate: CustomClassifier({est[0]})")
+                            surr_obj = ns.CustomClassifier(obj=est[1]())
                         else:
                             print(f"\n surrogate: {est[0]}")
                             surr_obj = est[1]()
@@ -542,7 +542,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                         )
                         print(f"\n result: {res}")
                         if customize == True:
-                            results.append((f"CustomRegressor({est[0]})", res))
+                            results.append((f"CustomClassifier({est[0]})", res))
                         else:
                             results.append((est[0], res))
                     except:
@@ -557,8 +557,8 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                 ):
                     try:
                         if customize == True:
-                            print(f"\n surrogate: CustomRegressor({est[0]})")
-                            surr_obj = ns.CustomRegressor(obj=est[1]())
+                            print(f"\n surrogate: CustomClassifier({est[0]})")
+                            surr_obj = ns.CustomClassifier(obj=est[1]())
                         else:
                             print(f"\n surrogate: {est[0]}")
                             surr_obj = est[1]()
@@ -579,7 +579,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                         )
                         print(f"\n result: {res}")
                         if customize == True:
-                            results.append((f"CustomRegressor({est[0]})", res))
+                            results.append((f"CustomClassifier({est[0]})", res))
                         else:
                             results.append((est[0], res))
                     except:

@@ -99,7 +99,7 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
         self.level = level
         self.pi_method = pi_method
 
-    def fit(self, X, y):
+    def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit Regression algorithms to X and y.
         Parameters
         ----------
@@ -109,6 +109,8 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
         y : array-like,
             Training vectors, where rows is the number of samples
             and columns is the number of features.
+        sample_weight: array-like, shape = [n_samples]
+                Sample weights.
         Returns
         -------
         A fitted object
@@ -163,11 +165,16 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
                     backend=self.backend,
                 )
             )
+
         if self.level is not None:
             self.stacked_obj = PredictionInterval(
                 obj=self.stacked_obj, method=self.pi_method, level=self.level
             )
-        self.stacked_obj.fit(X, y)
+
+        try: 
+            self.stacked_obj.fit(X, y, sample_weight=sample_weight, **kwargs)
+        except Exception as e:    
+            self.stacked_obj.fit(X, y)
 
         self.obj = deepcopy(self.stacked_obj)
 
