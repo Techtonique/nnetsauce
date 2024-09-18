@@ -1,4 +1,4 @@
-# version 0.24.4
+# version 0.24.5
 
 - Update `LazyDeepMTS`: **No more `LazyMTS`** class, instead, you can use `LazyDeepMTS` with `n_layers=1` 
 - Specify forecasting horizon in `LazyDeepMTS` (see updated docs and examples/lazy_mts_horizon.py)

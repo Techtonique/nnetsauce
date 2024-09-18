@@ -176,7 +176,7 @@ class CustomRegressor(Custom, RegressorMixin):
 
             y: array-like, shape = [n_samples]
                 Target values.
-            
+
             sample_weight: array-like, shape = [n_samples]
                 Sample weights.
 
@@ -201,9 +201,7 @@ class CustomRegressor(Custom, RegressorMixin):
             self.obj.fit(
                 scaled_Z,
                 centered_y,
-                sample_weight=sample_weight[
-                    self.index_row_
-                ].ravel(),
+                sample_weight=sample_weight[self.index_row_].ravel(),
                 **kwargs
             )
 
@@ -228,7 +226,7 @@ class CustomRegressor(Custom, RegressorMixin):
 
             y: array-like, shape = [n_samples]
                 Subset of target values.
-            
+
             sample_weight: array-like, shape = [n_samples]
                 Sample weights.
 

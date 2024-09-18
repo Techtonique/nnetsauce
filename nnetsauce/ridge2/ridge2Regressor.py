@@ -13,8 +13,10 @@ from sklearn.base import RegressorMixin
 from scipy.special import logsumexp
 from scipy.linalg import pinv
 
-if platform.system() in ("Linux", "Darwin"):
+try:
     from jax.numpy.linalg import pinv as jpinv
+except ImportError:
+    pass
 
 
 class Ridge2Regressor(Ridge2, RegressorMixin):

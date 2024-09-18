@@ -191,7 +191,7 @@ class CustomClassifier(Custom, ClassifierMixin):
 
             y: array-like, shape = [n_samples]
                 Target values.
-            
+
             sample_weight: array-like, shape = [n_samples]
                 Sample weights.
 
@@ -204,7 +204,7 @@ class CustomClassifier(Custom, ClassifierMixin):
         """
 
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
-        self.n_classes_ = len(np.unique(y))  # for compatibility with sklearn        
+        self.n_classes_ = len(np.unique(y))  # for compatibility with sklearn
 
         if self.level is not None:
             self.obj = PredictionSet(
@@ -216,9 +216,7 @@ class CustomClassifier(Custom, ClassifierMixin):
             self.obj.fit(
                 scaled_Z,
                 output_y,
-                sample_weight=sample_weight[
-                    self.index_row_
-                ].ravel(),
+                sample_weight=sample_weight[self.index_row_].ravel(),
                 # **kwargs
             )
 
@@ -242,7 +240,7 @@ class CustomClassifier(Custom, ClassifierMixin):
 
             y: array-like, shape = [n_samples]
                 Subset of target values.
-            
+
             sample_weight: array-like, shape = [n_samples]
                 Sample weights.
 

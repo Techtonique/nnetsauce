@@ -6,7 +6,7 @@ try:
     import nnetsauce as ns
 except:
     pass
-try: 
+try:
     import GPopt as gp
 except:
     pass
@@ -181,7 +181,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                 obj=self.stacked_obj, method=self.pi_method, level=self.level
             )
 
-        try: 
+        try:
             self.stacked_obj.fit(X, y, sample_weight=sample_weight, **kwargs)
         except Exception as e:
             self.stacked_obj.fit(X, y)
@@ -189,7 +189,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         self.obj = deepcopy(self.stacked_obj)
 
         return self.obj
-    
+
     def predict(self, X):
         return self.obj.predict(X)
 

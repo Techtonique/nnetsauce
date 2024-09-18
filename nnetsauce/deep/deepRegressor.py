@@ -171,9 +171,9 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
                 obj=self.stacked_obj, method=self.pi_method, level=self.level
             )
 
-        try: 
+        try:
             self.stacked_obj.fit(X, y, sample_weight=sample_weight, **kwargs)
-        except Exception as e:    
+        except Exception as e:
             self.stacked_obj.fit(X, y)
 
         self.obj = deepcopy(self.stacked_obj)

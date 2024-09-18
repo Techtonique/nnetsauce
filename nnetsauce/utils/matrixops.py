@@ -2,7 +2,6 @@ import copy
 import numpy as np
 import pandas as pd
 import platform
-from jax import device_put
 from scipy import sparse
 from sklearn.preprocessing import (
     StandardScaler,
@@ -15,8 +14,10 @@ from sklearn.mixture import GaussianMixture
 
 try:
     import jax.numpy as jnp
+    from jax import device_put
 except ImportError:
     pass
+
 
 # column bind
 def cbind(x, y, backend="cpu"):

@@ -40,7 +40,7 @@ class ClassicalMTS(Base):
             currently, 'VAR' or 'VECM'.
 
     Attributes:
-       
+
         df_: data frame
             the input data frame, in case a data.frame is provided to `fit`
 
@@ -53,10 +53,7 @@ class ClassicalMTS(Base):
 
     # construct the object -----
 
-    def __init__(
-        self,
-        model="VAR"
-    ):
+    def __init__(self, model="VAR"):
 
         self.model = model
         if self.model == "VAR":

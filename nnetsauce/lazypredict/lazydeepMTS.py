@@ -179,7 +179,7 @@ class LazyDeepMTS(MTS):
         kernel=None,
         agg="mean",
         seed=123,
-        backend="cpu",        
+        backend="cpu",
         show_progress=False,
     ):
         self.verbose = verbose
@@ -311,26 +311,24 @@ class LazyDeepMTS(MTS):
                 ]
             )
 
-        # baselines (Classical MTS) ----        
+        # baselines (Classical MTS) ----
         for i, name in enumerate(["VAR", "VECM"]):
             start = time.time()
-            regr = ClassicalMTS(model=name)            
+            regr = ClassicalMTS(model=name)
             regr.fit(X_train, **kwargs)
             self.models[name] = regr
             if self.h is None:
-                X_pred = regr.predict(h=X_test.shape[0], **kwargs)                
+                X_pred = regr.predict(h=X_test.shape[0], **kwargs)
             else:
                 assert self.h > 0, "h must be > 0"
                 X_pred = regr.predict(h=self.h, **kwargs)
-                try: 
+                try:
                     X_test = X_test[0: self.h, :]
-                except Exception as e: 
+                except Exception as e:
                     X_test = X_test.iloc[0: self.h, :]
 
             if per_series == False:
-                rmse = mean_squared_error(
-                    X_test, X_pred.mean, squared=False
-                )
+                rmse = mean_squared_error(X_test, X_pred.mean, squared=False)
                 mae = mean_absolute_error(X_test, X_pred.mean)
                 mpl = mean_pinball_loss(X_test, X_pred.mean)
             else:
@@ -356,19 +354,15 @@ class LazyDeepMTS(MTS):
             names.append(name)
             RMSE.append(rmse)
             MAE.append(mae)
-            MPL.append(mpl)  
-            if (self.replications is not None) or (
-                        self.type_pi == "gaussian"
-                    ):
+            MPL.append(mpl)
+            if (self.replications is not None) or (self.type_pi == "gaussian"):
                 winklerscore = winkler_score(
                     obj=X_pred, actual=X_test, level=95
                 )
-                coveragecalc = coverage(
-                    X_pred, X_test, level=95
-                )                
+                coveragecalc = coverage(X_pred, X_test, level=95)
                 WINKLERSCORE.append(winklerscore)
                 COVERAGE.append(coveragecalc)
-            TIME.append(time.time() - start)              
+            TIME.append(time.time() - start)
 
         if self.estimators == "all":
             if self.n_layers <= 1:
