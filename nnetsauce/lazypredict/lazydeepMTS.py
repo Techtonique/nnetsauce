@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
 import time
+
 from sklearn.utils import all_estimators
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
@@ -15,9 +15,11 @@ from sklearn.metrics import (
     mean_pinball_loss,
     mean_absolute_percentage_error,
 )
+from tqdm import tqdm
+
 from .config import DEEPREGRESSORSMTS, REGRESSORSMTS
 from ..deep import DeepMTS
-from ..mts import MTS
+from ..mts import ClassicalMTS, MTS
 from ..utils import (
     convert_df_to_numeric,
     coverage,
@@ -151,6 +153,7 @@ class LazyDeepMTS(MTS):
         ignore_warnings=True,
         custom_metric=None,
         predictions=False,
+        sort_by=None,
         random_state=42,
         estimators="all",
         preprocess=False,
@@ -169,20 +172,21 @@ class LazyDeepMTS(MTS):
         cluster_encode=True,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
-        lags=1,
-        type_pi="kde",
+        lags=15,
+        type_pi="scp2-kde",
         block_size=None,
         replications=None,
         kernel=None,
         agg="mean",
         seed=123,
-        backend="cpu",
+        backend="cpu",        
         show_progress=False,
     ):
         self.verbose = verbose
         self.ignore_warnings = ignore_warnings
         self.custom_metric = custom_metric
         self.predictions = predictions
+        self.sort_by = sort_by
         self.models = {}
         self.random_state = random_state
         self.estimators = estimators
@@ -210,8 +214,15 @@ class LazyDeepMTS(MTS):
             replications=replications,
             kernel=kernel,
             agg=agg,
+            verbose=verbose,
             show_progress=show_progress,
         )
+        if self.replications is not None:
+            if self.sort_by is None:
+                self.sort_by = "WINKLERSCORE"
+        else:
+            if self.sort_by is None:
+                self.sort_by = "RMSE"
 
     def fit(self, X_train, X_test, xreg=None, per_series=False, **kwargs):
         """Fit Regression algorithms to X_train, predict and score on X_test.
@@ -299,6 +310,65 @@ class LazyDeepMTS(MTS):
                     ),
                 ]
             )
+
+        # baselines (Classical MTS) ----        
+        for i, name in enumerate(["VAR", "VECM"]):
+            start = time.time()
+            regr = ClassicalMTS(model=name)            
+            regr.fit(X_train, **kwargs)
+            self.models[name] = regr
+            if self.h is None:
+                X_pred = regr.predict(h=X_test.shape[0], **kwargs)                
+            else:
+                assert self.h > 0, "h must be > 0"
+                X_pred = regr.predict(h=self.h, **kwargs)
+                try: 
+                    X_test = X_test[0: self.h, :]
+                except Exception as e: 
+                    X_test = X_test.iloc[0: self.h, :]
+
+            if per_series == False:
+                rmse = mean_squared_error(
+                    X_test, X_pred.mean, squared=False
+                )
+                mae = mean_absolute_error(X_test, X_pred.mean)
+                mpl = mean_pinball_loss(X_test, X_pred.mean)
+            else:
+                rmse = mean_errors(
+                    actual=X_test,
+                    pred=X_pred.mean,
+                    scoring="root_mean_squared_error",
+                    per_series=True,
+                )
+                mae = mean_errors(
+                    actual=X_test,
+                    pred=X_pred.mean,
+                    scoring="mean_absolute_error",
+                    per_series=True,
+                )
+                mpl = mean_errors(
+                    actual=X_test,
+                    pred=X_pred.mean,
+                    scoring="mean_pinball_loss",
+                    per_series=True,
+                )
+
+            names.append(name)
+            RMSE.append(rmse)
+            MAE.append(mae)
+            MPL.append(mpl)  
+            if (self.replications is not None) or (
+                        self.type_pi == "gaussian"
+                    ):
+                winklerscore = winkler_score(
+                    obj=X_pred, actual=X_test, level=95
+                )
+                coveragecalc = coverage(
+                    X_pred, X_test, level=95
+                )                
+                WINKLERSCORE.append(winklerscore)
+                COVERAGE.append(coveragecalc)
+            TIME.append(time.time() - start)              
 
         if self.estimators == "all":
             if self.n_layers <= 1:
@@ -597,7 +667,7 @@ class LazyDeepMTS(MTS):
                             )
                         else:
                             assert (
-                                self.h > 0 and self.h < X_test.shape[0]
+                                self.h > 0 and self.h <= X_test.shape[0]
                             ), "h must be > 0 and < X_test.shape[0]"
                             X_pred = pipe["regressor"].predict(
                                 h=self.h, **kwargs
@@ -610,7 +680,7 @@ class LazyDeepMTS(MTS):
                             )  # X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg) ## DO xreg like in `ahead`
                         else:
                             assert (
-                                self.h > 0 and self.h < X_test.shape[0]
+                                self.h > 0 and self.h <= X_test.shape[0]
                             ), "h must be > 0 and < X_test.shape[0]"
                             X_pred = pipe.predict(h=self.h, **kwargs)
 

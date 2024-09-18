@@ -191,6 +191,9 @@ class CustomClassifier(Custom, ClassifierMixin):
 
             y: array-like, shape = [n_samples]
                 Target values.
+            
+            sample_weight: array-like, shape = [n_samples]
+                Sample weights.
 
             **kwargs: additional parameters to be passed to
                         self.cook_training_set or self.obj.fit
@@ -201,16 +204,21 @@ class CustomClassifier(Custom, ClassifierMixin):
         """
 
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
-        self.n_classes_ = len(np.unique(y))  # for compatibility with sklearn
+        self.n_classes_ = len(np.unique(y))  # for compatibility with sklearn        
+
+        if self.level is not None:
+            self.obj = PredictionSet(
+                obj=self.obj, method=self.pi_method, level=self.level
+            )
 
         # if sample_weights, else: (must use self.row_index)
         if sample_weight is not None:
             self.obj.fit(
                 scaled_Z,
                 output_y,
-                sample_weight=np.ravel(sample_weight, order="C")[
+                sample_weight=sample_weight[
                     self.index_row_
-                ],
+                ].ravel(),
                 # **kwargs
             )
 
@@ -234,6 +242,9 @@ class CustomClassifier(Custom, ClassifierMixin):
 
             y: array-like, shape = [n_samples]
                 Subset of target values.
+            
+            sample_weight: array-like, shape = [n_samples]
+                Sample weights.
 
             **kwargs: additional parameters to be passed to
                         self.cook_training_set or self.obj.fit
@@ -252,9 +263,7 @@ class CustomClassifier(Custom, ClassifierMixin):
                 self.obj.partial_fit(
                     scaled_Z,
                     output_y,
-                    sample_weight=np.ravel(sample_weight, order="C")[
-                        self.index_row_
-                    ],
+                    sample_weight=sample_weight[self.index_row_].ravel(),
                     # **kwargs
                 )
             except:

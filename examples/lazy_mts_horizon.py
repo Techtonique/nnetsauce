@@ -24,7 +24,7 @@ mdata.index = pd.DatetimeIndex(quarterly)
 data = np.log(mdata).diff().dropna()
 
 n = data.shape[0]
-max_idx_train = np.floor(n*0.9)
+max_idx_train = np.floor(n*0.4)
 training_index = np.arange(0, max_idx_train)
 testing_index = np.arange(max_idx_train, n)
 df_train = data.iloc[training_index,:]
@@ -147,7 +147,7 @@ print(models)
 print(f"\n ----- Example 9 ----- \n")
 
 regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
-                    lags = 20, n_hidden_features=7, n_clusters=2,
+                     n_hidden_features=7, n_clusters=2,
                     #type_pi = "gaussian",
                     show_progress=False, preprocess=False,
                     h=5, )

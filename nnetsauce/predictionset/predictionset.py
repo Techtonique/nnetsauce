@@ -66,7 +66,7 @@ class PredictionSet(BaseEstimator, ClassifierMixin):
         else:
             raise ValueError("`self.method` must be in ('icp', 'tcp')")
 
-    def fit(self, X, y):
+    def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit the `method` to training data (X, y).
 
         Args:
@@ -76,6 +76,9 @@ class PredictionSet(BaseEstimator, ClassifierMixin):
                 of samples and n_features is the number of features.
 
             y: array-like, shape = [n_samples, ]; Target values.
+
+            sample_weight: array-like, shape = [n_samples]
+                Sample weights.
 
         """
         if self.method == "icp":
