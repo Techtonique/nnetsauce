@@ -143,12 +143,6 @@ class ClassicalMTS(Base):
 
         self.level_ = level
 
-        self.return_std_ = False  # do not remove (/!\)
-
-        self.mean_ = None  # do not remove (/!\)
-
-        self.mean_ = deepcopy(self.y_)  # do not remove (/!\)
-
         self.lower_ = None  # do not remove (/!\)
 
         self.upper_ = None  # do not remove (/!\)
