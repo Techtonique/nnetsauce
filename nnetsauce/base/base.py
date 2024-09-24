@@ -568,7 +568,7 @@ class Base(BaseEstimator):
                     Z, choice=self.type_scaling[0]
                 )
 
-        # Returning model inputs -----
+        # Returning model inputs -----        
         if mx.is_factor(y) is False:  # regression
             # center y
             if y is None:
