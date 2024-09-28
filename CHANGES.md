@@ -1,3 +1,9 @@
+# version 0.25.0
+
+- `get_best_model` for `Lazy*` classes (see updated docs)
+- accept raw data frames as inputs for MTS and DeepMTS
+- add Exponential Smoothing, ARIMA and Theta models to `ClassicalMTS`
+
 # version 0.24.5
 
 - Update `LazyDeepMTS`: **No more `LazyMTS`** class, instead, you can use `LazyDeepMTS` with `n_layers=1` 

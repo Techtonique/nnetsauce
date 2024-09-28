@@ -9,11 +9,11 @@ from .deep.deepRegressor import DeepRegressor
 from .deep.deepMTS import DeepMTS
 from .glm.glmClassifier import GLMClassifier
 from .glm.glmRegressor import GLMRegressor
-from .lazypredict.lazyClassifier import LazyClassifier
-from .lazypredict.lazyRegressor import LazyRegressor
+from .lazypredict.lazydeepClassifier import LazyDeepClassifier, LazyClassifier
+from .lazypredict.lazydeepRegressor import LazyDeepRegressor, LazyRegressor
 from .lazypredict.lazydeepClassifier import LazyDeepClassifier
 from .lazypredict.lazydeepRegressor import LazyDeepRegressor
-from .lazypredict.lazydeepMTS import LazyDeepMTS
+from .lazypredict.lazydeepMTS import LazyDeepMTS, LazyMTS
 from .mts.mts import MTS
 from .mts.classical import ClassicalMTS
 from .multitask.multitaskClassifier import MultitaskClassifier
@@ -48,6 +48,7 @@ __all__ = [
     "LazyRegressor",
     "LazyDeepClassifier",
     "LazyDeepRegressor",
+    "LazyMTS",
     "LazyDeepMTS",
     "MTS",
     "MultitaskClassifier",

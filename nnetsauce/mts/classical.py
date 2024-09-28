@@ -20,6 +20,10 @@ from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
 from statsmodels.tsa.api import VAR
 from statsmodels.tsa.vector_ar.vecm import VECM
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
+from statsmodels.tsa.forecasting.theta import ThetaModel
+
 from tqdm import tqdm
 from ..base import Base
 from ..sampling import vinecopula_sample
@@ -37,7 +41,7 @@ class ClassicalMTS(Base):
     Parameters:
 
         model: type of model: str.
-            currently, 'VAR' or 'VECM'.
+            currently, 'VAR', 'VECM', 'ARIMA', 'ETS', 'Theta'
 
     Attributes:
 
@@ -60,6 +64,14 @@ class ClassicalMTS(Base):
             self.obj = VAR
         elif self.model == "VECM":
             self.obj = VECM
+        elif self.model == "ARIMA":
+            self.obj = ARIMA
+        elif self.model == "ETS":
+            self.obj = ExponentialSmoothing
+        elif self.model == "Theta":
+            self.obj = ThetaModel
+        else:
+            raise ValueError("model not recognized")
         self.n_series = None
         self.mean_ = None
         self.upper_ = None
@@ -88,13 +100,16 @@ class ClassicalMTS(Base):
         self: object
         """
 
-        self.n_series = X.shape[1]
+        self.n_series = X.shape[1]        
 
         if (
             isinstance(X, pd.DataFrame) is False
         ):  # input data set is a numpy array
             X = pd.DataFrame(X)
-            self.series_names = ["series" + str(i) for i in range(X.shape[1])]
+            if self.n_series > 1: 
+                self.series_names = ["series" + str(i) for i in range(X.shape[1])]
+            else: 
+                self.series_names = "series0"
 
         else:  # input data set is a DataFrame with column names
 
@@ -168,7 +183,16 @@ class ClassicalMTS(Base):
             lower_bound, upper_bound = self._compute_confidence_intervals(
                 forecast_result, alpha=self.alpha_ / 100, **kwargs
             )
+        
+        elif self.model in ("ARIMA", "ETS", "Theta"):
+            forecast_result = self.obj.get_forecast(steps=h)
+            mean_forecast = forecast_result.predicted_mean
+            lower_bound = forecast_result.conf_int()[:, 0]
+            upper_bound = forecast_result.conf_int()[:, 1]    
 
+        else:
+            raise ValueError("model not recognized")                    
+        
         self.mean_ = pd.DataFrame(mean_forecast, columns=self.series_names)
         self.mean_.index = self.output_dates_
         self.lower_ = pd.DataFrame(lower_bound, columns=self.series_names)
