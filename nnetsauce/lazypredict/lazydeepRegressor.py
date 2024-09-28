@@ -285,8 +285,57 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                 ]
             )
         
-        for name, model in zip(["RandomForestRegressor", "XGBRegressor"], [RandomForestRegressor, xgb.XGBRegressor]):
+        # base models
+        try: 
+            baseline_names = ["RandomForestRegressor", "XGBRegressor"]
+            baseline_models = [RandomForestRegressor(), xgb.XGBRegressor()]
+        except Exception as exception:
+            baseline_names = ["RandomForestRegressor"]
+            baseline_models = [RandomForestRegressor()]
+
+        for name, model in zip(baseline_names, baseline_models):        
             start = time.time()
+            try:
+                model.fit(X_train, y_train)
+                self.models_[name] = model
+                y_pred = model.predict(X_test)
+                r_squared = r2_score(y_test, y_pred)
+                adj_rsquared = adjusted_rsquared(
+                    r_squared, X_test.shape[0], X_test.shape[1]
+                )
+                rmse = mean_squared_error(y_test, y_pred, squared=False)
+
+                names.append(name)
+                R2.append(r_squared)
+                ADJR2.append(adj_rsquared)
+                RMSE.append(rmse)
+                TIME.append(time.time() - start)
+
+                if self.custom_metric:
+                    custom_metric = self.custom_metric(y_test, y_pred)
+                    CUSTOM_METRIC.append(custom_metric)
+
+                if self.verbose > 0:
+                    scores_verbose = {
+                        "Model": name,
+                        "R-Squared": r_squared,
+                        "Adjusted R-Squared": adj_rsquared,
+                        "RMSE": rmse,
+                        "Time taken": time.time() - start,
+                    }
+
+                    if self.custom_metric:
+                        scores_verbose[self.custom_metric.__name__] = (
+                            custom_metric
+                        )
+
+                    print(scores_verbose)
+                if self.predictions:
+                    predictions[name] = y_pred
+            except Exception as exception:
+                if self.ignore_warnings is False:
+                    print(name + " model failed to execute")
+                    print(exception)                
 
         if self.estimators == "all":
             self.regressors = DEEPREGRESSORS

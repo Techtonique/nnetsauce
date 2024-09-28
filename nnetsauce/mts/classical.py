@@ -127,10 +127,13 @@ class ClassicalMTS(Base):
             self.df_.columns = self.series_names
             self.input_dates = ts.compute_input_dates(self.df_)
         else:
-            self.df_ = pd.DataFrame(X, columns=self.series_names)
-            self.input_dates = ts.compute_input_dates(self.df_)
+            self.df_ = pd.DataFrame(X, columns=self.series_names)            
 
-        self.obj = self.obj(X, **kwargs).fit(**kwargs)
+        if self.model == "Theta":
+            self.obj = self.obj(self.df_, 
+                                **kwargs).fit()
+        else:        
+            self.obj = self.obj(X, **kwargs).fit(**kwargs)        
 
         return self
 
@@ -164,6 +167,8 @@ class ClassicalMTS(Base):
         self.level_ = level
 
         self.alpha_ = 100 - level
+        
+        pi_multiplier = norm.ppf(1 - self.alpha_ / 200)
 
         # Named tuple for forecast results
         DescribeResult = namedtuple(
@@ -184,17 +189,41 @@ class ClassicalMTS(Base):
                 forecast_result, alpha=self.alpha_ / 100, **kwargs
             )
         
-        elif self.model in ("ARIMA", "ETS", "Theta"):
+        elif self.model == "ARIMA":
             forecast_result = self.obj.get_forecast(steps=h)
             mean_forecast = forecast_result.predicted_mean
             lower_bound = forecast_result.conf_int()[:, 0]
             upper_bound = forecast_result.conf_int()[:, 1]    
-
-        else:
-            raise ValueError("model not recognized")                    
         
-        self.mean_ = pd.DataFrame(mean_forecast, columns=self.series_names)
-        self.mean_.index = self.output_dates_
+        elif self.model == "ETS":
+            forecast_result = self.obj.forecast(steps=h)
+            residuals = self.obj.resid
+            std_errors = np.std(residuals)
+            mean_forecast = forecast_result
+            lower_bound = forecast_result - pi_multiplier * std_errors
+            upper_bound = forecast_result + pi_multiplier * std_errors
+        
+        elif self.model == "Theta":
+            try:
+                mean_forecast = self.obj.forecast(steps=h).values 
+                forecast_result = self.obj.prediction_intervals(steps=h, alpha=self.alpha_/100, 
+                                                            **kwargs)            
+                lower_bound = forecast_result["lower"].values 
+                upper_bound = forecast_result["upper"].values 
+            except Exception: 
+                mean_forecast = self.obj.forecast(steps=h)
+                forecast_result = self.obj.prediction_intervals(steps=h, alpha=self.alpha_/100, 
+                                                            **kwargs)            
+                lower_bound = forecast_result["lower"]
+                upper_bound = forecast_result["upper"]
+            
+        else:
+
+            raise ValueError("model not recognized")                    
+
+        self.mean_ = pd.DataFrame(mean_forecast, 
+                                    columns=self.series_names, 
+                                    index=self.output_dates_)        
         self.lower_ = pd.DataFrame(lower_bound, columns=self.series_names)
         self.lower_.index = self.output_dates_
         self.upper_ = pd.DataFrame(upper_bound, columns=self.series_names)

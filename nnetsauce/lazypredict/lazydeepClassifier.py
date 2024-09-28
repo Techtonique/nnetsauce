@@ -290,7 +290,68 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
             )
         
         # baseline models
-        
+        try: 
+            baseline_names = ["RandomForestClassifier", "XGBClassifier"]
+            baseline_models = [RandomForestClassifier(), xgb.XGBClassifier()]
+        except Exception as exception:
+            baseline_names = ["RandomForestClassifier"]
+            baseline_models = [RandomForestClassifier()]
+
+        for name, model in zip(baseline_names, baseline_models):
+            start = time.time()
+            try:
+                model.fit(X_train, y_train)
+                self.models_[name] = model
+                y_pred = model.predict(X_test)
+                accuracy = accuracy_score(y_test, y_pred, normalize=True)
+                b_accuracy = balanced_accuracy_score(y_test, y_pred)
+                f1 = f1_score(y_test, y_pred, average="weighted")
+                try:
+                    roc_auc = roc_auc_score(y_test, y_pred)
+                except Exception as exception:
+                    roc_auc = None
+                    if self.ignore_warnings is False:
+                        print("ROC AUC couldn't be calculated for " + name)
+                        print(exception)
+                names.append(name)
+                Accuracy.append(accuracy)
+                B_Accuracy.append(b_accuracy)
+                ROC_AUC.append(roc_auc)
+                F1.append(f1)
+                TIME.append(time.time() - start)
+                if self.custom_metric is not None:
+                    custom_metric = self.custom_metric(y_test, y_pred)
+                    CUSTOM_METRIC.append(custom_metric)
+                if self.verbose > 0:
+                    if self.custom_metric is not None:
+                        print(
+                            {
+                                "Model": name,
+                                "Accuracy": accuracy,
+                                "Balanced Accuracy": b_accuracy,
+                                "ROC AUC": roc_auc,
+                                "F1 Score": f1,
+                                self.custom_metric.__name__: custom_metric,
+                                "Time taken": time.time() - start,
+                            }
+                        )
+                    else:
+                        print(
+                            {
+                                "Model": name,
+                                "Accuracy": accuracy,
+                                "Balanced Accuracy": b_accuracy,
+                                "ROC AUC": roc_auc,
+                                "F1 Score": f1,
+                                "Time taken": time.time() - start,
+                            }
+                        )
+                if self.predictions:
+                    predictions[name] = y_pred
+            except Exception as exception:
+                if self.ignore_warnings is False:
+                    print(name + " model failed to execute")
+                    print(exception)
 
         if self.estimators == "all":
             self.classifiers = [

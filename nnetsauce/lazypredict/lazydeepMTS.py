@@ -322,7 +322,7 @@ class LazyDeepMTS(MTS):
             )
 
         # baselines (Classical MTS) ----
-        for i, name in enumerate(["VAR", "VECM", "ARIMA", "ETS", "Theta"]):
+        for i, name in enumerate(["ARIMA", "ETS", "Theta", "VAR", "VECM"]):           
             try: 
                 start = time.time()
                 regr = ClassicalMTS(model=name)
@@ -603,8 +603,6 @@ class LazyDeepMTS(MTS):
                             scores_verbose[self.custom_metric.__name__] = (
                                 custom_metric
                             )
-
-                        print(scores_verbose)
                     if self.predictions:
                         predictions[name] = X_pred
                 except Exception as exception:
@@ -1007,9 +1005,7 @@ class LazyDeepMTS(MTS):
             scores = dict_to_dataframe_series(scores, self.series_names)
         else:
             scores = pd.DataFrame(scores)
-        
-        print(f'scores.head(): {scores.head()}')
-
+       
         try: # case per_series, can't be sorted
             scores = scores.sort_values(by=self.sort_by, ascending=True).set_index("Model")
             
