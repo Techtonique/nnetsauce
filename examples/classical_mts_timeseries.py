@@ -55,3 +55,26 @@ print("\n")
 obj1.plot("realgovt")
 obj1.plot("tbilrate")
 
+obj1 = ns.ClassicalMTS(model="ETS")
+obj1.fit(df_train['realgovt'])
+
+res1 = obj1.predict(h=20) 
+print(res1)
+print("\n")
+obj1.plot()
+
+obj1 = ns.ClassicalMTS(model="ARIMA")
+obj1.fit(df_train['realgovt'])
+
+res1 = obj1.predict(h=20) 
+print(res1)
+print("\n")
+obj1.plot()
+
+obj1 = ns.ClassicalMTS(model="Theta")
+obj1.fit(df_train['realgovt'])
+
+res1 = obj1.predict(h=20) 
+print(res1)
+print("\n")
+obj1.plot()

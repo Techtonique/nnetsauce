@@ -73,6 +73,7 @@ class ClassicalMTS(Base):
         else:
             raise ValueError("model not recognized")
         self.n_series = None
+        self.replications = None
         self.mean_ = None
         self.upper_ = None
         self.lower_ = None
@@ -100,28 +101,38 @@ class ClassicalMTS(Base):
         self: object
         """
 
-        self.n_series = X.shape[1]        
+        try:
+            self.n_series = X.shape[1]        
+        except Exception:
+            self.n_series = 1
 
         if (
             isinstance(X, pd.DataFrame) is False
-        ):  # input data set is a numpy array
+        ) and isinstance(X, pd.Series) is False :  # input data set is a numpy array
+            
             X = pd.DataFrame(X)
             if self.n_series > 1: 
                 self.series_names = ["series" + str(i) for i in range(X.shape[1])]
             else: 
                 self.series_names = "series0"
 
-        else:  # input data set is a DataFrame with column names
-
+        else:  # input data set is a DataFrame or Series with column names
+            
             X_index = None
-            if X.index is not None:
+            if X.index is not None and len(X.shape) > 1:
                 X_index = X.index
                 X = copy.deepcopy(mo.convert_df_to_numeric(X))
             if X_index is not None:
-                X.index = X_index
-            self.series_names = X.columns.tolist()
+                try:
+                    X.index = X_index
+                except Exception:
+                    pass
+            if isinstance(X, pd.DataFrame): 
+                self.series_names = X.columns.tolist()
+            else:
+                self.series_names = X.name
 
-        if isinstance(X, pd.DataFrame):
+        if isinstance(X, pd.DataFrame) or isinstance(X, pd.Series):
             self.df_ = X
             X = X.values
             self.df_.columns = self.series_names
@@ -221,13 +232,27 @@ class ClassicalMTS(Base):
 
             raise ValueError("model not recognized")                    
 
-        self.mean_ = pd.DataFrame(mean_forecast, 
+        try: 
+            self.mean_ = pd.DataFrame(mean_forecast, 
+                                        columns=self.series_names, 
+                                        index=self.output_dates_)        
+            self.lower_ = pd.DataFrame(lower_bound, 
                                     columns=self.series_names, 
+                                        index=self.output_dates_)
+            self.upper_ = pd.DataFrame(upper_bound, 
+                                    columns=self.series_names, 
+                                        index=self.output_dates_)
+        except Exception:
+            self.mean_ = pd.Series(mean_forecast, 
+                                    name=self.series_names, 
                                     index=self.output_dates_)        
-        self.lower_ = pd.DataFrame(lower_bound, columns=self.series_names)
-        self.lower_.index = self.output_dates_
-        self.upper_ = pd.DataFrame(upper_bound, columns=self.series_names)
-        self.upper_.index = self.output_dates_
+            self.lower_ = pd.Series(lower_bound, 
+                                    name=self.series_names, 
+                                    index=self.output_dates_)
+            self.upper_ = pd.Series(upper_bound, 
+                                    name=self.series_names, 
+                                    index=self.output_dates_)
+        
 
         return DescribeResult(
             mean=self.mean_, lower=self.lower_, upper=self.upper_
@@ -358,10 +383,16 @@ class ClassicalMTS(Base):
             ), f"check series index (< {self.n_series})"
             series_idx = series
 
-        y_all = list(self.df_.iloc[:, series_idx]) + list(
-            self.mean_.iloc[:, series_idx]
-        )
-        y_test = list(self.mean_.iloc[:, series_idx])
+        if isinstance(self.df_, pd.DataFrame): 
+            y_all = list(self.df_.iloc[:, series_idx]) + list(
+                self.mean_.iloc[:, series_idx]
+            )
+            y_test = list(self.mean_.iloc[:, series_idx])
+        else:
+            y_all = list(self.df_.values) + list(
+                self.mean_.values
+            )
+            y_test = list(self.mean_.values)
         n_points_all = len(y_all)
         n_points_train = self.df_.shape[0]
 
@@ -379,13 +410,22 @@ class ClassicalMTS(Base):
             fig, ax = plt.subplots()
             ax.plot(x_all, y_all, "-")
             ax.plot(x_test, y_test, "-", color="orange")
-            ax.fill_between(
-                x_test,
-                self.lower_.iloc[:, series_idx],
-                self.upper_.iloc[:, series_idx],
-                alpha=0.2,
-                color="orange",
-            )
+            try: 
+                ax.fill_between(
+                    x_test,
+                    self.lower_.iloc[:, series_idx],
+                    self.upper_.iloc[:, series_idx],
+                    alpha=0.2,
+                    color="orange",
+                )
+            except Exception:
+                ax.fill_between(
+                    x_test,
+                    self.lower_.values,
+                    self.upper_.values,
+                    alpha=0.2,
+                    color="orange",
+                )
             if self.replications is None:
                 if self.n_series > 1:
                     plt.title(

@@ -124,13 +124,14 @@ def convert_df_to_numeric(df):
     Returns:
         pd.DataFrame: DataFrame with all columns converted to numeric type.
     """
-    for column in df.columns:
-        # Attempt to convert the column to numeric type using astype
-        try:
-            df[column] = df[column].astype(float)
-        except ValueError:
-            print(f"Column '{column}' contains non-numeric values.")
-    return df
+    if isinstance(df, pd.DataFrame):
+        for column in df.columns:
+            # Attempt to convert the column to numeric type using astype
+            try:
+                df[column] = df[column].astype(float)
+            except ValueError:
+                print(f"Column '{column}' contains non-numeric values.")
+        return df
 
 
 # computes t(x)%*%y
