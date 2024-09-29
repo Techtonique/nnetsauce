@@ -588,7 +588,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         }
 
         if self.custom_metric:
-            scores[self.custom_metric.__name__] = CUSTOM_METRIC
+            scores["Custom metric"] = CUSTOM_METRIC
 
         scores = pd.DataFrame(scores)
         scores = scores.sort_values(by=self.sort_by, ascending=True).set_index(

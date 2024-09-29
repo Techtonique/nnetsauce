@@ -684,7 +684,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                     "Balanced Accuracy": B_Accuracy,
                     "ROC AUC": ROC_AUC,
                     "F1 Score": F1,
-                    self.custom_metric.__name__: CUSTOM_METRIC,
+                    "Custom metric": CUSTOM_METRIC,
                     "Time Taken": TIME,
                 }
             )
