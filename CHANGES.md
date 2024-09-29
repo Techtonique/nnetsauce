@@ -1,8 +1,9 @@
 # version 0.25.0
 
 - `get_best_model` for `Lazy*` classes (see updated docs)
-- accept raw data frames as inputs for MTS and DeepMTS
-- add Exponential Smoothing, ARIMA and Theta models to `ClassicalMTS`
+- bring `LazyMTS` back
+- add Exponential Smoothing, ARIMA and Theta models to `ClassicalMTS` and `Lazy*MTS`
+- add `RandomForest` and `XGBoost` to `Lazy*Classifier` and `Lazy*Regressor`
 
 # version 0.24.5
 

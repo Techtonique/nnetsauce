@@ -347,6 +347,10 @@ class MTS(Base):
 
         else:  # input data set is a DataFrame with column names
 
+            #if "date" in X.columns: 
+            #    X.index = X["date"]
+            #    X.drop(['date'], axis=1, inplace=True)
+
             X_index = None
             if X.index is not None:
                 X_index = X.index

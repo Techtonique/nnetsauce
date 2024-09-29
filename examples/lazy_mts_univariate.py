@@ -42,7 +42,7 @@ print(models[['WINKLERSCORE', 'COVERAGE']].head().values)
 print(regr_mts4.get_best_model())
 
 regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
-                       lags = 4, n_hidden_features=7, n_clusters=2,                       
+                       lags = 20, n_hidden_features=7, n_clusters=2,                       
                        show_progress=True, preprocess=False)
 models, predictions = regr_mts5.fit(df_train, df_test)
 model_dictionary = regr_mts5.provide_models(df_train, df_test)
@@ -75,14 +75,15 @@ regr_mts4 = ns.LazyMTS(verbose=1, ignore_warnings=False, custom_metric=None,
 models, predictions = regr_mts4.fit(df_train, df_test)
 model_dictionary = regr_mts4.provide_models(df_train, df_test)
 print(models)
-print(models[['WINKLERSCORE', 'COVERAGE']].head())
+print(models[['WINKLERSCORE', 'COVERAGE']].head().values)
 print(regr_mts4.get_best_model())
 
 regr_mts5 = ns.LazyMTS(verbose=1, ignore_warnings=False, custom_metric=None,
-                       lags = 10, n_hidden_features=7, n_clusters=2,                       
+                       lags = 20, n_hidden_features=7, n_clusters=2,                       
                        show_progress=True, preprocess=False)
 models, predictions = regr_mts5.fit(df_train, df_test)
 model_dictionary = regr_mts5.provide_models(df_train, df_test)
 print(models)
 print(regr_mts5.get_best_model())
 print(models[['RMSE', 'MAE']].head().values)
+
