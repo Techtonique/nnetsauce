@@ -51,6 +51,7 @@ __all__ = [
     "LazyDeepRegressor",
     "LazyMTS",
     "LazyDeepMTS",
+    "MedianVotingRegressor",
     "MTS",
     "MultitaskClassifier",
     "PredictionInterval",
@@ -61,6 +62,5 @@ __all__ = [
     "Ridge2Regressor",
     "Ridge2Classifier",
     "Ridge2MultitaskClassifier",
-    "SubSampler",
-    "VotingRegressor"
+    "SubSampler"
 ]
