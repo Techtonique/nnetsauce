@@ -4,6 +4,7 @@
 - bring `LazyMTS` back
 - add Exponential Smoothing, ARIMA and Theta models to `ClassicalMTS` and `Lazy*MTS`
 - add `RandomForest` and `XGBoost` to `Lazy*Classifier` and `Lazy*Regressor`
+- Add `MedianVotingRegressor`: using the median of predictions from a list of regressors
 
 # version 0.24.5
 
