@@ -1,3 +1,3 @@
-from .votingregressor import VotingRegressor
+from .votingregressor import MedianVotingRegressor
 
-__all__ = ["VotingRegressor"]
+__all__ = ["MedianVotingRegressor"]
