@@ -603,7 +603,7 @@ class LazyDeepMTS(MTS):
                             }
 
                         if self.custom_metric:
-                            scores_verbose[self.custom_metric.__name__] = (
+                            scores_verbose["Custom metric"] = (
                                 custom_metric
                             )
                     if self.predictions:
@@ -970,7 +970,7 @@ class LazyDeepMTS(MTS):
                             }
 
                         if self.custom_metric:
-                            scores_verbose[self.custom_metric.__name__] = (
+                            scores_verbose["Custom metric"] = (
                                 custom_metric
                             )
 
