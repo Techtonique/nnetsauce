@@ -1000,6 +1000,8 @@ class LazyDeepMTS(MTS):
 
         if self.custom_metric:
             scores["Custom metric"] = CUSTOM_METRIC
+        
+        print(f"\n\n Scores: {scores} \n\n")
 
         if per_series:
             scores = dict_to_dataframe_series(scores, self.series_names)
