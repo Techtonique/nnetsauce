@@ -578,7 +578,7 @@ class LazyDeepMTS(MTS):
                             custom_metric = self.custom_metric(X_test, X_pred)
                             CUSTOM_METRIC.append(custom_metric)
                         except Exception as e:
-                            CUSTOM_METRIC.append(np.iinfo(im.dtype).max)
+                            CUSTOM_METRIC.append(np.iinfo(np.float32).max)
 
                     if self.verbose > 0:
                         if (self.replications is not None) or (
@@ -945,7 +945,7 @@ class LazyDeepMTS(MTS):
                                 custom_metric = self.custom_metric(X_test_h, X_pred)
                             CUSTOM_METRIC.append(custom_metric)
                         except Exception as e:
-                            CUSTOM_METRIC.append(np.iinfo(im.dtype).max)
+                            CUSTOM_METRIC.append(np.iinfo(np.float32).max)
 
                     if self.verbose > 0:
                         if (self.replications is not None) or (
