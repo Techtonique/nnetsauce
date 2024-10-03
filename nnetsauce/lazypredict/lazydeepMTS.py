@@ -573,12 +573,12 @@ class LazyDeepMTS(MTS):
                         COVERAGE.append(coveragecalc)
                     TIME.append(time.time() - start)
 
-                    if self.custom_metric:
-                        custom_metric = self.custom_metric(X_test, X_pred)
+                    if self.custom_metric:                        
                         try: 
+                            custom_metric = self.custom_metric(X_test, X_pred)
                             CUSTOM_METRIC.append(custom_metric)
                         except Exception as e:
-                            CUSTOM_METRIC.append(np.nan)
+                            CUSTOM_METRIC.append(np.iinfo(im.dtype).max)
 
                     if self.verbose > 0:
                         if (self.replications is not None) or (
@@ -937,16 +937,15 @@ class LazyDeepMTS(MTS):
                         COVERAGE.append(coveragecalc)
                     TIME.append(time.time() - start)
 
-                    if self.custom_metric:
-                        if self.h is None:
-                            custom_metric = self.custom_metric(X_test, X_pred)
-                        else:
-                            custom_metric = self.custom_metric(X_test_h, X_pred)
-
+                    if self.custom_metric:                        
                         try: 
+                            if self.h is None:
+                                custom_metric = self.custom_metric(X_test, X_pred)
+                            else:
+                                custom_metric = self.custom_metric(X_test_h, X_pred)
                             CUSTOM_METRIC.append(custom_metric)
                         except Exception as e:
-                            CUSTOM_METRIC.append(np.nan)
+                            CUSTOM_METRIC.append(np.iinfo(im.dtype).max)
 
                     if self.verbose > 0:
                         if (self.replications is not None) or (
