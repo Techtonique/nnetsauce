@@ -1,5 +1,10 @@
 import numpy as np
 import pandas as pd
+try:
+    import xgboost as xgb
+except ImportError:
+    pass
+from sklearn.ensemble import RandomForestRegressor
 from copy import deepcopy
 from tqdm import tqdm
 import time
@@ -98,8 +103,8 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         predictions: bool, optional (default=False)
             When set to True, the predictions of all the models models are returned as dataframe.
 
-        sort_by: string, optional (default='Accuracy')
-            Sort models by a metric. Available options are 'Accuracy', 'Balanced Accuracy', 'ROC AUC', 'F1 Score'
+        sort_by: string, optional (default='RMSE')
+            Sort models by a metric. Available options are 'R-Squared', 'Adjusted R-Squared', 'RMSE', 'Time Taken' and 'Custom Metric'.
             or a custom metric identified by its name and provided by custom_metric.
 
         random_state: int, optional (default=42)
@@ -118,6 +123,15 @@ class LazyDeepRegressor(Custom, RegressorMixin):
             Number of layers of CustomRegressors to be used.
 
         All the other parameters are the same as CustomRegressor's.
+    
+    Attributes:
+
+        models_: dict-object
+            Returns a dictionary with each model pipeline as value
+            with key as name of models.
+        
+        best_model_: object
+            Returns the best model pipeline based on the sort_by metric.                
 
     Examples:
 
@@ -146,6 +160,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         ignore_warnings=True,
         custom_metric=None,
         predictions=False,
+        sort_by="RMSE",
         random_state=42,
         estimators="all",
         preprocess=False,
@@ -174,7 +189,9 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         self.ignore_warnings = ignore_warnings
         self.custom_metric = custom_metric
         self.predictions = predictions
-        self.models = {}
+        self.sort_by = sort_by
+        self.models_ = {}
+        self.best_model_ = None
         self.random_state = random_state
         self.estimators = estimators
         self.preprocess = preprocess
@@ -267,6 +284,58 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                     ),
                 ]
             )
+        
+        # base models
+        try: 
+            baseline_names = ["RandomForestRegressor", "XGBRegressor"]
+            baseline_models = [RandomForestRegressor(), xgb.XGBRegressor()]
+        except Exception as exception:
+            baseline_names = ["RandomForestRegressor"]
+            baseline_models = [RandomForestRegressor()]
+
+        for name, model in zip(baseline_names, baseline_models):        
+            start = time.time()
+            try:
+                model.fit(X_train, y_train)
+                self.models_[name] = model
+                y_pred = model.predict(X_test)
+                r_squared = r2_score(y_test, y_pred)
+                adj_rsquared = adjusted_rsquared(
+                    r_squared, X_test.shape[0], X_test.shape[1]
+                )
+                rmse = mean_squared_error(y_test, y_pred, squared=False)
+
+                names.append(name)
+                R2.append(r_squared)
+                ADJR2.append(adj_rsquared)
+                RMSE.append(rmse)
+                TIME.append(time.time() - start)
+
+                if self.custom_metric:
+                    custom_metric = self.custom_metric(y_test, y_pred)
+                    CUSTOM_METRIC.append(custom_metric)
+
+                if self.verbose > 0:
+                    scores_verbose = {
+                        "Model": name,
+                        "R-Squared": r_squared,
+                        "Adjusted R-Squared": adj_rsquared,
+                        "RMSE": rmse,
+                        "Time taken": time.time() - start,
+                    }
+
+                    if self.custom_metric:
+                        scores_verbose[self.custom_metric.__name__] = (
+                            custom_metric
+                        )
+
+                    print(scores_verbose)
+                if self.predictions:
+                    predictions[name] = y_pred
+            except Exception as exception:
+                if self.ignore_warnings is False:
+                    print(name + " model failed to execute")
+                    print(exception)                
 
         if self.estimators == "all":
             self.regressors = DEEPREGRESSORS
@@ -357,7 +426,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
 
                     pipe.fit(X_train, y_train)
 
-                    self.models[name] = pipe
+                    self.models_[name] = pipe
                     y_pred = pipe.predict(X_test)
                     r_squared = r2_score(y_test, y_pred)
                     adj_rsquared = adjusted_rsquared(
@@ -469,7 +538,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
 
                     layer_regr.fit(X_train, y_train)
 
-                    self.models[name] = layer_regr
+                    self.models_[name] = layer_regr
                     y_pred = layer_regr.predict(X_test)
 
                     r_squared = r2_score(y_test, y_pred)
@@ -519,17 +588,31 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         }
 
         if self.custom_metric:
-            scores[self.custom_metric.__name__] = CUSTOM_METRIC
+            scores["Custom metric"] = CUSTOM_METRIC
 
         scores = pd.DataFrame(scores)
-        scores = scores.sort_values(by="RMSE", ascending=True).set_index(
+        scores = scores.sort_values(by=self.sort_by, ascending=True).set_index(
             "Model"
         )
+
+        self.best_model_ = self.models_[scores.index[0]]
 
         if self.predictions:
             predictions_df = pd.DataFrame.from_dict(predictions)
         return scores, predictions_df if self.predictions is True else scores
 
+    def get_best_model(self):
+        """
+        This function returns the best model pipeline based on the sort_by metric.
+
+        Returns:
+
+            best_model: object,
+                Returns the best model pipeline based on the sort_by metric.
+
+        """
+        return self.best_model_
+    
     def provide_models(self, X_train, X_test, y_train, y_test):
         """
         This function returns all the model objects trained in fit function.
@@ -560,7 +643,134 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                 with key as name of models.
 
         """
-        if len(self.models.keys()) == 0:
+        if len(self.models_.keys()) == 0:
             self.fit(X_train, X_test, y_train, y_test)
 
-        return self.models
+        return self.models_
+
+
+class LazyRegressor(LazyDeepRegressor):
+    """
+        Fitting -- almost -- all the regression algorithms with 
+        nnetsauce's CustomRegressor and returning their scores.
+
+    Parameters:
+
+        verbose: int, optional (default=0)
+            Any positive number for verbosity.
+
+        ignore_warnings: bool, optional (default=True)
+            When set to True, the warning related to algorigms that are not able to run are ignored.
+
+        custom_metric: function, optional (default=None)
+            When function is provided, models are evaluated based on the custom evaluation metric provided.
+
+        predictions: bool, optional (default=False)
+            When set to True, the predictions of all the models models are returned as dataframe.
+
+        sort_by: string, optional (default='RMSE')
+            Sort models by a metric. Available options are 'R-Squared', 'Adjusted R-Squared', 'RMSE', 'Time Taken' and 'Custom Metric'.
+            or a custom metric identified by its name and provided by custom_metric.
+
+        random_state: int, optional (default=42)
+            Reproducibiility seed.
+
+        estimators: list, optional (default='all')
+            list of Estimators names or just 'all' (default='all')
+
+        preprocess: bool
+            preprocessing is done when set to True
+
+        n_jobs : int, when possible, run in parallel
+            For now, only used by individual models that support it.
+
+        All the other parameters are the same as CustomRegressor's.
+    
+    Attributes:
+
+        models_: dict-object
+            Returns a dictionary with each model pipeline as value
+            with key as name of models.
+        
+        best_model_: object
+            Returns the best model pipeline based on the sort_by metric.                
+
+    Examples:
+
+        import nnetsauce as ns
+        import numpy as np
+        from sklearn import datasets
+        from sklearn.utils import shuffle
+
+        diabetes = datasets.load_diabetes()
+        X, y = shuffle(diabetes.data, diabetes.target, random_state=13)
+        X = X.astype(np.float32)
+
+        offset = int(X.shape[0] * 0.9)
+        X_train, y_train = X[:offset], y[:offset]
+        X_test, y_test = X[offset:], y[offset:]
+
+        reg = ns.LazyRegressor(verbose=0, ignore_warnings=False,
+                            custom_metric=None)
+        models, predictions = reg.fit(X_train, X_test, y_train, y_test)
+        print(models)
+    
+    """
+    
+    def __init__(
+        self,
+        verbose=0,
+        ignore_warnings=True,
+        custom_metric=None,
+        predictions=False,
+        sort_by="RMSE",
+        random_state=42,
+        estimators="all",
+        preprocess=False,
+        n_jobs=None,
+        # CustomRegressor attributes
+        obj=None,
+        n_hidden_features=5,
+        activation_name="relu",
+        a=0.01,
+        nodes_sim="sobol",
+        bias=True,
+        dropout=0,
+        direct_link=True,
+        n_clusters=2,
+        cluster_encode=True,
+        type_clust="kmeans",
+        type_scaling=("std", "std", "std"),
+        col_sample=1,
+        row_sample=1,
+        seed=123,
+        backend="cpu",
+    ):
+        super().__init__(
+            verbose=verbose,
+            ignore_warnings=ignore_warnings,
+            custom_metric=custom_metric,
+            predictions=predictions,
+            sort_by=sort_by,
+            random_state=random_state,
+            estimators=estimators,
+            preprocess=preprocess,
+            n_jobs=n_jobs,
+            n_layers=1,
+            obj=obj,
+            n_hidden_features=n_hidden_features,
+            activation_name=activation_name,
+            a=a,
+            nodes_sim=nodes_sim,
+            bias=bias,
+            dropout=dropout,
+            direct_link=direct_link,
+            n_clusters=n_clusters,
+            cluster_encode=cluster_encode,
+            type_clust=type_clust,
+            type_scaling=type_scaling,
+            col_sample=col_sample,
+            row_sample=row_sample,
+            seed=seed,
+            backend=backend,
+        )

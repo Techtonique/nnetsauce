@@ -10,9 +10,9 @@ from statsmodels.tsa.base.datetools import dates_from_str
 
 print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
-print(f"\n ----- Example 1 ----- \n")
+# print(f"\n ----- Example 1 ----- \n")
 
-# some example data
+# # some example data
 mdata = sm.datasets.macrodata.load_pandas().data
 # prepare the dates index
 dates = mdata[['year', 'quarter']].astype(int).astype(str)

@@ -9,11 +9,11 @@ from .deep.deepRegressor import DeepRegressor
 from .deep.deepMTS import DeepMTS
 from .glm.glmClassifier import GLMClassifier
 from .glm.glmRegressor import GLMRegressor
-from .lazypredict.lazyClassifier import LazyClassifier
-from .lazypredict.lazyRegressor import LazyRegressor
+from .lazypredict.lazydeepClassifier import LazyDeepClassifier, LazyClassifier
+from .lazypredict.lazydeepRegressor import LazyDeepRegressor, LazyRegressor
 from .lazypredict.lazydeepClassifier import LazyDeepClassifier
 from .lazypredict.lazydeepRegressor import LazyDeepRegressor
-from .lazypredict.lazydeepMTS import LazyDeepMTS
+from .lazypredict.lazydeepMTS import LazyDeepMTS, LazyMTS
 from .mts.mts import MTS
 from .mts.classical import ClassicalMTS
 from .multitask.multitaskClassifier import MultitaskClassifier
@@ -28,6 +28,7 @@ from .ridge2.ridge2MultitaskClassifier import Ridge2MultitaskClassifier
 from .rvfl.bayesianrvflRegressor import BayesianRVFLRegressor
 from .rvfl.bayesianrvfl2Regressor import BayesianRVFL2Regressor
 from .sampling import SubSampler
+from .votingregressor import MedianVotingRegressor
 
 __all__ = [
     "AdaBoostClassifier",
@@ -48,7 +49,9 @@ __all__ = [
     "LazyRegressor",
     "LazyDeepClassifier",
     "LazyDeepRegressor",
+    "LazyMTS",
     "LazyDeepMTS",
+    "MedianVotingRegressor",
     "MTS",
     "MultitaskClassifier",
     "PredictionInterval",
@@ -59,5 +62,5 @@ __all__ = [
     "Ridge2Regressor",
     "Ridge2Classifier",
     "Ridge2MultitaskClassifier",
-    "SubSampler",
+    "SubSampler"
 ]

@@ -1,3 +1,11 @@
+# version 0.25.0
+
+- `get_best_model` for `Lazy*` classes (see updated docs)
+- bring `LazyMTS` back
+- add Exponential Smoothing, ARIMA and Theta models to `ClassicalMTS` and `Lazy*MTS`
+- add `RandomForest` and `XGBoost` to `Lazy*Classifier` and `Lazy*Regressor` as baselines
+- Add `MedianVotingRegressor`: using the median of predictions from an ensemble of regressors
+
 # version 0.24.5
 
 - Update `LazyDeepMTS`: **No more `LazyMTS`** class, instead, you can use `LazyDeepMTS` with `n_layers=1` 

@@ -1,5 +1,10 @@
 import numpy as np
 import pandas as pd
+try:
+    import xgboost as xgb
+except ImportError:
+    pass
+from sklearn.ensemble import RandomForestClassifier
 from copy import deepcopy
 from functools import partial
 from tqdm import tqdm
@@ -125,6 +130,14 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
 
         All the other parameters are the same as CustomClassifier's.
 
+    Attributes:
+
+        models_: dict-object
+            Returns a dictionary with each model pipeline as value
+            with key as name of models.
+        
+        best_model_: object
+            Returns the best model pipeline.
 
     Examples
 
@@ -181,7 +194,8 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         self.custom_metric = custom_metric
         self.predictions = predictions
         self.sort_by = sort_by
-        self.models = {}
+        self.models_ = {}
+        self.best_model_ = None
         self.random_state = random_state
         self.estimators = estimators
         self.preprocess = preprocess
@@ -274,6 +288,70 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                     ),
                 ]
             )
+        
+        # baseline models
+        try: 
+            baseline_names = ["RandomForestClassifier", "XGBClassifier"]
+            baseline_models = [RandomForestClassifier(), xgb.XGBClassifier()]
+        except Exception as exception:
+            baseline_names = ["RandomForestClassifier"]
+            baseline_models = [RandomForestClassifier()]
+
+        for name, model in zip(baseline_names, baseline_models):
+            start = time.time()
+            try:
+                model.fit(X_train, y_train)
+                self.models_[name] = model
+                y_pred = model.predict(X_test)
+                accuracy = accuracy_score(y_test, y_pred, normalize=True)
+                b_accuracy = balanced_accuracy_score(y_test, y_pred)
+                f1 = f1_score(y_test, y_pred, average="weighted")
+                try:
+                    roc_auc = roc_auc_score(y_test, y_pred)
+                except Exception as exception:
+                    roc_auc = None
+                    if self.ignore_warnings is False:
+                        print("ROC AUC couldn't be calculated for " + name)
+                        print(exception)
+                names.append(name)
+                Accuracy.append(accuracy)
+                B_Accuracy.append(b_accuracy)
+                ROC_AUC.append(roc_auc)
+                F1.append(f1)
+                TIME.append(time.time() - start)
+                if self.custom_metric is not None:
+                    custom_metric = self.custom_metric(y_test, y_pred)
+                    CUSTOM_METRIC.append(custom_metric)
+                if self.verbose > 0:
+                    if self.custom_metric is not None:
+                        print(
+                            {
+                                "Model": name,
+                                "Accuracy": accuracy,
+                                "Balanced Accuracy": b_accuracy,
+                                "ROC AUC": roc_auc,
+                                "F1 Score": f1,
+                                self.custom_metric.__name__: custom_metric,
+                                "Time taken": time.time() - start,
+                            }
+                        )
+                    else:
+                        print(
+                            {
+                                "Model": name,
+                                "Accuracy": accuracy,
+                                "Balanced Accuracy": b_accuracy,
+                                "ROC AUC": roc_auc,
+                                "F1 Score": f1,
+                                "Time taken": time.time() - start,
+                            }
+                        )
+                if self.predictions:
+                    predictions[name] = y_pred
+            except Exception as exception:
+                if self.ignore_warnings is False:
+                    print(name + " model failed to execute")
+                    print(exception)
 
         if self.estimators == "all":
             self.classifiers = [
@@ -410,7 +488,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                     )
 
                     pipe.fit(X_train, y_train)
-                    self.models[name] = pipe
+                    self.models_[name] = pipe
                     y_pred = pipe.predict(X_test)
                     accuracy = accuracy_score(y_test, y_pred, normalize=True)
                     b_accuracy = balanced_accuracy_score(y_test, y_pred)
@@ -535,7 +613,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
 
                     layer_clf.fit(X_train, y_train)
 
-                    self.models[name] = layer_clf
+                    self.models_[name] = layer_clf
                     y_pred = layer_clf.predict(X_test)
                     accuracy = accuracy_score(y_test, y_pred, normalize=True)
                     b_accuracy = balanced_accuracy_score(y_test, y_pred)
@@ -606,7 +684,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                     "Balanced Accuracy": B_Accuracy,
                     "ROC AUC": ROC_AUC,
                     "F1 Score": F1,
-                    self.custom_metric.__name__: CUSTOM_METRIC,
+                    "Custom metric": CUSTOM_METRIC,
                     "Time Taken": TIME,
                 }
             )
@@ -614,9 +692,23 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
             "Model"
         )
 
+        self.best_model_ = self.models_[scores.index[0]]
+
         if self.predictions:
             predictions_df = pd.DataFrame.from_dict(predictions)
         return scores, predictions_df if self.predictions is True else scores
+
+    def get_best_model(self):
+        """
+        This function returns the best model pipeline based on the sort_by metric.
+
+        Returns:
+
+            best_model: object,
+                Returns the best model pipeline based on the sort_by metric.
+
+        """
+        return self.best_model_
 
     def provide_models(self, X_train, X_test, y_train, y_test):
         """Returns all the model objects trained. If fit hasn't been called yet,
@@ -646,7 +738,135 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                 Returns a dictionary with each model's pipeline as value
                 and key = name of the model.
         """
-        if len(self.models.keys()) == 0:
+        if len(self.models_.keys()) == 0:
             self.fit(X_train, X_test, y_train, y_test)
 
-        return self.models
+        return self.models_
+
+
+class LazyClassifier(LazyDeepClassifier):
+    """
+        Fitting -- almost -- all the classification algorithms with 
+        nnetsauce's CustomClassifier and returning their scores (no layers).
+
+    Parameters:
+
+        verbose: int, optional (default=0)
+            Any positive number for verbosity.
+
+        ignore_warnings: bool, optional (default=True)
+            When set to True, the warning related to algorigms that are not able to run are ignored.
+
+        custom_metric: function, optional (default=None)
+            When function is provided, models are evaluated based on the custom evaluation metric provided.
+
+        predictions: bool, optional (default=False)
+            When set to True, the predictions of all the models models are returned as dataframe.
+
+        sort_by: string, optional (default='Accuracy')
+            Sort models by a metric. Available options are 'Accuracy', 'Balanced Accuracy', 'ROC AUC', 'F1 Score'
+            or a custom metric identified by its name and provided by custom_metric.
+
+        random_state: int, optional (default=42)
+            Reproducibiility seed.
+
+        estimators: list, optional (default='all')
+            list of Estimators names or just 'all' (default='all')
+
+        preprocess: bool
+            preprocessing is done when set to True
+
+        n_jobs : int, when possible, run in parallel
+            For now, only used by individual models that support it.
+
+        All the other parameters are the same as CustomClassifier's.
+    
+    Attributes:
+
+        models_: dict-object
+            Returns a dictionary with each model pipeline as value
+            with key as name of models.
+        
+        best_model_: object
+            Returns the best model pipeline based on the sort_by metric.                
+
+    Examples:
+
+        import nnetsauce as ns
+        import numpy as np
+        from sklearn import datasets
+        from sklearn.utils import shuffle
+
+        dataset = datasets.load_iris()
+        X = dataset.data
+        y = dataset.target
+        X, y = shuffle(X, y, random_state=123)
+        X = X.astype(np.float32)
+        y = y.astype(np.float32)
+        X_train, X_test = X[:100], X[100:]
+        y_train, y_test = y[:100], y[100:]
+
+        clf = ns.LazyClassifier(verbose=0, ignore_warnings=True, custom_metric=None)
+        models, predictions = clf.fit(X_train, X_test, y_train, y_test)
+        model_dictionary = clf.provide_models(X_train,X_test,y_train,y_test)
+        print(models)
+    
+    """
+    
+    def __init__(
+        self,
+        verbose=0,
+        ignore_warnings=True,
+        custom_metric=None,
+        predictions=False,
+        sort_by="Accuracy",
+        random_state=42,
+        estimators="all",
+        preprocess=False,
+        n_jobs=None,
+        # CustomClassifier attributes
+        obj=None,
+        n_hidden_features=5,
+        activation_name="relu",
+        a=0.01,
+        nodes_sim="sobol",
+        bias=True,
+        dropout=0,
+        direct_link=True,
+        n_clusters=2,
+        cluster_encode=True,
+        type_clust="kmeans",
+        type_scaling=("std", "std", "std"),
+        col_sample=1,
+        row_sample=1,
+        seed=123,
+        backend="cpu",
+    ):
+        super().__init__(
+            verbose=verbose,
+            ignore_warnings=ignore_warnings,
+            custom_metric=custom_metric,
+            predictions=predictions,
+            sort_by=sort_by,
+            random_state=random_state,
+            estimators=estimators,
+            preprocess=preprocess,
+            n_jobs=n_jobs,
+            n_layers=1,
+            obj=obj,
+            n_hidden_features=n_hidden_features,
+            activation_name=activation_name,
+            a=a,
+            nodes_sim=nodes_sim,
+            bias=bias,
+            dropout=dropout,
+            direct_link=direct_link,
+            n_clusters=n_clusters,
+            cluster_encode=cluster_encode,
+            type_clust=type_clust,
+            type_scaling=type_scaling,
+            col_sample=col_sample,
+            row_sample=row_sample,
+            seed=seed,
+            backend=backend,
+        )

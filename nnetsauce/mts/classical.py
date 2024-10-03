@@ -20,6 +20,10 @@ from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
 from statsmodels.tsa.api import VAR
 from statsmodels.tsa.vector_ar.vecm import VECM
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
+from statsmodels.tsa.forecasting.theta import ThetaModel
+
 from tqdm import tqdm
 from ..base import Base
 from ..sampling import vinecopula_sample
@@ -37,7 +41,7 @@ class ClassicalMTS(Base):
     Parameters:
 
         model: type of model: str.
-            currently, 'VAR' or 'VECM'.
+            currently, 'VAR', 'VECM', 'ARIMA', 'ETS', 'Theta'
 
     Attributes:
 
@@ -60,7 +64,16 @@ class ClassicalMTS(Base):
             self.obj = VAR
         elif self.model == "VECM":
             self.obj = VECM
+        elif self.model == "ARIMA":
+            self.obj = ARIMA
+        elif self.model == "ETS":
+            self.obj = ExponentialSmoothing
+        elif self.model == "Theta":
+            self.obj = ThetaModel
+        else:
+            raise ValueError("model not recognized")
         self.n_series = None
+        self.replications = None
         self.mean_ = None
         self.upper_ = None
         self.lower_ = None
@@ -88,34 +101,50 @@ class ClassicalMTS(Base):
         self: object
         """
 
-        self.n_series = X.shape[1]
+        try:
+            self.n_series = X.shape[1]        
+        except Exception:
+            self.n_series = 1
 
         if (
             isinstance(X, pd.DataFrame) is False
-        ):  # input data set is a numpy array
+        ) and isinstance(X, pd.Series) is False :  # input data set is a numpy array
+            
             X = pd.DataFrame(X)
-            self.series_names = ["series" + str(i) for i in range(X.shape[1])]
+            if self.n_series > 1: 
+                self.series_names = ["series" + str(i) for i in range(X.shape[1])]
+            else: 
+                self.series_names = "series0"
 
-        else:  # input data set is a DataFrame with column names
-
+        else:  # input data set is a DataFrame or Series with column names
+            
             X_index = None
-            if X.index is not None:
+            if X.index is not None and len(X.shape) > 1:
                 X_index = X.index
                 X = copy.deepcopy(mo.convert_df_to_numeric(X))
             if X_index is not None:
-                X.index = X_index
-            self.series_names = X.columns.tolist()
+                try:
+                    X.index = X_index
+                except Exception:
+                    pass
+            if isinstance(X, pd.DataFrame): 
+                self.series_names = X.columns.tolist()
+            else:
+                self.series_names = X.name
 
-        if isinstance(X, pd.DataFrame):
+        if isinstance(X, pd.DataFrame) or isinstance(X, pd.Series):
             self.df_ = X
             X = X.values
             self.df_.columns = self.series_names
             self.input_dates = ts.compute_input_dates(self.df_)
         else:
-            self.df_ = pd.DataFrame(X, columns=self.series_names)
-            self.input_dates = ts.compute_input_dates(self.df_)
+            self.df_ = pd.DataFrame(X, columns=self.series_names)            
 
-        self.obj = self.obj(X, **kwargs).fit(**kwargs)
+        if self.model == "Theta":
+            self.obj = self.obj(self.df_, 
+                                **kwargs).fit()
+        else:        
+            self.obj = self.obj(X, **kwargs).fit(**kwargs)        
 
         return self
 
@@ -149,6 +178,8 @@ class ClassicalMTS(Base):
         self.level_ = level
 
         self.alpha_ = 100 - level
+        
+        pi_multiplier = norm.ppf(1 - self.alpha_ / 200)
 
         # Named tuple for forecast results
         DescribeResult = namedtuple(
@@ -168,13 +199,60 @@ class ClassicalMTS(Base):
             lower_bound, upper_bound = self._compute_confidence_intervals(
                 forecast_result, alpha=self.alpha_ / 100, **kwargs
             )
+        
+        elif self.model == "ARIMA":
+            forecast_result = self.obj.get_forecast(steps=h)
+            mean_forecast = forecast_result.predicted_mean
+            lower_bound = forecast_result.conf_int()[:, 0]
+            upper_bound = forecast_result.conf_int()[:, 1]    
+        
+        elif self.model == "ETS":
+            forecast_result = self.obj.forecast(steps=h)
+            residuals = self.obj.resid
+            std_errors = np.std(residuals)
+            mean_forecast = forecast_result
+            lower_bound = forecast_result - pi_multiplier * std_errors
+            upper_bound = forecast_result + pi_multiplier * std_errors
+        
+        elif self.model == "Theta":
+            try:
+                mean_forecast = self.obj.forecast(steps=h).values 
+                forecast_result = self.obj.prediction_intervals(steps=h, alpha=self.alpha_/100, 
+                                                            **kwargs)            
+                lower_bound = forecast_result["lower"].values 
+                upper_bound = forecast_result["upper"].values 
+            except Exception: 
+                mean_forecast = self.obj.forecast(steps=h)
+                forecast_result = self.obj.prediction_intervals(steps=h, alpha=self.alpha_/100, 
+                                                            **kwargs)            
+                lower_bound = forecast_result["lower"]
+                upper_bound = forecast_result["upper"]
+            
+        else:
 
-        self.mean_ = pd.DataFrame(mean_forecast, columns=self.series_names)
-        self.mean_.index = self.output_dates_
-        self.lower_ = pd.DataFrame(lower_bound, columns=self.series_names)
-        self.lower_.index = self.output_dates_
-        self.upper_ = pd.DataFrame(upper_bound, columns=self.series_names)
-        self.upper_.index = self.output_dates_
+            raise ValueError("model not recognized")                    
+
+        try: 
+            self.mean_ = pd.DataFrame(mean_forecast, 
+                                        columns=self.series_names, 
+                                        index=self.output_dates_)        
+            self.lower_ = pd.DataFrame(lower_bound, 
+                                    columns=self.series_names, 
+                                        index=self.output_dates_)
+            self.upper_ = pd.DataFrame(upper_bound, 
+                                    columns=self.series_names, 
+                                        index=self.output_dates_)
+        except Exception:
+            self.mean_ = pd.Series(mean_forecast, 
+                                    name=self.series_names, 
+                                    index=self.output_dates_)        
+            self.lower_ = pd.Series(lower_bound, 
+                                    name=self.series_names, 
+                                    index=self.output_dates_)
+            self.upper_ = pd.Series(upper_bound, 
+                                    name=self.series_names, 
+                                    index=self.output_dates_)
+        
 
         return DescribeResult(
             mean=self.mean_, lower=self.lower_, upper=self.upper_
@@ -305,10 +383,16 @@ class ClassicalMTS(Base):
             ), f"check series index (< {self.n_series})"
             series_idx = series
 
-        y_all = list(self.df_.iloc[:, series_idx]) + list(
-            self.mean_.iloc[:, series_idx]
-        )
-        y_test = list(self.mean_.iloc[:, series_idx])
+        if isinstance(self.df_, pd.DataFrame): 
+            y_all = list(self.df_.iloc[:, series_idx]) + list(
+                self.mean_.iloc[:, series_idx]
+            )
+            y_test = list(self.mean_.iloc[:, series_idx])
+        else:
+            y_all = list(self.df_.values) + list(
+                self.mean_.values
+            )
+            y_test = list(self.mean_.values)
         n_points_all = len(y_all)
         n_points_train = self.df_.shape[0]
 
@@ -326,13 +410,22 @@ class ClassicalMTS(Base):
             fig, ax = plt.subplots()
             ax.plot(x_all, y_all, "-")
             ax.plot(x_test, y_test, "-", color="orange")
-            ax.fill_between(
-                x_test,
-                self.lower_.iloc[:, series_idx],
-                self.upper_.iloc[:, series_idx],
-                alpha=0.2,
-                color="orange",
-            )
+            try: 
+                ax.fill_between(
+                    x_test,
+                    self.lower_.iloc[:, series_idx],
+                    self.upper_.iloc[:, series_idx],
+                    alpha=0.2,
+                    color="orange",
+                )
+            except Exception:
+                ax.fill_between(
+                    x_test,
+                    self.lower_.values,
+                    self.upper_.values,
+                    alpha=0.2,
+                    color="orange",
+                )
             if self.replications is None:
                 if self.n_series > 1:
                     plt.title(
