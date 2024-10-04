@@ -368,6 +368,20 @@ class LazyDeepMTS(MTS):
             RMSE.append(rmse)
             MAE.append(mae)
             MPL.append(mpl)
+
+            if self.custom_metric is not None:                        
+                try: 
+                    if self.h is None:
+                        custom_metric = self.custom_metric(X_test, X_pred)
+                    else:
+                        custom_metric = self.custom_metric(X_test_h, X_pred)
+                    print(f"\n\n Custom metric: {custom_metric} \n\n")                            
+                    CUSTOM_METRIC.append(custom_metric)
+                except Exception as e:
+                    custom_metric = np.iinfo(np.float32).max
+                    print(f"\n\n Custom metric: {custom_metric} \n\n")
+                    CUSTOM_METRIC.append(np.iinfo(np.float32).max)
+
             if (self.replications is not None) or (self.type_pi == "gaussian"):
                 if per_series == False:
                     winklerscore = winkler_score(
@@ -381,6 +395,18 @@ class LazyDeepMTS(MTS):
                     coveragecalc = coverage(X_pred, X_test, level=95, per_series=True)
                 WINKLERSCORE.append(winklerscore)
                 COVERAGE.append(coveragecalc)
+                if self.custom_metric is not None:                        
+                    try: 
+                        if self.h is None:
+                            custom_metric = self.custom_metric(X_test, X_pred)
+                        else:
+                            custom_metric = self.custom_metric(X_test_h, X_pred)
+                        print(f"\n\n Custom metric: {custom_metric} \n\n")                            
+                        CUSTOM_METRIC.append(custom_metric)
+                    except Exception as e:
+                        custom_metric = np.iinfo(np.float32).max
+                        print(f"\n\n Custom metric: {custom_metric} \n\n")
+                        CUSTOM_METRIC.append(np.iinfo(np.float32).max)
             TIME.append(time.time() - start)        
         
         if self.estimators == "all":
@@ -690,6 +716,7 @@ class LazyDeepMTS(MTS):
                             )
 
                     else:
+
                         if self.h is None:
                             X_pred = pipe.predict(
                                 h=X_test.shape[0], **kwargs
@@ -877,6 +904,7 @@ class LazyDeepMTS(MTS):
                                         per_series=True,
                                     )
                         else:  # no prediction interval
+
                             if per_series == False:
                                 if isinstance(X_test, pd.DataFrame):
                                     X_test_h = X_test.iloc[0: self.h, :]
