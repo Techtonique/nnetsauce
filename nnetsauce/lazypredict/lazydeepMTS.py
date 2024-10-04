@@ -395,18 +395,6 @@ class LazyDeepMTS(MTS):
                     coveragecalc = coverage(X_pred, X_test, level=95, per_series=True)
                 WINKLERSCORE.append(winklerscore)
                 COVERAGE.append(coveragecalc)
-                if self.custom_metric is not None:                        
-                    try: 
-                        if self.h is None:
-                            custom_metric = self.custom_metric(X_test, X_pred)
-                        else:
-                            custom_metric = self.custom_metric(X_test_h, X_pred)
-                        print(f"\n\n Custom metric: {custom_metric} \n\n")                            
-                        CUSTOM_METRIC.append(custom_metric)
-                    except Exception as e:
-                        custom_metric = np.iinfo(np.float32).max
-                        print(f"\n\n Custom metric: {custom_metric} \n\n")
-                        CUSTOM_METRIC.append(np.iinfo(np.float32).max)
             TIME.append(time.time() - start)        
         
         if self.estimators == "all":
