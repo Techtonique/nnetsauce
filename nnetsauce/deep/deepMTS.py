@@ -215,15 +215,13 @@ class DeepMTS(MTS):
     ):
         assert int(lags) == lags, "parameter 'lags' should be an integer"
         assert n_layers >= 1, "must have n_layers >= 1"
-        self.n_layers = int(n_layers)
-
-        stackobj = obj 
+        self.n_layers = int(n_layers) 
 
         if self.n_layers > 1:
-        
+
             for _ in range(self.n_layers - 1):
-                stackobj = CustomRegressor(
-                    obj=deepcopy(stackobj),
+                obj = CustomRegressor(
+                    obj=deepcopy(obj),
                     n_hidden_features=n_hidden_features,
                     activation_name=activation_name,
                     a=a,
@@ -245,27 +243,27 @@ class DeepMTS(MTS):
                     verbose=verbose,
                     show_progress=show_progress,
                 )
-        self.obj = stackobj
-        super().__init__(
-            obj=deepcopy(stackobj),
-            n_hidden_features=n_hidden_features,
-            activation_name=activation_name,
-            a=a,
-            nodes_sim=nodes_sim,
-            bias=bias,
-            dropout=dropout,
-            direct_link=direct_link,
-            n_clusters=n_clusters,
-            cluster_encode=cluster_encode,
-            type_clust=type_clust,
-            type_scaling=type_scaling,
-            seed=seed,
-            type_pi=type_pi,
-            block_size=block_size,
-            replications=replications,
-            kernel=kernel,
-            agg=agg,
-            backend=backend,
-            verbose=verbose,
-            show_progress=show_progress,
-        )
+        
+        self.obj = deepcopy(obj)
+        super().__init__(obj=self.obj,
+        n_hidden_features=n_hidden_features,
+        activation_name=activation_name,
+        a=a,
+        nodes_sim=nodes_sim,
+        bias=bias,
+        dropout=dropout,
+        direct_link=direct_link,
+        n_clusters=n_clusters,
+        cluster_encode=cluster_encode,
+        type_clust=type_clust,
+        type_scaling=type_scaling,
+        lags=lags,
+        type_pi=type_pi,
+        block_size=block_size,
+        replications=replications,
+        kernel=kernel,
+        agg=agg,
+        seed=seed,
+        backend=backend,
+        verbose=verbose,
+        show_progress=show_progress)
