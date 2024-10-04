@@ -375,11 +375,9 @@ class LazyDeepMTS(MTS):
                         custom_metric = self.custom_metric(X_test, X_pred)
                     else:
                         custom_metric = self.custom_metric(X_test_h, X_pred)
-                    print(f"\n\n Custom metric: {custom_metric} \n\n")                            
                     CUSTOM_METRIC.append(custom_metric)
                 except Exception as e:
                     custom_metric = np.iinfo(np.float32).max
-                    print(f"\n\n Custom metric: {custom_metric} \n\n")
                     CUSTOM_METRIC.append(np.iinfo(np.float32).max)
 
             if (self.replications is not None) or (self.type_pi == "gaussian"):
@@ -590,11 +588,9 @@ class LazyDeepMTS(MTS):
                     if self.custom_metric is not None:                        
                         try: 
                             custom_metric = self.custom_metric(X_test, X_pred)
-                            print(f"\n\n Custom metric: {custom_metric} \n\n")
                             CUSTOM_METRIC.append(custom_metric)
                         except Exception as e:
                             custom_metric = np.iinfo(np.float32).max
-                            print(f"\n\n Custom metric: {custom_metric} \n\n")
                             CUSTOM_METRIC.append(custom_metric)
 
                     if self.verbose > 0:
@@ -961,11 +957,9 @@ class LazyDeepMTS(MTS):
                                 custom_metric = self.custom_metric(X_test, X_pred)
                             else:
                                 custom_metric = self.custom_metric(X_test_h, X_pred)
-                            print(f"\n\n Custom metric: {custom_metric} \n\n")                            
                             CUSTOM_METRIC.append(custom_metric)
                         except Exception as e:
                             custom_metric = np.iinfo(np.float32).max
-                            print(f"\n\n Custom metric: {custom_metric} \n\n")
                             CUSTOM_METRIC.append(np.iinfo(np.float32).max)
 
                     if self.verbose > 0:
@@ -992,9 +986,7 @@ class LazyDeepMTS(MTS):
 
                         if self.custom_metric is not None:
                             scores_verbose["Custom metric"] = custom_metric                            
-
-                        print(scores_verbose)
-
+                       
                     if self.predictions:
                         predictions[name] = X_pred
 
@@ -1025,12 +1017,6 @@ class LazyDeepMTS(MTS):
         if self.custom_metric is not None:
             scores["Custom metric"] = CUSTOM_METRIC
         
-        print(f"\n\n Scores: {scores} \n\n")
-        for key, value in scores.items():
-            print(f"\n\n Key: {key} \n\n")
-            print(f"\n\n Value: {value} \n\n")
-            print(f"\n\n len(Value): {len(value)} \n\n")
-
         if per_series:
             scores = dict_to_dataframe_series(scores, self.series_names)
         else:
