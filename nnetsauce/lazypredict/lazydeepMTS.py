@@ -1012,6 +1012,7 @@ class LazyDeepMTS(MTS):
         for key, value in scores.items():
             print(f"\n\n Key: {key} \n\n")
             print(f"\n\n Value: {value} \n\n")
+            print(f"\n\n len(Value): {len(value)} \n\n")
 
         if per_series:
             scores = dict_to_dataframe_series(scores, self.series_names)
