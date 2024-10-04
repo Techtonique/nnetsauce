@@ -234,16 +234,8 @@ class DeepMTS(MTS):
                     type_clust=type_clust,
                     type_scaling=type_scaling,
                     seed=seed,
-                    type_pi=type_pi,
-                    block_size=block_size,
-                    replications=replications,
-                    kernel=kernel,
-                    agg=agg,
-                    backend=backend,
-                    verbose=verbose,
-                    show_progress=show_progress,
-                )
-        
+                    backend=backend)
+                
         self.obj = deepcopy(obj)
         super().__init__(obj=self.obj,
         n_hidden_features=n_hidden_features,
