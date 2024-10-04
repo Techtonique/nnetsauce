@@ -245,7 +245,7 @@ class DeepMTS(MTS):
                     verbose=verbose,
                     show_progress=show_progress,
                 )
-
+        self.obj = stackobj
         super().__init__(
             obj=deepcopy(stackobj),
             n_hidden_features=n_hidden_features,
