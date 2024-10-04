@@ -578,6 +578,7 @@ class LazyDeepMTS(MTS):
                             custom_metric = self.custom_metric(X_test, X_pred)
                             CUSTOM_METRIC.append(custom_metric)
                         except Exception as e:
+                            custom_metric = np.iinfo(np.float32).max
                             CUSTOM_METRIC.append(np.iinfo(np.float32).max)
 
                     if self.verbose > 0:
@@ -945,6 +946,7 @@ class LazyDeepMTS(MTS):
                                 custom_metric = self.custom_metric(X_test_h, X_pred)
                             CUSTOM_METRIC.append(custom_metric)
                         except Exception as e:
+                            custom_metric = np.iinfo(np.float32).max
                             CUSTOM_METRIC.append(np.iinfo(np.float32).max)
 
                     if self.verbose > 0:
@@ -1007,6 +1009,7 @@ class LazyDeepMTS(MTS):
             scores["Custom metric"] = CUSTOM_METRIC
         
         print(f"\n\n Scores: {scores} \n\n")
+        print(f"\n\n Scores length: {[len(v) for k, v in scores]} \n\n")
 
         if per_series:
             scores = dict_to_dataframe_series(scores, self.series_names)
