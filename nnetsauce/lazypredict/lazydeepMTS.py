@@ -1009,7 +1009,9 @@ class LazyDeepMTS(MTS):
             scores["Custom metric"] = CUSTOM_METRIC
         
         print(f"\n\n Scores: {scores} \n\n")
-        print(f"\n\n Scores length: {[len(v) for k, v in scores]} \n\n")
+        for key, value in scores.items():
+            print(f"\n\n Key: {key} \n\n")
+            print(f"\n\n Value: {value} \n\n")
 
         if per_series:
             scores = dict_to_dataframe_series(scores, self.series_names)
