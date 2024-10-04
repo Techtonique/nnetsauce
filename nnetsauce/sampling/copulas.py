@@ -21,11 +21,11 @@ def check_and_install(package_name):
         print(f"'{package_name}' has been installed successfully.")
 
 def vinecopula_sample(x, n_samples=10, method="vine-tll", random_state=123):
-    u = pv.to_pseudo_obs(x)
+    check_and_install(pyvinecopulib)
+    u = pyvinecopulib.to_pseudo_obs(x)
     method_name = method.replace("scp-vine-", "")
     method_name = method_name.replace("scp2-vine-", "")
-    method_name = method_name.replace("vine-", "")
-    check_and_install(pyvinecopulib)
+    method_name = method_name.replace("vine-", "")    
     controls = pyvinecopulib.FitControlsVinecop(
         family_set=[getattr(pyvinecopulib.BicopFamily, method_name)]
     )
