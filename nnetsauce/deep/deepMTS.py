@@ -2,7 +2,8 @@
 #
 # License: BSD 3 Clear Clause
 
-from ..deep import DeepRegressor
+from copy import deepcopy 
+from ..custom import CustomRegressor
 from ..mts import MTS
 
 
@@ -214,47 +215,47 @@ class DeepMTS(MTS):
     ):
         assert int(lags) == lags, "parameter 'lags' should be an integer"
         assert n_layers >= 1, "must have n_layers >= 1"
-        self.n_layers = int(n_layers)
+        self.n_layers = int(n_layers) 
 
-        self.obj = DeepRegressor(
-            obj=obj,
-            verbose=0,
-            n_layers=self.n_layers,
-            n_hidden_features=n_hidden_features,
-            activation_name=activation_name,
-            a=a,
-            nodes_sim=nodes_sim,
-            bias=bias,
-            dropout=dropout,
-            direct_link=direct_link,
-            n_clusters=n_clusters,
-            cluster_encode=cluster_encode,
-            type_clust=type_clust,
-            type_scaling=type_scaling,
-            seed=seed,
-            backend=backend,
-        )
+        if self.n_layers > 1:
 
-        super().__init__(
-            obj=self.obj,
-            n_hidden_features=n_hidden_features,
-            activation_name=activation_name,
-            a=a,
-            nodes_sim=nodes_sim,
-            bias=bias,
-            dropout=dropout,
-            direct_link=direct_link,
-            n_clusters=n_clusters,
-            cluster_encode=cluster_encode,
-            type_clust=type_clust,
-            type_scaling=type_scaling,
-            seed=seed,
-            type_pi=type_pi,
-            block_size=block_size,
-            replications=replications,
-            kernel=kernel,
-            agg=agg,
-            backend=backend,
-            verbose=verbose,
-            show_progress=show_progress,
-        )
+            for _ in range(self.n_layers - 1):
+                obj = CustomRegressor(
+                    obj=deepcopy(obj),
+                    n_hidden_features=n_hidden_features,
+                    activation_name=activation_name,
+                    a=a,
+                    nodes_sim=nodes_sim,
+                    bias=bias,
+                    dropout=dropout,
+                    direct_link=direct_link,
+                    n_clusters=n_clusters,
+                    cluster_encode=cluster_encode,
+                    type_clust=type_clust,
+                    type_scaling=type_scaling,
+                    seed=seed,
+                    backend=backend)
+                
+        self.obj = deepcopy(obj)
+        super().__init__(obj=self.obj,
+        n_hidden_features=n_hidden_features,
+        activation_name=activation_name,
+        a=a,
+        nodes_sim=nodes_sim,
+        bias=bias,
+        dropout=dropout,
+        direct_link=direct_link,
+        n_clusters=n_clusters,
+        cluster_encode=cluster_encode,
+        type_clust=type_clust,
+        type_scaling=type_scaling,
+        lags=lags,
+        type_pi=type_pi,
+        block_size=block_size,
+        replications=replications,
+        kernel=kernel,
+        agg=agg,
+        seed=seed,
+        backend=backend,
+        verbose=verbose,
+        show_progress=show_progress)
