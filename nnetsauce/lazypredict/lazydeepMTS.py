@@ -282,7 +282,7 @@ class LazyDeepMTS(MTS):
         TIME = []
         predictions = {}
 
-        if self.custom_metric:
+        if self.custom_metric is not None:
             CUSTOM_METRIC = []
 
         if self.h is None:
@@ -573,7 +573,7 @@ class LazyDeepMTS(MTS):
                         COVERAGE.append(coveragecalc)
                     TIME.append(time.time() - start)
 
-                    if self.custom_metric:                        
+                    if self.custom_metric is not None:                        
                         try: 
                             custom_metric = self.custom_metric(X_test, X_pred)
                             print(f"\n\n Custom metric: {custom_metric} \n\n")
@@ -605,7 +605,7 @@ class LazyDeepMTS(MTS):
                                 "Time taken": time.time() - start,
                             }
 
-                        if self.custom_metric:
+                        if self.custom_metric is not None:
                             scores_verbose["Custom metric"] = custom_metric
                             
                     if self.predictions:
@@ -939,7 +939,7 @@ class LazyDeepMTS(MTS):
                         COVERAGE.append(coveragecalc)
                     TIME.append(time.time() - start)
 
-                    if self.custom_metric:                        
+                    if self.custom_metric is not None:                        
                         try: 
                             if self.h is None:
                                 custom_metric = self.custom_metric(X_test, X_pred)
@@ -974,7 +974,7 @@ class LazyDeepMTS(MTS):
                                 "Time taken": time.time() - start,
                             }
 
-                        if self.custom_metric:
+                        if self.custom_metric is not None:
                             scores_verbose["Custom metric"] = custom_metric                            
 
                         print(scores_verbose)
@@ -1006,7 +1006,7 @@ class LazyDeepMTS(MTS):
                 "Time Taken": TIME,
             }
 
-        if self.custom_metric:
+        if self.custom_metric is not None:
             scores["Custom metric"] = CUSTOM_METRIC
         
         print(f"\n\n Scores: {scores} \n\n")
