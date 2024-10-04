@@ -219,35 +219,9 @@ class DeepMTS(MTS):
 
         stackobj = obj 
 
-        if self.n_layers == 1:
-
-            super().__init__(
-                obj=deepcopy(stackobj),
-                n_hidden_features=n_hidden_features,
-                activation_name=activation_name,
-                a=a,
-                nodes_sim=nodes_sim,
-                bias=bias,
-                dropout=dropout,
-                direct_link=direct_link,
-                n_clusters=n_clusters,
-                cluster_encode=cluster_encode,
-                type_clust=type_clust,
-                type_scaling=type_scaling,
-                seed=seed,
-                type_pi=type_pi,
-                block_size=block_size,
-                replications=replications,
-                kernel=kernel,
-                agg=agg,
-                backend=backend,
-                verbose=verbose,
-                show_progress=show_progress,
-            )
+        if self.n_layers > 1:
         
-        else: # n_layers > 1
-
-            for i in range(self.n_layers - 1):
+            for _ in range(self.n_layers - 1):
                 stackobj = CustomRegressor(
                     obj=deepcopy(stackobj),
                     n_hidden_features=n_hidden_features,
@@ -271,4 +245,27 @@ class DeepMTS(MTS):
                     verbose=verbose,
                     show_progress=show_progress,
                 )
-            self.obj = stackobj
+
+        super().__init__(
+            obj=deepcopy(stackobj),
+            n_hidden_features=n_hidden_features,
+            activation_name=activation_name,
+            a=a,
+            nodes_sim=nodes_sim,
+            bias=bias,
+            dropout=dropout,
+            direct_link=direct_link,
+            n_clusters=n_clusters,
+            cluster_encode=cluster_encode,
+            type_clust=type_clust,
+            type_scaling=type_scaling,
+            seed=seed,
+            type_pi=type_pi,
+            block_size=block_size,
+            replications=replications,
+            kernel=kernel,
+            agg=agg,
+            backend=backend,
+            verbose=verbose,
+            show_progress=show_progress,
+        )
