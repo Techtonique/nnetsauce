@@ -2,7 +2,6 @@ joblib
 matplotlib
 numpy
 pandas
-pyvinecopulib
 requests
 scipy
 scikit-learn
