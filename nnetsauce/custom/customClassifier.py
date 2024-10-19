@@ -204,7 +204,8 @@ class CustomClassifier(Custom, ClassifierMixin):
         """
 
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
-        self.n_classes_ = len(np.unique(y))  # for compatibility with sklearn
+        self.classes_ =  np.unique(y)
+        self.n_classes_ = len(self.classes_)  # for compatibility with         
 
         if self.level is not None:
             self.obj = PredictionSet(

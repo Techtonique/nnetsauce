@@ -126,6 +126,9 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         A fitted object
         """
 
+        self.classes_ =  np.unique(y)
+        self.n_classes_ = len(self.classes_)  # for compatibility with         scikit-learn
+
         if isinstance(X, np.ndarray):
             X = pd.DataFrame(X)
 
