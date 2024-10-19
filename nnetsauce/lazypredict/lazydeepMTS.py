@@ -10,7 +10,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.base import RegressorMixin
 from sklearn.metrics import (
     r2_score,
-    mean_squared_error,
+    root_mean_squared_error,
     mean_absolute_error,
     mean_pinball_loss,
     mean_absolute_percentage_error,
@@ -339,7 +339,7 @@ class LazyDeepMTS(MTS):
                         X_test = X_test.iloc[0: self.h, :]
 
                 if per_series == False:
-                    rmse = mean_squared_error(X_test, X_pred.mean, squared=False)
+                    rmse = root_mean_squared_error(X_test, X_pred.mean)
                     mae = mean_absolute_error(X_test, X_pred.mean)
                     mpl = mean_pinball_loss(X_test, X_pred.mean)
                 else:
@@ -509,8 +509,8 @@ class LazyDeepMTS(MTS):
                         self.type_pi == "gaussian"
                     ):
                         if per_series == False:
-                            rmse = mean_squared_error(
-                                X_test, X_pred.mean, squared=False
+                            rmse = root_mean_squared_error(
+                                X_test, X_pred.mean
                             )
                             mae = mean_absolute_error(X_test, X_pred.mean)
                             mpl = mean_pinball_loss(X_test, X_pred.mean)
@@ -548,8 +548,8 @@ class LazyDeepMTS(MTS):
                             )
                     else:
                         if per_series == False:
-                            rmse = mean_squared_error(
-                                X_test, X_pred, squared=False
+                            rmse = root_mean_squared_error(
+                                X_test, X_pred
                             )
                             mae = mean_absolute_error(X_test, X_pred)
                             mpl = mean_pinball_loss(X_test, X_pred)
@@ -745,8 +745,8 @@ class LazyDeepMTS(MTS):
                                     X_pred, X_test, level=95, per_series=True
                                 )
                             else:
-                                rmse = mean_squared_error(
-                                    X_test, X_pred.mean, squared=False
+                                rmse = root_mean_squared_error(
+                                    X_test, X_pred.mean
                                 )
                                 mae = mean_absolute_error(X_test, X_pred.mean)
                                 mpl = mean_pinball_loss(X_test, X_pred.mean)
@@ -777,8 +777,8 @@ class LazyDeepMTS(MTS):
                                     per_series=True,
                                 )
                             else:
-                                rmse = mean_squared_error(
-                                    X_test, X_pred, squared=False
+                                rmse = root_mean_squared_error(
+                                    X_test, X_pred
                                 )
                                 mae = mean_absolute_error(X_test, X_pred)
                                 mpl = mean_pinball_loss(X_test, X_pred)
@@ -790,8 +790,8 @@ class LazyDeepMTS(MTS):
                             if per_series == False:
                                 if isinstance(X_test, pd.DataFrame) == False:
                                     X_test_h = X_test[0: self.h, :]
-                                    rmse = mean_squared_error(
-                                        X_test_h, X_pred.mean, squared=False
+                                    rmse = root_mean_squared_error(
+                                        X_test_h, X_pred.mean
                                     )
                                     mae = mean_absolute_error(
                                         X_test_h, X_pred.mean
@@ -807,8 +807,8 @@ class LazyDeepMTS(MTS):
                                     )
                                 else:
                                     X_test_h = X_test.iloc[0: self.h, :]
-                                    rmse = mean_squared_error(
-                                        X_test_h, X_pred.mean, squared=False
+                                    rmse = root_mean_squared_error(
+                                        X_test_h, X_pred.mean
                                     )
                                     mae = mean_absolute_error(
                                         X_test_h, X_pred.mean
@@ -892,15 +892,14 @@ class LazyDeepMTS(MTS):
                             if per_series == False:
                                 if isinstance(X_test, pd.DataFrame):
                                     X_test_h = X_test.iloc[0: self.h, :]
-                                    rmse = mean_squared_error(
-                                        X_test_h, X_pred, squared=False
-                                    )
+                                    rmse = root_mean_squared_error(
+                                        X_test_h, X_pred)
                                     mae = mean_absolute_error(X_test_h, X_pred)
                                     mpl = mean_pinball_loss(X_test_h, X_pred)
                                 else:
                                     X_test_h = X_test[0: self.h, :]
-                                    rmse = mean_squared_error(
-                                        X_test_h, X_pred, squared=False
+                                    rmse = root_mean_squared_error(
+                                        X_test_h, X_pred
                                     )
                                     mae = mean_absolute_error(X_test_h, X_pred)
                                     mpl = mean_pinball_loss(X_test_h, X_pred)
@@ -1029,10 +1028,11 @@ class LazyDeepMTS(MTS):
         except Exception as e:
             pass 
 
-        if self.predictions:
-            predictions_df = pd.DataFrame.from_dict(predictions)
-
-        return scores, predictions_df if self.predictions is True else scores
+        if self.predictions is True:
+            
+            return scores, predictions
+        
+        return scores
 
     def get_best_model(self):
         """

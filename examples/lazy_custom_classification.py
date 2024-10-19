@@ -18,6 +18,7 @@ for model in load_models:
 
     clf = ns.LazyClassifier(verbose=0, ignore_warnings=True, 
                             custom_metric=None, preprocess=False, 
+                            predictions=True,
                             estimators=["RandomForestClassifier", 
                                         "RandomForestRegressor"],
                             n_jobs=-1)
@@ -27,6 +28,7 @@ for model in load_models:
     print(f"\nElapsed: {time() - start} seconds\n")
 
     print(models)
+    print(predictions)
 
 for model in load_models: 
 
@@ -37,6 +39,7 @@ for model in load_models:
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = .3, random_state = 13)
 
     clf = ns.LazyClassifier(verbose=0, ignore_warnings=True, 
+                            predictions=True,
                             custom_metric=None, preprocess=False, n_jobs=-1)
 
     start = time()
@@ -44,4 +47,5 @@ for model in load_models:
     print(f"\nElapsed: {time() - start} seconds\n")
 
     print(models)
+    print(predictions)
 

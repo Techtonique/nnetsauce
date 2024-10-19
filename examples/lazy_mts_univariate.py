@@ -32,23 +32,23 @@ df_test = data.iloc[testing_index,:]
 
 regr_mts4 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
                        lags = 4, n_hidden_features=7, n_clusters=2,
-                       type_pi = "kde",
+                       type_pi = "kde", predictions=True,
                        replications=100, kernel="gaussian",
                        show_progress=True, preprocess=False)
 models, predictions = regr_mts4.fit(df_train, df_test)
 model_dictionary = regr_mts4.provide_models(df_train, df_test)
-print(f"models: {models}")
-print(f"predictions: {predictions}")
+print(f"\n models: {models}")
+print(f"\n predictions: {predictions}")
 print(models[['WINKLERSCORE', 'COVERAGE']].head().values)
 print(regr_mts4.get_best_model())
 
 regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=True, custom_metric=None,
-                       lags = 20, n_hidden_features=7, n_clusters=2,                       
+                       lags = 20, n_hidden_features=7, predictions=True, n_clusters=2,                       
                        show_progress=True, preprocess=False)
 models, predictions = regr_mts5.fit(df_train, df_test)
 model_dictionary = regr_mts5.provide_models(df_train, df_test)
-print(f"models: {models}")
-print(f"predictions: {predictions}")
+print(f"\n models: {models}")
+print(f"\n predictions: {predictions}")
 print(models[['RMSE', 'MAE']].head().values)
 print(regr_mts5.get_best_model())
 
@@ -71,23 +71,23 @@ df_test = data.iloc[testing_index,:]
 
 regr_mts4 = ns.LazyMTS(verbose=1, ignore_warnings=False, custom_metric=None,
                        lags = 10, n_hidden_features=7, n_clusters=2,
-                       type_pi = "scp2-kde",
+                       type_pi = "scp2-kde", predictions=True,
                        replications=100, kernel="gaussian",
                        show_progress=True, preprocess=False)
 models, predictions = regr_mts4.fit(df_train, df_test)
 model_dictionary = regr_mts4.provide_models(df_train, df_test)
-print(f"models: {models}")
-print(f"predictions: {predictions}")
+print(f"\n models: {models}")
+print(f"\n predictions: {predictions}")
 print(models[['WINKLERSCORE', 'COVERAGE']].head().values)
 print(regr_mts4.get_best_model())
 
 regr_mts5 = ns.LazyMTS(verbose=1, ignore_warnings=False, custom_metric=None,
                        lags = 20, n_hidden_features=7, n_clusters=2,                       
-                       show_progress=True, preprocess=False)
+                       show_progress=True, preprocess=False, predictions=True)
 models, predictions = regr_mts5.fit(df_train, df_test)
 model_dictionary = regr_mts5.provide_models(df_train, df_test)
-print(f"models: {models}")
-print(f"predictions: {predictions}")
+print(f"\n models: {models}")
+print(f"\n predictions: {predictions}")
 print(regr_mts5.get_best_model())
 print(models[['RMSE', 'MAE']].head().values)
 

@@ -694,9 +694,11 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
 
         self.best_model_ = self.models_[scores.index[0]]
 
-        if self.predictions:
-            predictions_df = pd.DataFrame.from_dict(predictions)
-        return scores, predictions_df if self.predictions is True else scores
+        if self.predictions is True:
+            
+            return scores, predictions
+        
+        return scores
 
     def get_best_model(self):
         """
