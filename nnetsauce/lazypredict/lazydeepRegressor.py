@@ -14,10 +14,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.base import RegressorMixin
-from sklearn.metrics import (
-    r2_score,
-    mean_squared_error,
-)
+from sklearn.metrics import r2_score
 from .config import DEEPREGRESSORS
 from ..custom import Custom, CustomRegressor
 
@@ -303,7 +300,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                 adj_rsquared = adjusted_rsquared(
                     r_squared, X_test.shape[0], X_test.shape[1]
                 )
-                rmse = mean_squared_error(y_test, y_pred, squared=False)
+                rmse = np.sqrt(np.mean((y_test - y_pred)**2))
 
                 names.append(name)
                 R2.append(r_squared)
@@ -432,7 +429,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                     adj_rsquared = adjusted_rsquared(
                         r_squared, X_test.shape[0], X_test.shape[1]
                     )
-                    rmse = mean_squared_error(y_test, y_pred, squared=False)
+                    rmse = np.sqrt(np.mean((y_test - y_pred)**2))
 
                     names.append(name)
                     R2.append(r_squared)
@@ -545,7 +542,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                     adj_rsquared = adjusted_rsquared(
                         r_squared, X_test.shape[0], X_test.shape[1]
                     )
-                    rmse = mean_squared_error(y_test, y_pred, squared=False)
+                    rmse = np.sqrt(np.mean((y_test - y_pred)**2))
 
                     names.append(name)
                     R2.append(r_squared)

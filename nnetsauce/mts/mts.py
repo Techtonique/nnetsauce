@@ -11,11 +11,6 @@ from collections import namedtuple
 from copy import deepcopy
 from functools import partial
 from scipy.stats import describe, norm
-from sklearn.metrics import (
-    mean_squared_error,
-    mean_absolute_error,
-    mean_absolute_percentage_error,
-)
 from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
 from tqdm import tqdm
@@ -986,10 +981,8 @@ class MTS(Base):
         scoring_options = {
             "explained_variance": skm2.explained_variance_score,
             "neg_mean_absolute_error": skm2.mean_absolute_error,
-            "neg_mean_squared_error": skm2.mean_squared_error,
-            "neg_root_mean_squared_error": lambda x, y: np.sqrt(
-                skm2.mean_squared_error(x, y)
-            ),
+            "neg_mean_squared_error": lambda x, y: np.mean((x - y)**2),
+            "neg_root_mean_squared_error": lambda x, y: np.sqrt(np.mean((x - y)**2)),
             "neg_mean_squared_log_error": skm2.mean_squared_log_error,
             "neg_median_absolute_error": skm2.median_absolute_error,
             "r2": skm2.r2_score,
