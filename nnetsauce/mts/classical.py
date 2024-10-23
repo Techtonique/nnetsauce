@@ -17,11 +17,14 @@ from sklearn.metrics import (
 )
 from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
-from statsmodels.tsa.api import VAR
-from statsmodels.tsa.vector_ar.vecm import VECM
-from statsmodels.tsa.arima.model import ARIMA
-from statsmodels.tsa.holtwinters import ExponentialSmoothing
-from statsmodels.tsa.forecasting.theta import ThetaModel
+try: 
+    from statsmodels.tsa.api import VAR
+    from statsmodels.tsa.vector_ar.vecm import VECM
+    from statsmodels.tsa.arima.model import ARIMA
+    from statsmodels.tsa.holtwinters import ExponentialSmoothing
+    from statsmodels.tsa.forecasting.theta import ThetaModel
+except ImportError:
+    pass
 
 from tqdm import tqdm
 from ..base import Base
