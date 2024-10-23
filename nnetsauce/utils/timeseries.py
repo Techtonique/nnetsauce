@@ -6,7 +6,11 @@
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import mean_pinball_loss
+try: 
+    from sklearn.metrics import mean_pinball_loss
+except ImportError:
+    pass
+
 
 
 # (block) bootstrap

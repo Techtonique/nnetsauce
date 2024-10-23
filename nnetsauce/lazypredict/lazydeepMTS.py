@@ -8,10 +8,12 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.base import RegressorMixin
-from sklearn.metrics import (
-    mean_absolute_error,
-    mean_pinball_loss,
-)
+from sklearn.metrics import  mean_absolute_error
+try: 
+    from sklearn.metrics import mean_pinball_loss
+except ImportError:
+    pass
+
 from tqdm import tqdm
 
 from .config import DEEPREGRESSORSMTS, REGRESSORSMTS
