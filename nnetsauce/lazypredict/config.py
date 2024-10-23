@@ -1,6 +1,10 @@
 from functools import partial
 from sklearn.base import ClassifierMixin, RegressorMixin
-from sklearn.utils import all_estimators
+try: 
+    from sklearn.utils import all_estimators
+except ImportError:
+    pass
+
 from ..multitask import MultitaskClassifier, SimpleMultitaskClassifier
 from ..mts import ClassicalMTS
 

@@ -15,7 +15,10 @@ from copy import deepcopy
 from tqdm import tqdm
 from sklearn import metrics
 from sklearn.base import ClassifierMixin, RegressorMixin
-from sklearn.utils import all_estimators
+try: 
+    from sklearn.utils import all_estimators
+except ImportError:
+    pass
 from sklearn.model_selection import cross_val_score
 from ..custom import CustomClassifier
 from ..predictionset import PredictionSet

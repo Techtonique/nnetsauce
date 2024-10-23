@@ -8,7 +8,10 @@ from sklearn.ensemble import RandomForestRegressor
 from copy import deepcopy
 from tqdm import tqdm
 import time
-from sklearn.utils import all_estimators
+try: 
+    from sklearn.utils import all_estimators
+except ImportError:
+    pass
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder

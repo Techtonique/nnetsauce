@@ -37,7 +37,11 @@ print(obj_MTS.predict(h=10, return_pi=True))
 
 
 from sklearn.base import ClassifierMixin, RegressorMixin
-from sklearn.utils import all_estimators
+try: 
+    from sklearn.utils import all_estimators
+except ImportError:
+    pass
+
 
 removed_regressors = [
     "TheilSenRegressor",
