@@ -26,7 +26,7 @@ for model in load_models:
                                             "RandomForestRegressor"])
 
     start = time()
-    models, predictions = clf.fit(X_train, X_test, y_train, y_test)
+    models = clf.fit(X_train, X_test, y_train, y_test)
     print(f"\nElapsed: {time() - start} seconds\n")
 
     print(models)
@@ -44,7 +44,7 @@ for model in load_models:
                                 n_hidden_features=3)
 
     start = time()
-    models, predictions = clf.fit(X_train, X_test, y_train, y_test)
+    models = clf.fit(X_train, X_test, y_train, y_test)
     print(f"\nElapsed: {time() - start} seconds\n")
 
     print(models)

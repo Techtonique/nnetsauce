@@ -502,6 +502,39 @@ class MTS(Base):
             self.kde_ = grid.best_estimator_
 
         return self
+    
+    def partial_fit(self, X, xreg=None, **kwargs):
+        """Update the model with new observations X, with optional regressors xreg
+
+        Parameters:
+
+        X: {array-like}, shape = [n_samples, n_features]
+            Training time series, where n_samples is the number
+            of samples and n_features is the number of features;
+            X must be in increasing order (most recent observations last)
+
+        xreg: {array-like}, shape = [n_samples, n_features_xreg]
+            Additional (external) regressors to be passed to self.obj
+            xreg must be in 'increasing' order (most recent observations last)
+
+        **kwargs: for now, additional parameters to be passed to for kernel density estimation, when needed (see sklearn.neighbors.KernelDensity)
+
+        Returns:
+
+        self: object
+        """
+
+        if (
+            isinstance(X, pd.DataFrame) is False
+        ):
+            if X.shape[0] == 1:
+                X = X.reshape(1, -1)
+        else:
+            if X.shape[0] == 1:
+                colnames = X.columns
+                X = pd.DataFrame(X.values.reshape(1, -1), 
+                                 columns=colnames)
+        return self.fit(X, xreg, **kwargs)
 
     def predict(self, h=5, level=95, **kwargs):
         """Forecast all the time series, h steps ahead

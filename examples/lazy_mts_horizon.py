@@ -36,7 +36,7 @@ regr_mts4 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
                        replications=100, kernel="gaussian",
                        show_progress=True, preprocess=False,
                        h=5, )
-models, predictions = regr_mts4.fit(df_train, df_test)
+models = regr_mts4.fit(df_train, df_test)
 model_dictionary = regr_mts4.provide_models(df_train, df_test)
 print(models)
 print(models[['WINKLERSCORE', 'COVERAGE']])
@@ -50,7 +50,7 @@ regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
                       replications=100, 
                       show_progress=True, preprocess=False,
                       h=5, )
-models, predictions = regr_mts5.fit(df_train, df_test)
+models = regr_mts5.fit(df_train, df_test)
 model_dictionary = regr_mts5.provide_models(df_train, df_test)
 print(models)
 print(models[['WINKLERSCORE', 'COVERAGE']])
@@ -64,7 +64,7 @@ regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
                       replications=100, 
                       show_progress=True, preprocess=False,
                       h=5, )
-models, predictions = regr_mts5.fit(df_train, df_test)
+models = regr_mts5.fit(df_train, df_test)
 model_dictionary = regr_mts5.provide_models(df_train, df_test)
 print(models)
 print(models[['WINKLERSCORE', 'COVERAGE']])
@@ -76,7 +76,7 @@ regr_mts6 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
                       type_pi="scp2-block-bootstrap", 
                       replications=100, show_progress=True, 
                       preprocess=False, h=5 )
-models, predictions = regr_mts6.fit(df_train, df_test)
+models = regr_mts6.fit(df_train, df_test)
 model_dictionary = regr_mts6.provide_models(df_train, df_test)
 print(models)
 print(models[['WINKLERSCORE', 'COVERAGE']])
@@ -102,7 +102,7 @@ regr_mts4 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
                        estimators = ["Ridge", "Lasso", "LarsCV", "LassoCV", "LassoLarsCV"],
                        show_progress=True, preprocess=False,
                          h=5, )
-models, predictions = regr_mts4.fit(df_train, df_test)
+models = regr_mts4.fit(df_train, df_test)
 model_dictionary = regr_mts4.provide_models(df_train, df_test)
 print(models)
 print(models[['WINKLERSCORE', 'COVERAGE']])
@@ -116,7 +116,7 @@ regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
                         estimators = ["Ridge", "Lasso", "LarsCV", "LassoCV", "LassoLarsCV"],
                         show_progress=False, preprocess=False,
                          h=5, )
-models, predictions = regr_mts5.fit(df_train, df_test)
+models = regr_mts5.fit(df_train, df_test)
 model_dictionary = regr_mts5.provide_models(df_train, df_test)
 print(models[['WINKLERSCORE', 'COVERAGE']])
 
@@ -127,7 +127,7 @@ regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
                     #type_pi = "gaussian",
                     show_progress=False, preprocess=False,
                     h=5, )
-models, predictions = regr_mts5.fit(df_train, df_test)
+models = regr_mts5.fit(df_train, df_test)
 model_dictionary = regr_mts5.provide_models(df_train, df_test)
 print(models)
 
@@ -139,7 +139,7 @@ regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
                         estimators = ["Ridge", "Lasso", "LarsCV", "LassoCV", "LassoLarsCV"],
                         show_progress=False, preprocess=False,
                          h=5, )
-models, predictions = regr_mts5.fit(df_train, df_test, per_series=True)
+models = regr_mts5.fit(df_train, df_test, per_series=True)
 model_dictionary = regr_mts5.provide_models(df_train, df_test)
 print(models)
 
@@ -151,6 +151,6 @@ regr_mts5 = ns.LazyDeepMTS(verbose=1, ignore_warnings=False, custom_metric=None,
                     #type_pi = "gaussian",
                     show_progress=False, preprocess=False,
                     h=5, )
-models, predictions = regr_mts5.fit(df_train, df_test, per_series=True)
+models = regr_mts5.fit(df_train, df_test, per_series=True)
 model_dictionary = regr_mts5.provide_models(df_train, df_test)
 print(models)

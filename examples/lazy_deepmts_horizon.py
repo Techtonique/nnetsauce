@@ -44,7 +44,7 @@ regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
                       show_progress=False, preprocess=False, 
                       estimators=["ElasticNetCV", "RidgeCV"],
                       h=5, )
-models, predictions = regr_mts3.fit(df_train, df_test)
+models = regr_mts3.fit(df_train, df_test)
 model_dictionary = regr_mts3.provide_models(df_train, df_test)
 print(models)
 print(model_dictionary["DeepMTS(ElasticNetCV)"])
@@ -56,7 +56,7 @@ regr_mts = ns.LazyDeepMTS(verbose=0, ignore_warnings=True , custom_metric=None,
                       n_layers=3,
                       show_progress=False, preprocess=False,
                       h=5, )
-models, predictions = regr_mts.fit(df_train, df_test)
+models = regr_mts.fit(df_train, df_test)
 model_dictionary = regr_mts.provide_models(df_train, df_test)
 print(models)
 print(model_dictionary["DeepMTS(LinearSVR)"])
@@ -69,7 +69,7 @@ regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
                       replications=10, kernel="gaussian",
                       show_progress=False, preprocess=False,
                       h=5, )
-models, predictions = regr_mts3.fit(df_train, df_test)
+models = regr_mts3.fit(df_train, df_test)
 model_dictionary = regr_mts3.provide_models(df_train, df_test)
 print(models)
 print(models[['WINKLERSCORE', 'COVERAGE']])
@@ -83,7 +83,7 @@ regr_mts3 = ns.LazyDeepMTS(verbose=0, ignore_warnings=True, custom_metric=None,
                       type_pi="scp2-kde",
                       show_progress=False, preprocess=False,
                       h=5, )
-models, predictions = regr_mts3.fit(df2_train, df2_test)
+models = regr_mts3.fit(df2_train, df2_test)
 model_dictionary = regr_mts3.provide_models(df2_train, df2_test)
 print(models)
 print(models[['WINKLERSCORE', 'COVERAGE']])

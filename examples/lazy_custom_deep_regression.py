@@ -18,14 +18,14 @@ regr2 = ns.LazyDeepRegressor(n_layers=3, n_hidden_features=2,
 verbose=0, ignore_warnings=True, estimators=["ExtraTreesRegressor", 
                                              "RandomForestRegressor", 
                                              "LassoLarsIC"])
-models, predictions = regr2.fit(X_train, X_test, y_train, y_test)
+models = regr2.fit(X_train, X_test, y_train, y_test)
 model_dictionary = regr2.provide_models(X_train, X_test, y_train, y_test)
 print(models)
 print(model_dictionary["DeepCustomRegressor(LassoLarsIC)"])
 
 regr = ns.LazyDeepRegressor(n_layers=3, n_hidden_features=2, 
 verbose=0, ignore_warnings=True)
-models, predictions = regr.fit(X_train, X_test, y_train, y_test)
+models = regr.fit(X_train, X_test, y_train, y_test)
 model_dictionary = regr.provide_models(X_train, X_test, y_train, y_test)
 print(models)
 print(model_dictionary["DeepCustomRegressor(LassoLarsIC)"])
@@ -44,14 +44,14 @@ verbose=0, ignore_warnings=True, estimators=["ExtraTreesRegressor",
                                              "RandomForestRegressor", 
                                              "LassoLarsIC"], 
                                              preprocess=True)
-models, predictions = regr2.fit(X_train, X_test, y_train, y_test)
+models = regr2.fit(X_train, X_test, y_train, y_test)
 model_dictionary = regr2.provide_models(X_train, X_test, y_train, y_test)
 print(models)
 print(model_dictionary["DeepCustomRegressor(LassoLarsIC)"])
 
 regr = ns.LazyDeepRegressor(n_layers=3, n_hidden_features=2, 
 verbose=0, ignore_warnings=True, preprocess=True)
-models, predictions = regr.fit(X_train, X_test, y_train, y_test)
+models = regr.fit(X_train, X_test, y_train, y_test)
 model_dictionary = regr.provide_models(X_train, X_test, y_train, y_test)
 print(models)
 print(model_dictionary["DeepCustomRegressor(LassoLarsIC)"])
