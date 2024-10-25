@@ -381,8 +381,8 @@ class MTS(Base):
                 self.df_ = pd.concat(
                     [self.df_, pd.DataFrame(X, columns=self.series_names)], axis=0
                 )
-            # self.df_.index = None
-            self.input_dates = ts.compute_input_dates(self.df_)
+            
+        self.input_dates = ts.compute_input_dates(self.df_)
 
         try:
             # multivariate time series
