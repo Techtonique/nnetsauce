@@ -272,7 +272,7 @@ class CustomClassifier(Custom, ClassifierMixin):
 
         # if sample_weight is None:
         try:
-            self.obj.fit(scaled_Z, output_y)
+            self.obj.partial_fit(scaled_Z, output_y)
         except:
             raise NotImplementedError
 

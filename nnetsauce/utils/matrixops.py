@@ -300,45 +300,54 @@ def safe_sparse_dot(a, b, backend="cpu", dense_output=False):
 # Obtain this for JAX
 # Obtain this for JAX
 # scale... covariates
-def scale_covariates(X, choice="std", training=True, scaler=None):
+def scale_covariates(X, choice="std", scaler=None):
+    
+    # online training (scaler is already fitted)
+    if scaler is not None:
 
-    if training == True:
+        try: 
+            scaler.partial_fit(X)
+        except Exception as e:
+            try: 
+                scaler.fit(X)
+            except Exception as e:
+                print(e)
 
-        # scaler must be not None
-        if choice == "std":
-            if sparse.issparse(X):
-                scaler = StandardScaler(
-                    copy=True, with_mean=False, with_std=True
-                )
-            else:
-                scaler = StandardScaler(
-                    copy=True, with_mean=True, with_std=True
-                )
-
-        elif choice == "minmax":
-            scaler = MinMaxScaler()
-
-        elif choice == "maxabs":
-            scaler = MaxAbsScaler()
-
-        else:  # 'robust'
-            if sparse.issparse(X):
-                scaler = RobustScaler(
-                    copy=True, with_centering=False, with_scaling=True
-                )
-            else:
-                scaler = RobustScaler(
-                    copy=True, with_centering=True, with_scaling=True
-                )
-
-        scaled_X = scaler.fit_transform(X)
-
+        scaled_X = scaler.transform(X)
         return scaler, scaled_X
 
-    # training == False:
-    # scaler must be not None
-    return scaler.transform(X)
+    # initial batch training 
+    if choice == "std":
+        if sparse.issparse(X):
+            scaler = StandardScaler(
+                copy=True, with_mean=False, with_std=True
+            )
+        else:
+            scaler = StandardScaler(
+                copy=True, with_mean=True, with_std=True
+            )
 
+    elif choice == "minmax":
+        scaler = MinMaxScaler()
+
+    elif choice == "maxabs":
+        scaler = MaxAbsScaler()
+
+    else:  # 'robust'
+
+        if sparse.issparse(X):
+            scaler = RobustScaler(
+                copy=True, with_centering=False, with_scaling=True
+            )
+        else:
+            scaler = RobustScaler(
+                copy=True, with_centering=True, with_scaling=True
+            )
+
+    scaled_X = scaler.fit_transform(X)
+
+    return scaler, scaled_X
+    
 
 # from sklearn.utils.exmath
 def squared_norm(x, backend="cpu"):
