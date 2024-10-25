@@ -359,12 +359,29 @@ class MTS(Base):
             self.series_names = X.columns.tolist()
 
         if isinstance(X, pd.DataFrame):
-            self.df_ = X
-            X = X.values
-            self.df_.columns = self.series_names
-            self.input_dates = ts.compute_input_dates(self.df_)
+            if self.df_ is None:
+                self.df_ = X
+                X = X.values
+            else:
+                input_dates_prev = pd.DatetimeIndex(self.df_.index.values)  
+                frequency = pd.infer_freq(input_dates_prev)                                             
+                self.df_ = pd.concat([self.df_, X], axis=0) 
+                self.input_dates = pd.date_range(
+                    start=input_dates_prev[0], 
+                    periods=len(input_dates_prev)+X.shape[0], 
+                    freq=frequency
+                ).values.tolist()
+                self.df_.index = self.input_dates
+                X = self.df_.values
+            self.df_.columns = self.series_names            
         else:
-            self.df_ = pd.DataFrame(X, columns=self.series_names)
+            if self.df_ is None:
+                self.df_ = pd.DataFrame(X, columns=self.series_names)
+            else:
+                self.df_ = pd.concat(
+                    [self.df_, pd.DataFrame(X, columns=self.series_names)], axis=0
+                )
+            # self.df_.index = None
             self.input_dates = ts.compute_input_dates(self.df_)
 
         try:
@@ -524,17 +541,22 @@ class MTS(Base):
         self: object
         """
 
+        assert self.df_ is not None, "fit() must be called before partial_fit()"
+
         if (
             isinstance(X, pd.DataFrame) is False
-        ):
-            if X.shape[0] == 1:
+        ) and isinstance(X, pd.Series) is False:
+            if len(X.shape) == 1:
                 X = X.reshape(1, -1)
+            
+            return self.fit(X, xreg, **kwargs)
+        
         else:
-            if X.shape[0] == 1:
-                colnames = X.columns
+            if len(X.shape) == 1:                
                 X = pd.DataFrame(X.values.reshape(1, -1), 
-                                 columns=colnames)
-        return self.fit(X, xreg, **kwargs)
+                                 columns=self.df_.columns)
+                
+            return self.fit(X, xreg, **kwargs)
 
     def predict(self, h=5, level=95, **kwargs):
         """Forecast all the time series, h steps ahead
