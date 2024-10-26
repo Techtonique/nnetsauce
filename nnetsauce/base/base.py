@@ -230,7 +230,7 @@ class Base(BaseEstimator):
 
     # "preprocessing" methods to be inherited -----
 
-    def encode_clusters(self, X=None, predict=False, **kwargs):  #
+    def encode_clusters(self, X=None, predict=False, scaler=None, **kwargs):  #
         """Create new covariates with kmeans or GMM clustering
 
         Parameters:
@@ -241,6 +241,9 @@ class Base(BaseEstimator):
 
             predict: boolean
                 is False on training set and True on test set
+            
+            scaler: {object} of class StandardScaler, MinMaxScaler, RobustScaler or MaxAbsScaler
+                if scaler has already been fitted on training data (online training), it can be passed here
 
             **kwargs:
                 additional parameters to be passed to the
@@ -261,9 +264,11 @@ class Base(BaseEstimator):
             X = copy.deepcopy(X.values.astype(float))
 
         if predict is False:  # encode training set
+
             # scale input data before clustering
             self.clustering_scaler_, scaled_X = mo.scale_covariates(
-                X, choice=self.type_scaling[2]
+                X, choice=self.type_scaling[2], 
+                scaler=self.clustering_scaler_
             )
 
             self.clustering_obj_, X_clustered = mo.cluster_covariates(
@@ -464,7 +469,7 @@ class Base(BaseEstimator):
 
             W: {array-like}, shape = [n_features, hidden_features]
                 if provided, constructs the hidden layer via W
-
+            
         Returns:
 
             (centered response, direct link + hidden layer matrix): {tuple}
@@ -479,6 +484,7 @@ class Base(BaseEstimator):
             ), "must have len(self.type_scaling) >= 2 when self.n_hidden_features > 0"
 
         if X is None:
+
             if self.col_sample == 1:
                 input_X = self.X_
             else:
@@ -495,6 +501,7 @@ class Base(BaseEstimator):
                 input_X = self.X_[:, self.index_col_]
 
         else:  # X is not None # keep X vs self.X_
+
             if isinstance(X, pd.DataFrame):
                 X = copy.deepcopy(X.values.astype(float))
 
@@ -515,10 +522,14 @@ class Base(BaseEstimator):
 
         if (
             self.n_clusters <= 0
-        ):  # data without any clustering: self.n_clusters is None -----
+        ):  
+            # data without any clustering: self.n_clusters is None -----
+
             if self.n_hidden_features > 0:  # with hidden layer
+
                 self.nn_scaler_, scaled_X = mo.scale_covariates(
-                    input_X, choice=self.type_scaling[1]
+                    input_X, choice=self.type_scaling[1], 
+                    scaler=self.nn_scaler_
                 )
                 Phi_X = (
                     self.create_layer(scaled_X)
@@ -531,14 +542,20 @@ class Base(BaseEstimator):
                     else Phi_X
                 )
                 self.scaler_, scaled_Z = mo.scale_covariates(
-                    Z, choice=self.type_scaling[0]
+                    Z, choice=self.type_scaling[0], 
+                    scaler=self.scaler_
                 )
             else:  # no hidden layer
                 Z = input_X
                 self.scaler_, scaled_Z = mo.scale_covariates(
-                    Z, choice=self.type_scaling[0]
+                    Z, choice=self.type_scaling[0], 
+                    scaler=self.scaler_
                 )
-        else:  # data with clustering: self.n_clusters is not None ----- # keep
+
+        else:  
+            
+            # data with clustering: self.n_clusters is not None ----- # keep
+
             augmented_X = mo.cbind(
                 input_X,
                 self.encode_clusters(input_X, **kwargs),
@@ -546,8 +563,10 @@ class Base(BaseEstimator):
             )
 
             if self.n_hidden_features > 0:  # with hidden layer
+
                 self.nn_scaler_, scaled_X = mo.scale_covariates(
-                    augmented_X, choice=self.type_scaling[1]
+                    augmented_X, choice=self.type_scaling[1], 
+                    scaler=self.nn_scaler_
                 )
                 Phi_X = (
                     self.create_layer(scaled_X)
@@ -560,12 +579,14 @@ class Base(BaseEstimator):
                     else Phi_X
                 )
                 self.scaler_, scaled_Z = mo.scale_covariates(
-                    Z, choice=self.type_scaling[0]
+                    Z, choice=self.type_scaling[0], 
+                    scaler=self.scaler_
                 )
             else:  # no hidden layer
                 Z = augmented_X
                 self.scaler_, scaled_Z = mo.scale_covariates(
-                    Z, choice=self.type_scaling[0]
+                    Z, choice=self.type_scaling[0], 
+                    scaler=self.scaler_
                 )
 
         # Returning model inputs -----        

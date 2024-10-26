@@ -3,6 +3,7 @@
 # License: BSD 3
 
 import numpy as np
+import pandas as pd
 import sklearn.metrics as skm2
 from .custom import Custom
 from ..predictionset import PredictionSet
@@ -203,6 +204,12 @@ class CustomClassifier(Custom, ClassifierMixin):
             self: object
         """
 
+        if len(X.shape) == 1:
+            if isinstance(X, pd.DataFrame):
+                X = pd.DataFrame(X.values.reshape(1, -1), columns=X.columns)    
+            else:
+                X = X.reshape(1, -1)
+
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
         self.classes_ =  np.unique(y)
         self.n_classes_ = len(self.classes_)  # for compatibility with         
@@ -253,6 +260,13 @@ class CustomClassifier(Custom, ClassifierMixin):
             self: object
         """
 
+        if len(X.shape) == 1:
+            if isinstance(X, pd.DataFrame):
+                X = pd.DataFrame(X.values.reshape(1, -1), columns=X.columns)             
+            else:
+                X = X.reshape(1, -1)
+            y = np.array([y], dtype=np.integer)
+
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
         self.n_classes_ = len(np.unique(y))  # for compatibility with sklearn
 
@@ -272,7 +286,7 @@ class CustomClassifier(Custom, ClassifierMixin):
 
         # if sample_weight is None:
         try:
-            self.obj.fit(scaled_Z, output_y)
+            self.obj.partial_fit(scaled_Z, output_y)
         except:
             raise NotImplementedError
 

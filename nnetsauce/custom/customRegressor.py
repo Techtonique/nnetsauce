@@ -3,6 +3,7 @@
 # License: BSD 3
 
 import numpy as np
+import pandas as pd
 import sklearn.metrics as skm2
 from .custom import Custom
 from ..utils import matrixops as mo
@@ -239,6 +240,13 @@ class CustomRegressor(Custom, RegressorMixin):
 
         """
 
+        if len(X.shape) == 1:
+            if isinstance(X, pd.DataFrame):
+                X = pd.DataFrame(X.values.reshape(1, -1), columns=X.columns)             
+            else:
+                X = X.reshape(1, -1)
+            y = np.array([y])
+
         centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
         # if sample_weights, else: (must use self.row_index)
@@ -255,10 +263,10 @@ class CustomRegressor(Custom, RegressorMixin):
 
             return self
 
-        try:
-            self.obj.partial_fit(scaled_Z, centered_y, **kwargs)
-        except:
-            raise NotImplementedError
+        #try:
+        self.obj.partial_fit(scaled_Z, centered_y, **kwargs)
+        #except:
+        #    raise NotImplementedError
 
         self.X_ = X
 
@@ -348,6 +356,14 @@ class CustomRegressor(Custom, RegressorMixin):
                 replications=self.replications,
                 kernel=self.kernel,
             )
+
+            if len(self.X_.shape) == 1:
+                if isinstance(X, pd.DataFrame):
+                    self.X_ = pd.DataFrame(self.X_.values.reshape(1, -1), columns=self.X_.columns)             
+                else:
+                    self.X_ = self.X_.reshape(1, -1)
+                self.y_ = np.array([self.y_])
+
             self.pi.fit(self.X_, self.y_)
             self.X_ = None
             self.y_ = None
