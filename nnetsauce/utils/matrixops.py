@@ -94,6 +94,14 @@ def center_response(y):
 
 # cluster the covariates
 def cluster_covariates(X, n_clusters, seed, type_clust="kmeans", **kwargs):
+
+    if isinstance(X, pd.DataFrame):
+        if len(X.shape) == 1:
+            X = pd.DataFrame(X.values.reshape(1, -1), columns=X.columns)
+    else:
+        if len(X.shape) == 1:
+            X = X.reshape(1, -1)
+
     if isinstance(X, pd.DataFrame):
         X = copy.deepcopy(X.values.astype(float))
 
@@ -301,6 +309,12 @@ def safe_sparse_dot(a, b, backend="cpu", dense_output=False):
 # Obtain this for JAX
 # scale... covariates
 def scale_covariates(X, choice="std", scaler=None):
+
+    if len(X.shape) == 1:
+        if isinstance(X, pd.DataFrame):
+            X = pd.DataFrame(X.values.reshape(1, -1), columns=X.columns)             
+        else:
+            X = X.reshape(1, -1)
     
     # online training (scaler is already fitted)
     if scaler is not None:
