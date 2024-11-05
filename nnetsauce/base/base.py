@@ -262,6 +262,9 @@ class Base(BaseEstimator):
 
         if isinstance(X, pd.DataFrame):
             X = copy.deepcopy(X.values.astype(float))
+        
+        if len(X.shape) == 1:
+            X = X.reshape(1, -1)
 
         if predict is False:  # encode training set
 

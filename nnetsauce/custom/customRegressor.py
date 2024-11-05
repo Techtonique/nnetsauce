@@ -276,9 +276,6 @@ class CustomRegressor(Custom, RegressorMixin):
 
         self.y_ = y
 
-        if hasattr(self.obj, "coef_"):
-            self.coef_ = self.obj.coef_
-
         return self
 
     def predict(self, X, level=95, method=None, **kwargs):

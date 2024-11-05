@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from copy import deepcopy
 from sklearn.base import BaseEstimator, RegressorMixin
+from ..base import Base
 
 
 def _update_mean(mean_old, n_obs, new_vectors):
@@ -51,10 +52,19 @@ class RegressorUpdater(BaseEstimator, RegressorMixin):
             X = X.reshape(1, -1)
         assert X.shape[0] == 1, "X must have 1 row"       
         self.updating_factor_ = self.n_obs_**(-self.alpha)
-        if isinstance(X, pd.DataFrame):
-            newx = X.values.ravel()        
-        else: 
-            newx = X.ravel()
+
+        if isinstance(self.regr, Base): # nnetsauce model
+            newX = self.regr.cook_test_set(X=X)
+            if isinstance(X, pd.DataFrame):
+                newx = newX.values.ravel()        
+            else: 
+                newx = newX.ravel()
+        else: # sklearn model
+            if isinstance(X, pd.DataFrame):
+                newx = X.values.ravel()        
+            else: 
+                newx = X.ravel()
+
         new_coef = self.regr.coef_ + self.updating_factor_ * np.dot(newx, y - np.dot(newx, self.regr.coef_))       
         self.regr.coef_ = _update_mean(self.regr.coef_, self.n_obs_, new_coef)
         self.coef_ = deepcopy(self.regr.coef_)

@@ -179,9 +179,6 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
 
         self.obj = deepcopy(self.stacked_obj)
 
-        if hasattr(self.obj, "coef_"):
-            self.coef_ = self.obj.coef_
-
         return self.obj
 
     def predict(self, X, **kwargs):
