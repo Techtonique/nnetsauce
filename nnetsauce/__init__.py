@@ -28,6 +28,7 @@ from .ridge2.ridge2MultitaskClassifier import Ridge2MultitaskClassifier
 from .rvfl.bayesianrvflRegressor import BayesianRVFLRegressor
 from .rvfl.bayesianrvfl2Regressor import BayesianRVFL2Regressor
 from .sampling import SubSampler
+from .updater import RegressorUpdater
 from .votingregressor import MedianVotingRegressor
 
 __all__ = [
@@ -59,6 +60,7 @@ __all__ = [
     "Optimizer",
     "RandomBagRegressor",
     "RandomBagClassifier",
+    "RegressorUpdater",
     "Ridge2Regressor",
     "Ridge2Classifier",
     "Ridge2MultitaskClassifier",
