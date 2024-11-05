@@ -165,6 +165,7 @@ class CustomRegressor(Custom, RegressorMixin):
         self.type_split = type_split
         self.level = level
         self.pi_method = pi_method
+        self.coef_ = None
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit custom model to training data (X, y).
@@ -213,6 +214,9 @@ class CustomRegressor(Custom, RegressorMixin):
         self.X_ = X
 
         self.y_ = y
+
+        if hasattr(self.obj, "coef_"):
+            self.coef_ = self.obj.coef_
 
         return self
 
@@ -271,6 +275,9 @@ class CustomRegressor(Custom, RegressorMixin):
         self.X_ = X
 
         self.y_ = y
+
+        if hasattr(self.obj, "coef_"):
+            self.coef_ = self.obj.coef_
 
         return self
 

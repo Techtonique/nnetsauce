@@ -5,10 +5,29 @@ from sklearn.base import BaseEstimator, RegressorMixin
 
 
 def _update_mean(mean_old, n_obs, new_vectors):
-    print(f"n_obs: {n_obs}")
     return (n_obs * mean_old + new_vectors) / (n_obs + 1)
 
 class RegressorUpdater(BaseEstimator, RegressorMixin):
+    """
+    Update a regression model with new observations
+
+    Parameters
+    ----------
+    regr: object
+        A regression model with a coef_ attribute
+    alpha: float
+        Updating factor's exponent
+
+    Attributes
+    ----------
+    n_obs_: int
+        Number of observations
+    coef_: np.ndarray
+        Coefficients of the model
+    updating_factor_: float
+        Updating factor
+
+    """
     def __init__(self, regr, alpha=0.5):
         self.regr = regr
         self.alpha = alpha
@@ -33,11 +52,10 @@ class RegressorUpdater(BaseEstimator, RegressorMixin):
         assert X.shape[0] == 1, "X must have 1 row"       
         self.updating_factor_ = self.n_obs_**(-self.alpha)
         if isinstance(X, pd.DataFrame):
-            new_coef = self.regr.coef_ + self.updating_factor_ * np.dot(X.values.ravel(), y - np.dot(X.values.ravel(), 
-                                                                                                 self.regr.coef_))
+            newx = X.values.ravel()        
         else: 
-            new_coef = self.regr.coef_ + self.updating_factor_ * np.dot(X.ravel(), y - np.dot(X.ravel(), self.regr.coef_))       
-        print(f"new_coef: {new_coef}")    
+            newx = X.ravel()
+        new_coef = self.regr.coef_ + self.updating_factor_ * np.dot(newx, y - np.dot(newx, self.regr.coef_))       
         self.regr.coef_ = _update_mean(self.regr.coef_, self.n_obs_, new_coef)
         self.coef_ = deepcopy(self.regr.coef_)
         self.n_obs_ += X.shape[0]

@@ -98,6 +98,7 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
         self.n_layers = n_layers
         self.level = level
         self.pi_method = pi_method
+        self.coef_ = None
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit Regression algorithms to X and y.
@@ -177,6 +178,9 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
             self.stacked_obj.fit(X, y)
 
         self.obj = deepcopy(self.stacked_obj)
+
+        if hasattr(self.obj, "coef_"):
+            self.coef_ = self.obj.coef_
 
         return self.obj
 
