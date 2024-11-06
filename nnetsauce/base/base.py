@@ -673,6 +673,9 @@ class Base(BaseEstimator):
 
         if isinstance(X, pd.DataFrame):
             X = copy.deepcopy(X.values.astype(float))
+        
+        if len(X.shape) == 1:
+            X = X.reshape(1, -1)
 
         if (
             self.n_clusters == 0

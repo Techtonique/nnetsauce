@@ -108,11 +108,13 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
 
         assert n_layers >= 1, "must have n_layers >= 1"
 
-        self.stacked_obj = obj
+        self.stacked_obj = deepcopy(obj)
         self.verbose = verbose
         self.n_layers = n_layers
+        self.classes_ = None
+        self.n_classes_ = None
 
-    def fit(self, X, y, sample_weight=None, **kwargs):
+    def fit(self, X, y, **kwargs):
         """Fit Classification algorithms to X and y.
         Parameters
         ----------
@@ -122,8 +124,10 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         y : array-like,
             Training vectors, where rows is the number of samples
             and columns is the number of features.
-        sample_weight: array-like, shape = [n_samples]
-                Sample weights.
+        **kwargs: dict
+            Additional parameters to be passed to the fit method 
+            of the base learner. For example, `sample_weight`.
+
         Returns
         -------
         A fitted object
@@ -179,31 +183,57 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                     row_sample=self.row_sample,
                     seed=self.seed,
                     backend=self.backend,
-                )
+                )                
             )
+        
+        self.stacked_obj.fit(X, y, **kwargs)
 
         if self.level is not None:
             self.stacked_obj = PredictionSet(
                 obj=self.stacked_obj, method=self.pi_method, level=self.level
             )
 
-        try:
-            self.stacked_obj.fit(X, y, sample_weight=sample_weight, **kwargs)
-        except Exception as e:
-            self.stacked_obj.fit(X, y)
-
-        self.obj = deepcopy(self.stacked_obj)
-
-        return self.obj
+        return self
+    
+    def partial_fit(self, X, y, **kwargs):
+        """Fit Regression algorithms to X and y.
+        Parameters
+        ----------
+        X : array-like,
+            Training vectors, where rows is the number of samples
+            and columns is the number of features.
+        y : array-like,
+            Training vectors, where rows is the number of samples
+            and columns is the number of features.
+        **kwargs: dict
+            Additional parameters to be passed to the fit method 
+            of the base learner. For example, `sample_weight`.
+        Returns
+        -------
+        A fitted object
+        """
+        assert hasattr(self, "stacked_obj"), "model must be fitted first"
+        current_obj = self.stacked_obj
+        for _ in range(self.n_layers):
+            try: 
+                input_X = current_obj.obj.cook_test_set(X)
+                current_obj.obj.partial_fit(input_X, y, **kwargs)
+                try: 
+                    current_obj = current_obj.obj
+                except AttributeError:
+                    pass
+            except ValueError:
+                pass 
+        return self
 
     def predict(self, X):
-        return self.obj.predict(X)
+        return self.stacked_obj.predict(X)
 
     def predict_proba(self, X):
-        return self.obj.predict_proba(X)
+        return self.stacked_obj.predict_proba(X)
 
     def score(self, X, y, scoring=None):
-        return self.obj.score(X, y, scoring)
+        return self.stacked_obj.score(X, y, scoring)
 
     def cross_val_optim(
         self,

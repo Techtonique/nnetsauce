@@ -220,7 +220,7 @@ class CustomRegressor(Custom, RegressorMixin):
 
         return self
 
-    def partial_fit(self, X, y, sample_weight=None, **kwargs):
+    def partial_fit(self, X, y, **kwargs):
         """Partial fit custom model to training data (X, y).
 
         Parameters:
@@ -231,9 +231,6 @@ class CustomRegressor(Custom, RegressorMixin):
 
             y: array-like, shape = [n_samples]
                 Subset of target values.
-
-            sample_weight: array-like, shape = [n_samples]
-                Sample weights.
 
             **kwargs: additional parameters to be passed to
                 self.cook_training_set or self.obj.fit
@@ -253,24 +250,7 @@ class CustomRegressor(Custom, RegressorMixin):
 
         centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
-        # if sample_weights, else: (must use self.row_index)
-        if sample_weight is not None:
-            try:
-                self.obj.partial_fit(
-                    scaled_Z,
-                    centered_y,
-                    sample_weight=sample_weight[self.index_row_].ravel(),
-                    **kwargs
-                )
-            except:
-                raise NotImplementedError
-
-            return self
-
-        #try:
         self.obj.partial_fit(scaled_Z, centered_y, **kwargs)
-        #except:
-        #    raise NotImplementedError
 
         self.X_ = X
 
