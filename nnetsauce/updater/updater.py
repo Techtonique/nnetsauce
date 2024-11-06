@@ -80,7 +80,7 @@ class RegressorUpdater(BaseEstimator, RegressorMixin):
                 self.coef_ = self.regr.coef_
             return self
 
-        if check_is_fitted(self.regr) is False: # sklearn model or CustomRegressor model ---
+        if hasattr(self.regr, "coef_") == False: # sklearn model or CustomRegressor model ---
             self.regr.fit(X, y)
             self.n_obs_ = X.shape[0]    
             self.regr.fit(X, y) 
@@ -95,7 +95,7 @@ class RegressorUpdater(BaseEstimator, RegressorMixin):
         return self
 
     def predict(self, X):
-        assert hasattr(self.regr, "coef_"), "model must have coef_ attribute"
+        #assert hasattr(self.regr, "coef_"), "model must have coef_ attribute"
         return self.regr.predict(X) 
 
     def partial_fit(self, X, y):  
