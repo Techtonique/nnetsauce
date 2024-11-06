@@ -20,8 +20,8 @@ quarterly = dates_from_str(quarterly)
 print(mdata.head())
 mdata = mdata[['realgdp', 'realinv', 'cpi']]
 mdata.index = pd.DatetimeIndex(quarterly)
-#data = np.log(mdata).diff().dropna()
-data = mdata
+data = np.log(mdata).diff().dropna()
+#data = mdata
 
 n = data.shape[0]
 max_idx_train = np.floor(n*0.9)
@@ -57,7 +57,9 @@ print(obj_MTS.obj.coef_)
 print(obj_MTS.predict().mean)
 
 
-regr = ns.RegressorUpdater(LassoCV(), alpha=0.9)
+print(df_train.tail())
+
+regr = ns.RegressorUpdater(LassoCV(), alpha=0.1)
 
 obj_MTS = ns.MTS(regr, lags = 2, n_hidden_features=0, 
                  verbose = 1, replications=100)
