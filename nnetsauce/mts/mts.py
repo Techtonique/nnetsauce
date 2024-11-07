@@ -401,7 +401,10 @@ class MTS(Base):
         self.X_ = None
         self.n_series = p
         self.fit_objs_.clear()
-        self.y_means_.clear()
+        try:
+            self.y_means_.clear()
+        except AttributeError:
+            self.y_means_ = None
         residuals_ = []
         self.residuals_ = None
         self.residuals_sims_ = None
@@ -493,6 +496,8 @@ class MTS(Base):
                     iterator = tqdm(range(p))
                 else:
                     iterator = range(p)
+
+                residuals_ = []
 
                 for i in iterator:                    
                     y_mean_temp = np.mean(self.y_[first_half_idx, i])
@@ -778,13 +783,19 @@ class MTS(Base):
                     )
 
             if "return_pi" in kwargs:
-                for i in range(self.n_series):
-                    preds_pi = self.fit_objs_[i].predict(
-                        cooked_new_X, return_pi=True
-                    )
+                try: 
+                    preds_pi = self.obj.predict(cooked_new_X, return_pi=True)
                     mean_pi_.append(preds_pi.mean[0])
                     lower_pi_.append(preds_pi.lower[0])
                     upper_pi_.append(preds_pi.upper[0])
+                except Exception:
+                    for i in range(self.n_series):
+                        preds_pi = self.fit_objs_[i].predict(
+                            cooked_new_X, return_pi=True
+                        )
+                        mean_pi_.append(preds_pi.mean[0])
+                        lower_pi_.append(preds_pi.lower[0])
+                        upper_pi_.append(preds_pi.upper[0])
 
             try:
                 predicted_cooked_new_X = self.obj.predict(cooked_new_X)
