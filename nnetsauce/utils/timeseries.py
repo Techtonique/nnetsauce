@@ -208,7 +208,7 @@ def mean_errors(
 
     if isinstance(pred, pd.DataFrame):
         pred = pred.values
-    else:
+    elif isinstance(pred, tuple):
         pred = pred.mean.values
 
     if isinstance(actual, pd.DataFrame):
@@ -220,19 +220,19 @@ def mean_errors(
 
         if scoring == "mean_error":
             return np.mean(diff, axis=0).tolist()
-        elif scoring == "mean_absolute_error":
+        if scoring == "mean_absolute_error":
             return np.mean(np.abs(diff), axis=0).tolist()
-        elif scoring == "mean_percentage_error":
+        if scoring == "mean_percentage_error":
             return np.asarray(np.mean(diff / actual, axis=0) * 100).tolist()
-        elif scoring == "mean_absolute_percentage_error":
+        if scoring == "mean_absolute_percentage_error":
             return np.asarray(
                 np.mean(np.abs(diff / actual), axis=0) * 100
             ).tolist()
-        elif scoring == "root_mean_squared_error":
+        if scoring == "root_mean_squared_error":
             return np.sqrt(np.mean(np.square(diff), axis=0)).tolist()
-        elif scoring == "mean_squared_error":
+        if scoring == "mean_squared_error":
             return np.mean(np.square(diff), axis=0).tolist()
-        elif scoring == "mean_pinball_loss":
+        if scoring == "mean_pinball_loss":
             return [
                 mean_pinball_loss(actual[:, i], pred[:, i])
                 for i in range(actual.shape[1])
@@ -242,17 +242,17 @@ def mean_errors(
 
         if scoring == "mean_error":
             return np.mean(diff)
-        elif scoring == "mean_absolute_error":
+        if scoring == "mean_absolute_error":
             return np.mean(np.abs(diff))
-        elif scoring == "mean_percentage_error":
+        if scoring == "mean_percentage_error":
             return np.mean(diff / actual) * 100
-        elif scoring == "mean_absolute_percentage_error":
+        if scoring == "mean_absolute_percentage_error":
             return np.mean(np.abs(diff / actual)) * 100
-        elif scoring == "root_mean_squared_error":
+        if scoring == "root_mean_squared_error":
             return np.sqrt(np.mean(np.square(diff)))
-        elif scoring == "mean_squared_error":
+        if scoring == "mean_squared_error":
             return np.mean(np.square(diff))
-        elif scoring == "mean_pinball_loss":
+        if scoring == "mean_pinball_loss":
             return mean_pinball_loss(actual, pred)
 
 
