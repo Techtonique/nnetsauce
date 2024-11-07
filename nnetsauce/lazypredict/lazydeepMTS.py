@@ -341,7 +341,7 @@ class LazyDeepMTS(MTS):
                         X_test = X_test.iloc[0: self.h, :]
 
                 if per_series == False:
-                    rmse = np.sqrt(np.mean((X_test - X_pred.mean)**2))
+                    rmse = np.sqrt(np.mean(np.square((X_test - X_pred.mean))))
                     mae = mean_absolute_error(X_test, X_pred.mean)
                     mpl = mean_pinball_loss(X_test, X_pred.mean)
                 else:
@@ -511,7 +511,7 @@ class LazyDeepMTS(MTS):
                         self.type_pi == "gaussian"
                     ):
                         if per_series == False:
-                            rmse = np.sqrt(np.mean((X_test - X_pred.mean)**2))
+                            rmse = np.sqrt(np.mean(np.square((X_test - X_pred.mean))))
                             mae = mean_absolute_error(X_test, X_pred.mean)
                             mpl = mean_pinball_loss(X_test, X_pred.mean)
                             winklerscore = winkler_score(
@@ -548,7 +548,7 @@ class LazyDeepMTS(MTS):
                             )
                     else:
                         if per_series == False:
-                            rmse = np.sqrt(np.mean((X_test - X_pred)**2))
+                            rmse = np.sqrt(np.mean(np.square(X_test - X_pred)))
                             mae = mean_absolute_error(X_test, X_pred)
                             mpl = mean_pinball_loss(X_test, X_pred)
                         else:
@@ -743,7 +743,7 @@ class LazyDeepMTS(MTS):
                                     X_pred, X_test, level=95, per_series=True
                                 )
                             else:
-                                rmse = np.sqrt(np.mean((X_test - X_pred.mean)**2))
+                                rmse = np.sqrt(np.mean(np.square((X_test - X_pred.mean))))
                                 mae = mean_absolute_error(X_test, X_pred.mean)
                                 mpl = mean_pinball_loss(X_test, X_pred.mean)
                                 winklerscore = winkler_score(
@@ -773,7 +773,7 @@ class LazyDeepMTS(MTS):
                                     per_series=True,
                                 )
                             else:
-                                rmse = np.sqrt(np.mean((X_test - X_pred)**2))
+                                rmse = np.sqrt(np.mean(np.square(X_test - X_pred)))
                                 mae = mean_absolute_error(X_test, X_pred)
                                 mpl = mean_pinball_loss(X_test, X_pred)
                     else:  # self.h is not None

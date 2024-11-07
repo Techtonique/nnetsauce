@@ -305,6 +305,7 @@ class MTS(Base):
         self.residuals_std_dev_ = None
         self.n_obs_ = None
         self.level_ = None
+        self.scaled_Z_ = None
 
     def fit(self, X, xreg=None, **kwargs):
         """Fit MTS model to training data X, with optional regressors xreg
@@ -430,12 +431,7 @@ class MTS(Base):
         if self.verbose > 0:
             print(
                 f"\n Adjusting {type(self.obj).__name__} to multivariate time series... \n "
-            )
-
-        if self.show_progress is True:
-            iterator = tqdm(range(p))
-        else:
-            iterator = range(p)
+            )        
 
         if self.type_pi in (
             "gaussian",
@@ -443,47 +439,83 @@ class MTS(Base):
             "bootstrap",
             "block-bootstrap",
         ) or self.type_pi.startswith("vine"):
-            for i in iterator:
-                y_mean = np.mean(self.y_[:, i])
-                self.y_means_[i] = y_mean
-                centered_y_i = self.y_[:, i] - y_mean
-                self.centered_y_is_.append(centered_y_i)
-                self.obj.fit(X=scaled_Z, y=centered_y_i)
-                self.fit_objs_[i] = deepcopy(self.obj)
-                residuals_.append(
-                    (
-                        centered_y_i - self.fit_objs_[i].predict(scaled_Z)
-                    ).tolist()
-                )
+            
+            try: # multioutput regressor
+
+                self.y_means_ = np.mean(self.y_, axis=0)
+                centered_y = self.y_ - self.y_means_
+                self.obj.fit(X=scaled_Z, y=centered_y)
+                residuals_ = centered_y - self.obj.predict(scaled_Z)
+                self.residuals_ = residuals_
+
+            except Exception: # single output regressor
+
+                if self.show_progress is True:
+                    iterator = tqdm(range(p))
+                else:
+                    iterator = range(p)
+            
+                for i in iterator:
+                    y_mean = np.mean(self.y_[:, i])
+                    self.y_means_[i] = y_mean
+                    centered_y_i = self.y_[:, i] - y_mean
+                    self.centered_y_is_.append(centered_y_i)
+                    self.obj.fit(X=scaled_Z, y=centered_y_i)
+                    self.fit_objs_[i] = deepcopy(self.obj)
+                    residuals_.append(
+                        (
+                            centered_y_i - self.fit_objs_[i].predict(scaled_Z)
+                        ).tolist()
+                    )
 
         if self.type_pi.startswith("scp"):
-            # split conformal prediction
-            for i in iterator:
-                n_y = self.y_.shape[0]
-                n_y_half = n_y // 2
-                first_half_idx = range(0, n_y_half)
-                second_half_idx = range(n_y_half, n_y)
-                y_mean_temp = np.mean(self.y_[first_half_idx, i])
-                centered_y_i_temp = self.y_[first_half_idx, i] - y_mean_temp
-                self.obj.fit(X=scaled_Z[first_half_idx, :], y=centered_y_i_temp)
-                # calibrated residuals actually
-                residuals_.append(
-                    (
-                        self.y_[second_half_idx, i]
-                        - (
-                            y_mean_temp
-                            + self.obj.predict(scaled_Z[second_half_idx, :])
-                        )
-                    ).tolist()
-                )
-                # fit on the second half
-                y_mean = np.mean(self.y_[second_half_idx, i])
-                self.y_means_[i] = y_mean
-                centered_y_i = self.y_[second_half_idx, i] - y_mean
-                self.obj.fit(X=scaled_Z[second_half_idx, :], y=centered_y_i)
-                self.fit_objs_[i] = deepcopy(self.obj)
 
-        self.residuals_ = np.asarray(residuals_).T
+            # split conformal prediction
+            n_y = self.y_.shape[0]
+            n_y_half = n_y // 2
+            first_half_idx = range(0, n_y_half)
+            second_half_idx = range(n_y_half, n_y)
+
+            try: # multioutput regressor
+
+                y_mean_temp = np.mean(self.y_[first_half_idx, :], axis=0)
+                centered_y_temp = self.y_[first_half_idx, :] - y_mean_temp
+                self.obj.fit(X=scaled_Z[first_half_idx, :], y=centered_y_temp)
+                residuals_ = self.y_[second_half_idx, :] - y_mean_temp - self.obj.predict(scaled_Z[second_half_idx, :])
+                self.y_means_ = np.mean(self.y_[second_half_idx, :], axis=0)
+                centered_y = self.y_[second_half_idx, :] - self.y_means_[:, np.newaxis]
+                self.obj.fit(X=scaled_Z[second_half_idx, :], y=centered_y)  
+                self.residuals_ = np.asarray(residuals_)              
+
+            except Exception: # single output regressor
+
+                if self.show_progress is True:
+                    iterator = tqdm(range(p))
+                else:
+                    iterator = range(p)
+
+                for i in iterator:                    
+                    y_mean_temp = np.mean(self.y_[first_half_idx, i])
+                    centered_y_i_temp = self.y_[first_half_idx, i] - y_mean_temp
+                    self.obj.fit(X=scaled_Z[first_half_idx, :], y=centered_y_i_temp)
+                    # calibrated residuals actually
+                    residuals_.append(
+                        (
+                            self.y_[second_half_idx, i]
+                            - (
+                                y_mean_temp
+                                + self.obj.predict(scaled_Z[second_half_idx, :])
+                            )
+                        ).tolist()
+                    )
+                    # fit on the second half
+                    y_mean = np.mean(self.y_[second_half_idx, i])
+                    self.y_means_[i] = y_mean
+                    centered_y_i = self.y_[second_half_idx, i] - y_mean
+                    self.obj.fit(X=scaled_Z[second_half_idx, :], y=centered_y_i)
+                    self.fit_objs_[i] = deepcopy(self.obj)
+
+                self.residuals_ = np.asarray(residuals_).T       
 
         if self.type_pi == "gaussian":
             self.gaussian_preds_std_ = np.std(self.residuals_, axis=0)
@@ -551,12 +583,11 @@ class MTS(Base):
             
             return self.fit(X, xreg, **kwargs)
         
-        else:
-            if len(X.shape) == 1:                
-                X = pd.DataFrame(X.values.reshape(1, -1), 
-                                 columns=self.df_.columns)
-                
-            return self.fit(X, xreg, **kwargs)
+        if len(X.shape) == 1:                
+            X = pd.DataFrame(X.values.reshape(1, -1), 
+                                columns=self.df_.columns)
+            
+        return self.fit(X, xreg, **kwargs)
 
     def predict(self, h=5, level=95, **kwargs):
         """Forecast all the time series, h steps ahead
@@ -730,16 +761,21 @@ class MTS(Base):
             cooked_new_X = self.cook_test_set(new_X, **kwargs)
 
             if "return_std" in kwargs:
-                self.preds_std_.append(
-                    [
-                        np.asarray(
-                            self.fit_objs_[i].predict(
-                                cooked_new_X, return_std=True
-                            )[1]
-                        ).item()
-                        for i in range(self.n_series)
-                    ]
-                )
+                try: # multioutput regressor
+                    self.preds_std_ = self.obj.predict(
+                        cooked_new_X, return_std=True
+                    )[1]
+                except Exception: # single output regressor
+                    self.preds_std_.append(
+                        [
+                            np.asarray(
+                                self.fit_objs_[i].predict(
+                                    cooked_new_X, return_std=True
+                                )[1]
+                            ).item()
+                            for i in range(self.n_series)
+                        ]
+                    )
 
             if "return_pi" in kwargs:
                 for i in range(self.n_series):
@@ -750,12 +786,15 @@ class MTS(Base):
                     lower_pi_.append(preds_pi.lower[0])
                     upper_pi_.append(preds_pi.upper[0])
 
-            predicted_cooked_new_X = np.asarray(
-                [
-                    np.asarray(self.fit_objs_[i].predict(cooked_new_X)).item()
-                    for i in range(self.n_series)
-                ]
-            )
+            try:
+                predicted_cooked_new_X = self.obj.predict(cooked_new_X)
+            except Exception:
+                predicted_cooked_new_X = np.asarray(
+                    [
+                        np.asarray(self.fit_objs_[i].predict(cooked_new_X)).item()
+                        for i in range(self.n_series)
+                    ]
+                )
 
             preds = np.asarray(y_means_ + predicted_cooked_new_X)
 
