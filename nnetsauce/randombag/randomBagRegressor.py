@@ -8,7 +8,7 @@ from .bag import RandomBag
 from ..custom import CustomRegressor
 from ..utils import misc as mx
 from sklearn.base import RegressorMixin
-import pickle
+from copy import deepcopy
 from joblib import Parallel, delayed
 from tqdm import tqdm
 from .helpers import rbagloop_regression
@@ -218,7 +218,7 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
         # buggy
         # if self.n_jobs is not None:
         def fit_estimators(m):
-            base_learner__ = pickle.loads(pickle.dumps(base_learner, -1))
+            base_learner__ = deepcopy(base_learner)
             base_learner__.set_params(seed=self.seed + m * 1000)
             base_learner__.fit(X, y, **kwargs)
             return base_learner__

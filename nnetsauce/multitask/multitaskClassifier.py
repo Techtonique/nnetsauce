@@ -3,11 +3,11 @@
 # License: BSD 3
 
 import numpy as np
-import pickle
 import sklearn.metrics as skm2
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 from ..base import Base
+from copy import deepcopy
 from scipy.special import expit
 from sklearn.base import ClassifierMixin
 
@@ -199,9 +199,7 @@ class MultitaskClassifier(Base, ClassifierMixin):
 
         # if sample_weight is None:
         for i in range(self.n_classes_):
-            self.fit_objs_[i] = pickle.loads(
-                pickle.dumps(self.obj.fit(scaled_Z, Y[:, i], **kwargs), -1)
-            )
+            self.fit_objs_[i] = deepcopy(self.obj.fit(scaled_Z, Y[:, i], **kwargs))
 
         self.classes_ = np.unique(y)
         return self

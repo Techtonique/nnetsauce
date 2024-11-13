@@ -14,7 +14,7 @@ from ..utils import Progbar
 from math import exp, log
 from sklearn.base import ClassifierMixin
 from scipy.special import xlogy, expit
-import pickle
+from copy import deepcopy
 
 
 class AdaBoostClassifier(Boosting, ClassifierMixin):
@@ -290,7 +290,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                 ).predict(X)
 
                 self.base_learners_.update(
-                    {m: pickle.loads(pickle.dumps(base_learner, -1))}
+                    {m: deepcopy(base_learner)}
                 )
 
                 cond = [y[i] != preds[i] for i in x_range_n]
@@ -352,7 +352,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                 )
 
                 self.base_learners_.update(
-                    {m: pickle.loads(pickle.dumps(base_learner, -1))}
+                    {m: deepcopy(base_learner)}
                 )
 
                 w_m *= np.exp(

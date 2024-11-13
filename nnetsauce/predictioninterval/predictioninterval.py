@@ -1,6 +1,5 @@
 from locale import normalize
 import numpy as np
-import pickle
 from collections import namedtuple
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.model_selection import train_test_split

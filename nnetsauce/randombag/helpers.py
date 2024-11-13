@@ -2,9 +2,9 @@
 #
 # License: BSD 3 Clear
 
-import pickle
 import numpy as np
 from ..utils import Progbar
+from copy import deepcopy
 
 # 0 - utils -----
 
@@ -24,7 +24,7 @@ def rbagloop_classification(base_learner, X, y, n_estimators, verbose, seed):
 
                 base_learner.fit(np.asarray(X), np.asarray(y))
 
-                voter[m] = pickle.loads(pickle.dumps(base_learner, -1))
+                voter[m] = deepcopy(base_learner)
 
                 pbar.update(m)
 
@@ -44,7 +44,7 @@ def rbagloop_classification(base_learner, X, y, n_estimators, verbose, seed):
 
             base_learner.fit(np.asarray(X), np.asarray(y))
 
-            voter[m] = pickle.loads(pickle.dumps(base_learner, -1))
+            voter[m] = deepcopy(base_learner)
 
         except Warning:
             continue
@@ -65,7 +65,7 @@ def rbagloop_regression(base_learner, X, y, n_estimators, verbose, seed):
 
                 base_learner.fit(np.asarray(X), np.asarray(y))
 
-                voter[m] = pickle.loads(pickle.dumps(base_learner, -1))
+                voter[m] = deepcopy(base_learner)
 
                 pbar.update(m)
 
@@ -85,7 +85,7 @@ def rbagloop_regression(base_learner, X, y, n_estimators, verbose, seed):
 
             base_learner.fit(np.asarray(X), np.asarray(y))
 
-            voter[m] = pickle.loads(pickle.dumps(base_learner, -1))
+            voter[m] = deepcopy(base_learner)
 
         except Warning:
             continue
