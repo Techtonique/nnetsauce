@@ -165,6 +165,7 @@ class CustomRegressor(Custom, RegressorMixin):
         self.type_split = type_split
         self.level = level
         self.pi_method = pi_method
+        self.coef_ = None
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit custom model to training data (X, y).
@@ -214,9 +215,12 @@ class CustomRegressor(Custom, RegressorMixin):
 
         self.y_ = y
 
+        if hasattr(self.obj, "coef_"):
+            self.coef_ = self.obj.coef_
+
         return self
 
-    def partial_fit(self, X, y, sample_weight=None, **kwargs):
+    def partial_fit(self, X, y, **kwargs):
         """Partial fit custom model to training data (X, y).
 
         Parameters:
@@ -227,9 +231,6 @@ class CustomRegressor(Custom, RegressorMixin):
 
             y: array-like, shape = [n_samples]
                 Subset of target values.
-
-            sample_weight: array-like, shape = [n_samples]
-                Sample weights.
 
             **kwargs: additional parameters to be passed to
                 self.cook_training_set or self.obj.fit
@@ -249,24 +250,7 @@ class CustomRegressor(Custom, RegressorMixin):
 
         centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
-        # if sample_weights, else: (must use self.row_index)
-        if sample_weight is not None:
-            try:
-                self.obj.partial_fit(
-                    scaled_Z,
-                    centered_y,
-                    sample_weight=sample_weight[self.index_row_].ravel(),
-                    **kwargs
-                )
-            except:
-                raise NotImplementedError
-
-            return self
-
-        #try:
         self.obj.partial_fit(scaled_Z, centered_y, **kwargs)
-        #except:
-        #    raise NotImplementedError
 
         self.X_ = X
 
@@ -390,3 +374,29 @@ class CustomRegressor(Custom, RegressorMixin):
         return self.y_mean_ + self.obj.predict(
             self.cook_test_set(X, **kwargs), **kwargs
         )
+    
+    def score(self, X, y, scoring=None):
+        """Compute the score of the model.
+
+        Parameters:
+
+            X: {array-like}, shape = [n_samples, n_features]
+                Training vectors, where n_samples is the number
+                of samples and n_features is the number of features.
+
+            y: array-like, shape = [n_samples]
+                Target values.
+
+            scoring: str
+                scoring method
+
+        Returns:
+
+            score: float
+
+        """
+
+        if scoring is None:
+            return np.sqrt(np.mean((self.predict(X) - y) ** 2))
+
+        return skm2.get_scorer(scoring)(self, X, y) 

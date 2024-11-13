@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from sklearn.datasets import load_diabetes
-from sklearn.linear_model import ElasticNet, Ridge, LassoCV, SGDRegressor
+from sklearn.linear_model import ElasticNet, Ridge, RidgeCV, LassoCV, SGDRegressor
 from sklearn.model_selection import train_test_split
 from statsmodels.tsa.base.datetools import dates_from_str
 from nnetsauce.utils.model_selection import cross_val_score
@@ -20,8 +20,8 @@ quarterly = dates_from_str(quarterly)
 print(mdata.head())
 mdata = mdata[['realgdp', 'realinv', 'cpi']]
 mdata.index = pd.DatetimeIndex(quarterly)
-#data = np.log(mdata).diff().dropna()
-data = mdata
+data = np.log(mdata).diff().dropna()
+#data = mdata
 
 n = data.shape[0]
 max_idx_train = np.floor(n*0.9)
@@ -29,25 +29,68 @@ training_index = np.arange(0, max_idx_train)
 testing_index = np.arange(max_idx_train, n)
 df_train = data.iloc[training_index,:]
 df_test = data.iloc[testing_index,:]
-# Adjust Bayesian Ridge
-regr4 = SGDRegressor()
 
-obj_MTS = ns.MTS(regr4, lags = 1, n_hidden_features=5, verbose = 1, replications=100)
+# Adjust SGDRegressor to work with MTS
+regr = SGDRegressor()
+
+obj_MTS = ns.MTS(regr, lags = 1, n_hidden_features=5, 
+                 verbose = 1, replications=100)
 
 print(df_train.tail())
 
 obj_MTS.fit(df_train)
 
-print(obj_MTS.predict())
+print(obj_MTS.obj.coef_)
+
+print(obj_MTS.predict().mean)
+print(obj_MTS.predict().lower)
+print(obj_MTS.predict().upper)
 
 obj_MTS.partial_fit(df_test.iloc[0, :])
 
-print(obj_MTS.predict())
+print(obj_MTS.obj.coef_)
+
+print(obj_MTS.predict().mean)
+print(obj_MTS.predict().lower)
+print(obj_MTS.predict().upper)
 
 obj_MTS.partial_fit(df_test.iloc[1, :])
 
-print(obj_MTS.predict())
+print(obj_MTS.obj.coef_)
+
+print(obj_MTS.predict().mean)
+print(obj_MTS.predict().lower)
+print(obj_MTS.predict().upper)
 
 
+print(df_train.tail())
 
+regr = ns.RegressorUpdater(LassoCV(), alpha=0.1)
+
+obj_MTS = ns.MTS(regr, lags = 2, n_hidden_features=0, 
+                 verbose = 1, replications=100)
+
+obj_MTS.fit(df_train)
+
+print(obj_MTS.obj.coef_)
+
+print(obj_MTS.predict().mean)
+print(obj_MTS.predict().lower)
+print(obj_MTS.predict().upper)
+
+obj_MTS.partial_fit(df_test.iloc[0, :])
+
+print(obj_MTS.obj.coef_)
+
+print(obj_MTS.predict().mean)
+print(obj_MTS.predict().lower)
+print(obj_MTS.predict().upper)
+
+obj_MTS.partial_fit(df_test.iloc[1, :])
+
+print(obj_MTS.obj.coef_)
+
+print(obj_MTS.predict().mean)
+print(obj_MTS.predict().lower)
+print(obj_MTS.predict().upper)
 

@@ -260,3 +260,29 @@ class GLMRegressor(GLM, RegressorMixin):
         return self.y_mean_ + np.dot(
             self.cook_test_set(X, **kwargs), self.beta_
         )
+
+    def score(self, X, y, scoring=None):
+        """Compute the score of the model.
+
+        Parameters:
+
+            X: {array-like}, shape = [n_samples, n_features]
+                Training vectors, where n_samples is the number
+                of samples and n_features is the number of features.
+
+            y: array-like, shape = [n_samples]
+                Target values.
+
+            scoring: str
+                scoring method
+
+        Returns:
+
+            score: float
+
+        """
+
+        if scoring is None:
+            return np.sqrt(np.mean((self.predict(X) - y) ** 2))
+
+        return skm2.get_scorer(scoring)(self, X, y) 

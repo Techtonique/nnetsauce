@@ -53,9 +53,7 @@ print(obj_MTS.predict(h=5, return_std=True))
 print(f"\n 2. fit ARDRegression: ------- \n")
 
 regr2 = linear_model.ARDRegression()
-obj_MTS2 = ns.MTS(regr2, lags = 1, n_hidden_features=5, 
-                  replications=10, kernel='gaussian', 
-                  seed=2324, verbose = 1)
+obj_MTS2 = ns.MTS(regr2, lags = 1, n_hidden_features=5, verbose = 1)
 start = time()
 obj_MTS2.fit(df_train.values)
 print(f"Elapsed {time()-start} s")
@@ -66,9 +64,6 @@ print(obj_MTS2.kde_)
 print("\n\n")
 print(obj_MTS2.predict(h=5, return_std=True))
 print("\n\n")
-print(f"------- obj_MTS2.residuals_: {obj_MTS2.residuals_}")
-print("\n\n")
-
 
 print(f"\n 3. fit ElasticNet: ------- \n")
 

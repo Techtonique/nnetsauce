@@ -300,3 +300,57 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
         exp_ZB = np.exp(ZB)
 
         return exp_ZB / exp_ZB.sum(axis=1)[:, None]
+
+    def score(self, X, y, scoring=None):
+        """Scoring function for classification.
+
+        Args:
+
+            X: {array-like}, shape = [n_samples, n_features]
+                Training vectors, where n_samples is the number
+                of samples and n_features is the number of features.
+
+            y: array-like, shape = [n_samples]
+                Target values.
+            
+            scoring: str
+                scoring method (default is accuracy)
+
+        Returns:
+
+            score: float
+        """
+
+        if scoring is None:
+            scoring = "accuracy"
+        
+        if scoring == "accuracy":
+            return skm2.accuracy_score(y, self.predict(X))
+
+        if scoring == "f1":
+            return skm2.f1_score(y, self.predict(X))
+        
+        if scoring == "precision":
+            return skm2.precision_score(y, self.predict(X))
+        
+        if scoring == "recall":
+            return skm2.recall_score(y, self.predict(X))
+        
+        if scoring == "roc_auc":
+            return skm2.roc_auc_score(y, self.predict(X))
+        
+        if scoring == "log_loss":
+            return skm2.log_loss(y, self.predict_proba(X))
+        
+        if scoring == "balanced_accuracy":
+            return skm2.balanced_accuracy_score(y, self.predict(X))
+        
+        if scoring == "average_precision":
+            return skm2.average_precision_score(y, self.predict(X))
+        
+        if scoring == "neg_brier_score":
+            return -skm2.brier_score_loss(y, self.predict_proba(X))
+        
+        if scoring == "neg_log_loss":
+            return -skm2.log_loss(y, self.predict_proba(X))
+                    

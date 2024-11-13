@@ -1,3 +1,7 @@
+# version 0.26.1
+
+- Class `RegressorUpdater`. See [examples](./examples/update_regression.py). 
+
 # version 0.25.0
 
 - `get_best_model` for `Lazy*` classes (see updated docs)
