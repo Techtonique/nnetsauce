@@ -11,6 +11,7 @@ from ..predictioninterval import PredictionInterval
 from sklearn.base import RegressorMixin
 from functools import partial
 from scipy.stats import norm
+from collections import namedtuple
 
 
 class CustomRegressor(Custom, RegressorMixin):
@@ -314,7 +315,11 @@ class CustomRegressor(Custom, RegressorMixin):
                 lower = self.y_mean_ + (mean_ - pi_multiplier * std_)
                 upper = self.y_mean_ + (mean_ + pi_multiplier * std_)
 
-                return preds, std_, lower, upper
+                DescribeResults = namedtuple(
+                    "DescribeResults", ["mean", "std", "lower", "upper"]
+                )
+
+                return DescribeResults(preds, std_, lower, upper)            
 
             # len(X.shape) > 1
             mean_, std_ = self.obj.predict(
@@ -325,7 +330,11 @@ class CustomRegressor(Custom, RegressorMixin):
             lower = self.y_mean_ + (mean_ - pi_multiplier * std_)
             upper = self.y_mean_ + (mean_ + pi_multiplier * std_)
 
-            return preds, std_, lower, upper
+            DescribeResults = namedtuple(
+                    "DescribeResults", ["mean", "std", "lower", "upper"]
+                )
+            
+            return DescribeResults(preds, std_, lower, upper)
 
         if "return_pi" in kwargs:
             assert method in (
