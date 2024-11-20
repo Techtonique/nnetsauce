@@ -167,6 +167,8 @@ class CustomRegressor(Custom, RegressorMixin):
         self.level = level
         self.pi_method = pi_method
         self.coef_ = None
+        self.X_ = None
+        self.y_ = None 
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit custom model to training data (X, y).
