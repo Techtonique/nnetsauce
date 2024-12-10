@@ -92,6 +92,9 @@ run-mts: ## run all mts examples with one command
 run-lazy: ## run all lazy examples with one command
 	find examples -maxdepth 2 -name "lazy*.py" -exec  python3 {} \;
 
+run-conformal: ## run all lazy examples with one command
+	find examples -maxdepth 2 -name "*conformal*.py" -exec  python3 {} \;
+
 run-tests: install ## run all the tests with one command
 	pip3 install coverage nose2
 	python3 -m coverage run -m unittest discover -s nnetsauce/tests -p "*.py"	

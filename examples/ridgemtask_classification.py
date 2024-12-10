@@ -28,8 +28,6 @@ fit_obj.fit(X_train, y_train)
 print(f"Elapsed {time() - start}") 
 
 print(fit_obj.score(X_test, y_test))
-print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
-
 
 start = time()
 preds = fit_obj.predict(X_test)

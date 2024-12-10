@@ -68,9 +68,9 @@ class CustomRegressor(Custom, RegressorMixin):
             Currently available: standardization ('std') or MinMax scaling ('minmax')
 
         type_pi: str.
-            type of prediction interval; currently "kde" (default).
-            Used only in `self.predict`, for `self.replications` > 0 and `self.kernel`
-            in ('gaussian', 'tophat'). Default is `None`.
+            type of prediction interval; currently `None` (split or local 
+            conformal without simulation), "kde" or "bootstrap" (simulated split 
+            conformal).
 
         replications: int.
             number of replications (if needed) for predictive simulation.
@@ -360,8 +360,8 @@ class CustomRegressor(Custom, RegressorMixin):
                 self.y_ = np.array([self.y_])
 
             self.pi.fit(self.X_, self.y_)
-            self.X_ = None
-            self.y_ = None
+            #self.X_ = None # consumes memory to keep, dangerous to delete (side effect)
+            #self.y_ = None # consumes memory to keep, dangerous to delete (side effect)
             preds = self.pi.predict(X, return_pi=True)
             return preds
 

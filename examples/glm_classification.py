@@ -31,7 +31,6 @@ print(time() - start)
 # plt.plot(fit_obj.optimizer.results[2])
 
 print(fit_obj.score(X_test, y_test))
-print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
 
 start = time()
 preds = fit_obj.predict(X_test)

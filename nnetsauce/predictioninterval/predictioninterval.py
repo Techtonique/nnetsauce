@@ -32,10 +32,12 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             equivalent to a miscoverage error of 5 (%)
 
         replications: an integer;
-            Number of replications for simulated conformal (default is `None`)
+            Number of replications for simulated conformal (default is `None`), 
+            for type_pi = "bootstrap" or "kde"
 
         type_pi: a string;
-            type of prediction interval: currently "kde" (default) or "bootstrap"
+            type of prediction interval: currently `None` 
+            (split conformal without simulation), "kde" or "bootstrap"
 
         type_split: a string;
             "random" (random split of data) or "sequential" (sequential split of data)
@@ -49,7 +51,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
         obj,
         method="splitconformal",
         level=95,
-        type_pi="bootstrap",
+        type_pi=None,
         type_split="random",
         replications=None,
         kernel=None,
@@ -91,10 +93,13 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
         """
 
         if self.type_split == "random":
+
             X_train, X_calibration, y_train, y_calibration = train_test_split(
                 X, y, test_size=0.5, random_state=self.seed
             )
+
         elif self.type_split == "sequential":
+
             n_x = X.shape[0]
             n_x_half = n_x // 2
             first_half_idx = range(0, n_x_half)
@@ -105,8 +110,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             y_calibration = y[second_half_idx]
 
         if self.method == "splitconformal":
-
-            n_samples_calibration = X_calibration.shape[0]
+            
             self.obj.fit(X_train, y_train)
             preds_calibration = self.obj.predict(X_calibration)
             self.calibrated_residuals_ = y_calibration - preds_calibration
@@ -132,6 +136,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                     interpolation="higher",
                 )
 
+
         if self.method == "localconformal":
 
             mad_estimator = ExtraTreesRegressor()
@@ -142,6 +147,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             self.icp_ = IcpRegressor(nc)
             self.icp_.fit(X_train, y_train)
             self.icp_.calibrate(X_calibration, y_calibration)
+
 
         return self
 
@@ -162,11 +168,15 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
 
         """
 
-        pred = self.obj.predict(X)
+        if self.method == "splitconformal":
+            pred = self.obj.predict(X)
+
+        if self.method == "localconformal":
+            pred = self.icp_.predict(X)
 
         if self.method == "splitconformal":
 
-            if self.replications is None:
+            if self.replications is None and self.type_pi is None: # type_pi is not used here, no bootstrap or kde
 
                 if return_pi:
 
@@ -182,7 +192,15 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
 
                     return pred
 
-            else:  # if self.replications is not None
+            else:  # self.method == "splitconformal" and if self.replications is not None, type_pi must be used
+
+                if self.type_pi is None:
+                    self.type_pi = "kde"
+                    raise Warning("type_pi must be set, setting to 'kde'")   
+
+                if self.replications is None:
+                    self.replications = 100
+                    raise Warning("replications must be set, setting to 100")
 
                 assert self.type_pi in (
                     "bootstrap",
@@ -259,59 +277,6 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
 
                     return pred
 
-            else:  # if self.replications is not None
+            else:  # (self.method == "localconformal") and if self.replications is not None
 
-                assert self.type_pi in (
-                    "bootstrap",
-                    "kde",
-                ), "`self.type_pi` must be in ('bootstrap', 'kde')"
-
-                if self.type_pi == "bootstrap":
-                    np.random.seed(self.seed)
-                    self.residuals_sims_ = np.asarray(
-                        [
-                            np.random.choice(
-                                a=self.scaled_calibrated_residuals_,
-                                size=X.shape[0],
-                            )
-                            for _ in range(self.replications)
-                        ]
-                    ).T
-                    self.sims_ = np.asarray(
-                        [
-                            pred
-                            + self.calibrated_residuals_scaler_.scale_[0]
-                            * self.residuals_sims_[:, i].ravel()
-                            for i in tqdm(range(self.replications))
-                        ]
-                    ).T
-                elif self.type_pi == "kde":
-                    self.kde_ = gaussian_kde(
-                        dataset=self.scaled_calibrated_residuals_
-                    )
-                    self.sims_ = np.asarray(
-                        [
-                            pred
-                            + self.calibrated_residuals_scaler_.scale_[0]
-                            * self.kde_.resample(
-                                size=X.shape[0], seed=self.seed + i
-                            ).ravel()
-                            for i in tqdm(range(self.replications))
-                        ]
-                    ).T
-
-                self.mean_ = np.mean(self.sims_, axis=1)
-                self.lower_ = np.quantile(
-                    self.sims_, q=self.alpha_ / 200, axis=1
-                )
-                self.upper_ = np.quantile(
-                    self.sims_, q=1 - self.alpha_ / 200, axis=1
-                )
-
-                DescribeResult = namedtuple(
-                    "DescribeResult", ("mean", "sims", "lower", "upper")
-                )
-
-                return DescribeResult(
-                    self.mean_, self.sims_, self.lower_, self.upper_
-                )
+                raise NotImplementedError("When self.method == 'localconformal', there are no simulations")

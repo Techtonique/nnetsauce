@@ -148,7 +148,6 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
     preds = fit_obj.predict(X_test)
 
-    print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
     print(metrics.classification_report(preds, y_test))
 
     ```
