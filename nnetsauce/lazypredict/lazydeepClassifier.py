@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+
 try:
     import xgboost as xgb
 except ImportError:
@@ -9,7 +10,8 @@ from copy import deepcopy
 from functools import partial
 from tqdm import tqdm
 import time
-try: 
+
+try:
     from sklearn.utils import all_estimators
 except ImportError:
     pass
@@ -138,7 +140,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         models_: dict-object
             Returns a dictionary with each model pipeline as value
             with key as name of models.
-        
+
         best_model_: object
             Returns the best model pipeline.
 
@@ -291,9 +293,9 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                     ),
                 ]
             )
-        
+
         # baseline models
-        try: 
+        try:
             baseline_names = ["RandomForestClassifier", "XGBClassifier"]
             baseline_models = [RandomForestClassifier(), xgb.XGBClassifier()]
         except Exception as exception:
@@ -698,9 +700,9 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         self.best_model_ = self.models_[scores.index[0]]
 
         if self.predictions is True:
-            
+
             return scores, predictions
-        
+
         return scores
 
     def get_best_model(self):
@@ -751,7 +753,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
 
 class LazyClassifier(LazyDeepClassifier):
     """
-        Fitting -- almost -- all the classification algorithms with 
+        Fitting -- almost -- all the classification algorithms with
         nnetsauce's CustomClassifier and returning their scores (no layers).
 
     Parameters:
@@ -785,15 +787,15 @@ class LazyClassifier(LazyDeepClassifier):
             For now, only used by individual models that support it.
 
         All the other parameters are the same as CustomClassifier's.
-    
+
     Attributes:
 
         models_: dict-object
             Returns a dictionary with each model pipeline as value
             with key as name of models.
-        
+
         best_model_: object
-            Returns the best model pipeline based on the sort_by metric.                
+            Returns the best model pipeline based on the sort_by metric.
 
     Examples:
 
@@ -815,9 +817,9 @@ class LazyClassifier(LazyDeepClassifier):
         models, predictions = clf.fit(X_train, X_test, y_train, y_test)
         model_dictionary = clf.provide_models(X_train,X_test,y_train,y_test)
         print(models)
-    
+
     """
-    
+
     def __init__(
         self,
         verbose=0,

@@ -285,4 +285,4 @@ class GLMRegressor(GLM, RegressorMixin):
         if scoring is None:
             return np.sqrt(np.mean((self.predict(X) - y) ** 2))
 
-        return skm2.get_scorer(scoring)(self, X, y) 
+        return skm2.get_scorer(scoring)(self, X, y)

@@ -343,7 +343,7 @@ class MTS(Base):
 
         else:  # input data set is a DataFrame with column names
 
-            #if "date" in X.columns: 
+            # if "date" in X.columns:
             #    X.index = X["date"]
             #    X.drop(['date'], axis=1, inplace=True)
 
@@ -364,25 +364,26 @@ class MTS(Base):
                 self.df_ = X
                 X = X.values
             else:
-                input_dates_prev = pd.DatetimeIndex(self.df_.index.values)  
-                frequency = pd.infer_freq(input_dates_prev)                                             
-                self.df_ = pd.concat([self.df_, X], axis=0) 
+                input_dates_prev = pd.DatetimeIndex(self.df_.index.values)
+                frequency = pd.infer_freq(input_dates_prev)
+                self.df_ = pd.concat([self.df_, X], axis=0)
                 self.input_dates = pd.date_range(
-                    start=input_dates_prev[0], 
-                    periods=len(input_dates_prev)+X.shape[0], 
-                    freq=frequency
+                    start=input_dates_prev[0],
+                    periods=len(input_dates_prev) + X.shape[0],
+                    freq=frequency,
                 ).values.tolist()
                 self.df_.index = self.input_dates
                 X = self.df_.values
-            self.df_.columns = self.series_names            
+            self.df_.columns = self.series_names
         else:
             if self.df_ is None:
                 self.df_ = pd.DataFrame(X, columns=self.series_names)
             else:
                 self.df_ = pd.concat(
-                    [self.df_, pd.DataFrame(X, columns=self.series_names)], axis=0
+                    [self.df_, pd.DataFrame(X, columns=self.series_names)],
+                    axis=0,
                 )
-            
+
         self.input_dates = ts.compute_input_dates(self.df_)
 
         try:
@@ -434,7 +435,7 @@ class MTS(Base):
         if self.verbose > 0:
             print(
                 f"\n Adjusting {type(self.obj).__name__} to multivariate time series... \n "
-            )        
+            )
 
         if self.type_pi in (
             "gaussian",
@@ -442,8 +443,8 @@ class MTS(Base):
             "bootstrap",
             "block-bootstrap",
         ) or self.type_pi.startswith("vine"):
-            
-            try: # multioutput regressor
+
+            try:  # multioutput regressor
 
                 self.y_means_ = np.mean(self.y_, axis=0)
                 centered_y = self.y_ - self.y_means_
@@ -451,13 +452,13 @@ class MTS(Base):
                 residuals_ = centered_y - self.obj.predict(scaled_Z)
                 self.residuals_ = residuals_
 
-            except Exception: # single output regressor
+            except Exception:  # single output regressor
 
                 if self.show_progress is True:
                     iterator = tqdm(range(p))
                 else:
                     iterator = range(p)
-            
+
                 for i in iterator:
                     y_mean = np.mean(self.y_[:, i])
                     self.y_means_[i] = y_mean
@@ -479,18 +480,24 @@ class MTS(Base):
             first_half_idx = range(0, n_y_half)
             second_half_idx = range(n_y_half, n_y)
 
-            try: # multioutput regressor
+            try:  # multioutput regressor
 
                 y_mean_temp = np.mean(self.y_[first_half_idx, :], axis=0)
                 centered_y_temp = self.y_[first_half_idx, :] - y_mean_temp
                 self.obj.fit(X=scaled_Z[first_half_idx, :], y=centered_y_temp)
-                residuals_ = self.y_[second_half_idx, :] - y_mean_temp - self.obj.predict(scaled_Z[second_half_idx, :])
+                residuals_ = (
+                    self.y_[second_half_idx, :]
+                    - y_mean_temp
+                    - self.obj.predict(scaled_Z[second_half_idx, :])
+                )
                 self.y_means_ = np.mean(self.y_[second_half_idx, :], axis=0)
-                centered_y = self.y_[second_half_idx, :] - self.y_means_[:, np.newaxis]
-                self.obj.fit(X=scaled_Z[second_half_idx, :], y=centered_y)  
-                self.residuals_ = np.asarray(residuals_)              
+                centered_y = (
+                    self.y_[second_half_idx, :] - self.y_means_[:, np.newaxis]
+                )
+                self.obj.fit(X=scaled_Z[second_half_idx, :], y=centered_y)
+                self.residuals_ = np.asarray(residuals_)
 
-            except Exception: # single output regressor
+            except Exception:  # single output regressor
 
                 if self.show_progress is True:
                     iterator = tqdm(range(p))
@@ -499,10 +506,12 @@ class MTS(Base):
 
                 residuals_ = []
 
-                for i in iterator:                    
+                for i in iterator:
                     y_mean_temp = np.mean(self.y_[first_half_idx, i])
                     centered_y_i_temp = self.y_[first_half_idx, i] - y_mean_temp
-                    self.obj.fit(X=scaled_Z[first_half_idx, :], y=centered_y_i_temp)
+                    self.obj.fit(
+                        X=scaled_Z[first_half_idx, :], y=centered_y_i_temp
+                    )
                     # calibrated residuals actually
                     residuals_.append(
                         (
@@ -520,7 +529,7 @@ class MTS(Base):
                     self.obj.fit(X=scaled_Z[second_half_idx, :], y=centered_y_i)
                     self.fit_objs_[i] = deepcopy(self.obj)
 
-                self.residuals_ = np.asarray(residuals_).T       
+                self.residuals_ = np.asarray(residuals_).T
 
         if self.type_pi == "gaussian":
             self.gaussian_preds_std_ = np.std(self.residuals_, axis=0)
@@ -556,7 +565,7 @@ class MTS(Base):
             self.kde_ = grid.best_estimator_
 
         return self
-    
+
     def partial_fit(self, X, xreg=None, **kwargs):
         """Update the model with new observations X, with optional regressors xreg
 
@@ -580,18 +589,17 @@ class MTS(Base):
 
         assert self.df_ is not None, "fit() must be called before partial_fit()"
 
-        if (
-            isinstance(X, pd.DataFrame) is False
-        ) and isinstance(X, pd.Series) is False:
+        if (isinstance(X, pd.DataFrame) is False) and isinstance(
+            X, pd.Series
+        ) is False:
             if len(X.shape) == 1:
                 X = X.reshape(1, -1)
-            
+
             return self.fit(X, xreg, **kwargs)
-        
-        if len(X.shape) == 1:                
-            X = pd.DataFrame(X.values.reshape(1, -1), 
-                                columns=self.df_.columns)
-            
+
+        if len(X.shape) == 1:
+            X = pd.DataFrame(X.values.reshape(1, -1), columns=self.df_.columns)
+
         return self.fit(X, xreg, **kwargs)
 
     def predict(self, h=5, level=95, **kwargs):
@@ -766,11 +774,11 @@ class MTS(Base):
             cooked_new_X = self.cook_test_set(new_X, **kwargs)
 
             if "return_std" in kwargs:
-                try: # multioutput regressor
+                try:  # multioutput regressor
                     self.preds_std_ = self.obj.predict(
                         cooked_new_X, return_std=True
                     )[1]
-                except Exception: # single output regressor
+                except Exception:  # single output regressor
                     self.preds_std_.append(
                         [
                             np.asarray(
@@ -783,7 +791,7 @@ class MTS(Base):
                     )
 
             if "return_pi" in kwargs:
-                try: 
+                try:
                     preds_pi = self.obj.predict(cooked_new_X, return_pi=True)
                     mean_pi_.append(preds_pi.mean[0])
                     lower_pi_.append(preds_pi.lower[0])
@@ -802,7 +810,9 @@ class MTS(Base):
             except Exception:
                 predicted_cooked_new_X = np.asarray(
                     [
-                        np.asarray(self.fit_objs_[i].predict(cooked_new_X)).item()
+                        np.asarray(
+                            self.fit_objs_[i].predict(cooked_new_X)
+                        ).item()
                         for i in range(self.n_series)
                     ]
                 )
@@ -1086,8 +1096,10 @@ class MTS(Base):
         scoring_options = {
             "explained_variance": skm2.explained_variance_score,
             "neg_mean_absolute_error": skm2.mean_absolute_error,
-            "neg_mean_squared_error": lambda x, y: np.mean((x - y)**2),
-            "neg_root_mean_squared_error": lambda x, y: np.sqrt(np.mean((x - y)**2)),
+            "neg_mean_squared_error": lambda x, y: np.mean((x - y) ** 2),
+            "neg_root_mean_squared_error": lambda x, y: np.sqrt(
+                np.mean((x - y) ** 2)
+            ),
             "neg_mean_squared_log_error": skm2.mean_squared_log_error,
             "neg_median_absolute_error": skm2.median_absolute_error,
             "r2": skm2.r2_score,

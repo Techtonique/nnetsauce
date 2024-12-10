@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+
 try:
     import xgboost as xgb
 except ImportError:
@@ -8,7 +9,8 @@ from sklearn.ensemble import RandomForestRegressor
 from copy import deepcopy
 from tqdm import tqdm
 import time
-try: 
+
+try:
     from sklearn.utils import all_estimators
 except ImportError:
     pass
@@ -123,15 +125,15 @@ class LazyDeepRegressor(Custom, RegressorMixin):
             Number of layers of CustomRegressors to be used.
 
         All the other parameters are the same as CustomRegressor's.
-    
+
     Attributes:
 
         models_: dict-object
             Returns a dictionary with each model pipeline as value
             with key as name of models.
-        
+
         best_model_: object
-            Returns the best model pipeline based on the sort_by metric.                
+            Returns the best model pipeline based on the sort_by metric.
 
     Examples:
 
@@ -284,16 +286,16 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                     ),
                 ]
             )
-        
+
         # base models
-        try: 
+        try:
             baseline_names = ["RandomForestRegressor", "XGBRegressor"]
             baseline_models = [RandomForestRegressor(), xgb.XGBRegressor()]
         except Exception as exception:
             baseline_names = ["RandomForestRegressor"]
             baseline_models = [RandomForestRegressor()]
 
-        for name, model in zip(baseline_names, baseline_models):        
+        for name, model in zip(baseline_names, baseline_models):
             start = time.time()
             try:
                 model.fit(X_train, y_train)
@@ -303,7 +305,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                 adj_rsquared = adjusted_rsquared(
                     r_squared, X_test.shape[0], X_test.shape[1]
                 )
-                rmse = np.sqrt(np.mean((y_test - y_pred)**2))
+                rmse = np.sqrt(np.mean((y_test - y_pred) ** 2))
 
                 names.append(name)
                 R2.append(r_squared)
@@ -335,7 +337,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
             except Exception as exception:
                 if self.ignore_warnings is False:
                     print(name + " model failed to execute")
-                    print(exception)                
+                    print(exception)
 
         if self.estimators == "all":
             self.regressors = DEEPREGRESSORS
@@ -432,7 +434,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                     adj_rsquared = adjusted_rsquared(
                         r_squared, X_test.shape[0], X_test.shape[1]
                     )
-                    rmse = np.sqrt(np.mean((y_test - y_pred)**2))
+                    rmse = np.sqrt(np.mean((y_test - y_pred) ** 2))
 
                     names.append(name)
                     R2.append(r_squared)
@@ -545,7 +547,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                     adj_rsquared = adjusted_rsquared(
                         r_squared, X_test.shape[0], X_test.shape[1]
                     )
-                    rmse = np.sqrt(np.mean((y_test - y_pred)**2))
+                    rmse = np.sqrt(np.mean((y_test - y_pred) ** 2))
 
                     names.append(name)
                     R2.append(r_squared)
@@ -598,9 +600,9 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         self.best_model_ = self.models_[scores.index[0]]
 
         if self.predictions is True:
-            
+
             return scores, predictions
-        
+
         return scores
 
     def get_best_model(self):
@@ -614,7 +616,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
 
         """
         return self.best_model_
-    
+
     def provide_models(self, X_train, X_test, y_train, y_test):
         """
         This function returns all the model objects trained in fit function.
@@ -653,7 +655,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
 
 class LazyRegressor(LazyDeepRegressor):
     """
-        Fitting -- almost -- all the regression algorithms with 
+        Fitting -- almost -- all the regression algorithms with
         nnetsauce's CustomRegressor and returning their scores.
 
     Parameters:
@@ -687,15 +689,15 @@ class LazyRegressor(LazyDeepRegressor):
             For now, only used by individual models that support it.
 
         All the other parameters are the same as CustomRegressor's.
-    
+
     Attributes:
 
         models_: dict-object
             Returns a dictionary with each model pipeline as value
             with key as name of models.
-        
+
         best_model_: object
-            Returns the best model pipeline based on the sort_by metric.                
+            Returns the best model pipeline based on the sort_by metric.
 
     Examples:
 
@@ -716,9 +718,9 @@ class LazyRegressor(LazyDeepRegressor):
                             custom_metric=None)
         models, predictions = reg.fit(X_train, X_test, y_train, y_test)
         print(models)
-    
+
     """
-    
+
     def __init__(
         self,
         verbose=0,

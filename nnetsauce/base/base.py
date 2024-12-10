@@ -241,7 +241,7 @@ class Base(BaseEstimator):
 
             predict: boolean
                 is False on training set and True on test set
-            
+
             scaler: {object} of class StandardScaler, MinMaxScaler, RobustScaler or MaxAbsScaler
                 if scaler has already been fitted on training data (online training), it can be passed here
 
@@ -262,7 +262,7 @@ class Base(BaseEstimator):
 
         if isinstance(X, pd.DataFrame):
             X = copy.deepcopy(X.values.astype(float))
-        
+
         if len(X.shape) == 1:
             X = X.reshape(1, -1)
 
@@ -270,8 +270,7 @@ class Base(BaseEstimator):
 
             # scale input data before clustering
             self.clustering_scaler_, scaled_X = mo.scale_covariates(
-                X, choice=self.type_scaling[2], 
-                scaler=self.clustering_scaler_
+                X, choice=self.type_scaling[2], scaler=self.clustering_scaler_
             )
 
             self.clustering_obj_, X_clustered = mo.cluster_covariates(
@@ -472,7 +471,7 @@ class Base(BaseEstimator):
 
             W: {array-like}, shape = [n_features, hidden_features]
                 if provided, constructs the hidden layer via W
-            
+
         Returns:
 
             (centered response, direct link + hidden layer matrix): {tuple}
@@ -523,16 +522,13 @@ class Base(BaseEstimator):
                 self.index_col_ = index_col
                 input_X = X[:, self.index_col_]
 
-        if (
-            self.n_clusters <= 0
-        ):  
+        if self.n_clusters <= 0:
             # data without any clustering: self.n_clusters is None -----
 
             if self.n_hidden_features > 0:  # with hidden layer
 
                 self.nn_scaler_, scaled_X = mo.scale_covariates(
-                    input_X, choice=self.type_scaling[1], 
-                    scaler=self.nn_scaler_
+                    input_X, choice=self.type_scaling[1], scaler=self.nn_scaler_
                 )
                 Phi_X = (
                     self.create_layer(scaled_X)
@@ -545,18 +541,16 @@ class Base(BaseEstimator):
                     else Phi_X
                 )
                 self.scaler_, scaled_Z = mo.scale_covariates(
-                    Z, choice=self.type_scaling[0], 
-                    scaler=self.scaler_
+                    Z, choice=self.type_scaling[0], scaler=self.scaler_
                 )
             else:  # no hidden layer
                 Z = input_X
                 self.scaler_, scaled_Z = mo.scale_covariates(
-                    Z, choice=self.type_scaling[0], 
-                    scaler=self.scaler_
+                    Z, choice=self.type_scaling[0], scaler=self.scaler_
                 )
 
-        else:  
-            
+        else:
+
             # data with clustering: self.n_clusters is not None ----- # keep
 
             augmented_X = mo.cbind(
@@ -568,8 +562,9 @@ class Base(BaseEstimator):
             if self.n_hidden_features > 0:  # with hidden layer
 
                 self.nn_scaler_, scaled_X = mo.scale_covariates(
-                    augmented_X, choice=self.type_scaling[1], 
-                    scaler=self.nn_scaler_
+                    augmented_X,
+                    choice=self.type_scaling[1],
+                    scaler=self.nn_scaler_,
                 )
                 Phi_X = (
                     self.create_layer(scaled_X)
@@ -582,17 +577,15 @@ class Base(BaseEstimator):
                     else Phi_X
                 )
                 self.scaler_, scaled_Z = mo.scale_covariates(
-                    Z, choice=self.type_scaling[0], 
-                    scaler=self.scaler_
+                    Z, choice=self.type_scaling[0], scaler=self.scaler_
                 )
             else:  # no hidden layer
                 Z = augmented_X
                 self.scaler_, scaled_Z = mo.scale_covariates(
-                    Z, choice=self.type_scaling[0], 
-                    scaler=self.scaler_
+                    Z, choice=self.type_scaling[0], scaler=self.scaler_
                 )
 
-        # Returning model inputs -----        
+        # Returning model inputs -----
         if mx.is_factor(y) is False:  # regression
             # center y
             if y is None:
@@ -673,7 +666,7 @@ class Base(BaseEstimator):
 
         if isinstance(X, pd.DataFrame):
             X = copy.deepcopy(X.values.astype(float))
-        
+
         if len(X.shape) == 1:
             X = X.reshape(1, -1)
 

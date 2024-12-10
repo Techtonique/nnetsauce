@@ -68,8 +68,8 @@ class CustomRegressor(Custom, RegressorMixin):
             Currently available: standardization ('std') or MinMax scaling ('minmax')
 
         type_pi: str.
-            type of prediction interval; currently `None` (split or local 
-            conformal without simulation), "kde" or "bootstrap" (simulated split 
+            type of prediction interval; currently `None` (split or local
+            conformal without simulation), "kde" or "bootstrap" (simulated split
             conformal).
 
         replications: int.
@@ -168,7 +168,7 @@ class CustomRegressor(Custom, RegressorMixin):
         self.pi_method = pi_method
         self.coef_ = None
         self.X_ = None
-        self.y_ = None 
+        self.y_ = None
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit custom model to training data (X, y).
@@ -246,7 +246,7 @@ class CustomRegressor(Custom, RegressorMixin):
 
         if len(X.shape) == 1:
             if isinstance(X, pd.DataFrame):
-                X = pd.DataFrame(X.values.reshape(1, -1), columns=X.columns)             
+                X = pd.DataFrame(X.values.reshape(1, -1), columns=X.columns)
             else:
                 X = X.reshape(1, -1)
             y = np.array([y])
@@ -321,7 +321,7 @@ class CustomRegressor(Custom, RegressorMixin):
                     "DescribeResults", ["mean", "std", "lower", "upper"]
                 )
 
-                return DescribeResults(preds, std_, lower, upper)            
+                return DescribeResults(preds, std_, lower, upper)
 
             # len(X.shape) > 1
             mean_, std_ = self.obj.predict(
@@ -333,9 +333,9 @@ class CustomRegressor(Custom, RegressorMixin):
             upper = self.y_mean_ + (mean_ + pi_multiplier * std_)
 
             DescribeResults = namedtuple(
-                    "DescribeResults", ["mean", "std", "lower", "upper"]
-                )
-            
+                "DescribeResults", ["mean", "std", "lower", "upper"]
+            )
+
             return DescribeResults(preds, std_, lower, upper)
 
         if "return_pi" in kwargs:
@@ -354,14 +354,16 @@ class CustomRegressor(Custom, RegressorMixin):
 
             if len(self.X_.shape) == 1:
                 if isinstance(X, pd.DataFrame):
-                    self.X_ = pd.DataFrame(self.X_.values.reshape(1, -1), columns=self.X_.columns)             
+                    self.X_ = pd.DataFrame(
+                        self.X_.values.reshape(1, -1), columns=self.X_.columns
+                    )
                 else:
                     self.X_ = self.X_.reshape(1, -1)
                 self.y_ = np.array([self.y_])
 
             self.pi.fit(self.X_, self.y_)
-            #self.X_ = None # consumes memory to keep, dangerous to delete (side effect)
-            #self.y_ = None # consumes memory to keep, dangerous to delete (side effect)
+            # self.X_ = None # consumes memory to keep, dangerous to delete (side effect)
+            # self.y_ = None # consumes memory to keep, dangerous to delete (side effect)
             preds = self.pi.predict(X, return_pi=True)
             return preds
 
@@ -385,7 +387,7 @@ class CustomRegressor(Custom, RegressorMixin):
         return self.y_mean_ + self.obj.predict(
             self.cook_test_set(X, **kwargs), **kwargs
         )
-    
+
     def score(self, X, y, scoring=None):
         """Compute the score of the model.
 
@@ -410,4 +412,4 @@ class CustomRegressor(Custom, RegressorMixin):
         if scoring is None:
             return np.sqrt(np.mean((self.predict(X) - y) ** 2))
 
-        return skm2.get_scorer(scoring)(self, X, y) 
+        return skm2.get_scorer(scoring)(self, X, y)

@@ -98,7 +98,7 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
         self.n_layers = n_layers
         self.level = level
         self.pi_method = pi_method
-        self.coef_ = None        
+        self.coef_ = None
 
     def fit(self, X, y, **kwargs):
         """Fit Regression algorithms to X and y.
@@ -111,7 +111,7 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
             Training vectors, where rows is the number of samples
             and columns is the number of features.
         **kwargs: dict
-            Additional parameters to be passed to the fit method 
+            Additional parameters to be passed to the fit method
             of the base learner. For example, `sample_weight`.
         Returns
         -------
@@ -167,7 +167,7 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
                     backend=self.backend,
                 )
             )
-        
+
         self.stacked_obj.fit(X, y, **kwargs)
 
         if self.level is not None:
@@ -180,7 +180,7 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
 
         if hasattr(self.stacked_obj, "coef_"):
             self.coef_ = self.stacked_obj.coef_
-        
+
         if hasattr(self.stacked_obj, "scaler_"):
             self.scaler_ = self.stacked_obj.scaler_
 
@@ -188,10 +188,10 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
             self.nn_scaler_ = self.stacked_obj.nn_scaler_
 
         if hasattr(self.stacked_obj, "clustering_scaler_"):
-            self.clustering_scaler_ = self.stacked_obj.clustering_scaler_            
+            self.clustering_scaler_ = self.stacked_obj.clustering_scaler_
 
         return self
-    
+
     def partial_fit(self, X, y, **kwargs):
         """Fit Regression algorithms to X and y.
         Parameters
@@ -203,7 +203,7 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
             Training vectors, where rows is the number of samples
             and columns is the number of features.
         **kwargs: dict
-            Additional parameters to be passed to the fit method 
+            Additional parameters to be passed to the fit method
             of the base learner. For example, `sample_weight`.
         Returns
         -------
@@ -212,16 +212,16 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
         assert hasattr(self, "stacked_obj"), "model must be fitted first"
         current_obj = self.stacked_obj
         for _ in range(self.n_layers):
-            try: 
+            try:
                 input_X = current_obj.obj.cook_test_set(X)
                 current_obj.obj.partial_fit(input_X, y, **kwargs)
-                try: 
+                try:
                     current_obj = current_obj.obj
                 except AttributeError:
                     pass
             except ValueError as e:
                 print(e)
-                pass 
+                pass
         return self
 
     def predict(self, X, **kwargs):

@@ -15,7 +15,8 @@ from copy import deepcopy
 from tqdm import tqdm
 from sklearn import metrics
 from sklearn.base import ClassifierMixin, RegressorMixin
-try: 
+
+try:
     from sklearn.utils import all_estimators
 except ImportError:
     pass
@@ -125,7 +126,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
             Training vectors, where rows is the number of samples
             and columns is the number of features.
         **kwargs: dict
-            Additional parameters to be passed to the fit method 
+            Additional parameters to be passed to the fit method
             of the base learner. For example, `sample_weight`.
 
         Returns
@@ -133,8 +134,10 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         A fitted object
         """
 
-        self.classes_ =  np.unique(y)
-        self.n_classes_ = len(self.classes_)  # for compatibility with         scikit-learn
+        self.classes_ = np.unique(y)
+        self.n_classes_ = len(
+            self.classes_
+        )  # for compatibility with         scikit-learn
 
         if isinstance(X, np.ndarray):
             X = pd.DataFrame(X)
@@ -183,9 +186,9 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                     row_sample=self.row_sample,
                     seed=self.seed,
                     backend=self.backend,
-                )                
+                )
             )
-        
+
         self.stacked_obj.fit(X, y, **kwargs)
 
         if self.level is not None:
@@ -194,7 +197,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
             )
 
         return self
-    
+
     def partial_fit(self, X, y, **kwargs):
         """Fit Regression algorithms to X and y.
         Parameters
@@ -206,7 +209,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
             Training vectors, where rows is the number of samples
             and columns is the number of features.
         **kwargs: dict
-            Additional parameters to be passed to the fit method 
+            Additional parameters to be passed to the fit method
             of the base learner. For example, `sample_weight`.
         Returns
         -------
@@ -215,15 +218,15 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         assert hasattr(self, "stacked_obj"), "model must be fitted first"
         current_obj = self.stacked_obj
         for _ in range(self.n_layers):
-            try: 
+            try:
                 input_X = current_obj.obj.cook_test_set(X)
                 current_obj.obj.partial_fit(input_X, y, **kwargs)
-                try: 
+                try:
                     current_obj = current_obj.obj
                 except AttributeError:
                     pass
             except ValueError:
-                pass 
+                pass
         return self
 
     def predict(self, X):

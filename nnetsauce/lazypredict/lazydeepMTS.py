@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import time
 
-try: 
+try:
     from sklearn.utils import all_estimators
 except ImportError:
     pass
@@ -11,8 +11,9 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.base import RegressorMixin
-from sklearn.metrics import  mean_absolute_error
-try: 
+from sklearn.metrics import mean_absolute_error
+
+try:
     from sklearn.metrics import mean_pinball_loss
 except ImportError:
     pass
@@ -142,13 +143,13 @@ class LazyDeepMTS(MTS):
             Number of steps ahead to predict (when used, must be > 0 and < X_test.shape[0]).
 
         All the other parameters are the same as MTS's.
-    
+
     Attributes:
 
         models_: dict-object
             Returns a dictionary with each model pipeline as value
             with key as name of models.
-        
+
         best_model_: object
             Returns the best model pipeline based on the sort_by metric.
 
@@ -164,7 +165,7 @@ class LazyDeepMTS(MTS):
         ignore_warnings=True,
         custom_metric=None,
         predictions=False,
-        sort_by=None, # leave it as is 
+        sort_by=None,  # leave it as is
         random_state=42,
         estimators="all",
         preprocess=False,
@@ -324,8 +325,8 @@ class LazyDeepMTS(MTS):
             )
 
         # baselines (Classical MTS) ----
-        for i, name in enumerate(["ARIMA", "ETS", "Theta", "VAR", "VECM"]):           
-            try: 
+        for i, name in enumerate(["ARIMA", "ETS", "Theta", "VAR", "VECM"]):
+            try:
                 start = time.time()
                 regr = ClassicalMTS(model=name)
                 regr.fit(X_train, **kwargs)
@@ -369,8 +370,8 @@ class LazyDeepMTS(MTS):
             MAE.append(mae)
             MPL.append(mpl)
 
-            if self.custom_metric is not None:                        
-                try: 
+            if self.custom_metric is not None:
+                try:
                     if self.h is None:
                         custom_metric = self.custom_metric(X_test, X_pred)
                     else:
@@ -386,15 +387,17 @@ class LazyDeepMTS(MTS):
                         obj=X_pred, actual=X_test, level=95
                     )
                     coveragecalc = coverage(X_pred, X_test, level=95)
-                else: 
+                else:
                     winklerscore = winkler_score(
                         obj=X_pred, actual=X_test, level=95, per_series=True
                     )
-                    coveragecalc = coverage(X_pred, X_test, level=95, per_series=True)
+                    coveragecalc = coverage(
+                        X_pred, X_test, level=95, per_series=True
+                    )
                 WINKLERSCORE.append(winklerscore)
                 COVERAGE.append(coveragecalc)
-            TIME.append(time.time() - start)        
-        
+            TIME.append(time.time() - start)
+
         if self.estimators == "all":
             if self.n_layers <= 1:
                 self.regressors = REGRESSORSMTS
@@ -433,7 +436,7 @@ class LazyDeepMTS(MTS):
                                     DeepMTS(
                                         obj=model(
                                             random_state=self.random_state,
-                                            **kwargs
+                                            **kwargs,
                                         ),
                                         n_layers=self.n_layers,
                                         n_hidden_features=self.n_hidden_features,
@@ -535,7 +538,8 @@ class LazyDeepMTS(MTS):
                             per_series=per_series,
                         )
                         coveragecalc = coverage(
-                            X_pred, X_test, level=95, per_series=per_series)
+                            X_pred, X_test, level=95, per_series=per_series
+                        )
                     else:
                         print(f"X_test: {X_test}")
                         print(f"X_pred: {X_pred}")
@@ -570,8 +574,8 @@ class LazyDeepMTS(MTS):
                         COVERAGE.append(coveragecalc)
                     TIME.append(time.time() - start)
 
-                    if self.custom_metric is not None:                        
-                        try: 
+                    if self.custom_metric is not None:
+                        try:
                             custom_metric = self.custom_metric(X_test, X_pred)
                             CUSTOM_METRIC.append(custom_metric)
                         except Exception as e:
@@ -602,7 +606,7 @@ class LazyDeepMTS(MTS):
 
                         if self.custom_metric is not None:
                             scores_verbose["Custom metric"] = custom_metric
-                            
+
                     if self.predictions:
                         predictions[name] = X_pred
                 except Exception as exception:
@@ -699,7 +703,7 @@ class LazyDeepMTS(MTS):
                     if self.h is None:
                         if (self.replications is not None) or (
                             self.type_pi == "gaussian"
-                        ):                            
+                        ):
                             print(f"X_test: {X_test}")
                             print(f"X_pred: {X_pred}")
                             rmse = mean_errors(
@@ -875,12 +879,16 @@ class LazyDeepMTS(MTS):
                         COVERAGE.append(coveragecalc)
                     TIME.append(time.time() - start)
 
-                    if self.custom_metric is not None:                        
-                        try: 
+                    if self.custom_metric is not None:
+                        try:
                             if self.h is None:
-                                custom_metric = self.custom_metric(X_test, X_pred)
+                                custom_metric = self.custom_metric(
+                                    X_test, X_pred
+                                )
                             else:
-                                custom_metric = self.custom_metric(X_test_h, X_pred)
+                                custom_metric = self.custom_metric(
+                                    X_test_h, X_pred
+                                )
                             CUSTOM_METRIC.append(custom_metric)
                         except Exception as e:
                             custom_metric = np.iinfo(np.float32).max
@@ -909,8 +917,8 @@ class LazyDeepMTS(MTS):
                             }
 
                         if self.custom_metric is not None:
-                            scores_verbose["Custom metric"] = custom_metric                            
-                       
+                            scores_verbose["Custom metric"] = custom_metric
+
                     if self.predictions:
                         predictions[name] = X_pred
 
@@ -940,23 +948,25 @@ class LazyDeepMTS(MTS):
 
         if self.custom_metric is not None:
             scores["Custom metric"] = CUSTOM_METRIC
-        
+
         if per_series:
             scores = dict_to_dataframe_series(scores, self.series_names)
         else:
             scores = pd.DataFrame(scores)
-       
-        try: # case per_series, can't be sorted
-            scores = scores.sort_values(by=self.sort_by, ascending=True).set_index("Model")
-            
+
+        try:  # case per_series, can't be sorted
+            scores = scores.sort_values(
+                by=self.sort_by, ascending=True
+            ).set_index("Model")
+
             self.best_model_ = self.models_[scores.index[0]]
         except Exception as e:
-            pass 
+            pass
 
         if self.predictions is True:
 
             return scores, predictions
-        
+
         return scores
 
     def get_best_model(self):
@@ -1005,6 +1015,7 @@ class LazyDeepMTS(MTS):
 
         return self.models_
 
+
 class LazyMTS(LazyDeepMTS):
     """
     Fitting -- almost -- all the regression algorithms to multivariate time series
@@ -1043,13 +1054,13 @@ class LazyMTS(LazyDeepMTS):
             Number of steps ahead to predict (when used, must be > 0 and < X_test.shape[0]).
 
         All the other parameters are the same as MTS's.
-    
+
     Attributes:
 
         models_: dict-object
             Returns a dictionary with each model pipeline as value
             with key as name of models.
-        
+
         best_model_: object
             Returns the best model pipeline based on the sort_by metric.
 
@@ -1065,7 +1076,7 @@ class LazyMTS(LazyDeepMTS):
         ignore_warnings=True,
         custom_metric=None,
         predictions=False,
-        sort_by=None, # leave it as is 
+        sort_by=None,  # leave it as is
         random_state=42,
         estimators="all",
         preprocess=False,

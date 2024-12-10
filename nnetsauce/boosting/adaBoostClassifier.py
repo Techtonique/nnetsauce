@@ -288,9 +288,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                     X, y, sample_weight=w_m.ravel(), **kwargs
                 ).predict(X)
 
-                self.base_learners_.update(
-                    {m: deepcopy(base_learner)}
-                )
+                self.base_learners_.update({m: deepcopy(base_learner)})
 
                 cond = [y[i] != preds[i] for i in x_range_n]
 
@@ -350,9 +348,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                     a=probs, a_min=2.220446049250313e-16, a_max=1.0, out=probs
                 )
 
-                self.base_learners_.update(
-                    {m: deepcopy(base_learner)}
-                )
+                self.base_learners_.update({m: deepcopy(base_learner)})
 
                 w_m *= np.exp(
                     -1.0

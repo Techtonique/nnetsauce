@@ -1,6 +1,7 @@
 from functools import partial
 from sklearn.base import ClassifierMixin, RegressorMixin
-try: 
+
+try:
     from sklearn.utils import all_estimators
 except ImportError:
     pass

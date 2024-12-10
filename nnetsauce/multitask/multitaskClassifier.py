@@ -199,7 +199,9 @@ class MultitaskClassifier(Base, ClassifierMixin):
 
         # if sample_weight is None:
         for i in range(self.n_classes_):
-            self.fit_objs_[i] = deepcopy(self.obj.fit(scaled_Z, Y[:, i], **kwargs))
+            self.fit_objs_[i] = deepcopy(
+                self.obj.fit(scaled_Z, Y[:, i], **kwargs)
+            )
 
         self.classes_ = np.unique(y)
         return self

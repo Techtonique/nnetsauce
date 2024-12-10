@@ -32,11 +32,11 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             equivalent to a miscoverage error of 5 (%)
 
         replications: an integer;
-            Number of replications for simulated conformal (default is `None`), 
+            Number of replications for simulated conformal (default is `None`),
             for type_pi = "bootstrap" or "kde"
 
         type_pi: a string;
-            type of prediction interval: currently `None` 
+            type of prediction interval: currently `None`
             (split conformal without simulation), "kde" or "bootstrap"
 
         type_split: a string;
@@ -110,7 +110,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             y_calibration = y[second_half_idx]
 
         if self.method == "splitconformal":
-            
+
             self.obj.fit(X_train, y_train)
             preds_calibration = self.obj.predict(X_calibration)
             self.calibrated_residuals_ = y_calibration - preds_calibration
@@ -136,7 +136,6 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                     interpolation="higher",
                 )
 
-
         if self.method == "localconformal":
 
             mad_estimator = ExtraTreesRegressor()
@@ -147,7 +146,6 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             self.icp_ = IcpRegressor(nc)
             self.icp_.fit(X_train, y_train)
             self.icp_.calibrate(X_calibration, y_calibration)
-
 
         return self
 
@@ -176,7 +174,9 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
 
         if self.method == "splitconformal":
 
-            if self.replications is None and self.type_pi is None: # type_pi is not used here, no bootstrap or kde
+            if (
+                self.replications is None and self.type_pi is None
+            ):  # type_pi is not used here, no bootstrap or kde
 
                 if return_pi:
 
@@ -196,7 +196,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
 
                 if self.type_pi is None:
                     self.type_pi = "kde"
-                    raise Warning("type_pi must be set, setting to 'kde'")   
+                    raise Warning("type_pi must be set, setting to 'kde'")
 
                 if self.replications is None:
                     self.replications = 100
@@ -279,4 +279,6 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
 
             else:  # (self.method == "localconformal") and if self.replications is not None
 
-                raise NotImplementedError("When self.method == 'localconformal', there are no simulations")
+                raise NotImplementedError(
+                    "When self.method == 'localconformal', there are no simulations"
+                )

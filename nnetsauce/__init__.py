@@ -64,5 +64,5 @@ __all__ = [
     "Ridge2Regressor",
     "Ridge2Classifier",
     "Ridge2MultitaskClassifier",
-    "SubSampler"
+    "SubSampler",
 ]

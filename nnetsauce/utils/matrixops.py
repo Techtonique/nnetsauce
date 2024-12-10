@@ -312,17 +312,17 @@ def scale_covariates(X, choice="std", scaler=None):
 
     if len(X.shape) == 1:
         if isinstance(X, pd.DataFrame):
-            X = pd.DataFrame(X.values.reshape(1, -1), columns=X.columns)             
+            X = pd.DataFrame(X.values.reshape(1, -1), columns=X.columns)
         else:
             X = X.reshape(1, -1)
-    
+
     # online training (scaler is already fitted)
     if scaler is not None:
 
-        try: 
+        try:
             scaler.partial_fit(X)
         except Exception as e:
-            try: 
+            try:
                 scaler.fit(X)
             except Exception as e:
                 print(e)
@@ -330,16 +330,12 @@ def scale_covariates(X, choice="std", scaler=None):
         scaled_X = scaler.transform(X)
         return scaler, scaled_X
 
-    # initial batch training 
+    # initial batch training
     if choice == "std":
         if sparse.issparse(X):
-            scaler = StandardScaler(
-                copy=True, with_mean=False, with_std=True
-            )
+            scaler = StandardScaler(copy=True, with_mean=False, with_std=True)
         else:
-            scaler = StandardScaler(
-                copy=True, with_mean=True, with_std=True
-            )
+            scaler = StandardScaler(copy=True, with_mean=True, with_std=True)
 
     elif choice == "minmax":
         scaler = MinMaxScaler()
@@ -361,7 +357,7 @@ def scale_covariates(X, choice="std", scaler=None):
     scaled_X = scaler.fit_transform(X)
 
     return scaler, scaled_X
-    
+
 
 # from sklearn.utils.exmath
 def squared_norm(x, backend="cpu"):
