@@ -56,6 +56,7 @@ docs: install ## generate docs
 	find nnetsauce/ -name "*.py" -exec autopep8 --max-line-length=80 --in-place {} +
 	pdoc -t docs nnetsauce/* --output-dir nnetsauce-docs
 	find . -name '__pycache__' -exec rm -fr {} +
+	cp -rf nnetsauce-docs/* ../../Pro_Website/Techtonique.github.io/nnetsauce
 
 servedocs: install ## compile the docs watching for change	 	
 	pip install black pdoc 

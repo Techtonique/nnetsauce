@@ -13,7 +13,16 @@ from collections import namedtuple
 from functools import partial
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 from sklearn.model_selection import cross_val_score, train_test_split
-from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, r2_score, mean_squared_error, mean_absolute_error, mean_absolute_percentage_error
+from sklearn.metrics import (
+    accuracy_score,
+    balanced_accuracy_score,
+    f1_score,
+    roc_auc_score,
+    r2_score,
+    mean_squared_error,
+    mean_absolute_error,
+    mean_absolute_percentage_error,
+)
 from ..utils import activations as ac
 from ..utils import matrixops as mo
 from ..utils import misc as mx
@@ -718,17 +727,20 @@ class Base(BaseEstimator):
 
         # if no hidden layer
         return self.scaler_.transform(augmented_X)
-    
-    def cross_val_score(self, 
-                        X, y, 
-                        cv=5, 
-                        scoring="accuracy",
-                        random_state=42,
-                        n_jobs=-1,
-                        epsilon=0.5,
-                        penalized=True,
-                        objective='abs',
-                        **kwargs):
+
+    def cross_val_score(
+        self,
+        X,
+        y,
+        cv=5,
+        scoring="accuracy",
+        random_state=42,
+        n_jobs=-1,
+        epsilon=0.5,
+        penalized=True,
+        objective="abs",
+        **kwargs
+    ):
         """
         Penalized Cross-validation score for a model.
 
@@ -740,20 +752,20 @@ class Base(BaseEstimator):
 
             y: array-like, shape = [n_samples]
                 Target values
-            
+
             X_test: {array-like}, shape = [n_samples, n_features]
                 Test vectors, where n_samples is the number
                 of samples and n_features is the number of features
 
             y_test: array-like, shape = [n_samples]
                 Target values
-            
+
             cv: int
                 Number of folds
 
             scoring: str
                 Scoring metric
-            
+
             random_state: int
                 Random state
 
@@ -764,14 +776,14 @@ class Base(BaseEstimator):
                 Penalty parameter
 
             penalized: bool
-                Whether to obtain penalized cross-validation score or not 
+                Whether to obtain penalized cross-validation score or not
 
             objective: str
                 'abs': Minimize the absolute difference between cross-validation score and validation score
                 'relative': Minimize the relative difference between cross-validation score and validation score
         Returns:
 
-            A namedtuple with the following fields:                            
+            A namedtuple with the following fields:
                 - cv_score: float
                     cross-validation score
                 - val_score: float
@@ -781,54 +793,64 @@ class Base(BaseEstimator):
                     If higher scoring metric is better, minimize the function result.
                     If lower scoring metric is better, maximize the function result.
         """
-        if scoring == 'accuracy':
+        if scoring == "accuracy":
             scoring_func = accuracy_score
-        elif scoring == 'f1':
+        elif scoring == "balanced_accuracy":
+            scoring_func = balanced_accuracy_score
+        elif scoring == "f1":
             scoring_func = f1_score
-        elif scoring == 'roc_auc':
+        elif scoring == "roc_auc":
             scoring_func = roc_auc_score
-        elif scoring == 'r2':
+        elif scoring == "r2":
             scoring_func = r2_score
-        elif scoring == 'mse':
+        elif scoring == "mse":
             scoring_func = mean_squared_error
-        elif scoring == 'mae':
+        elif scoring == "mae":
             scoring_func = mean_absolute_error
-        elif scoring == 'mape':
+        elif scoring == "mape":
             scoring_func = mean_absolute_percentage_error
-        elif scoring == 'rmse':
-            scoring_func = lambda y_true, y_pred: np.sqrt(mean_squared_error(y_true, y_pred))        
-        
-        X_train, X_val, y_train, y_val = train_test_split(X, y, 
-                                                          test_size=0.2, 
-                                                          random_state=random_state)
-        
-        res = cross_val_score(self, X_train, y_train, 
-                              cv=cv, scoring=scoring, 
-                              n_jobs=n_jobs) # cross-validation error
+        elif scoring == "rmse":
+            def scoring_func(y_true, y_pred): return np.sqrt(
+                mean_squared_error(y_true, y_pred)
+            )
+
+        X_train, X_val, y_train, y_val = train_test_split(
+            X, y, test_size=0.2, random_state=random_state
+        )
+
+        res = cross_val_score(
+            self, X_train, y_train, cv=cv, scoring=scoring, n_jobs=n_jobs
+        )  # cross-validation error
 
         if penalized == False:
-            return res 
+            return res
 
-        DescribeResult = namedtuple('DescribeResult', ['cv_score', 'val_score', 'penalized_score'])
+        DescribeResult = namedtuple(
+            "DescribeResult", ["cv_score", "val_score", "penalized_score"]
+        )
 
-        numerator = res.mean()     
-                        
-        # Evaluate on the (cv+1)-th fold  
-        preds_val = self.fit(X_train, y_train).predict(X_val)   
-        try:       
-            denominator = scoring(y_val, preds_val) # validation error
+        numerator = res.mean()
+
+        # Evaluate on the (cv+1)-th fold
+        preds_val = self.fit(X_train, y_train).predict(X_val)
+        try:
+            denominator = scoring(y_val, preds_val)  # validation error
         except Exception as e:
             denominator = scoring_func(y_val, preds_val)
 
         # if higher is better
-        if objective == 'abs':
-            penalized_score = np.abs(numerator - denominator) + epsilon*(1/denominator + 1/numerator)
-        elif objective == 'relative':
+        if objective == "abs":
+            penalized_score = np.abs(numerator - denominator) + epsilon * (
+                1 / denominator + 1 / numerator
+            )
+        elif objective == "relative":
             ratio = numerator / denominator
-            penalized_score = np.abs(ratio - 1) + epsilon*(1/denominator + 1/numerator)
-                                         
-        return DescribeResult(cv_score=numerator, 
-                             val_score=denominator, 
-                             penalized_score=penalized_score)
-        
+            penalized_score = np.abs(ratio - 1) + epsilon * (
+                1 / denominator + 1 / numerator
+            )
 
+        return DescribeResult(
+            cv_score=numerator,
+            val_score=denominator,
+            penalized_score=penalized_score,
+        )
