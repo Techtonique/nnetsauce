@@ -727,6 +727,7 @@ class Base(BaseEstimator):
                         n_jobs=-1,
                         epsilon=0.5,
                         penalized=True,
+                        objective='abs',
                         **kwargs):
         """
         Penalized Cross-validation score for a model.
@@ -763,8 +764,11 @@ class Base(BaseEstimator):
                 Penalty parameter
 
             penalized: bool
-                Whether to obtain penalized cross-validation score or not                
-        
+                Whether to obtain penalized cross-validation score or not 
+
+            objective: str
+                'abs': Minimize the absolute difference between cross-validation score and validation score
+                'relative': Minimize the relative difference between cross-validation score and validation score
         Returns:
 
             A namedtuple with the following fields:                            
@@ -817,7 +821,11 @@ class Base(BaseEstimator):
             denominator = scoring_func(y_val, preds_val)
 
         # if higher is better
-        penalized_score = numerator / denominator + epsilon*(1/denominator + 1/numerator)
+        if objective == 'abs':
+            penalized_score = np.abs(numerator - denominator) + epsilon*(1/denominator + 1/numerator)
+        elif objective == 'relative':
+            ratio = numerator / denominator
+            penalized_score = np.abs(ratio - 1) + epsilon*(1/denominator + 1/numerator)
                                          
         return DescribeResult(cv_score=numerator, 
                              val_score=denominator, 
