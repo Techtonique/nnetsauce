@@ -9,8 +9,11 @@ import platform
 import warnings
 import sklearn.metrics as skm
 
+from collections import namedtuple
 from functools import partial
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
+from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, r2_score, mean_squared_error, mean_absolute_error, mean_absolute_percentage_error
 from ..utils import activations as ac
 from ..utils import matrixops as mo
 from ..utils import misc as mx
@@ -715,3 +718,109 @@ class Base(BaseEstimator):
 
         # if no hidden layer
         return self.scaler_.transform(augmented_X)
+    
+    def cross_val_score(self, 
+                        X, y, 
+                        cv=5, 
+                        scoring="accuracy",
+                        random_state=42,
+                        n_jobs=-1,
+                        epsilon=0.5,
+                        penalized=True,
+                        **kwargs):
+        """
+        Penalized Cross-validation score for a model.
+
+        Parameters:
+
+            X: {array-like}, shape = [n_samples, n_features]
+                Training vectors, where n_samples is the number
+                of samples and n_features is the number of features
+
+            y: array-like, shape = [n_samples]
+                Target values
+            
+            X_test: {array-like}, shape = [n_samples, n_features]
+                Test vectors, where n_samples is the number
+                of samples and n_features is the number of features
+
+            y_test: array-like, shape = [n_samples]
+                Target values
+            
+            cv: int
+                Number of folds
+
+            scoring: str
+                Scoring metric
+            
+            random_state: int
+                Random state
+
+            n_jobs: int
+                Number of jobs to run in parallel
+
+            epsilon: float
+                Penalty parameter
+
+            penalized: bool
+                Whether to obtain penalized cross-validation score or not                
+        
+        Returns:
+
+            A namedtuple with the following fields:                            
+                - cv_score: float
+                    cross-validation score
+                - val_score: float
+                    validation score
+                - penalized_score: float
+                    penalized cross-validation score: cv_score / val_score + epsilon*(1/val_score + 1/cv_score)
+                    If higher scoring metric is better, minimize the function result.
+                    If lower scoring metric is better, maximize the function result.
+        """
+        if scoring == 'accuracy':
+            scoring_func = accuracy_score
+        elif scoring == 'f1':
+            scoring_func = f1_score
+        elif scoring == 'roc_auc':
+            scoring_func = roc_auc_score
+        elif scoring == 'r2':
+            scoring_func = r2_score
+        elif scoring == 'mse':
+            scoring_func = mean_squared_error
+        elif scoring == 'mae':
+            scoring_func = mean_absolute_error
+        elif scoring == 'mape':
+            scoring_func = mean_absolute_percentage_error
+        elif scoring == 'rmse':
+            scoring_func = lambda y_true, y_pred: np.sqrt(mean_squared_error(y_true, y_pred))        
+        
+        X_train, X_val, y_train, y_val = train_test_split(X, y, 
+                                                          test_size=0.2, 
+                                                          random_state=random_state)
+        
+        res = cross_val_score(self, X_train, y_train, 
+                              cv=cv, scoring=scoring, 
+                              n_jobs=n_jobs) # cross-validation error
+
+        if penalized == False:
+            return res 
+
+        DescribeResult = namedtuple('DescribeResult', ['cv_score', 'val_score', 'penalized_score'])
+
+        numerator = res.mean()     
+                        
+        # Evaluate on the (cv+1)-th fold  
+        preds_val = self.fit(X_train, y_train).predict(X_val)   
+        try:       
+            denominator = scoring(y_val, preds_val) # validation error
+        except Exception as e:
+            denominator = scoring_func(y_val, preds_val)
+
+        # if higher is better
+        penalized_score = numerator / denominator + epsilon*(1/denominator + 1/numerator)
+                                         
+        return DescribeResult(cv_score=numerator, 
+                             val_score=denominator, 
+                             penalized_score=penalized_score)
+        
+
