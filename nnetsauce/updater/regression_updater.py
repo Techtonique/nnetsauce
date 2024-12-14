@@ -33,7 +33,6 @@ class RegressorUpdater(BaseEstimator, RegressorMixin):
         Updating factor
 
     """
-
     def __init__(self, regr, alpha=0.5):
         self.regr = regr
         self.alpha = alpha
@@ -48,30 +47,6 @@ class RegressorUpdater(BaseEstimator, RegressorMixin):
             pass
 
     def fit(self, X, y, **kwargs):
-
-        if isinstance(self.regr, DeepRegressor):  # deep nnetsauce model ---
-            if check_is_fitted(self.regr) == False:
-                assert hasattr(
-                    self.regr, "stacked_obj"
-                ), "model must be fitted first"
-                current_obj = self.regr.stacked_obj
-                for _ in range(self.regr.n_layers):
-                    try:
-                        input_X = current_obj.obj.cook_test_set(X)
-                        current_obj.obj.fit(input_X, y, **kwargs)
-                        try:
-                            current_obj = current_obj.obj
-                        except AttributeError:
-                            pass
-                    except ValueError:
-                        pass
-                self.n_obs_ = X.shape[0]
-                return self
-            # MODEL IS ALREADY FITTED ---
-            self.n_obs_ = X.shape[0]
-            if hasattr(self.regr, "coef_"):
-                self.coef_ = self.regr.coef_
-            return self
 
         if isinstance(
             self.regr, CustomRegressor
@@ -124,27 +99,8 @@ class RegressorUpdater(BaseEstimator, RegressorMixin):
         self.updating_factor_ = self.n_obs_ ** (-self.alpha)
 
         if isinstance(self.regr, Base):  # nnetsauce model ---
+            
             newX = deepcopy(X)
-            if isinstance(self.regr, DeepRegressor):
-                current_obj = self.regr.stacked_obj.obj
-                newX = current_obj.cook_test_set(X=newX)
-                for _ in range(self.regr.n_layers):
-                    if isinstance(X, pd.DataFrame):
-                        newx = newX.values.ravel()
-                    else:
-                        newx = newX.ravel()
-                    new_coef = (
-                        current_obj.coef_
-                        + self.updating_factor_
-                        * np.dot(newx, y - np.dot(newx, current_obj.coef_))
-                    )
-                    current_obj.coef_ = _update_mean(
-                        current_obj.coef_, self.n_obs_, new_coef
-                    )
-                    current_obj = current_obj.obj
-                    newX = current_obj.obj.cook_test_set(X=newX)
-                self.n_obs_ += 1
-                return self
 
             if isinstance(
                 self.regr, CustomRegressor

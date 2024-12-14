@@ -118,7 +118,6 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
             self.fit_objs_[i] = deepcopy(
                 self.obj.fit(self.scaled_X_, Y[:, i], **kwargs)
             )
-
         self.classes_ = np.unique(y)
         return self
 
