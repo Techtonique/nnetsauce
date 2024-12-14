@@ -33,6 +33,7 @@ class ClassifierUpdater(BaseEstimator, ClassifierMixin):
         Updating factor
 
     """
+
     def __init__(self, clf, alpha=0.5):
         self.clf = clf
         self.alpha = alpha
@@ -111,7 +112,7 @@ class ClassifierUpdater(BaseEstimator, ClassifierMixin):
         self.updating_factor_ = self.n_obs_ ** (-self.alpha)
 
         if isinstance(self.clf, Base):  # nnetsauce model ---
-            
+
             newX = deepcopy(X)
 
             if isinstance(

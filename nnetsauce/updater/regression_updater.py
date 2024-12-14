@@ -33,6 +33,7 @@ class RegressorUpdater(BaseEstimator, RegressorMixin):
         Updating factor
 
     """
+
     def __init__(self, regr, alpha=0.5):
         self.regr = regr
         self.alpha = alpha
@@ -99,7 +100,7 @@ class RegressorUpdater(BaseEstimator, RegressorMixin):
         self.updating_factor_ = self.n_obs_ ** (-self.alpha)
 
         if isinstance(self.regr, Base):  # nnetsauce model ---
-            
+
             newX = deepcopy(X)
 
             if isinstance(

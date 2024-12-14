@@ -810,9 +810,9 @@ class Base(BaseEstimator):
         elif scoring == "mape":
             scoring_func = mean_absolute_percentage_error
         elif scoring == "rmse":
-            def scoring_func(y_true, y_pred): return np.sqrt(
-                mean_squared_error(y_true, y_pred)
-            )
+
+            def scoring_func(y_true, y_pred):
+                return np.sqrt(mean_squared_error(y_true, y_pred))
 
         X_train, X_val, y_train, y_val = train_test_split(
             X, y, test_size=0.2, random_state=random_state
