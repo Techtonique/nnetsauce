@@ -176,6 +176,7 @@ class CustomClassifier(Custom, ClassifierMixin):
         self.level = level
         self.pi_method = pi_method
         self.coef_ = None
+        self.intercept_ = None
         self.type_fit = "classification"
         if self.level is not None:
             self.obj = PredictionSet(
@@ -238,6 +239,9 @@ class CustomClassifier(Custom, ClassifierMixin):
 
         if hasattr(self.obj, "coef_"):
             self.coef_ = self.obj.coef_
+        
+        if hasattr(self.obj, "intercept_"):    
+            self.intercept_ = self.obj.intercept_
 
         return self
 

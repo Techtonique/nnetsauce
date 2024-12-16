@@ -167,6 +167,7 @@ class CustomRegressor(Custom, RegressorMixin):
         self.level = level
         self.pi_method = pi_method
         self.coef_ = None
+        self.intercept_ = None
         self.X_ = None
         self.y_ = None
 
@@ -220,6 +221,9 @@ class CustomRegressor(Custom, RegressorMixin):
 
         if hasattr(self.obj, "coef_"):
             self.coef_ = self.obj.coef_
+
+        if hasattr(self.obj, "intercept_"):    
+            self.intercept_ = self.obj.intercept_
 
         return self
 
