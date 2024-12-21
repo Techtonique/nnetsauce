@@ -20,8 +20,8 @@ print(df.shape)
 print(198*0.8)
 # df_train = df.iloc[0:97,]
 # df_test = df.iloc[97:123,]
-df_train = df.iloc[0:158,]
-df_test = df.iloc[158:198,]
+df_train = df.iloc[0:158,:]
+df_test = df.iloc[158:198,:]
 
 regr = ns.PredictionInterval(obj=Ridge(),
                              method="splitconformal",
@@ -32,6 +32,8 @@ regr = ns.PredictionInterval(obj=Ridge(),
 print(df_test)
 obj_MTS = ns.MTS(regr, lags = 25, n_hidden_features=10, verbose = 1)
 obj_MTS.fit(df_train)
+print("\n")
+print(obj_MTS.fit_objs_)
 print("\n")
 print(obj_MTS.predict(h=10, return_pi=True))
 
@@ -98,5 +100,5 @@ for est in all_estimators():
                 lags=25)
         regr.fit(df_train)
         print(regr.predict(h=10, return_pi=True))
-      except:
+      except Exception as e:
         pass

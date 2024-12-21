@@ -444,33 +444,33 @@ class MTS(Base):
             "block-bootstrap",
         ) or self.type_pi.startswith("vine"):
 
-            try:  # multioutput regressor
+            # try:  # multioutput regressor
 
-                self.y_means_ = np.mean(self.y_, axis=0)
-                centered_y = self.y_ - self.y_means_
-                self.obj.fit(X=scaled_Z, y=centered_y)
-                residuals_ = centered_y - self.obj.predict(scaled_Z)
-                self.residuals_ = residuals_
+            #     self.y_means_ = np.mean(self.y_, axis=0)
+            #     centered_y = self.y_ - self.y_means_
+            #     self.obj.fit(X=scaled_Z, y=centered_y)
+            #     residuals_ = centered_y - self.obj.predict(scaled_Z)
+            #     self.residuals_ = residuals_
 
-            except Exception:  # single output regressor
+            #except Exception as e:  # single output regressor
+            #    print(e)
+            if self.show_progress is True:
+                iterator = tqdm(range(p))
+            else:
+                iterator = range(p)
 
-                if self.show_progress is True:
-                    iterator = tqdm(range(p))
-                else:
-                    iterator = range(p)
-
-                for i in iterator:
-                    y_mean = np.mean(self.y_[:, i])
-                    self.y_means_[i] = y_mean
-                    centered_y_i = self.y_[:, i] - y_mean
-                    self.centered_y_is_.append(centered_y_i)
-                    self.obj.fit(X=scaled_Z, y=centered_y_i)
-                    self.fit_objs_[i] = deepcopy(self.obj)
-                    residuals_.append(
-                        (
-                            centered_y_i - self.fit_objs_[i].predict(scaled_Z)
-                        ).tolist()
-                    )
+            for i in iterator:
+                y_mean = np.mean(self.y_[:, i])
+                self.y_means_[i] = y_mean
+                centered_y_i = self.y_[:, i] - y_mean
+                self.centered_y_is_.append(centered_y_i)
+                self.obj.fit(X=scaled_Z, y=centered_y_i)
+                self.fit_objs_[i] = deepcopy(self.obj)
+                residuals_.append(
+                    (
+                        centered_y_i - self.fit_objs_[i].predict(scaled_Z)
+                    ).tolist()
+                )
 
         if self.type_pi.startswith("scp"):
 
@@ -791,15 +791,16 @@ class MTS(Base):
                     )
 
             if "return_pi" in kwargs:
-                try:
-                    preds_pi = self.obj.predict(cooked_new_X, return_pi=True)
+                if self.n_series <= 1: 
+                    preds_pi = self.obj.predict(cooked_new_X, 
+                                                return_pi=True)
                     mean_pi_.append(preds_pi.mean[0])
                     lower_pi_.append(preds_pi.lower[0])
                     upper_pi_.append(preds_pi.upper[0])
-                except Exception:
+                else:
                     for i in range(self.n_series):
                         preds_pi = self.fit_objs_[i].predict(
-                            cooked_new_X, return_pi=True
+                            cooked_new_X, return_pi=True,                             
                         )
                         mean_pi_.append(preds_pi.mean[0])
                         lower_pi_.append(preds_pi.lower[0])
@@ -807,7 +808,8 @@ class MTS(Base):
 
             try:
                 predicted_cooked_new_X = self.obj.predict(cooked_new_X)
-            except Exception:
+            except Exception as e:
+                print(e)
                 predicted_cooked_new_X = np.asarray(
                     [
                         np.asarray(
