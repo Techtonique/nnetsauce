@@ -808,8 +808,7 @@ class MTS(Base):
 
             try:
                 predicted_cooked_new_X = self.obj.predict(cooked_new_X)
-            except Exception as e:
-                print(e)
+            except Exception as e:                
                 predicted_cooked_new_X = np.asarray(
                     [
                         np.asarray(
