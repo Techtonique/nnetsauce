@@ -1,4 +1,4 @@
-# Authors: Thierry Moudiki
+# Authors: T. Moudiki
 #
 # License: BSD 3 Clear Clause
 
@@ -305,7 +305,6 @@ class MTS(Base):
         self.residuals_std_dev_ = None
         self.n_obs_ = None
         self.level_ = None
-        self.scaled_Z_ = None
 
     def fit(self, X, xreg=None, **kwargs):
         """Fit MTS model to training data X, with optional regressors xreg
@@ -343,10 +342,6 @@ class MTS(Base):
 
         else:  # input data set is a DataFrame with column names
 
-            # if "date" in X.columns:
-            #    X.index = X["date"]
-            #    X.drop(['date'], axis=1, inplace=True)
-
             X_index = None
             if X.index is not None:
                 X_index = X.index
@@ -364,26 +359,25 @@ class MTS(Base):
                 self.df_ = X
                 X = X.values
             else:
-                input_dates_prev = pd.DatetimeIndex(self.df_.index.values)
-                frequency = pd.infer_freq(input_dates_prev)
-                self.df_ = pd.concat([self.df_, X], axis=0)
+                input_dates_prev = pd.DatetimeIndex(self.df_.index.values)  
+                frequency = pd.infer_freq(input_dates_prev)                                             
+                self.df_ = pd.concat([self.df_, X], axis=0) 
                 self.input_dates = pd.date_range(
-                    start=input_dates_prev[0],
-                    periods=len(input_dates_prev) + X.shape[0],
-                    freq=frequency,
+                    start=input_dates_prev[0], 
+                    periods=len(input_dates_prev)+X.shape[0], 
+                    freq=frequency
                 ).values.tolist()
                 self.df_.index = self.input_dates
                 X = self.df_.values
-            self.df_.columns = self.series_names
+            self.df_.columns = self.series_names            
         else:
             if self.df_ is None:
                 self.df_ = pd.DataFrame(X, columns=self.series_names)
             else:
                 self.df_ = pd.concat(
-                    [self.df_, pd.DataFrame(X, columns=self.series_names)],
-                    axis=0,
+                    [self.df_, pd.DataFrame(X, columns=self.series_names)], axis=0
                 )
-
+            
         self.input_dates = ts.compute_input_dates(self.df_)
 
         try:
@@ -402,10 +396,7 @@ class MTS(Base):
         self.X_ = None
         self.n_series = p
         self.fit_objs_.clear()
-        try:
-            self.y_means_.clear()
-        except AttributeError:
-            self.y_means_ = None
+        self.y_means_.clear()
         residuals_ = []
         self.residuals_ = None
         self.residuals_sims_ = None
@@ -437,28 +428,17 @@ class MTS(Base):
                 f"\n Adjusting {type(self.obj).__name__} to multivariate time series... \n "
             )
 
+        if self.show_progress is True:
+            iterator = tqdm(range(p))
+        else:
+            iterator = range(p)
+
         if self.type_pi in (
             "gaussian",
             "kde",
             "bootstrap",
             "block-bootstrap",
         ) or self.type_pi.startswith("vine"):
-
-            # try:  # multioutput regressor
-
-            #     self.y_means_ = np.mean(self.y_, axis=0)
-            #     centered_y = self.y_ - self.y_means_
-            #     self.obj.fit(X=scaled_Z, y=centered_y)
-            #     residuals_ = centered_y - self.obj.predict(scaled_Z)
-            #     self.residuals_ = residuals_
-
-            #except Exception as e:  # single output regressor
-            #    print(e)
-            if self.show_progress is True:
-                iterator = tqdm(range(p))
-            else:
-                iterator = range(p)
-
             for i in iterator:
                 y_mean = np.mean(self.y_[:, i])
                 self.y_means_[i] = y_mean
@@ -473,63 +453,33 @@ class MTS(Base):
                 )
 
         if self.type_pi.startswith("scp"):
-
             # split conformal prediction
-            n_y = self.y_.shape[0]
-            n_y_half = n_y // 2
-            first_half_idx = range(0, n_y_half)
-            second_half_idx = range(n_y_half, n_y)
-
-            try:  # multioutput regressor
-
-                y_mean_temp = np.mean(self.y_[first_half_idx, :], axis=0)
-                centered_y_temp = self.y_[first_half_idx, :] - y_mean_temp
-                self.obj.fit(X=scaled_Z[first_half_idx, :], y=centered_y_temp)
-                residuals_ = (
-                    self.y_[second_half_idx, :]
-                    - y_mean_temp
-                    - self.obj.predict(scaled_Z[second_half_idx, :])
+            for i in iterator:
+                n_y = self.y_.shape[0]
+                n_y_half = n_y // 2
+                first_half_idx = range(0, n_y_half)
+                second_half_idx = range(n_y_half, n_y)
+                y_mean_temp = np.mean(self.y_[first_half_idx, i])
+                centered_y_i_temp = self.y_[first_half_idx, i] - y_mean_temp
+                self.obj.fit(X=scaled_Z[first_half_idx, :], y=centered_y_i_temp)
+                # calibrated residuals actually
+                residuals_.append(
+                    (
+                        self.y_[second_half_idx, i]
+                        - (
+                            y_mean_temp
+                            + self.obj.predict(scaled_Z[second_half_idx, :])
+                        )
+                    ).tolist()
                 )
-                self.y_means_ = np.mean(self.y_[second_half_idx, :], axis=0)
-                centered_y = (
-                    self.y_[second_half_idx, :] - self.y_means_[:, np.newaxis]
-                )
-                self.obj.fit(X=scaled_Z[second_half_idx, :], y=centered_y)
-                self.residuals_ = np.asarray(residuals_)
+                # fit on the second half
+                y_mean = np.mean(self.y_[second_half_idx, i])
+                self.y_means_[i] = y_mean
+                centered_y_i = self.y_[second_half_idx, i] - y_mean
+                self.obj.fit(X=scaled_Z[second_half_idx, :], y=centered_y_i)
+                self.fit_objs_[i] = deepcopy(self.obj)
 
-            except Exception:  # single output regressor
-
-                if self.show_progress is True:
-                    iterator = tqdm(range(p))
-                else:
-                    iterator = range(p)
-
-                residuals_ = []
-
-                for i in iterator:
-                    y_mean_temp = np.mean(self.y_[first_half_idx, i])
-                    centered_y_i_temp = self.y_[first_half_idx, i] - y_mean_temp
-                    self.obj.fit(
-                        X=scaled_Z[first_half_idx, :], y=centered_y_i_temp
-                    )
-                    # calibrated residuals actually
-                    residuals_.append(
-                        (
-                            self.y_[second_half_idx, i]
-                            - (
-                                y_mean_temp
-                                + self.obj.predict(scaled_Z[second_half_idx, :])
-                            )
-                        ).tolist()
-                    )
-                    # fit on the second half
-                    y_mean = np.mean(self.y_[second_half_idx, i])
-                    self.y_means_[i] = y_mean
-                    centered_y_i = self.y_[second_half_idx, i] - y_mean
-                    self.obj.fit(X=scaled_Z[second_half_idx, :], y=centered_y_i)
-                    self.fit_objs_[i] = deepcopy(self.obj)
-
-                self.residuals_ = np.asarray(residuals_).T
+        self.residuals_ = np.asarray(residuals_).T
 
         if self.type_pi == "gaussian":
             self.gaussian_preds_std_ = np.std(self.residuals_, axis=0)
@@ -565,7 +515,7 @@ class MTS(Base):
             self.kde_ = grid.best_estimator_
 
         return self
-
+    
     def partial_fit(self, X, xreg=None, **kwargs):
         """Update the model with new observations X, with optional regressors xreg
 
@@ -589,18 +539,20 @@ class MTS(Base):
 
         assert self.df_ is not None, "fit() must be called before partial_fit()"
 
-        if (isinstance(X, pd.DataFrame) is False) and isinstance(
-            X, pd.Series
-        ) is False:
+        if (
+            isinstance(X, pd.DataFrame) is False
+        ) and isinstance(X, pd.Series) is False:
             if len(X.shape) == 1:
                 X = X.reshape(1, -1)
-
+            
             return self.fit(X, xreg, **kwargs)
-
-        if len(X.shape) == 1:
-            X = pd.DataFrame(X.values.reshape(1, -1), columns=self.df_.columns)
-
-        return self.fit(X, xreg, **kwargs)
+        
+        else:
+            if len(X.shape) == 1:                
+                X = pd.DataFrame(X.values.reshape(1, -1), 
+                                 columns=self.df_.columns)
+                
+            return self.fit(X, xreg, **kwargs)
 
     def predict(self, h=5, level=95, **kwargs):
         """Forecast all the time series, h steps ahead
@@ -774,49 +726,32 @@ class MTS(Base):
             cooked_new_X = self.cook_test_set(new_X, **kwargs)
 
             if "return_std" in kwargs:
-                try:  # multioutput regressor
-                    self.preds_std_ = self.obj.predict(
-                        cooked_new_X, return_std=True
-                    )[1]
-                except Exception:  # single output regressor
-                    self.preds_std_.append(
-                        [
-                            np.asarray(
-                                self.fit_objs_[i].predict(
-                                    cooked_new_X, return_std=True
-                                )[1]
-                            ).item()
-                            for i in range(self.n_series)
-                        ]
-                    )
-
-            if "return_pi" in kwargs:
-                if self.n_series <= 1: 
-                    preds_pi = self.obj.predict(cooked_new_X, 
-                                                return_pi=True)
-                    mean_pi_.append(preds_pi.mean[0])
-                    lower_pi_.append(preds_pi.lower[0])
-                    upper_pi_.append(preds_pi.upper[0])
-                else:
-                    for i in range(self.n_series):
-                        preds_pi = self.fit_objs_[i].predict(
-                            cooked_new_X, return_pi=True,                             
-                        )
-                        mean_pi_.append(preds_pi.mean[0])
-                        lower_pi_.append(preds_pi.lower[0])
-                        upper_pi_.append(preds_pi.upper[0])
-
-            try:
-                predicted_cooked_new_X = self.obj.predict(cooked_new_X)
-            except Exception as e:                
-                predicted_cooked_new_X = np.asarray(
+                self.preds_std_.append(
                     [
                         np.asarray(
-                            self.fit_objs_[i].predict(cooked_new_X)
+                            self.fit_objs_[i].predict(
+                                cooked_new_X, return_std=True
+                            )[1]
                         ).item()
                         for i in range(self.n_series)
                     ]
                 )
+
+            if "return_pi" in kwargs:
+                for i in range(self.n_series):
+                    preds_pi = self.fit_objs_[i].predict(
+                        cooked_new_X, return_pi=True
+                    )
+                    mean_pi_.append(preds_pi.mean[0])
+                    lower_pi_.append(preds_pi.lower[0])
+                    upper_pi_.append(preds_pi.upper[0])
+
+            predicted_cooked_new_X = np.asarray(
+                [
+                    np.asarray(self.fit_objs_[i].predict(cooked_new_X)).item()
+                    for i in range(self.n_series)
+                ]
+            )
 
             preds = np.asarray(y_means_ + predicted_cooked_new_X)
 
@@ -1097,10 +1032,8 @@ class MTS(Base):
         scoring_options = {
             "explained_variance": skm2.explained_variance_score,
             "neg_mean_absolute_error": skm2.mean_absolute_error,
-            "neg_mean_squared_error": lambda x, y: np.mean((x - y) ** 2),
-            "neg_root_mean_squared_error": lambda x, y: np.sqrt(
-                np.mean((x - y) ** 2)
-            ),
+            "neg_mean_squared_error": lambda x, y: np.mean((x - y)**2),
+            "neg_root_mean_squared_error": lambda x, y: np.sqrt(np.mean((x - y)**2)),
             "neg_mean_squared_log_error": skm2.mean_squared_log_error,
             "neg_median_absolute_error": skm2.median_absolute_error,
             "r2": skm2.r2_score,
