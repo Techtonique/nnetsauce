@@ -341,8 +341,6 @@ class LazyDeepMTS(MTS):
                     except Exception as e:
                         X_test = X_test.iloc[0: self.h, :]
 
-                print(f"X_test: {X_test}")
-                print(f"X_pred: {X_pred}")
                 rmse = mean_errors(
                     actual=X_test,
                     pred=X_pred,
@@ -511,8 +509,6 @@ class LazyDeepMTS(MTS):
                     if (self.replications is not None) or (
                         self.type_pi == "gaussian"
                     ):
-                        print(f"X_test: {X_test}")
-                        print(f"X_pred: {X_pred}")
                         rmse = mean_errors(
                             actual=X_test,
                             pred=X_pred,
@@ -541,8 +537,6 @@ class LazyDeepMTS(MTS):
                             X_pred, X_test, level=95, per_series=per_series
                         )
                     else:
-                        print(f"X_test: {X_test}")
-                        print(f"X_pred: {X_pred}")
                         rmse = mean_errors(
                             actual=X_test,
                             pred=X_pred,
@@ -704,8 +698,6 @@ class LazyDeepMTS(MTS):
                         if (self.replications is not None) or (
                             self.type_pi == "gaussian"
                         ):
-                            print(f"X_test: {X_test}")
-                            print(f"X_pred: {X_pred}")
                             rmse = mean_errors(
                                 actual=X_test,
                                 pred=X_pred.mean,
@@ -734,8 +726,6 @@ class LazyDeepMTS(MTS):
                                 X_pred, X_test, level=95, per_series=per_series
                             )
                         else:  # no prediction interval
-                            print(f"X_test: {X_test}")
-                            print(f"X_pred: {X_pred}")
                             rmse = mean_errors(
                                 actual=X_test,
                                 pred=X_pred,
@@ -761,8 +751,6 @@ class LazyDeepMTS(MTS):
 
                             if isinstance(X_test, pd.DataFrame):
                                 X_test_h = X_test.iloc[0: self.h, :]
-                                print(f"X_test: {X_test}")
-                                print(f"X_pred: {X_pred}")
                                 rmse = mean_errors(
                                     actual=X_test_h,
                                     pred=X_pred,
@@ -795,8 +783,6 @@ class LazyDeepMTS(MTS):
                                 )
                             else:
                                 X_test_h = X_test[0: self.h, :]
-                                print(f"X_test: {X_test}")
-                                print(f"X_pred: {X_pred}")
                                 rmse = mean_errors(
                                     actual=X_test_h,
                                     pred=X_pred,
@@ -830,8 +816,6 @@ class LazyDeepMTS(MTS):
                         else:  # no prediction interval
 
                             if isinstance(X_test, pd.DataFrame):
-                                print(f"X_test: {X_test}")
-                                print(f"X_pred: {X_pred}")
                                 X_test_h = X_test.iloc[0: self.h, :]
                                 rmse = mean_errors(
                                     actual=X_test_h,
@@ -852,9 +836,7 @@ class LazyDeepMTS(MTS):
                                     per_series=per_series,
                                 )
                             else:
-                                X_test_h = X_test[0: self.h, :]
-                                print(f"X_test: {X_test}")
-                                print(f"X_pred: {X_pred}")
+                                X_test_h = X_test[0: self.h, :]                                
                                 rmse = mean_errors(
                                     actual=X_test_h,
                                     pred=X_pred,
