@@ -20,6 +20,7 @@ from .multitask.multitaskClassifier import MultitaskClassifier
 from .multitask.simplemultitaskClassifier import SimpleMultitaskClassifier
 from .optimizers.optimizer import Optimizer
 from .predictioninterval import PredictionInterval
+from .quantile.quantile import QuantileRegressor
 from .randombag.randomBagClassifier import RandomBagClassifier
 from .randombag.randomBagRegressor import RandomBagRegressor
 from .ridge2.ridge2Classifier import Ridge2Classifier
@@ -58,6 +59,7 @@ __all__ = [
     "PredictionInterval",
     "SimpleMultitaskClassifier",
     "Optimizer",
+    "QuantileRegressor",
     "RandomBagRegressor",
     "RandomBagClassifier",
     "RegressorUpdater",

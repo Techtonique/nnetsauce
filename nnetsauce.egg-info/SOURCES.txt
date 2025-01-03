@@ -53,6 +53,8 @@ nnetsauce/predictioninterval/__init__.py
 nnetsauce/predictioninterval/predictioninterval.py
 nnetsauce/predictionset/__init__.py
 nnetsauce/predictionset/predictionset.py
+nnetsauce/quantile/__init__.py
+nnetsauce/quantile/quantile.py
 nnetsauce/randombag/__init__.py
 nnetsauce/randombag/bag.py
 nnetsauce/randombag/helpers.py
