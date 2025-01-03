@@ -250,6 +250,7 @@ class QuantileRegressor(BaseEstimator,
         return self
     
     def predict(self, X):
+        
         if self.base_regressor_ is None or self.offset_multipliers_ is None:
             raise ValueError("Model not fitted yet.")
         
@@ -291,6 +292,11 @@ class QuantileRegressor(BaseEstimator,
               current_predictions = current_predictions + offset
               all_predictions.append(current_predictions)
         
-        return all_predictions
+        DescribeResult = namedtuple("DecribeResult", ["mean", "lower", "upper", "median"])
+        DescribeResult.mean = base_predictions
+        DescribeResult.lower = np.asarray(all_predictions[0])
+        DescribeResult.median = np.asarray(all_predictions[1])
+        DescribeResult.upper = np.asarray(all_predictions[2])        
+        return DescribeResult
 
 

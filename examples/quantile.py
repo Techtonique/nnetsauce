@@ -52,16 +52,31 @@ for dataset, dataset_name in zip(datasets, dataset_names):
             predictions = regressor.predict(X_test)
 
             # Check ordering
-            lower_bound, median, upper_bound = predictions
+            lower_bound, median, upper_bound = predictions.lower, predictions.median, predictions.upper
             is_ordered = np.all(np.logical_and(lower_bound < median, median < upper_bound))
             print(f"Are the predictions ordered correctly? {is_ordered}")
 
-            df = pd.DataFrame(predictions).T
-            df.columns = ['lower_bound', 'median', 'upper_bound']
+            # Calculate coverage
+            coverage = np.mean((lower_bound <= y_test)*(upper_bound >= y_test))
+            print(f"Coverage: {coverage:.2f}")
 
-            print("coverage", np.mean((df['lower_bound'] <= y_test)*(df['upper_bound'] >= y_test)))
-
-            df.plot()
-            plt.plot(y_test, label='y_test', color='gray', linestyle='--')
+            # Plot
+            plt.figure(figsize=(10, 6))
+            
+            # Plot the actual values
+            plt.plot(y_test, label='Actual', color='black', alpha=0.5)
+            
+            # Plot the predictions and confidence interval
+            plt.plot(predictions.median, label='Median prediction', color='blue', linewidth=2)
+            plt.plot(predictions.mean, label='Mean prediction', color='orange', linestyle='--', linewidth=2)
+            plt.fill_between(range(len(y_test)), 
+                           lower_bound, upper_bound,
+                           alpha=0.3, color='gray',
+                           edgecolor='gray',
+                           label='Prediction interval')
+            
+            plt.title(f'{regr.__class__.__name__} - {score} scoring')
+            plt.xlabel('Sample index')
+            plt.ylabel('Value')
             plt.legend()
             plt.show()
