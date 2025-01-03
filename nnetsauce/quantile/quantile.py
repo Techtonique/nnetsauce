@@ -127,9 +127,9 @@ class QuantileRegressor(BaseEstimator,
                                         #popsize=15,
                                         #maxiter=120,
                                         #tol=1e-4,
-                                        popsize=20,
-                                        maxiter=150,
-                                        tol=1e-5,
+                                        popsize=25,
+                                        maxiter=200,
+                                        tol=1e-6,
                                         disp=False)
         
         return np.exp(result.x[0])
