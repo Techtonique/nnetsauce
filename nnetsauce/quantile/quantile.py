@@ -120,12 +120,12 @@ class QuantileRegressor(BaseEstimator,
           return self._compute_quantile_loss(residuals, quantile)
         
         # Optimize in log space for numerical stability
-        bounds = [(-10, 10)]  # log space bounds
-        
+        #bounds = [(-10, 10)]  # log space bounds
+        bounds = [(-100, 100)]  # log space bounds
         result = differential_evolution(objective, 
                                         bounds,
                                         #popsize=15,
-                                        #maxiter=120,
+                                        #maxiter=100,
                                         #tol=1e-4,
                                         popsize=25,
                                         maxiter=200,
@@ -250,7 +250,7 @@ class QuantileRegressor(BaseEstimator,
         return self
     
     def predict(self, X):
-        
+
         if self.base_regressor_ is None or self.offset_multipliers_ is None:
             raise ValueError("Model not fitted yet.")
         
