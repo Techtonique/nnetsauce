@@ -10,41 +10,58 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.datasets import load_diabetes
+from sklearn.datasets import load_diabetes, fetch_california_housing
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
+from tqdm import tqdm
 
 
-scoring = ["conformal", "residuals", "predictions"]
+scoring = ["conformal", "residuals", "predictions", "studentized", "conformal-studentized"]
 
-for score in scoring:
+datasets = [load_diabetes, fetch_california_housing]
 
-    regr = Ridge()
+dataset_names = ["diabetes", "california_housing"]
 
-    regressor = ns.QuantileRegressor(
-        base_regressor=regr, 
-        score = score   
-    )
+regrs = [RandomForestRegressor(), RidgeCV(), KNeighborsRegressor()]
 
-    X, y = load_diabetes(return_X_y=True)
+for dataset, dataset_name in zip(datasets, dataset_names):
+
+    print("\n dataset", dataset_name)
+
+    X, y = dataset(return_X_y=True)
+    if dataset_name == "california_housing":
+        X, y = X[:1000], y[:1000]
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, 
                                                         random_state=42)
 
-    regressor.fit(X_train, y_train)
-    predictions = regressor.predict(X_test)
+    for score in tqdm(scoring):
 
-    # Check ordering
-    lower_bound, median, upper_bound = predictions
-    is_ordered = np.all(np.logical_and(lower_bound < median, median < upper_bound))
-    print(f"Are the predictions ordered correctly? {is_ordered}")
+        print("\n score", score)
 
-    df = pd.DataFrame(predictions).T
-    df.columns = ['lower_bound', 'median', 'upper_bound']
+        for regr in regrs:
 
-    print("coverage", np.mean((df['lower_bound'] <= y_test)*(df['upper_bound'] >= y_test)))
+            print("\n regr", regr.__class__.__name__)
 
-    df.plot()
-    plt.plot(y_test, label='y_test', color='gray', linestyle='--')
-    plt.legend()
-    plt.show()
+            regressor = ns.QuantileRegressor(
+                base_regressor=regr, 
+                score = score   
+            )
+
+            regressor.fit(X_train, y_train)
+            predictions = regressor.predict(X_test)
+
+            # Check ordering
+            lower_bound, median, upper_bound = predictions
+            is_ordered = np.all(np.logical_and(lower_bound < median, median < upper_bound))
+            print(f"Are the predictions ordered correctly? {is_ordered}")
+
+            df = pd.DataFrame(predictions).T
+            df.columns = ['lower_bound', 'median', 'upper_bound']
+
+            print("coverage", np.mean((df['lower_bound'] <= y_test)*(df['upper_bound'] >= y_test)))
+
+            df.plot()
+            plt.plot(y_test, label='y_test', color='gray', linestyle='--')
+            plt.legend()
+            plt.show()
