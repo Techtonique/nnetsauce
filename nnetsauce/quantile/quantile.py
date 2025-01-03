@@ -84,7 +84,7 @@ class QuantileRegressor(BaseEstimator,
                 predictions = prev_predictions + offset            
           elif self.score == "residuals":
             assert scoring_residuals is not None, "scoring_residuals must be not None"
-            print("scoring_residuals", scoring_residuals)
+            #print("scoring_residuals", scoring_residuals)
             # Calculate predictions
             if prev_predictions is None:
                 # For first quantile, subtract from conditional expectation 
