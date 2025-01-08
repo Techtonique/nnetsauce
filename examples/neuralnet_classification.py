@@ -16,11 +16,13 @@ for dataset, name in zip(datasets, dataset_names):
 
     X, y = dataset.data, dataset.target
     X_train, X_test, y_train, y_test = train_test_split(X, y, 
-                                                    test_size=0.1, 
+                                                    test_size=0.2, 
+                                                    stratify=y,
                                                     random_state=42)
 
     X_train_1, X_train_2, y_train_1, y_train_2 = train_test_split(X_train, y_train, 
                                                               test_size=0.5, 
+                                                              stratify=y_train,
                                                               random_state=42)
     # train with random initial weights
     model = NeuralNetClassifier(hidden_layer_sizes=(100,), 
