@@ -18,6 +18,8 @@ from .mts.mts import MTS
 from .mts.classical import ClassicalMTS
 from .multitask.multitaskClassifier import MultitaskClassifier
 from .multitask.simplemultitaskClassifier import SimpleMultitaskClassifier
+from .neuralnet.neuralnetregression import NeuralNetRegressor
+from .neuralnet.neuralnetclassification import NeuralNetClassifier
 from .optimizers.optimizer import Optimizer
 from .predictioninterval import PredictionInterval
 from .quantile.quantile import QuantileRegressor
@@ -56,6 +58,8 @@ __all__ = [
     "MedianVotingRegressor",
     "MTS",
     "MultitaskClassifier",
+    "NeuralNetRegressor",
+    "NeuralNetClassifier",
     "PredictionInterval",
     "SimpleMultitaskClassifier",
     "Optimizer",
