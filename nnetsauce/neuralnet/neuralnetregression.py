@@ -8,6 +8,37 @@ except ImportError:
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.preprocessing import StandardScaler
 
+def predict(params, inputs):
+  for W, b in params:
+    outputs = jnp.dot(inputs, W) + b
+    inputs = jnp.tanh(outputs)  # inputs to the next layer
+  return outputs                # no activation on last layer
+
+def loss(params, inputs, targets):
+  preds = predict(params, inputs)
+  return jnp.sum((preds - targets)**2)
+
+def initialize_params(input_dim, hidden_layer_sizes, random_state=None):
+    """Initialize network parameters."""
+    if random_state is not None:
+        rng = jax.random.PRNGKey(random_state)
+    else:
+        rng = jax.random.PRNGKey(0)
+    
+    # Layer dimensions including input and output
+    layer_sizes = [input_dim] + list(hidden_layer_sizes) + [1]
+    
+    # Initialize parameters for each layer
+    params = []
+    for i in range(len(layer_sizes) - 1):
+        rng, key = jax.random.split(rng)
+        # Xavier/Glorot initialization
+        scale = jnp.sqrt(2.0 / (layer_sizes[i] + layer_sizes[i+1]))
+        W = scale * jax.random.normal(key, (layer_sizes[i], layer_sizes[i+1]))
+        b = jnp.zeros(layer_sizes[i+1])
+        params.append((W, b))
+    return params
+
 class NeuralNetRegressor(BaseEstimator, RegressorMixin):
     """
     (Pretrained) Neural Network Regressor.
@@ -112,6 +143,8 @@ class NeuralNetRegressor(BaseEstimator, RegressorMixin):
             self.params = initialize_params(X.shape[1], 
                                             self.hidden_layer_sizes, 
                                             self.random_state)        
+        grad_loss = jit(grad(loss))  # compiled gradient evaluation function
+        perex_grads = jit(vmap(grad_loss, in_axes=(None, 0, 0)))  # fast per-example grads
         # Training loop
         for _ in range(self.max_iter):
             grads = perex_grads(self.params, X, y)
@@ -143,36 +176,3 @@ class NeuralNetRegressor(BaseEstimator, RegressorMixin):
         return predictions.reshape(-1) + self.y_mean_
 
 
-def predict(params, inputs):
-  for W, b in params:
-    outputs = jnp.dot(inputs, W) + b
-    inputs = jnp.tanh(outputs)  # inputs to the next layer
-  return outputs                # no activation on last layer
-
-def loss(params, inputs, targets):
-  preds = predict(params, inputs)
-  return jnp.sum((preds - targets)**2)
-
-grad_loss = jit(grad(loss))  # compiled gradient evaluation function
-perex_grads = jit(vmap(grad_loss, in_axes=(None, 0, 0)))  # fast per-example grads
-
-def initialize_params(input_dim, hidden_layer_sizes, random_state=None):
-    """Initialize network parameters."""
-    if random_state is not None:
-        rng = jax.random.PRNGKey(random_state)
-    else:
-        rng = jax.random.PRNGKey(0)
-    
-    # Layer dimensions including input and output
-    layer_sizes = [input_dim] + list(hidden_layer_sizes) + [1]
-    
-    # Initialize parameters for each layer
-    params = []
-    for i in range(len(layer_sizes) - 1):
-        rng, key = jax.random.split(rng)
-        # Xavier/Glorot initialization
-        scale = jnp.sqrt(2.0 / (layer_sizes[i] + layer_sizes[i+1]))
-        W = scale * jax.random.normal(key, (layer_sizes[i], layer_sizes[i+1]))
-        b = jnp.zeros(layer_sizes[i+1])
-        params.append((W, b))
-    return params
