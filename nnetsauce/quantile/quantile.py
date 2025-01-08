@@ -34,6 +34,18 @@ class QuantileResult:
 
 
 class QuantileRegressor(BaseEstimator, RegressorMixin):
+    """
+    Quantile Regressor.
+
+    Parameters:
+
+        base_regressor : sklearn.base.BaseEstimator
+            The base regressor to use.
+        level : int, default=95
+            The level of the quantiles to compute.
+        score : str, default="predictions"
+            The score to use for the optimization.
+    """
 
     def __init__(self, base_regressor, level=95, score="predictions"):
         assert score in (
@@ -152,6 +164,16 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
         return np.exp(result.x[0])
 
     def fit(self, X: np.ndarray, y: np.ndarray):
+        """Fit the model to the data.
+
+        Parameters:
+
+            X: {array-like}, shape = [n_samples, n_features]
+                Training vectors, where n_samples is the number of samples and
+                n_features is the number of features.
+            y: array-like, shape = [n_samples]
+                Target values.
+        """
         self.base_regressor_ = clone(self.base_regressor)
         if self.score in ("predictions", "residuals"):
             self.base_regressor_.fit(X, y)
@@ -286,7 +308,14 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
         return self
 
     def predict(self, X):
+        """Predict the target variable.
 
+        Parameters:
+
+            X: {array-like}, shape = [n_samples, n_features]
+                Training vectors, where n_samples is the number of samples and
+                n_features is the number of features.
+        """
         if self.base_regressor_ is None or self.offset_multipliers_ is None:
             raise ValueError("Model not fitted yet.")
 
