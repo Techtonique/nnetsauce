@@ -359,25 +359,26 @@ class MTS(Base):
                 self.df_ = X
                 X = X.values
             else:
-                input_dates_prev = pd.DatetimeIndex(self.df_.index.values)  
-                frequency = pd.infer_freq(input_dates_prev)                                             
-                self.df_ = pd.concat([self.df_, X], axis=0) 
+                input_dates_prev = pd.DatetimeIndex(self.df_.index.values)
+                frequency = pd.infer_freq(input_dates_prev)
+                self.df_ = pd.concat([self.df_, X], axis=0)
                 self.input_dates = pd.date_range(
-                    start=input_dates_prev[0], 
-                    periods=len(input_dates_prev)+X.shape[0], 
-                    freq=frequency
+                    start=input_dates_prev[0],
+                    periods=len(input_dates_prev) + X.shape[0],
+                    freq=frequency,
                 ).values.tolist()
                 self.df_.index = self.input_dates
                 X = self.df_.values
-            self.df_.columns = self.series_names            
+            self.df_.columns = self.series_names
         else:
             if self.df_ is None:
                 self.df_ = pd.DataFrame(X, columns=self.series_names)
             else:
                 self.df_ = pd.concat(
-                    [self.df_, pd.DataFrame(X, columns=self.series_names)], axis=0
+                    [self.df_, pd.DataFrame(X, columns=self.series_names)],
+                    axis=0,
                 )
-            
+
         self.input_dates = ts.compute_input_dates(self.df_)
 
         try:
@@ -424,9 +425,7 @@ class MTS(Base):
 
         # loop on all the time series and adjust self.obj.fit
         if self.verbose > 0:
-            print(
-                f"\n Adjusting {type(self.obj).__name__} to multivariate time series... \n "
-            )
+            print(f"\n Adjusting {type(self.obj).__name__} to multivariate time series... \n")
 
         if self.show_progress is True:
             iterator = tqdm(range(p))
@@ -508,14 +507,12 @@ class MTS(Base):
             grid.fit(self.residuals_)
 
             if self.verbose > 0:
-                print(
-                    f"\n Best parameters for {self.kernel} kernel: {grid.best_params_} \n"
-                )
+                print(f"\n Best parameters for {self.kernel} kernel: {grid.best_params_} \n")
 
             self.kde_ = grid.best_estimator_
 
         return self
-    
+
     def partial_fit(self, X, xreg=None, **kwargs):
         """Update the model with new observations X, with optional regressors xreg
 
@@ -539,19 +536,20 @@ class MTS(Base):
 
         assert self.df_ is not None, "fit() must be called before partial_fit()"
 
-        if (
-            isinstance(X, pd.DataFrame) is False
-        ) and isinstance(X, pd.Series) is False:
+        if (isinstance(X, pd.DataFrame) is False) and isinstance(
+            X, pd.Series
+        ) is False:
             if len(X.shape) == 1:
                 X = X.reshape(1, -1)
-            
+
             return self.fit(X, xreg, **kwargs)
-        
+
         else:
-            if len(X.shape) == 1:                
-                X = pd.DataFrame(X.values.reshape(1, -1), 
-                                 columns=self.df_.columns)
-                
+            if len(X.shape) == 1:
+                X = pd.DataFrame(
+                    X.values.reshape(1, -1), columns=self.df_.columns
+                )
+
             return self.fit(X, xreg, **kwargs)
 
     def predict(self, h=5, level=95, **kwargs):
@@ -1032,8 +1030,10 @@ class MTS(Base):
         scoring_options = {
             "explained_variance": skm2.explained_variance_score,
             "neg_mean_absolute_error": skm2.mean_absolute_error,
-            "neg_mean_squared_error": lambda x, y: np.mean((x - y)**2),
-            "neg_root_mean_squared_error": lambda x, y: np.sqrt(np.mean((x - y)**2)),
+            "neg_mean_squared_error": lambda x, y: np.mean((x - y) ** 2),
+            "neg_root_mean_squared_error": lambda x, y: np.sqrt(
+                np.mean((x - y) ** 2)
+            ),
             "neg_mean_squared_log_error": skm2.mean_squared_log_error,
             "neg_median_absolute_error": skm2.median_absolute_error,
             "r2": skm2.r2_score,
@@ -1135,8 +1135,7 @@ class MTS(Base):
                 plt.show()
             else:  # self.replications is not None
                 if self.n_series > 1:
-                    plt.title(
-                        f"prediction intervals for {self.replications} simulations of {series}",
+                    plt.title(f"prediction intervals for {self.replications} simulations of {series}",
                         loc="left",
                         fontsize=12,
                         fontweight=0,

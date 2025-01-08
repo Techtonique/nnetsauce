@@ -687,7 +687,8 @@ class LazyDeepMTS(MTS):
                         if self.h is None:
                             X_pred = pipe.predict(
                                 h=X_test.shape[0], **kwargs
-                            )  # X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg) ## DO xreg like in `ahead`
+                                # X_pred = pipe.predict(h=X_test.shape[0], new_xreg=new_xreg) ## DO xreg like in `ahead`
+                            )
                         else:
                             assert (
                                 self.h > 0 and self.h <= X_test.shape[0]
@@ -836,7 +837,7 @@ class LazyDeepMTS(MTS):
                                     per_series=per_series,
                                 )
                             else:
-                                X_test_h = X_test[0: self.h, :]                                
+                                X_test_h = X_test[0: self.h, :]
                                 rmse = mean_errors(
                                     actual=X_test_h,
                                     pred=X_pred,
