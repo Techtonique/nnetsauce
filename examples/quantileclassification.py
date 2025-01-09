@@ -22,7 +22,7 @@ datasets = [load_iris, load_breast_cancer, load_wine, load_digits]
 
 dataset_names = ["iris", "breast_cancer", "wine", "digits"]
 
-regrs = [RidgeCV(), LassoCV(), KNeighborsRegressor()] 
+regrs = [RidgeCV(), LassoCV(), KNeighborsRegressor(), RandomForestRegressor()] 
 
 for dataset, dataset_name in zip(datasets, dataset_names):
 
