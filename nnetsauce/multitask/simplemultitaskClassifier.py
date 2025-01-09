@@ -7,6 +7,7 @@ import sklearn.metrics as skm2
 from ..base import Base
 from ..utils import matrixops as mo
 from ..utils import misc as mx
+from collections import namedtuple
 from copy import deepcopy
 from scipy.special import expit
 from sklearn.base import ClassifierMixin
@@ -137,8 +138,25 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
             model predictions: {array-like}
 
         """
-
-        return np.argmax(self.predict_proba(X, **kwargs), axis=1)
+        try: 
+            preds = self.predict_proba(X, **kwargs)
+            try: 
+                DescribeResult = namedtuple("DescribeResult", 
+                                            ["mean", "upper", "lower", "median"])
+                return DescribeResult(mean=np.argmax(preds.mean, axis=1), 
+                                    upper=np.argmax(preds.upper, axis=1), 
+                                    lower=np.argmax(preds.lower, axis=1), 
+                                    median=np.argmax(preds.median, axis=1))
+            except Exception as e:
+                print(e)
+                DescribeResult = namedtuple("DescribeResult", 
+                                            ["mean", "upper", "lower"])
+                return DescribeResult(mean=np.argmax(preds.mean, axis=1), 
+                                      upper=np.argmax(preds.upper, axis=1), 
+                                      lower=np.argmax(preds.lower, axis=1))
+        except Exception as e:
+            print(e)
+            return np.argmax(self.predict_proba(X, **kwargs), axis=1)
 
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
@@ -171,17 +189,105 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
 
             Z = self.X_scaler_.transform(new_X, **kwargs)
 
-            # loop on all the classes
-            for i in range(self.n_classes_):
-                probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)[0]
+            try:
+                # Try probabilistic model first (conformal or quantile)
+                probs_upper = np.zeros((shape_X[0], self.n_classes_))
+                probs_lower = np.zeros((shape_X[0], self.n_classes_))
+                probs_median = np.zeros((shape_X[0], self.n_classes_))
+                
+                # loop on all the classes
+                for i in range(self.n_classes_):
+                    probs_temp = self.fit_objs_[i].predict(Z, **kwargs)
+                    probs_upper[:, i] = probs_temp.upper
+                    probs_lower[:, i] = probs_temp.lower
+                    probs[:, i] = probs_temp.mean
+                    try:
+                        probs_median[:, i] = probs_temp.median
+                    except:
+                        pass
+                        
+            except Exception as e:
+                print(e)
+                # Fallback to standard model
+                for i in range(self.n_classes_):
+                    probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)[0]
 
         else:
+
             Z = self.X_scaler_.transform(X, **kwargs)
 
-            # loop on all the classes
-            for i in range(self.n_classes_):
-                probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)
+            try:
+                # Try probabilistic model first (conformal or quantile)
+                probs_upper = np.zeros((shape_X[0], self.n_classes_))
+                probs_lower = np.zeros((shape_X[0], self.n_classes_))
+                probs_median = np.zeros((shape_X[0], self.n_classes_))
+                
+                # loop on all the classes
+                for i in range(self.n_classes_):
+                    probs_temp = self.fit_objs_[i].predict(Z, **kwargs)
+                    probs_upper[:, i] = probs_temp.upper
+                    probs_lower[:, i] = probs_temp.lower
+                    probs[:, i] = probs_temp.mean
+                    try:
+                        probs_median[:, i] = probs_temp.median
+                    except:
+                        pass
+                        
+            except Exception as e:
+                print(e)
+                # Fallback to standard model
+                for i in range(self.n_classes_):
+                    probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)[0]
 
         expit_raw_probs = expit(probs)
 
-        return expit_raw_probs / expit_raw_probs.sum(axis=1)[:, None]
+        try:
+            expit_raw_probs_upper = expit(probs_upper)        
+            expit_raw_probs_lower = expit(probs_lower)
+            try: 
+                expit_raw_probs_median = expit(probs_median)
+            except Exception as e:
+                print(e)
+                pass 
+            probs_upper = expit_raw_probs_upper / expit_raw_probs_upper.sum(axis=1)[:, None]
+            probs_lower = expit_raw_probs_lower / expit_raw_probs_lower.sum(axis=1)[:, None]
+            probs_upper = np.minimum(probs_upper, 1)
+            probs_lower = np.maximum(probs_lower, 0)
+            try: 
+                probs_median = expit_raw_probs_median / expit_raw_probs_median.sum(axis=1)[:, None]
+            except Exception as e:
+                print(e)
+                pass
+            
+            # Normalize each probability independently to [0,1] range
+            probs = expit_raw_probs
+            probs_upper = np.minimum(expit_raw_probs_upper, 1)
+            probs_lower = np.maximum(expit_raw_probs_lower, 0)
+            
+            # Ensure upper >= lower
+            probs_upper = np.maximum(probs_upper, probs_lower)
+            
+            try: 
+                probs_median = expit_raw_probs_median
+            except Exception as e:
+                print(e)
+                pass
+            
+            try: 
+                DescribeResult = namedtuple("DescribeResult", 
+                                            ["mean", "upper", "lower", "median"])
+                return DescribeResult(mean=probs, 
+                                      upper=probs_upper, 
+                                      lower=probs_lower, 
+                                      median=probs_median)
+            except Exception as e:
+                print(e)
+                DescribeResult = namedtuple("DescribeResult", 
+                                            ["mean", "upper", "lower"])
+                return DescribeResult(mean=probs, 
+                                      upper=probs_upper, 
+                                      lower=probs_lower)
+            
+        except Exception as e:
+            print(e)
+            return expit_raw_probs / expit_raw_probs.sum(axis=1)[:, None]

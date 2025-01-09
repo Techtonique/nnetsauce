@@ -44,8 +44,8 @@ for dataset, dataset_name in zip(datasets, dataset_names):
             print("\n regr", regr.__class__.__name__)
 
             regressor = ns.QuantileRegressor(
-                base_regressor=regr, 
-                score = score   
+                obj=regr, 
+                scoring = score   
             )
 
             regressor.fit(X_train, y_train)

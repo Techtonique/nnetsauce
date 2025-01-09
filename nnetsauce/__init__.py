@@ -22,7 +22,8 @@ from .neuralnet.neuralnetregression import NeuralNetRegressor
 from .neuralnet.neuralnetclassification import NeuralNetClassifier
 from .optimizers.optimizer import Optimizer
 from .predictioninterval import PredictionInterval
-from .quantile.quantile import QuantileRegressor
+from .quantile.quantileregression import QuantileRegressor
+from .quantile.quantileclassification import QuantileClassifier
 from .randombag.randomBagClassifier import RandomBagClassifier
 from .randombag.randomBagRegressor import RandomBagRegressor
 from .ridge2.ridge2Classifier import Ridge2Classifier
@@ -64,6 +65,7 @@ __all__ = [
     "SimpleMultitaskClassifier",
     "Optimizer",
     "QuantileRegressor",
+    "QuantileClassifier",
     "RandomBagRegressor",
     "RandomBagClassifier",
     "RegressorUpdater",
