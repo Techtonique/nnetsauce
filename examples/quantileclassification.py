@@ -48,8 +48,15 @@ for dataset, dataset_name in zip(datasets, dataset_names):
 
             classifier.fit(X_train, y_train)
             predictions_proba = classifier.predict_proba(X_test)
-            print("predictions_proba", predictions_proba)
+            
             predictions = classifier.predict(X_test)
+
+            # Check probability ordering
+            is_ordered = np.all(
+                (predictions_proba.lower <= predictions_proba.median) & 
+                (predictions_proba.median <= predictions_proba.upper)
+            )
+            print("Probabilities properly ordered:", is_ordered)
 
             print("score median", accuracy_score(y_test, predictions.median))
             print("score mean", accuracy_score(y_test, predictions.mean))
