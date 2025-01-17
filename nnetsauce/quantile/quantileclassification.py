@@ -71,7 +71,6 @@ class QuantileClassifier(BaseEstimator, ClassifierMixin):
 
         
     """
-
     def __init__(self, obj, level=95, scoring="predictions"):
         assert scoring in (
             "predictions",
