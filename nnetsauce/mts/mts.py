@@ -305,6 +305,7 @@ class MTS(Base):
         self.residuals_std_dev_ = None
         self.n_obs_ = None
         self.level_ = None
+        self.init_n_series_ = None
 
     def fit(self, X, xreg=None, **kwargs):
         """Fit MTS model to training data X, with optional regressors xreg
@@ -327,16 +328,19 @@ class MTS(Base):
         self: object
         """
 
+        self.init_n_series_ = X.shape[1]
+
         if (
             isinstance(X, pd.DataFrame) is False
-        ):  # input data set is a numpy array
-
+        ):  
+            # input data set is a numpy array
             if xreg is None:
                 X = pd.DataFrame(X)
                 self.series_names = [
                     "series" + str(i) for i in range(X.shape[1])
                 ]
-            else:  # xreg is not None
+            else:
+                # xreg is not None
                 X = mo.cbind(X, xreg)
                 self.xreg_ = xreg
 
@@ -348,7 +352,8 @@ class MTS(Base):
             if xreg is None:
                 X = copy.deepcopy(mo.convert_df_to_numeric(X))
             else:
-                X = copy.deepcopy(mo.cbind(mo.convert_df_to_numeric(X), xreg))
+                X = copy.deepcopy(mo.cbind(mo.convert_df_to_numeric(X), 
+                                           xreg))
                 self.xreg_ = xreg
             if X_index is not None:
                 X.index = X_index
@@ -382,13 +387,13 @@ class MTS(Base):
         self.input_dates = ts.compute_input_dates(self.df_)
 
         try:
-            # multivariate time series
+            # multivariate time series            
             n, p = X.shape
         except:
             # univariate time series
             n = X.shape[0]
             p = 1
-
+            
         self.n_obs_ = n
 
         rep_1_n = np.repeat(1, n)
@@ -563,10 +568,6 @@ class MTS(Base):
         level: {integer}
             Level of confidence (if obj has option 'return_std' and the
             posterior is gaussian)
-
-        new_xreg: {array-like}, shape = [n_samples = h, n_new_xreg]
-            New values of additional (deterministic) regressors on horizon = h
-            new_xreg must be in increasing order (most recent observations last)
 
         **kwargs: additional parameters to be passed to
                 self.cook_test_set
@@ -768,7 +769,7 @@ class MTS(Base):
         ) or ("vine" in self.type_pi):
 
             if self.replications is None:
-                return self.mean_
+                return self.mean_.iloc[:, :self.init_n_series_]
 
             # if "return_std" not in kwargs and self.replications is not None
             meanf = []
@@ -1039,16 +1040,6 @@ class MTS(Base):
             "r2": skm2.r2_score,
         }
 
-        # if p > 1:
-        #     return tuple(
-        #         [
-        #             scoring_options[scoring](
-        #                 X_test[:, i], preds[:, i]#, **kwargs
-        #             )
-        #             for i in range(p)
-        #         ]
-        #     )
-        # else:
         return scoring_options[scoring](X_test, preds)
 
     def plot(self, series=None, type_axis="dates", type_plot="pi"):
