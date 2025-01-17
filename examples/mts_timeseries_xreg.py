@@ -59,17 +59,17 @@ xreg_test = pd.DataFrame(
 )
 
 # Fit model
-model = ns.MTS(RidgeCV(), 
+model = ns.MTS(RidgeCV(alphas=10**np.linspace(-3, 3, 100)), 
                lags=10, 
                n_hidden_features=5, 
-               replications=10,
+               replications=250,
                type_pi="scp2-kde",
                kernel='gaussian',
                verbose=1)
 model.fit(df_train, xreg=xreg_train)
 
 # Predict
-predictions = model.predict(h=10, xreg=xreg_test)
+predictions = model.predict(h=15, xreg=xreg_test)
 print(predictions)
 
-#model.plot("tbilrate", type_plot="pi")
+model.plot("realgovt", type_plot="pi")
