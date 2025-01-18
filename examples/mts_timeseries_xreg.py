@@ -155,7 +155,7 @@ xreg_test = pd.DataFrame(
 
 model = ns.MTS(LassoCV(alphas=10**np.linspace(-10, 10, 100)), 
                replications=3,
-               lags=15,
+               lags=25,
                type_pi="scp2-kde",
                kernel='gaussian',
                verbose=1)
