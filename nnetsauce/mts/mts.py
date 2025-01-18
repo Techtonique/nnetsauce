@@ -1061,9 +1061,9 @@ class MTS(Base):
         ), "model forecasting must be obtained first (with predict)"
 
         if series is None:
-            assert (
-                self.init_n_series_ == 1
-            ), "please specify series index or name (n_series > 1)"
+            #assert (
+            #    self.init_n_series_ == 1
+            #), "please specify series index or name (n_series > 1)"
             series = 0
 
         if isinstance(series, str):
