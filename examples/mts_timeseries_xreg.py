@@ -127,10 +127,9 @@ model.plot("heater", type_plot="pi")
 
 
 url = "https://raw.githubusercontent.com/Techtonique/datasets/main/time_series/univariate/AirPassengers.csv"
-df = pd.read_csv(url)
-df.index = pd.DatetimeIndex(df.date)
-df.drop(columns=['date'], inplace=True)
-data = df 
+df_temp = pd.read_csv(url)
+df_temp.index = pd.DatetimeIndex(df_temp.date)
+data = df_temp.drop(columns=['date'])
 
 n = data.shape[0]
 max_idx_train = int(np.floor(n*0.9))
@@ -139,29 +138,38 @@ testing_index = np.arange(max_idx_train, n)
 df_train = data.iloc[training_index]
 df_test = data.iloc[testing_index]
 
-trend = np.arange(n)
-
-xreg_train = pd.DataFrame(
-    trend[training_index],
-    columns=['trend'],
-    index=df_train.index  # Important: use same index as training data
-)
-
-xreg_test = pd.DataFrame(
-    trend[testing_index],
-    columns=['trend'],
-    index=df_test.index  # Important: use same index as test data
-)
-
-model = ns.MTS(LassoCV(alphas=10**np.linspace(-10, 10, 100)), 
-               replications=3,
+model = ns.MTS(RidgeCV(alphas=10**np.linspace(-3, 3, 100)), 
+               replications=100,
                lags=25,
                type_pi="scp2-kde",
                kernel='gaussian',
                verbose=1)
 model.fit(df_train)
 
-predictions = model.predict(h=h)
-print(predictions)
+model.predict(h=h)
 
 model.plot(type_plot="pi")
+
+
+data = df_temp.drop(columns=['date']).diff().dropna()
+
+n = data.shape[0]
+max_idx_train = int(np.floor(n*0.9))
+training_index = np.arange(0, max_idx_train)
+testing_index = np.arange(max_idx_train, n)
+df_train = data.iloc[training_index]
+df_test = data.iloc[testing_index]
+
+model = ns.MTS(RidgeCV(alphas=10**np.linspace(-3, 3, 100)), 
+               replications=100,
+               lags=25,
+               type_pi="scp2-kde",
+               kernel='gaussian',
+               verbose=1)
+model.fit(df_train)
+
+model.predict(h=h)
+
+model.plot(type_plot="pi")
+
+
