@@ -329,7 +329,7 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
 
         return self
 
-    def predict(self, X):
+    def predict(self, X, return_pi=True):
         """Predict the target variable.
 
         Parameters:
@@ -337,6 +337,9 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors, where n_samples is the number of samples and
                 n_features is the number of features.
+
+            return_pi: bool, default=True
+                Whether to return the prediction intervals.
         """
         if self.obj_ is None or self.offset_multipliers_ is None:
             raise ValueError("Model not fitted yet.")
@@ -385,6 +388,9 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
                 offset = multiplier * self.student_multiplier_
                 current_predictions = current_predictions + offset
                 all_predictions.append(current_predictions)
+        
+        if return_pi == False:
+            return np.asarray(all_predictions[1])
 
         DescribeResult = namedtuple(
             "DecribeResult", ["mean", "lower", "upper", "median"]

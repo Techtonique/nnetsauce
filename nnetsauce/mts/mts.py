@@ -16,7 +16,7 @@ from sklearn.model_selection import GridSearchCV
 from tqdm import tqdm
 from ..base import Base
 from ..sampling import vinecopula_sample
-from ..simulation import getsims
+from ..simulation import getsims, getsimsxreg
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 from ..utils import timeseries as ts
@@ -393,7 +393,6 @@ class MTS(Base):
             # univariate time series
             n = X.shape[0]
             p = 1
-            
         self.n_obs_ = n
 
         rep_1_n = np.repeat(1, n)
@@ -411,7 +410,7 @@ class MTS(Base):
         self.scaled_Z_ = None
         self.centered_y_is_ = []
 
-        if p > 1:
+        if self.init_n_series_ > 1:
             # multivariate time series
             mts_input = ts.create_train_inputs(X[::-1], self.lags)
         else:
@@ -433,9 +432,9 @@ class MTS(Base):
             print(f"\n Adjusting {type(self.obj).__name__} to multivariate time series... \n")
 
         if self.show_progress is True:
-            iterator = tqdm(range(p))
+            iterator = tqdm(range(self.init_n_series_))
         else:
-            iterator = range(p)
+            iterator = range(self.init_n_series_)
 
         if self.type_pi in (
             "gaussian",
@@ -558,27 +557,7 @@ class MTS(Base):
             return self.fit(X, xreg, **kwargs)
 
     def predict(self, h=5, level=95, **kwargs):
-        """Forecast all the time series, h steps ahead
-
-        Parameters:
-
-        h: {integer}
-            Forecasting horizon
-
-        level: {integer}
-            Level of confidence (if obj has option 'return_std' and the
-            posterior is gaussian)
-
-        **kwargs: additional parameters to be passed to
-                self.cook_test_set
-
-        Returns:
-
-        model predictions for horizon = h: {array-like}, data frame or tuple.
-        Standard deviation and prediction intervals are returned when
-        `obj.predict` can return standard deviation
-
-        """
+        """Forecast all the time series, h steps ahead"""
 
         self.output_dates_, frequency = ts.compute_output_dates(self.df_, h)
 
@@ -596,9 +575,9 @@ class MTS(Base):
 
         self.sims_ = None  # do not remove (/!\)
 
-        y_means_ = np.asarray([self.y_means_[i] for i in range(self.n_series)])
+        y_means_ = np.asarray([self.y_means_[i] for i in range(self.init_n_series_)])
 
-        n_features = self.n_series * self.lags
+        n_features = self.init_n_series_ * self.lags
 
         self.alpha_ = 100 - level
 
@@ -615,25 +594,37 @@ class MTS(Base):
             mean_pi_ = []
             lower_pi_ = []
             upper_pi_ = []
+            median_pi_ = []
             DescribeResult = namedtuple(
                 "DescribeResult", ("mean", "lower", "upper")
             )  # to be updated
 
         if self.kde_ != None and "kde" in self.type_pi:  # kde
+            target_cols = self.df_.columns[:self.init_n_series_]  # Get target column names
             if self.verbose == 1:
                 self.residuals_sims_ = tuple(
                     self.kde_.sample(
                         n_samples=h, random_state=self.seed + 100 * i
-                    )
+                    )  # Keep full sample
                     for i in tqdm(range(self.replications))
                 )
             elif self.verbose == 0:
                 self.residuals_sims_ = tuple(
                     self.kde_.sample(
                         n_samples=h, random_state=self.seed + 100 * i
-                    )
+                    )  # Keep full sample
                     for i in range(self.replications)
                 )
+
+            # Convert to DataFrames after sampling
+            self.residuals_sims_ = tuple(
+                pd.DataFrame(
+                    sim,  # Keep all columns
+                    columns=target_cols,  # Use original target column names
+                    index=self.output_dates_
+                )
+                for sim in self.residuals_sims_
+            )
 
         if self.type_pi in ("bootstrap", "scp-bootstrap", "scp2-bootstrap"):
             assert self.replications is not None and isinstance(
@@ -716,53 +707,43 @@ class MTS(Base):
                     for i in range(self.replications)
                 )
 
-        for _ in range(h):
+        mean_ = deepcopy(self.mean_)
 
-            new_obs = ts.reformat_response(self.mean_, self.lags)
-
-            new_X = new_obs.reshape(1, n_features)
-
+        for i in range(h):
+            new_obs = ts.reformat_response(mean_, self.lags)
+            new_X = new_obs.reshape(1, -1)
             cooked_new_X = self.cook_test_set(new_X, **kwargs)
-
-            if "return_std" in kwargs:
-                self.preds_std_.append(
-                    [
-                        np.asarray(
-                            self.fit_objs_[i].predict(
-                                cooked_new_X, return_std=True
-                            )[1]
-                        ).item()
-                        for i in range(self.n_series)
-                    ]
-                )
-
-            if "return_pi" in kwargs:
-                for i in range(self.n_series):
-                    preds_pi = self.fit_objs_[i].predict(
-                        cooked_new_X, return_pi=True
-                    )
-                    mean_pi_.append(preds_pi.mean[0])
-                    lower_pi_.append(preds_pi.lower[0])
-                    upper_pi_.append(preds_pi.upper[0])
-
             predicted_cooked_new_X = np.asarray(
                 [
                     np.asarray(self.fit_objs_[i].predict(cooked_new_X)).item()
-                    for i in range(self.n_series)
+                    for i in range(self.init_n_series_)
                 ]
             )
 
             preds = np.asarray(y_means_ + predicted_cooked_new_X)
+            
+            # Create full row with both predictions and external regressors
+            if self.xreg_ is not None and 'xreg' in kwargs:
+                next_xreg = kwargs['xreg'].iloc[i:i+1].values.flatten()
+                full_row = np.concatenate([preds, next_xreg])
+            else:
+                full_row = preds
+                
+            # Create a new row with same number of columns as mean_
+            new_row = np.zeros((1, mean_.shape[1]))
+            new_row[0, :full_row.shape[0]] = full_row
+            
+            # Maintain the full dimensionality by using vstack instead of rbind
+            mean_ = np.vstack([new_row, mean_[:-1]])
 
-            self.mean_ = mo.rbind(preds, self.mean_)  # preallocate?
-
-        # function's return ----------------------------------------------------------------------
+        # Final output should only include the target columns
         self.mean_ = pd.DataFrame(
-            self.mean_[0:h, :][::-1],
-            columns=self.df_.columns,
+            mean_[0:h, :self.init_n_series_][::-1],
+            columns=self.df_.columns[:self.init_n_series_],
             index=self.output_dates_,
         )
 
+        # function's return ----------------------------------------------------------------------
         if (
             (("return_std" not in kwargs) and ("return_pi" not in kwargs))
             and (self.type_pi not in ("gaussian", "scp"))
@@ -773,6 +754,7 @@ class MTS(Base):
 
             # if "return_std" not in kwargs and self.replications is not None
             meanf = []
+            medianf = []
             lower = []
             upper = []
 
@@ -816,39 +798,48 @@ class MTS(Base):
             DescribeResult = namedtuple(
                 "DescribeResult", ("mean", "sims", "lower", "upper")
             )
-            for ix in range(self.n_series):
+            for ix in range(self.init_n_series_):
                 sims_ix = getsims(self.sims_, ix)
+                print("sims_ix", sims_ix)
                 if self.agg == "mean":
                     meanf.append(np.mean(sims_ix, axis=1))
                 else:
-                    meanf.append(np.median(sims_ix, axis=1))
+                    medianf.append(np.median(sims_ix, axis=1))
                 lower.append(np.quantile(sims_ix, q=self.alpha_ / 200, axis=1))
                 upper.append(
                     np.quantile(sims_ix, q=1 - self.alpha_ / 200, axis=1)
                 )
-
             self.mean_ = pd.DataFrame(
                 np.asarray(meanf).T,
-                columns=self.series_names,  # self.df_.columns,
+                columns=self.series_names[:self.init_n_series_],  # self.df_.columns,
                 index=self.output_dates_,
             )
 
             self.lower_ = pd.DataFrame(
                 np.asarray(lower).T,
-                columns=self.series_names,  # self.df_.columns,
+                columns=self.series_names[:self.init_n_series_],  # self.df_.columns,
                 index=self.output_dates_,
             )
 
             self.upper_ = pd.DataFrame(
                 np.asarray(upper).T,
-                columns=self.series_names,  # self.df_.columns,
+                columns=self.series_names[:self.init_n_series_],  # self.df_.columns,
                 index=self.output_dates_,
             )
+
+            try:
+                self.median_ = pd.DataFrame(
+                    np.asarray(medianf).T,
+                    columns=self.series_names[:self.init_n_series_],  # self.df_.columns,
+                    index=self.output_dates_,
+                )
+            except Exception as e:
+                pass
 
             res = DescribeResult(
                 self.mean_, self.sims_, self.lower_, self.upper_
             )
-
+            print("res", res)
             if self.xreg_ is not None:
 
                 if len(self.xreg_.shape) > 1:
@@ -977,6 +968,43 @@ class MTS(Base):
                 return DescribeResult(res2[0], res2[1], res2[2])
 
             return res
+
+        # After prediction loop, ensure sims only contain target columns
+        print("self.sims_", self.sims_)
+        if self.sims_ is not None:
+            if self.verbose == 1:
+                self.sims_ = tuple(
+                    sim[:h, ]  # Only keep target columns and h rows
+                    for sim in tqdm(self.sims_)
+                )
+            elif self.verbose == 0:
+                self.sims_ = tuple(
+                    sim[:h, ]  # Only keep target columns and h rows
+                    for sim in self.sims_
+                )
+
+            # Convert numpy arrays to DataFrames with proper columns
+            self.sims_ = tuple(
+                pd.DataFrame(
+                    sim,
+                    columns=self.df_.columns[:self.init_n_series_],
+                    index=self.output_dates_
+                )
+                for sim in self.sims_
+            )
+
+        # After simulations are complete, before returning results
+        if "kde" in self.type_pi or "bootstrap" in self.type_pi or "vine" in self.type_pi:
+            print("sims_ix", self.sims_)  # Debug print
+            if self.xreg_ is not None and 'xreg' in kwargs:
+                # Use getsimsxreg when external regressors are present
+                target_cols = self.df_.columns[:self.init_n_series_]
+                print("Using getsimsxreg")  # Debug print
+                self.sims_ = getsimsxreg(self.sims_, self.output_dates_, target_cols)
+            else:
+                # Use original getsims for backward compatibility
+                print("Using original getsims")  # Debug print
+                self.sims_ = getsims(self.sims_)
 
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):
         """Train on training_index, score on testing_index."""
