@@ -159,7 +159,7 @@ model = ns.MTS(LassoCV(alphas=10**np.linspace(-10, 10, 100)),
                type_pi="scp2-kde",
                kernel='gaussian',
                verbose=1)
-model.fit(df_train, xreg=xreg_train)
+model.fit(df_train)
 
 predictions = model.predict(h=h)
 print(predictions)

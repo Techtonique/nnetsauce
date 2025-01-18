@@ -800,7 +800,6 @@ class MTS(Base):
             )
             for ix in range(self.init_n_series_):
                 sims_ix = getsims(self.sims_, ix)
-                print("sims_ix", sims_ix)
                 if self.agg == "mean":
                     meanf.append(np.mean(sims_ix, axis=1))
                 else:
@@ -836,32 +835,9 @@ class MTS(Base):
             except Exception as e:
                 pass
 
-            res = DescribeResult(
+            return DescribeResult(
                 self.mean_, self.sims_, self.lower_, self.upper_
-            )
-            print("res", res)
-            if self.xreg_ is not None:
-
-                if len(self.xreg_.shape) > 1:
-
-                    res2 = mx.tuple_map(
-                        res,
-                        lambda x: mo.delete_last_columns(
-                            x, num_columns=self.xreg_.shape[1]
-                        ),
-                    )
-
-                else:
-
-                    res2 = mx.tuple_map(
-                        res, lambda x: mo.delete_last_columns(x, num_columns=1)
-                    )
-
-                return res2
-
-            else:
-
-                return res
+            )        
 
         if (
             (("return_std" in kwargs) or ("return_pi" in kwargs))
@@ -969,8 +945,7 @@ class MTS(Base):
 
             return res
 
-        # After prediction loop, ensure sims only contain target columns
-        print("self.sims_", self.sims_)
+        # After prediction loop, ensure sims only contain target columns       
         if self.sims_ is not None:
             if self.verbose == 1:
                 self.sims_ = tuple(
@@ -993,17 +968,13 @@ class MTS(Base):
                 for sim in self.sims_
             )
 
-        # After simulations are complete, before returning results
-        if "kde" in self.type_pi or "bootstrap" in self.type_pi or "vine" in self.type_pi:
-            print("sims_ix", self.sims_)  # Debug print
-            if self.xreg_ is not None and 'xreg' in kwargs:
+        if self.type_pi in ("kde", "bootstrap", "block-bootstrap", "vine-copula"):
+            if self.xreg_ is not None:
                 # Use getsimsxreg when external regressors are present
                 target_cols = self.df_.columns[:self.init_n_series_]
-                print("Using getsimsxreg")  # Debug print
                 self.sims_ = getsimsxreg(self.sims_, self.output_dates_, target_cols)
             else:
                 # Use original getsims for backward compatibility
-                print("Using original getsims")  # Debug print
                 self.sims_ = getsims(self.sims_)
 
     def score(self, X, training_index, testing_index, scoring=None, **kwargs):
