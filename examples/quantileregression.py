@@ -49,7 +49,7 @@ for dataset, dataset_name in zip(datasets, dataset_names):
             )
 
             regressor.fit(X_train, y_train)
-            predictions = regressor.predict(X_test)
+            predictions = regressor.predict(X_test, return_pi=True)
 
             # Check ordering
             lower_bound, median, upper_bound = predictions.lower, predictions.median, predictions.upper
