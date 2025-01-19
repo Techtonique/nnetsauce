@@ -329,7 +329,7 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
 
         return self
 
-    def predict(self, X, return_pi=True):
+    def predict(self, X, return_pi=False):
         """Predict the target variable.
 
         Parameters:
