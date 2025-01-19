@@ -10,6 +10,7 @@ from collections import namedtuple
 from sklearn.base import BaseEstimator, ClassifierMixin
 from scipy.optimize import differential_evolution
 from dataclasses import dataclass
+from functools import partial 
 from typing import Dict, Any, List
 from sklearn.base import clone
 from sklearn.base import BaseEstimator, ClassifierMixin
@@ -80,7 +81,10 @@ class QuantileClassifier(BaseEstimator, ClassifierMixin):
             "conformal-studentized",
         ), "scoring must be 'predictions' or 'residuals'"
         self.obj = obj
-        self.obj_ = SimpleMultitaskClassifier(QuantileRegressor(self.obj))        
+        quantileregressor = QuantileRegressor(self.obj)
+        quantileregressor.predict = partial(quantileregressor.predict, 
+                                            return_pi=True)
+        self.obj_ = SimpleMultitaskClassifier(quantileregressor)        
 
     def fit(self, X, y, **kwargs):
         self.obj_.fit(X, y, **kwargs)
