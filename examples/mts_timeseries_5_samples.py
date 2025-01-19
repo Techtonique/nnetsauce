@@ -14,8 +14,8 @@ from sklearn.gaussian_process.kernels import Matern
 
 print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
-subprocess.check_call([sys.executable, "-m", "pip", "install", "statsmodels"])
-from statsmodels.stats.diagnostic import acorr_ljungbox
+#subprocess.check_call([sys.executable, "-m", "pip", "install", "statsmodels"])
+#from statsmodels.stats.diagnostic import acorr_ljungbox
 
 np.random.seed(1235)
 
@@ -31,7 +31,6 @@ print(df.shape)
 print(198*0.8)
 df_train = df.iloc[0:150,]
 df_test = df.iloc[150:155,]
-
 
 print(f"df_train.head():\n{df_train.head()}")
 print(f"df_train.tail():\n{df_train.tail()}")

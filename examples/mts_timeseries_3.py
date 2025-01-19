@@ -11,7 +11,7 @@ print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 np.random.seed(1235)
 
 
-M = np.random.rand(10, 3)
+M = np.random.rand(100, 3)
 M[:,0] = 10*M[:,0]
 M[:,2] = 25*M[:,2]
 
@@ -35,4 +35,9 @@ obj_MTS2 = ns.MTS(obj=ns.CustomRegressor(obj=linear_model.Ridge()),
                   n_hidden_features=5, 
                   verbose = 1)
 obj_MTS2.fit(M)
+
+# with conformal prediction
+res2 = obj_MTS2.predict(return_pi=True, level=80, method="splitconformal") 
+print(res2)
+print("\n")
 

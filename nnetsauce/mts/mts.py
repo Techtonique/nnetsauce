@@ -288,6 +288,7 @@ class MTS(Base):
         self.xreg_ = None
         self.y_means_ = {}
         self.mean_ = None
+        self.median_ = None
         self.upper_ = None
         self.lower_ = None
         self.output_dates_ = None
@@ -710,9 +711,32 @@ class MTS(Base):
         mean_ = deepcopy(self.mean_)
 
         for i in range(h):
+
             new_obs = ts.reformat_response(mean_, self.lags)
             new_X = new_obs.reshape(1, -1)
             cooked_new_X = self.cook_test_set(new_X, **kwargs)
+
+            if "return_std" in kwargs:
+                self.preds_std_.append(
+                    [
+                        np.asarray(
+                            self.fit_objs_[i].predict(
+                                cooked_new_X, return_std=True
+                            )[1]
+                        ).item()
+                        for i in range(self.n_series)
+                    ]
+                )
+
+            if "return_pi" in kwargs:
+                for i in range(self.n_series):
+                    preds_pi = self.fit_objs_[i].predict(
+                        cooked_new_X, **kwargs
+                    )
+                    mean_pi_.append(preds_pi.mean[0])
+                    lower_pi_.append(preds_pi.lower[0])
+                    upper_pi_.append(preds_pi.upper[0])
+
             predicted_cooked_new_X = np.asarray(
                 [
                     np.asarray(self.fit_objs_[i].predict(cooked_new_X)).item()
@@ -856,6 +880,9 @@ class MTS(Base):
             if "return_std" in kwargs:
 
                 self.preds_std_ = np.asarray(self.preds_std_)
+                print("self.preds_std_", self.preds_std_)
+                print("self.mean_", self.mean_)
+                print("pi_multiplier", pi_multiplier)
 
                 self.lower_ = pd.DataFrame(
                     self.mean_.values - pi_multiplier * self.preds_std_,
