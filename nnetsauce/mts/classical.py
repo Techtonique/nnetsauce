@@ -451,8 +451,7 @@ class ClassicalMTS(Base):
                 plt.show()
             else:  # self.replications is not None
                 if self.n_series > 1:
-                    plt.title(
-                        f"prediction intervals for {self.replications} simulations of {series}",
+                    plt.title(f"prediction intervals for {self.replications} simulations of {series}",
                         loc="left",
                         fontsize=12,
                         fontweight=0,
@@ -487,16 +486,14 @@ class ClassicalMTS(Base):
             plt.plot(x_test, y_test, "-", color="blue")
             # Add titles
             if self.n_series > 1:
-                plt.title(
-                    f"{self.replications} simulations of {series}",
+                plt.title(f"{self.replications} simulations of {series}",
                     loc="left",
                     fontsize=12,
                     fontweight=0,
                     color="black",
                 )
             else:
-                plt.title(
-                    f"{self.replications} simulations of input time series",
+                plt.title(f"{self.replications} simulations of input time series",
                     loc="left",
                     fontsize=12,
                     fontweight=0,

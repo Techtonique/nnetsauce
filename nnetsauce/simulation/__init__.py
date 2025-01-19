@@ -5,7 +5,7 @@ from .nodesimulation import (
     generate_halton,
 )
 
-from .getsims import getsims
+from .getsims import getsims, getsimsxreg
 
 __all__ = [
     "generate_sobol",
@@ -13,4 +13,5 @@ __all__ = [
     "generate_hammersley",
     "generate_halton",
     "getsims",
+    "getsimsxreg",
 ]

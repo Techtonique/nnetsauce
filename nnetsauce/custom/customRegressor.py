@@ -222,7 +222,7 @@ class CustomRegressor(Custom, RegressorMixin):
         if hasattr(self.obj, "coef_"):
             self.coef_ = self.obj.coef_
 
-        if hasattr(self.obj, "intercept_"):    
+        if hasattr(self.obj, "intercept_"):
             self.intercept_ = self.obj.intercept_
 
         return self

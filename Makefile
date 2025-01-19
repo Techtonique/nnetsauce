@@ -51,17 +51,17 @@ coverage: ## check code coverage quickly with the default Python
 	coverage report --omit="venv/*,nnetsauce/tests/*" --show-missing
 
 docs: install ## generate docs		
-	pip install black pdoc 
-	black nnetsauce/* --line-length=80	
-	find nnetsauce/ -name "*.py" -exec autopep8 --max-line-length=80 --in-place {} +
+	#pip install black pdoc 
+	#black nnetsauce/* --line-length=80	
+	#find nnetsauce/ -name "*.py" -exec autopep8 --max-line-length=80 --in-place {} +
 	pdoc -t docs nnetsauce/* --output-dir nnetsauce-docs
 	find . -name '__pycache__' -exec rm -fr {} +
 	cp -rf nnetsauce-docs/* ../../Pro_Website/Techtonique.github.io/nnetsauce
 
 servedocs: install ## compile the docs watching for change	 	
-	pip install black pdoc 
-	black nnetsauce/* --line-length=80	
-	find nnetsauce/ -name "*.py" -exec autopep8 --max-line-length=80 --in-place {} +
+	#pip install black pdoc 
+	#black nnetsauce/* --line-length=80	
+	#find nnetsauce/ -name "*.py" -exec autopep8 --max-line-length=80 --in-place {} +
 	pdoc -t docs nnetsauce/* 
 	find . -name '__pycache__' -exec rm -fr {} +
 
@@ -75,7 +75,7 @@ dist: clean ## builds source and wheel package
 	ls -l dist
 
 install: clean ## install the package to the active Python's site-packages
-	python3 -m pip install .
+	uv pip install -e .
 
 build-site: docs ## export mkdocs website to a folder		
 	cp -rf nnetsauce-docs/* ../../Pro_Website/Techtonique.github.io/nnetsauce
