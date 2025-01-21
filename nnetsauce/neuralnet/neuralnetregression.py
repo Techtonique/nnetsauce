@@ -3,9 +3,7 @@ try:
     import jax.numpy as jnp
     from jax import grad, jit, vmap
 except ImportError:
-    raise ImportError(
-        "Jax is not installed. Please install Jax to use this module."
-    )
+    pass
 
 import numpy as np
 from sklearn.base import BaseEstimator, RegressorMixin
