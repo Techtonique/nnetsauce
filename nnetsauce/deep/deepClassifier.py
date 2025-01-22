@@ -432,9 +432,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
             int(np.ceil(res.best_params["nodes_sim"]))
         ]
         res.best_params["dropout"] = res.best_params["dropout"]
-        res.best_params["n_clusters"] = int(
-            np.ceil(res.best_params["n_clusters"])
-        )
+        res.best_params["n_clusters"] = int(np.ceil(res.best_params["n_clusters"]))
         res.best_params["type_clust"] = num_to_type_clust[
             int(np.ceil(res.best_params["type_clust"]))
         ]
@@ -444,9 +442,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
             self.set_params(**res.best_params, verbose=0, seed=seed)
             preds = self.fit(X_train, y_train).predict(X_test)
             # check error on y_test
-            oos_err = getattr(metrics, scoring + "_score")(
-                y_true=y_test, y_pred=preds
-            )
+            oos_err = getattr(metrics, scoring + "_score")(y_true=y_test, y_pred=preds)
             result = namedtuple("result", res._fields + ("test_" + scoring,))
             return result(*res, oos_err)
         else:

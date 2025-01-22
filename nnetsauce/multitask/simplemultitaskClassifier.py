@@ -138,24 +138,30 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
             model predictions: {array-like}
 
         """
-        try: 
+        try:
             preds = self.predict_proba(X, **kwargs)
-            try: 
-                DescribeResult = namedtuple("DescribeResult", 
-                                            ["mean", "upper", "lower", "median"])
-                return DescribeResult(mean=np.argmax(preds.mean, axis=1), 
-                                    upper=np.argmax(preds.upper, axis=1), 
-                                    lower=np.argmax(preds.lower, axis=1), 
-                                    median=np.argmax(preds.median, axis=1))
+            try:
+                DescribeResult = namedtuple(
+                    "DescribeResult", ["mean", "upper", "lower", "median"]
+                )
+                return DescribeResult(
+                    mean=np.argmax(preds.mean, axis=1),
+                    upper=np.argmax(preds.upper, axis=1),
+                    lower=np.argmax(preds.lower, axis=1),
+                    median=np.argmax(preds.median, axis=1),
+                )
             except Exception as e:
-                
-                DescribeResult = namedtuple("DescribeResult", 
-                                            ["mean", "upper", "lower"])
-                return DescribeResult(mean=np.argmax(preds.mean, axis=1), 
-                                      upper=np.argmax(preds.upper, axis=1), 
-                                      lower=np.argmax(preds.lower, axis=1))
+
+                DescribeResult = namedtuple(
+                    "DescribeResult", ["mean", "upper", "lower"]
+                )
+                return DescribeResult(
+                    mean=np.argmax(preds.mean, axis=1),
+                    upper=np.argmax(preds.upper, axis=1),
+                    lower=np.argmax(preds.lower, axis=1),
+                )
         except Exception as e:
-            
+
             return np.argmax(self.predict_proba(X, **kwargs), axis=1)
 
     def predict_proba(self, X, **kwargs):
@@ -194,7 +200,7 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
                 probs_upper = np.zeros((shape_X[0], self.n_classes_))
                 probs_lower = np.zeros((shape_X[0], self.n_classes_))
                 probs_median = np.zeros((shape_X[0], self.n_classes_))
-                
+
                 # loop on all the classes
                 for i in range(self.n_classes_):
                     probs_temp = self.fit_objs_[i].predict(Z, **kwargs)
@@ -205,9 +211,9 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
                         probs_median[:, i] = probs_temp.median
                     except:
                         pass
-                        
+
             except Exception as e:
-                
+
                 # Fallback to standard model
                 for i in range(self.n_classes_):
                     probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)[0]
@@ -221,7 +227,7 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
                 probs_upper = np.zeros((shape_X[0], self.n_classes_))
                 probs_lower = np.zeros((shape_X[0], self.n_classes_))
                 probs_median = np.zeros((shape_X[0], self.n_classes_))
-                
+
                 # loop on all the classes
                 for i in range(self.n_classes_):
                     probs_temp = self.fit_objs_[i].predict(Z, **kwargs)
@@ -232,9 +238,9 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
                         probs_median[:, i] = probs_temp.median
                     except:
                         pass
-                        
+
             except Exception as e:
-                
+
                 # Fallback to standard model
                 for i in range(self.n_classes_):
                     probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)[0]
@@ -242,52 +248,60 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
         expit_raw_probs = expit(probs)
 
         try:
-            expit_raw_probs_upper = expit(probs_upper)        
+            expit_raw_probs_upper = expit(probs_upper)
             expit_raw_probs_lower = expit(probs_lower)
-            try: 
+            try:
                 expit_raw_probs_median = expit(probs_median)
             except Exception as e:
-                
-                pass 
-            probs_upper = expit_raw_probs_upper / expit_raw_probs_upper.sum(axis=1)[:, None]
-            probs_lower = expit_raw_probs_lower / expit_raw_probs_lower.sum(axis=1)[:, None]
+
+                pass
+            probs_upper = (
+                expit_raw_probs_upper / expit_raw_probs_upper.sum(axis=1)[:, None]
+            )
+            probs_lower = (
+                expit_raw_probs_lower / expit_raw_probs_lower.sum(axis=1)[:, None]
+            )
             probs_upper = np.minimum(probs_upper, 1)
             probs_lower = np.maximum(probs_lower, 0)
-            try: 
-                probs_median = expit_raw_probs_median / expit_raw_probs_median.sum(axis=1)[:, None]
+            try:
+                probs_median = (
+                    expit_raw_probs_median / expit_raw_probs_median.sum(axis=1)[:, None]
+                )
             except Exception as e:
-                
+
                 pass
-            
+
             # Normalize each probability independently to [0,1] range
             probs = expit_raw_probs
             probs_upper = np.minimum(expit_raw_probs_upper, 1)
             probs_lower = np.maximum(expit_raw_probs_lower, 0)
-            
+
             # Ensure upper >= lower
             probs_upper = np.maximum(probs_upper, probs_lower)
-            
-            try: 
+
+            try:
                 probs_median = expit_raw_probs_median
             except Exception as e:
-                
+
                 pass
-            
-            try: 
-                DescribeResult = namedtuple("DescribeResult", 
-                                            ["mean", "upper", "lower", "median"])
-                return DescribeResult(mean=probs, 
-                                      upper=probs_upper, 
-                                      lower=probs_lower, 
-                                      median=probs_median)
+
+            try:
+                DescribeResult = namedtuple(
+                    "DescribeResult", ["mean", "upper", "lower", "median"]
+                )
+                return DescribeResult(
+                    mean=probs,
+                    upper=probs_upper,
+                    lower=probs_lower,
+                    median=probs_median,
+                )
             except Exception as e:
-                
-                DescribeResult = namedtuple("DescribeResult", 
-                                            ["mean", "upper", "lower"])
-                return DescribeResult(mean=probs, 
-                                      upper=probs_upper, 
-                                      lower=probs_lower)
-            
+
+                DescribeResult = namedtuple(
+                    "DescribeResult", ["mean", "upper", "lower"]
+                )
+                return DescribeResult(mean=probs, upper=probs_upper, lower=probs_lower)
+
         except Exception as e:
-            
+
             return expit_raw_probs / expit_raw_probs.sum(axis=1)[:, None]

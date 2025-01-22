@@ -344,9 +344,7 @@ class NcFactory(object):
                 adapter = ClassifierAdapter(model)
 
             if normalizer_adapter is not None:
-                normalizer = RegressorNormalizer(
-                    adapter, normalizer_adapter, err_func
-                )
+                normalizer = RegressorNormalizer(adapter, normalizer_adapter, err_func)
                 return ClassifierNc(adapter, err_func, normalizer)
             else:
                 return ClassifierNc(adapter, err_func)
@@ -367,9 +365,7 @@ class NcFactory(object):
                 adapter = RegressorAdapter(model)
 
             if normalizer_adapter is not None:
-                normalizer = RegressorNormalizer(
-                    adapter, normalizer_adapter, err_func
-                )
+                normalizer = RegressorNormalizer(adapter, normalizer_adapter, err_func)
                 return RegressorNc(adapter, err_func, normalizer)
             else:
                 return RegressorNc(adapter, err_func)
@@ -406,9 +402,7 @@ class BaseModelNc(BaseScorer):
         # If we use sklearn.base.clone (e.g., during cross-validation),
         # object references get jumbled, so we need to make sure that the
         # normalizer has a reference to the proper model adapter, if applicable.
-        if self.normalizer is not None and hasattr(
-            self.normalizer, "base_model"
-        ):
+        if self.normalizer is not None and hasattr(self.normalizer, "base_model"):
             self.normalizer.base_model = self.model
 
         self.last_x, self.last_y = None, None
@@ -501,9 +495,7 @@ class ClassifierNc(BaseModelNc):
     RegressorNc, NormalizedRegressorNc
     """
 
-    def __init__(
-        self, model, err_func=MarginErrFunc(), normalizer=None, beta=1e-6
-    ):
+    def __init__(self, model, err_func=MarginErrFunc(), normalizer=None, beta=1e-6):
         super(ClassifierNc, self).__init__(model, err_func, normalizer, beta)
 
 
@@ -542,9 +534,7 @@ class RegressorNc(BaseModelNc):
     ProbEstClassifierNc, NormalizedRegressorNc
     """
 
-    def __init__(
-        self, model, err_func=AbsErrorErrFunc(), normalizer=None, beta=1e-6
-    ):
+    def __init__(self, model, err_func=AbsErrorErrFunc(), normalizer=None, beta=1e-6):
         super(RegressorNc, self).__init__(model, err_func, normalizer, beta)
 
     def predict(self, x, nc, significance=None):

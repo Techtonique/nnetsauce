@@ -25,21 +25,13 @@ class TestMultitask(ut.TestCase):
 
         regr = LinearRegression()
 
-        fit_obj = ns.MultitaskClassifier(
-            regr, n_hidden_features=5, n_clusters=0
-        )
+        fit_obj = ns.MultitaskClassifier(regr, n_hidden_features=5, n_clusters=0)
 
-        fit_obj2 = ns.MultitaskClassifier(
-            regr, n_hidden_features=10, n_clusters=3
-        )
+        fit_obj2 = ns.MultitaskClassifier(regr, n_hidden_features=10, n_clusters=3)
 
-        fit_obj3 = ns.MultitaskClassifier(
-            regr, n_hidden_features=5, n_clusters=0
-        )
+        fit_obj3 = ns.MultitaskClassifier(regr, n_hidden_features=5, n_clusters=0)
 
-        fit_obj4 = ns.MultitaskClassifier(
-            regr, n_hidden_features=8, n_clusters=2
-        )
+        fit_obj4 = ns.MultitaskClassifier(regr, n_hidden_features=8, n_clusters=2)
 
         fit_obj.fit(X_train, y_train)
         preds1 = fit_obj.predict_proba(X_test)
@@ -80,21 +72,13 @@ class TestMultitask(ut.TestCase):
 
         regr = LinearRegression()
 
-        fit_obj = ns.MultitaskClassifier(
-            regr, n_hidden_features=3, n_clusters=2
-        )
+        fit_obj = ns.MultitaskClassifier(regr, n_hidden_features=3, n_clusters=2)
 
-        fit_obj2 = ns.MultitaskClassifier(
-            regr, n_hidden_features=7, n_clusters=2
-        )
+        fit_obj2 = ns.MultitaskClassifier(regr, n_hidden_features=7, n_clusters=2)
 
-        fit_obj3 = ns.MultitaskClassifier(
-            regr, n_hidden_features=5, n_clusters=2
-        )
+        fit_obj3 = ns.MultitaskClassifier(regr, n_hidden_features=5, n_clusters=2)
 
-        fit_obj4 = ns.MultitaskClassifier(
-            regr, n_hidden_features=4, n_clusters=2
-        )
+        fit_obj4 = ns.MultitaskClassifier(regr, n_hidden_features=4, n_clusters=2)
 
         fit_obj.fit(X_train, y_train)
         score1 = fit_obj.score(X_test, y_test)

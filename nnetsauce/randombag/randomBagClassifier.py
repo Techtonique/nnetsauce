@@ -244,8 +244,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
         if self.verbose == 1:
             voters_list = Parallel(n_jobs=self.n_jobs, prefer="threads")(
-                delayed(fit_estimators)(m)
-                for m in tqdm(range(self.n_estimators))
+                delayed(fit_estimators)(m) for m in tqdm(range(self.n_estimators))
             )
         else:
             voters_list = Parallel(n_jobs=self.n_jobs, prefer="threads")(
@@ -353,8 +352,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
         if self.verbose == 1:
             preds = Parallel(n_jobs=self.n_jobs, prefer="threads")(
-                delayed(predict_estimator)(m)
-                for m in tqdm(range(self.n_estimators))
+                delayed(predict_estimator)(m) for m in tqdm(range(self.n_estimators))
             )
 
         else:

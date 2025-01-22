@@ -130,9 +130,7 @@ class Base(BaseEstimator):
         sys_platform = platform.system()
 
         if (sys_platform == "Windows") and (backend in ("gpu", "tpu")):
-            warnings.warn(
-                "No GPU/TPU computing on Windows yet, backend set to 'cpu'"
-            )
+            warnings.warn("No GPU/TPU computing on Windows yet, backend set to 'cpu'")
             backend = "cpu"
 
         assert activation_name in (
@@ -208,9 +206,7 @@ class Base(BaseEstimator):
             activation_options = {
                 "relu": ac.relu if (self.backend == "cpu") else jnn.relu,
                 "tanh": np.tanh if (self.backend == "cpu") else jnp.tanh,
-                "sigmoid": (
-                    ac.sigmoid if (self.backend == "cpu") else jnn.sigmoid
-                ),
+                "sigmoid": (ac.sigmoid if (self.backend == "cpu") else jnn.sigmoid),
                 "prelu": partial(ac.prelu, a=a),
                 "elu": (
                     partial(ac.elu, a=a)
@@ -220,16 +216,10 @@ class Base(BaseEstimator):
             }
         else:  # on Windows currently, no JAX
             activation_options = {
-                "relu": (
-                    ac.relu if (self.backend == "cpu") else NotImplementedError
-                ),
-                "tanh": (
-                    np.tanh if (self.backend == "cpu") else NotImplementedError
-                ),
+                "relu": (ac.relu if (self.backend == "cpu") else NotImplementedError),
+                "tanh": (np.tanh if (self.backend == "cpu") else NotImplementedError),
                 "sigmoid": (
-                    ac.sigmoid
-                    if (self.backend == "cpu")
-                    else NotImplementedError
+                    ac.sigmoid if (self.backend == "cpu") else NotImplementedError
                 ),
                 "prelu": partial(ac.prelu, a=a),
                 "elu": (
@@ -301,14 +291,10 @@ class Base(BaseEstimator):
             return X_clustered.astype(np.float16)
 
         # if predict == True, encode test set
-        X_clustered = self.clustering_obj_.predict(
-            self.clustering_scaler_.transform(X)
-        )
+        X_clustered = self.clustering_obj_.predict(self.clustering_scaler_.transform(X))
 
         if self.cluster_encode == True:
-            return mo.one_hot_encode(X_clustered, self.n_clusters).astype(
-                np.float16
-            )
+            return mo.one_hot_encode(X_clustered, self.n_clusters).astype(np.float16)
 
         return X_clustered.astype(np.float16)
 
@@ -378,9 +364,7 @@ class Base(BaseEstimator):
 
                 return mo.dropout(
                     x=self.activation_func(
-                        mo.safe_sparse_dot(
-                            a=scaled_X, b=self.W_, backend=self.backend
-                        )
+                        mo.safe_sparse_dot(a=scaled_X, b=self.W_, backend=self.backend)
                     ),
                     drop_prob=self.dropout,
                     seed=self.seed,
@@ -610,13 +594,9 @@ class Base(BaseEstimator):
                 n, p = Z.shape
 
                 self.subsampler_ = (
-                    SubSampler(
-                        y=self.y_, row_sample=self.row_sample, seed=self.seed
-                    )
+                    SubSampler(y=self.y_, row_sample=self.row_sample, seed=self.seed)
                     if y is None
-                    else SubSampler(
-                        y=y, row_sample=self.row_sample, seed=self.seed
-                    )
+                    else SubSampler(y=y, row_sample=self.row_sample, seed=self.seed)
                 )
 
                 self.index_row_ = self.subsampler_.subsample()
@@ -639,9 +619,7 @@ class Base(BaseEstimator):
             n, p = Z.shape
 
             self.subsampler_ = (
-                SubSampler(
-                    y=self.y_, row_sample=self.row_sample, seed=self.seed
-                )
+                SubSampler(y=self.y_, row_sample=self.row_sample, seed=self.seed)
                 if y is None
                 else SubSampler(y=y, row_sample=self.row_sample, seed=self.seed)
             )
@@ -652,9 +630,7 @@ class Base(BaseEstimator):
             # classification
             return (
                 y[self.index_row_].reshape(n_row_sample),
-                self.scaler_.transform(
-                    Z[self.index_row_, :].reshape(n_row_sample, p)
-                ),
+                self.scaler_.transform(Z[self.index_row_, :].reshape(n_row_sample, p)),
             )
         # y is not subsampled
         # classification
@@ -704,9 +680,7 @@ class Base(BaseEstimator):
 
         # data with clustering: self.n_clusters > 0 -----
         if self.col_sample == 1:
-            predicted_clusters = self.encode_clusters(
-                X=X, predict=True, **kwargs
-            )
+            predicted_clusters = self.encode_clusters(X=X, predict=True, **kwargs)
             augmented_X = mo.cbind(X, predicted_clusters, backend=self.backend)
         else:
             predicted_clusters = self.encode_clusters(

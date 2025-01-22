@@ -139,9 +139,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
         if self.method == "localconformal":
 
             mad_estimator = ExtraTreesRegressor()
-            normalizer = RegressorNormalizer(
-                self.obj, mad_estimator, AbsErrorErrFunc()
-            )
+            normalizer = RegressorNormalizer(self.obj, mad_estimator, AbsErrorErrFunc())
             nc = RegressorNc(self.obj, AbsErrorErrFunc(), normalizer)
             self.icp_ = IcpRegressor(nc)
             self.icp_.fit(X_train, y_train)
@@ -227,9 +225,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                         ]
                     ).T
                 elif self.type_pi == "kde":
-                    self.kde_ = gaussian_kde(
-                        dataset=self.scaled_calibrated_residuals_
-                    )
+                    self.kde_ = gaussian_kde(dataset=self.scaled_calibrated_residuals_)
                     self.sims_ = np.asarray(
                         [
                             pred
@@ -242,20 +238,14 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                     ).T
 
                 self.mean_ = np.mean(self.sims_, axis=1)
-                self.lower_ = np.quantile(
-                    self.sims_, q=self.alpha_ / 200, axis=1
-                )
-                self.upper_ = np.quantile(
-                    self.sims_, q=1 - self.alpha_ / 200, axis=1
-                )
+                self.lower_ = np.quantile(self.sims_, q=self.alpha_ / 200, axis=1)
+                self.upper_ = np.quantile(self.sims_, q=1 - self.alpha_ / 200, axis=1)
 
                 DescribeResult = namedtuple(
                     "DescribeResult", ("mean", "sims", "lower", "upper")
                 )
 
-                return DescribeResult(
-                    self.mean_, self.sims_, self.lower_, self.upper_
-                )
+                return DescribeResult(self.mean_, self.sims_, self.lower_, self.upper_)
 
         if self.method == "localconformal":
 

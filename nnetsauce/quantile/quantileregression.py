@@ -40,21 +40,21 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
     Parameters:
 
         obj: base model (regression model)
-            The base regressor from which to build a 
+            The base regressor from which to build a
             quantile regressor.
 
         level: int, default=95
             The level of the quantiles to compute.
 
         scoring: str, default="predictions"
-            The scoring to use for the optimization and constructing 
+            The scoring to use for the optimization and constructing
             prediction intervals (predictions, residuals, conformal,
               studentized, conformal-studentized).
 
     Attributes:
 
         obj_ : base model (regression model)
-            The base regressor from which to build a 
+            The base regressor from which to build a
             quantile regressor.
 
         offset_multipliers_ : list
@@ -66,7 +66,7 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
         student_multiplier_ : float
             The multiplier for the student.
 
-        
+
     """
 
     def __init__(self, obj, level=95, scoring="predictions"):
@@ -86,9 +86,7 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
         self.scoring_residuals_ = None
         self.student_multiplier_ = None
 
-    def _compute_quantile_loss(
-        self, residuals: np.ndarray, quantile: float
-    ) -> float:
+    def _compute_quantile_loss(self, residuals: np.ndarray, quantile: float) -> float:
         """
         Compute the quantile loss for a given set of residuals and quantile.
         """
@@ -118,9 +116,7 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
             # Convert to positive multiplier using exp
             multiplier = np.exp(log_multiplier[0])
             if self.scoring == "predictions":
-                assert (
-                    base_predictions is not None
-                ), "base_predictions must be not None"
+                assert base_predictions is not None, "base_predictions must be not None"
                 # Calculate predictions
                 if prev_predictions is None:
                     # For first quantile, subtract from conditional expectation
@@ -221,9 +217,7 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
                     X, y, test_size=0.5, random_state=42
                 )
                 self.obj_.fit(X_train, y_train)
-                scoring_residuals = y_calib - self.obj_.predict(
-                    X_calib
-                )
+                scoring_residuals = y_calib - self.obj_.predict(X_calib)
                 # Calculate studentized multiplier using calibration data
                 self.student_multiplier_ = np.std(y_calib, ddof=1) / np.sqrt(
                     len(y_calib)
@@ -256,8 +250,8 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
                 # Update current predictions
                 if current_predictions is None:
                     # First quantile (lowest)
-                    current_predictions = (
-                        base_predictions - multiplier * np.abs(base_predictions)
+                    current_predictions = base_predictions - multiplier * np.abs(
+                        base_predictions
                     )
                 else:
                     # Subsequent quantiles
@@ -277,9 +271,8 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
                 # Update current predictions
                 if current_predictions is None:
                     # First quantile (lowest)
-                    current_predictions = (
-                        base_predictions
-                        - multiplier * np.std(scoring_residuals)
+                    current_predictions = base_predictions - multiplier * np.std(
+                        scoring_residuals
                     )
                 else:
                     # Subsequent quantiles
@@ -299,9 +292,8 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
                 # Update current predictions
                 if current_predictions is None:
                     # First quantile (lowest)
-                    current_predictions = (
-                        base_predictions
-                        - multiplier * np.std(scoring_residuals)
+                    current_predictions = base_predictions - multiplier * np.std(
+                        scoring_residuals
                     )
                 else:
                     # Subsequent quantiles
@@ -388,7 +380,7 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
                 offset = multiplier * self.student_multiplier_
                 current_predictions = current_predictions + offset
                 all_predictions.append(current_predictions)
-        
+
         if return_pi == False:
             return np.asarray(all_predictions[1])
 

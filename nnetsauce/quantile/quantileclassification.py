@@ -10,7 +10,7 @@ from collections import namedtuple
 from sklearn.base import BaseEstimator, ClassifierMixin
 from scipy.optimize import differential_evolution
 from dataclasses import dataclass
-from functools import partial 
+from functools import partial
 from typing import Dict, Any, List
 from sklearn.base import clone
 from sklearn.base import BaseEstimator, ClassifierMixin
@@ -23,7 +23,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from warnings import filterwarnings
 
-from .quantileregression import QuantileRegressor 
+from .quantileregression import QuantileRegressor
 from nnetsauce.multitask.simplemultitaskClassifier import SimpleMultitaskClassifier
 
 filterwarnings("ignore")
@@ -44,21 +44,21 @@ class QuantileClassifier(BaseEstimator, ClassifierMixin):
     Parameters:
 
         obj: base model (classification model)
-            The base classifier from which to build a 
+            The base classifier from which to build a
             quantile classifier.
 
         level: int, default=95
             The level of the quantiles to compute.
 
         scoring: str, default="predictions"
-            The scoring to use for the optimization and constructing 
+            The scoring to use for the optimization and constructing
             prediction intervals (predictions, residuals, conformal,
               studentized, conformal-studentized).
 
     Attributes:
 
         obj_ : base model (classification model)
-            The base classifier from which to build a 
+            The base classifier from which to build a
             quantile classifier.
 
         offset_multipliers_ : list
@@ -70,8 +70,9 @@ class QuantileClassifier(BaseEstimator, ClassifierMixin):
         student_multiplier_ : float
             The multiplier for the student.
 
-        
+
     """
+
     def __init__(self, obj, level=95, scoring="predictions"):
         assert scoring in (
             "predictions",
@@ -82,9 +83,8 @@ class QuantileClassifier(BaseEstimator, ClassifierMixin):
         ), "scoring must be 'predictions' or 'residuals'"
         self.obj = obj
         quantileregressor = QuantileRegressor(self.obj)
-        quantileregressor.predict = partial(quantileregressor.predict, 
-                                            return_pi=True)
-        self.obj_ = SimpleMultitaskClassifier(quantileregressor)        
+        quantileregressor.predict = partial(quantileregressor.predict, return_pi=True)
+        self.obj_ = SimpleMultitaskClassifier(quantileregressor)
 
     def fit(self, X, y, **kwargs):
         self.obj_.fit(X, y, **kwargs)

@@ -10,9 +10,7 @@ from ..utils.misc import flatten, is_factor
 
 def dosubsample(y, row_sample=0.8, seed=123, n_jobs=None, verbose=False):
     index = []
-    assert (row_sample < 1) & (
-        row_sample >= 0
-    ), "'row_sample' must be < 1 and >= 0"
+    assert (row_sample < 1) & (row_sample >= 0), "'row_sample' must be < 1 and >= 0"
     n_obs = len(y)
     n_obs_out = np.ceil(n_obs * row_sample)
 

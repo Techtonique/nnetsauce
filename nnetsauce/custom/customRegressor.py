@@ -382,9 +382,7 @@ class CustomRegressor(Custom, RegressorMixin):
 
             return (
                 self.y_mean_
-                + self.obj.predict(
-                    self.cook_test_set(new_X, **kwargs), **kwargs
-                )
+                + self.obj.predict(self.cook_test_set(new_X, **kwargs), **kwargs)
             )[0]
 
         # len(X.shape) > 1

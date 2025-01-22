@@ -100,9 +100,7 @@ class BaseIcp(BaseEstimator):
 
             for cond in self.categories:
                 idx = category_map == cond
-                cal_scores = self.nc_function.score(
-                    self.cal_x[idx, :], self.cal_y[idx]
-                )
+                cal_scores = self.nc_function.score(self.cal_x[idx, :], self.cal_y[idx])
                 self.cal_scores[cond] = np.sort(cal_scores, 0)[::-1]
         else:
             self.categories = np.array([0])
@@ -389,9 +387,7 @@ class IcpRegressor(BaseIcp, RegressorMixin):
         """
         # TODO: interpolated p-values
 
-        n_significance = (
-            99 if significance is None else np.array(significance).size
-        )
+        n_significance = 99 if significance is None else np.array(significance).size
 
         if n_significance > 1:
             prediction = np.zeros((x.shape[0], 2, n_significance))

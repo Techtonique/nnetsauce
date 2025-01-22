@@ -344,9 +344,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
                     X, y, sample_weight=w_m.ravel(), **kwargs
                 ).predict_proba(X)
 
-                np.clip(
-                    a=probs, a_min=2.220446049250313e-16, a_max=1.0, out=probs
-                )
+                np.clip(a=probs, a_min=2.220446049250313e-16, a_max=1.0, out=probs)
 
                 self.base_learners_.update({m: deepcopy(base_learner)})
 
@@ -448,9 +446,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
 
             log_preds_proba = np.log(probs)
 
-            ensemble_learner += (
-                log_preds_proba - log_preds_proba.mean(axis=1)[:, None]
-            )
+            ensemble_learner += log_preds_proba - log_preds_proba.mean(axis=1)[:, None]
 
             # if self.verbose == 1:
             #    pbar.update(idx)
