@@ -144,14 +144,7 @@ class GLMRegressor(GLM, RegressorMixin):
         return -np.mean(y[row_index] * XB - np.exp(XB))
 
     def loss_func(
-        self,
-        beta,
-        group_index,
-        X,
-        y,
-        row_index=None,
-        type_loss="gaussian",
-        **kwargs
+        self, beta, group_index, X, y, row_index=None, type_loss="gaussian", **kwargs
     ):
         res = {
             "gaussian": self.gaussian_loss,
@@ -253,13 +246,10 @@ class GLMRegressor(GLM, RegressorMixin):
             )
 
             return (
-                self.y_mean_
-                + np.dot(self.cook_test_set(new_X, **kwargs), self.beta_)
+                self.y_mean_ + np.dot(self.cook_test_set(new_X, **kwargs), self.beta_)
             )[0]
 
-        return self.y_mean_ + np.dot(
-            self.cook_test_set(X, **kwargs), self.beta_
-        )
+        return self.y_mean_ + np.dot(self.cook_test_set(X, **kwargs), self.beta_)
 
     def score(self, X, y, scoring=None):
         """Compute the score of the model.

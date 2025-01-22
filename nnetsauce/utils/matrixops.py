@@ -40,9 +40,7 @@ def cbind(x, y, backend="cpu"):
                     "series" + str(i) for i in range(x.shape[1])
                 ] + y.columns.tolist()
 
-            if backend in ("gpu", "tpu") and (
-                platform.system() in ("Linux", "Darwin")
-            ):
+            if backend in ("gpu", "tpu") and (platform.system() in ("Linux", "Darwin")):
 
                 res = jnp.column_stack((x.values, y))
 
@@ -64,9 +62,7 @@ def cbind(x, y, backend="cpu"):
                     "series" + str(i) for i in range(x.shape[1])
                 ]
 
-            if backend in ("gpu", "tpu") and (
-                platform.system() in ("Linux", "Darwin")
-            ):
+            if backend in ("gpu", "tpu") and (platform.system() in ("Linux", "Darwin")):
 
                 res = jnp.column_stack((x.values, y))
 
@@ -77,9 +73,7 @@ def cbind(x, y, backend="cpu"):
             return pd.DataFrame(res, columns=col_names)
 
         # x and y are numpy arrays
-        if backend in ("gpu", "tpu") and (
-            platform.system() in ("Linux", "Darwin")
-        ):
+        if backend in ("gpu", "tpu") and (platform.system() in ("Linux", "Darwin")):
 
             return jnp.column_stack((x, y))
 
@@ -106,17 +100,13 @@ def cluster_covariates(X, n_clusters, seed, type_clust="kmeans", **kwargs):
         X = copy.deepcopy(X.values.astype(float))
 
     if type_clust == "kmeans":
-        kmeans = KMeans(
-            n_clusters=n_clusters, random_state=seed, n_init=10, **kwargs
-        )
+        kmeans = KMeans(n_clusters=n_clusters, random_state=seed, n_init=10, **kwargs)
         kmeans.fit(X)
 
         return kmeans, kmeans.predict(X)
 
     elif type_clust == "gmm":
-        gmm = GaussianMixture(
-            n_components=n_clusters, random_state=seed, **kwargs
-        )
+        gmm = GaussianMixture(n_components=n_clusters, random_state=seed, **kwargs)
         gmm.fit(X)
 
         return gmm, gmm.predict(X)
@@ -181,9 +171,7 @@ def delete_last_columns(x, num_columns, inplace=False):
         if isinstance(x[1], pd.DataFrame):
             modified_dfs = []
             for i in range(len(x)):
-                modified_dfs.append(
-                    x[i].drop(x[i].columns[-num_columns:], axis=1)
-                )
+                modified_dfs.append(x[i].drop(x[i].columns[-num_columns:], axis=1))
             return tuple(modified_dfs)
 
 
@@ -212,9 +200,7 @@ def dropout(x, drop_prob=0, seed=123):
 
 # one-hot encoding
 def one_hot_encode(x_clusters, n_clusters):
-    assert (
-        max(x_clusters) <= n_clusters
-    ), "you must have max(x_clusters) <= n_clusters"
+    assert max(x_clusters) <= n_clusters, "you must have max(x_clusters) <= n_clusters"
 
     n_obs = len(x_clusters)
     res = np.zeros((n_obs, n_clusters))
@@ -346,13 +332,9 @@ def scale_covariates(X, choice="std", scaler=None):
     else:  # 'robust'
 
         if sparse.issparse(X):
-            scaler = RobustScaler(
-                copy=True, with_centering=False, with_scaling=True
-            )
+            scaler = RobustScaler(copy=True, with_centering=False, with_scaling=True)
         else:
-            scaler = RobustScaler(
-                copy=True, with_centering=True, with_scaling=True
-            )
+            scaler = RobustScaler(copy=True, with_centering=True, with_scaling=True)
 
     scaled_X = scaler.fit_transform(X)
 

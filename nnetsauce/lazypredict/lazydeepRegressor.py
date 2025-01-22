@@ -327,9 +327,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                     }
 
                     if self.custom_metric:
-                        scores_verbose[self.custom_metric.__name__] = (
-                            custom_metric
-                        )
+                        scores_verbose[self.custom_metric.__name__] = custom_metric
 
                     print(scores_verbose)
                 if self.predictions:
@@ -345,10 +343,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
             self.regressors = [
                 ("DeepCustomRegressor(" + est[0] + ")", est[1])
                 for est in all_estimators()
-                if (
-                    issubclass(est[1], RegressorMixin)
-                    and (est[0] in self.estimators)
-                )
+                if (issubclass(est[1], RegressorMixin) and (est[0] in self.estimators))
             ]
 
         if self.preprocess is True:
@@ -456,9 +451,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                         }
 
                         if self.custom_metric:
-                            scores_verbose[self.custom_metric.__name__] = (
-                                custom_metric
-                            )
+                            scores_verbose[self.custom_metric.__name__] = custom_metric
 
                         print(scores_verbose)
                     if self.predictions:
@@ -569,9 +562,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                         }
 
                         if self.custom_metric:
-                            scores_verbose[self.custom_metric.__name__] = (
-                                custom_metric
-                            )
+                            scores_verbose[self.custom_metric.__name__] = custom_metric
 
                         print(scores_verbose)
                     if self.predictions:
@@ -593,9 +584,7 @@ class LazyDeepRegressor(Custom, RegressorMixin):
             scores["Custom metric"] = CUSTOM_METRIC
 
         scores = pd.DataFrame(scores)
-        scores = scores.sort_values(by=self.sort_by, ascending=True).set_index(
-            "Model"
-        )
+        scores = scores.sort_values(by=self.sort_by, ascending=True).set_index("Model")
 
         self.best_model_ = self.models_[scores.index[0]]
 

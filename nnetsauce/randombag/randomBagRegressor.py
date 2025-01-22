@@ -225,8 +225,7 @@ class RandomBagRegressor(RandomBag, RegressorMixin):
 
         if self.verbose == 1:
             voters_list = Parallel(n_jobs=self.n_jobs, prefer="threads")(
-                delayed(fit_estimators)(m)
-                for m in tqdm(range(self.n_estimators))
+                delayed(fit_estimators)(m) for m in tqdm(range(self.n_estimators))
             )
         else:
             voters_list = Parallel(n_jobs=self.n_jobs, prefer="threads")(

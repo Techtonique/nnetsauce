@@ -55,19 +55,13 @@ removed_regressors = [
 CLASSIFIERS = [
     ("CustomClassifier(" + est[0] + ")", est[1])
     for est in all_estimators()
-    if (
-        issubclass(est[1], ClassifierMixin)
-        and (est[0] not in removed_classifiers)
-    )
+    if (issubclass(est[1], ClassifierMixin) and (est[0] not in removed_classifiers))
 ]
 
 DEEPCLASSIFIERS = [
     ("DeepCustomClassifier(" + est[0] + ")", est[1])
     for est in all_estimators()
-    if (
-        issubclass(est[1], ClassifierMixin)
-        and (est[0] not in removed_classifiers)
-    )
+    if (issubclass(est[1], ClassifierMixin) and (est[0] not in removed_classifiers))
 ]
 
 MULTITASKCLASSIFIERS = [
@@ -76,10 +70,7 @@ MULTITASKCLASSIFIERS = [
         partial(MultitaskClassifier, obj=est[1]()),
     )
     for est in all_estimators()
-    if (
-        issubclass(est[1], RegressorMixin)
-        and (est[0] not in removed_regressors)
-    )
+    if (issubclass(est[1], RegressorMixin) and (est[0] not in removed_regressors))
 ]
 
 DEEPMULTITASKCLASSIFIERS = [
@@ -88,10 +79,7 @@ DEEPMULTITASKCLASSIFIERS = [
         partial(MultitaskClassifier, obj=est[1]()),
     )
     for est in all_estimators()
-    if (
-        issubclass(est[1], RegressorMixin)
-        and (est[0] not in removed_regressors)
-    )
+    if (issubclass(est[1], RegressorMixin) and (est[0] not in removed_regressors))
 ]
 
 SIMPLEMULTITASKCLASSIFIERS = [
@@ -100,10 +88,7 @@ SIMPLEMULTITASKCLASSIFIERS = [
         partial(SimpleMultitaskClassifier, obj=est[1]()),
     )
     for est in all_estimators()
-    if (
-        issubclass(est[1], RegressorMixin)
-        and (est[0] not in removed_regressors)
-    )
+    if (issubclass(est[1], RegressorMixin) and (est[0] not in removed_regressors))
 ]
 
 DEEPSIMPLEMULTITASKCLASSIFIERS = [
@@ -112,46 +97,31 @@ DEEPSIMPLEMULTITASKCLASSIFIERS = [
         partial(SimpleMultitaskClassifier, obj=est[1]()),
     )
     for est in all_estimators()
-    if (
-        issubclass(est[1], RegressorMixin)
-        and (est[0] not in removed_regressors)
-    )
+    if (issubclass(est[1], RegressorMixin) and (est[0] not in removed_regressors))
 ]
 
 REGRESSORS = [
     ("CustomRegressor(" + est[0] + ")", est[1])
     for est in all_estimators()
-    if (
-        issubclass(est[1], RegressorMixin)
-        and (est[0] not in removed_regressors)
-    )
+    if (issubclass(est[1], RegressorMixin) and (est[0] not in removed_regressors))
 ]
 
 DEEPREGRESSORS = [
     ("DeepCustomRegressor(" + est[0] + ")", est[1])
     for est in all_estimators()
-    if (
-        issubclass(est[1], RegressorMixin)
-        and (est[0] not in removed_regressors)
-    )
+    if (issubclass(est[1], RegressorMixin) and (est[0] not in removed_regressors))
 ]
 
 REGRESSORSMTS = [
     ("MTS(" + est[0] + ")", est[1])
     for est in all_estimators()
-    if (
-        issubclass(est[1], RegressorMixin)
-        and (est[0] not in removed_regressors)
-    )
+    if (issubclass(est[1], RegressorMixin) and (est[0] not in removed_regressors))
 ]
 
 DEEPREGRESSORSMTS = [
     ("DeepMTS(" + est[0] + ")", est[1])
     for est in all_estimators()
-    if (
-        issubclass(est[1], RegressorMixin)
-        and (est[0] not in removed_regressors)
-    )
+    if (issubclass(est[1], RegressorMixin) and (est[0] not in removed_regressors))
 ]
 
 CLASSICALMTS = [

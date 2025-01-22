@@ -6,9 +6,7 @@ import sys
 
 def install_package(package_name):
     """Install a package dynamically using pip."""
-    subprocess.check_call(
-        [sys.executable, "-m", "pip", "install", package_name]
-    )
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package_name])
 
 
 def check_and_install(package_name):

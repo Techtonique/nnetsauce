@@ -36,9 +36,7 @@ def inv_penalized_cov(x, lam=None, backend="cpu"):
     if backend in ("gpu", "tpu") and (sys_platform in ("Linux", "Darwin")):
         if lam is None:
             return jla.inv(mo.crossprod(x=x, backend=backend))
-        return jla.inv(
-            mo.crossprod(x=x, backend=backend) + lam * jnp.eye(x.shape[1])
-        )
+        return jla.inv(mo.crossprod(x=x, backend=backend) + lam * jnp.eye(x.shape[1]))
 
     if lam is None:
         return la.inv(mo.crossprod(x))
@@ -69,9 +67,7 @@ def beta_Sigma_hat(
         if fit_intercept == True:
             X = mo.cbind(x=np.ones(n), y=X, backend=backend)
             if X_star is not None:
-                X_star = mo.cbind(
-                    x=np.ones(X_star.shape[0]), y=X_star, backend=backend
-                )
+                X_star = mo.cbind(x=np.ones(X_star.shape[0]), y=X_star, backend=backend)
 
         Cn = inv_penalized_cov(x=X, backend=backend)
 
@@ -91,19 +87,14 @@ def beta_Sigma_hat(
                     b=mo.tcrossprod(x=Sigma_hat_, y=X, backend=backend),
                     backend=backend,
                 )
-                smoothing_matrix = mo.safe_sparse_dot(
-                    a=X, b=temp, backend=backend
-                )
-                y_hat = mo.safe_sparse_dot(
-                    a=smoothing_matrix, b=y, backend=backend
-                )
+                smoothing_matrix = mo.safe_sparse_dot(a=X, b=temp, backend=backend)
+                y_hat = mo.safe_sparse_dot(a=smoothing_matrix, b=y, backend=backend)
 
                 return {
                     "beta_hat": beta_hat_,
                     "Sigma_hat": Sigma_hat_,
                     "GCV": np.mean(
-                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
-                        ** 2
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n)) ** 2
                     ),
                 }
 
@@ -127,23 +118,16 @@ def beta_Sigma_hat(
                     b=mo.tcrossprod(Sigma_hat_, X, backend=backend),
                     backend=backend,
                 )
-                smoothing_matrix = mo.safe_sparse_dot(
-                    a=X, b=temp, backend=backend
-                )
-                y_hat = mo.safe_sparse_dot(
-                    a=smoothing_matrix, b=y, backend=backend
-                )
+                smoothing_matrix = mo.safe_sparse_dot(a=X, b=temp, backend=backend)
+                y_hat = mo.safe_sparse_dot(a=smoothing_matrix, b=y, backend=backend)
 
                 return {
                     "beta_hat": beta_hat_,
                     "Sigma_hat": Sigma_hat_,
                     "GCV": np.mean(
-                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
-                        ** 2
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n)) ** 2
                     ),
-                    "preds": mo.safe_sparse_dot(
-                        a=X_star, b=beta_hat_, backend=backend
-                    ),
+                    "preds": mo.safe_sparse_dot(a=X_star, b=beta_hat_, backend=backend),
                     "preds_std": np.sqrt(
                         np.diag(
                             mo.safe_sparse_dot(
@@ -172,18 +156,13 @@ def beta_Sigma_hat(
                     b=mo.tcrossprod(x=Sigma_hat_, y=X, backend=backend),
                     backend=backend,
                 )
-                smoothing_matrix = mo.safe_sparse_dot(
-                    a=X, b=temp, backend=backend
-                )
-                y_hat = mo.safe_sparse_dot(
-                    a=smoothing_matrix, b=y, backend=backend
-                )
+                smoothing_matrix = mo.safe_sparse_dot(a=X, b=temp, backend=backend)
+                y_hat = mo.safe_sparse_dot(a=smoothing_matrix, b=y, backend=backend)
 
                 return {
                     "beta_hat": beta_hat_,
                     "GCV": np.mean(
-                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
-                        ** 2
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n)) ** 2
                     ),
                 }
 
@@ -200,22 +179,15 @@ def beta_Sigma_hat(
                         b=mo.tcrossprod(x=Sigma_hat_, y=X, backend=backend),
                         backend=backend,
                     )
-                    smoothing_matrix = mo.safe_sparse_dot(
-                        a=X, b=temp, backend=backend
-                    )
-                    y_hat = mo.safe_sparse_dot(
-                        a=smoothing_matrix, b=y, backend=backend
-                    )
+                    smoothing_matrix = mo.safe_sparse_dot(a=X, b=temp, backend=backend)
+                    y_hat = mo.safe_sparse_dot(a=smoothing_matrix, b=y, backend=backend)
 
                 return {
                     "beta_hat": beta_hat_,
                     "GCV": np.mean(
-                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
-                        ** 2
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n)) ** 2
                     ),
-                    "preds": mo.safe_sparse_dot(
-                        a=X_star, b=beta_hat_, backend=backend
-                    ),
+                    "preds": mo.safe_sparse_dot(a=X_star, b=beta_hat_, backend=backend),
                 }
 
     else:  # X is None | y is None  # predict
@@ -225,16 +197,12 @@ def beta_Sigma_hat(
             assert Sigma_hat_ is not None
 
             return {
-                "preds": mo.safe_sparse_dot(
-                    a=X_star, b=beta_hat_, backend=backend
-                ),
+                "preds": mo.safe_sparse_dot(a=X_star, b=beta_hat_, backend=backend),
                 "preds_std": np.sqrt(
                     np.diag(
                         mo.safe_sparse_dot(
                             a=X_star,
-                            b=mo.tcrossprod(
-                                x=Sigma_hat_, y=X_star, backend=backend
-                            ),
+                            b=mo.tcrossprod(x=Sigma_hat_, y=X_star, backend=backend),
                             backend=backend,
                         )
                     )
@@ -242,11 +210,7 @@ def beta_Sigma_hat(
             }
 
         else:
-            return {
-                "preds": mo.safe_sparse_dot(
-                    a=X_star, b=beta_hat_, backend=backend
-                )
-            }
+            return {"preds": mo.safe_sparse_dot(a=X_star, b=beta_hat_, backend=backend)}
 
 
 # beta and Sigma in Bayesian Ridge Regression 1
@@ -276,9 +240,7 @@ def beta_Sigma_hat_rvfl(
         if fit_intercept == True:
             X = mo.cbind(np.ones(n), X, backend=backend)
             if X_star is not None:
-                X_star = mo.cbind(
-                    x=np.ones(X_star.shape[0]), y=X_star, backend=backend
-                )
+                X_star = mo.cbind(x=np.ones(X_star.shape[0]), y=X_star, backend=backend)
 
         s2 = s**2
         lambda_ = (sigma**2) / s2
@@ -304,19 +266,14 @@ def beta_Sigma_hat_rvfl(
                     b=mo.tcrossprod(x=Sigma_hat_, y=X, backend=backend),
                     backend=backend,
                 )
-                smoothing_matrix = mo.safe_sparse_dot(
-                    a=X, b=temp, backend=backend
-                )
-                y_hat = mo.safe_sparse_dot(
-                    a=smoothing_matrix, b=y, backend=backend
-                )
+                smoothing_matrix = mo.safe_sparse_dot(a=X, b=temp, backend=backend)
+                y_hat = mo.safe_sparse_dot(a=smoothing_matrix, b=y, backend=backend)
 
                 return {
                     "beta_hat": beta_hat_,
                     "Sigma_hat": Sigma_hat_,
                     "GCV": np.mean(
-                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
-                        ** 2
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n)) ** 2
                     ),
                 }
 
@@ -343,23 +300,16 @@ def beta_Sigma_hat_rvfl(
                     b=mo.tcrossprod(x=Sigma_hat_, y=X, backend=backend),
                     backend=backend,
                 )
-                smoothing_matrix = mo.safe_sparse_dot(
-                    a=X, b=temp, backend=backend
-                )
-                y_hat = mo.safe_sparse_dot(
-                    a=smoothing_matrix, b=y, backend=backend
-                )
+                smoothing_matrix = mo.safe_sparse_dot(a=X, b=temp, backend=backend)
+                y_hat = mo.safe_sparse_dot(a=smoothing_matrix, b=y, backend=backend)
 
                 return {
                     "beta_hat": beta_hat_,
                     "Sigma_hat": Sigma_hat_,
                     "GCV": np.mean(
-                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
-                        ** 2
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n)) ** 2
                     ),
-                    "preds": mo.safe_sparse_dot(
-                        a=X_star, b=beta_hat_, backend=backend
-                    ),
+                    "preds": mo.safe_sparse_dot(a=X_star, b=beta_hat_, backend=backend),
                     "preds_std": np.sqrt(
                         np.diag(
                             mo.safe_sparse_dot(
@@ -383,27 +333,20 @@ def beta_Sigma_hat_rvfl(
                 )
                 Sigma_hat_ = s2 * (
                     np.eye(X.shape[1])
-                    - mo.safe_sparse_dot(
-                        a=Cn, b=mo.crossprod(X), backend=backend
-                    )
+                    - mo.safe_sparse_dot(a=Cn, b=mo.crossprod(X), backend=backend)
                 )
                 temp = mo.safe_sparse_dot(
                     a=Cn,
                     b=mo.tcrossprod(x=Sigma_hat_, y=X, backend=backend),
                     backend=backend,
                 )
-                smoothing_matrix = mo.safe_sparse_dot(
-                    a=X, b=temp, backend=backend
-                )
-                y_hat = mo.safe_sparse_dot(
-                    a=smoothing_matrix, b=y, backend=backend
-                )
+                smoothing_matrix = mo.safe_sparse_dot(a=X, b=temp, backend=backend)
+                y_hat = mo.safe_sparse_dot(a=smoothing_matrix, b=y, backend=backend)
 
                 return {
                     "beta_hat": beta_hat_,
                     "GCV": np.mean(
-                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
-                        ** 2
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n)) ** 2
                     ),
                 }
 
@@ -423,22 +366,15 @@ def beta_Sigma_hat_rvfl(
                         b=mo.tcrossprod(x=Sigma_hat_, y=X, backend=backend),
                         backend=backend,
                     )
-                    smoothing_matrix = mo.safe_sparse_dot(
-                        a=X, b=temp, backend=backend
-                    )
-                    y_hat = mo.safe_sparse_dot(
-                        a=smoothing_matrix, b=y, backend=backend
-                    )
+                    smoothing_matrix = mo.safe_sparse_dot(a=X, b=temp, backend=backend)
+                    y_hat = mo.safe_sparse_dot(a=smoothing_matrix, b=y, backend=backend)
 
                 return {
                     "beta_hat": beta_hat_,
                     "GCV": np.mean(
-                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
-                        ** 2
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n)) ** 2
                     ),
-                    "preds": mo.safe_sparse_dot(
-                        a=X_star, b=beta_hat_, backend=backend
-                    ),
+                    "preds": mo.safe_sparse_dot(a=X_star, b=beta_hat_, backend=backend),
                 }
 
     else:  # X is None | y is None  # predict
@@ -453,9 +389,7 @@ def beta_Sigma_hat_rvfl(
                     np.diag(
                         mo.safe_sparse_dot(
                             a=X_star,
-                            b=mo.tcrossprod(
-                                x=Sigma_hat_, y=X_star, backend=backend
-                            ),
+                            b=mo.tcrossprod(x=Sigma_hat_, y=X_star, backend=backend),
                             backend=backend,
                         )
                         + (sigma**2) * np.eye(X_star.shape[0])
@@ -464,11 +398,7 @@ def beta_Sigma_hat_rvfl(
             }
 
         else:
-            return {
-                "preds": mo.safe_sparse_dot(
-                    a=X_star, b=beta_hat_, backend=backend
-                )
-            }
+            return {"preds": mo.safe_sparse_dot(a=X_star, b=beta_hat_, backend=backend)}
 
 
 # beta and Sigma in Bayesian Ridge Regression 2
@@ -524,9 +454,7 @@ def beta_Sigma_hat_rvfl2(
             )
 
             if X_star is not None:
-                X_star = mo.cbind(
-                    x=np.ones(X_star.shape[0]), y=X_star, backend=backend
-                )
+                X_star = mo.cbind(x=np.ones(X_star.shape[0]), y=X_star, backend=backend)
         else:
             # rename to invCn
             Cn = (
@@ -560,9 +488,7 @@ def beta_Sigma_hat_rvfl2(
         if return_cov == True:
             if X_star is None:
                 return {
-                    "beta_hat": mo.safe_sparse_dot(
-                        a=temp, b=y, backend=backend
-                    ),
+                    "beta_hat": mo.safe_sparse_dot(a=temp, b=y, backend=backend),
                     "Sigma_hat": Sigma
                     - mo.safe_sparse_dot(
                         a=temp,
@@ -570,8 +496,7 @@ def beta_Sigma_hat_rvfl2(
                         backend=backend,
                     ),
                     "GCV": np.mean(
-                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
-                        ** 2
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n)) ** 2
                     ),
                 }
 
@@ -590,12 +515,9 @@ def beta_Sigma_hat_rvfl2(
                     "beta_hat": beta_hat_,
                     "Sigma_hat": Sigma_hat_,
                     "GCV": np.mean(
-                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
-                        ** 2
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n)) ** 2
                     ),
-                    "preds": mo.safe_sparse_dot(
-                        a=X_star, b=beta_hat_, backend=backend
-                    ),
+                    "preds": mo.safe_sparse_dot(a=X_star, b=beta_hat_, backend=backend),
                     "preds_std": np.sqrt(
                         np.diag(
                             mo.safe_sparse_dot(
@@ -613,12 +535,9 @@ def beta_Sigma_hat_rvfl2(
         else:  # return_cov == False
             if X_star is None:
                 return {
-                    "beta_hat": mo.safe_sparse_dot(
-                        a=temp, b=y, backend=backend
-                    ),
+                    "beta_hat": mo.safe_sparse_dot(a=temp, b=y, backend=backend),
                     "GCV": np.mean(
-                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
-                        ** 2
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n)) ** 2
                     ),
                 }
 
@@ -629,12 +548,9 @@ def beta_Sigma_hat_rvfl2(
                 return {
                     "beta_hat": beta_hat_,
                     "GCV": np.mean(
-                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n))
-                        ** 2
+                        ((y - y_hat) / (1 - np.trace(smoothing_matrix) / n)) ** 2
                     ),
-                    "preds": mo.safe_sparse_dot(
-                        a=X_star, b=beta_hat_, backend=backend
-                    ),
+                    "preds": mo.safe_sparse_dot(a=X_star, b=beta_hat_, backend=backend),
                 }
 
     else:  # (X is None) | (y is None) # predict
@@ -644,16 +560,12 @@ def beta_Sigma_hat_rvfl2(
             assert Sigma_hat_ is not None
 
             return {
-                "preds": mo.safe_sparse_dot(
-                    a=X_star, b=beta_hat_, backend=backend
-                ),
+                "preds": mo.safe_sparse_dot(a=X_star, b=beta_hat_, backend=backend),
                 "preds_std": np.sqrt(
                     np.diag(
                         mo.safe_sparse_dot(
                             a=X_star,
-                            b=mo.tcrossprod(
-                                Sigma_hat_, X_star, backend=backend
-                            ),
+                            b=mo.tcrossprod(Sigma_hat_, X_star, backend=backend),
                             backend=backend,
                         )
                         + (sigma**2) * np.eye(X_star.shape[0])
@@ -662,8 +574,4 @@ def beta_Sigma_hat_rvfl2(
             }
 
         else:
-            return {
-                "preds": mo.safe_sparse_dot(
-                    a=X_star, b=beta_hat_, backend=backend
-                )
-            }
+            return {"preds": mo.safe_sparse_dot(a=X_star, b=beta_hat_, backend=backend)}

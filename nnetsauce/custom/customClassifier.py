@@ -179,9 +179,7 @@ class CustomClassifier(Custom, ClassifierMixin):
         self.intercept_ = None
         self.type_fit = "classification"
         if self.level is not None:
-            self.obj = PredictionSet(
-                self.obj, level=self.level, method=self.pi_method
-            )
+            self.obj = PredictionSet(self.obj, level=self.level, method=self.pi_method)
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit custom model to training data (X, y).
@@ -327,9 +325,7 @@ class CustomClassifier(Custom, ClassifierMixin):
                 np.ones(n_features).reshape(1, n_features),
             )
 
-            return (
-                self.obj.predict(self.cook_test_set(new_X, **kwargs), **kwargs)
-            )[0]
+            return (self.obj.predict(self.cook_test_set(new_X, **kwargs), **kwargs))[0]
 
         return self.obj.predict(self.cook_test_set(X, **kwargs), **kwargs)
 
@@ -358,9 +354,7 @@ class CustomClassifier(Custom, ClassifierMixin):
             )
 
             return (
-                self.obj.predict_proba(
-                    self.cook_test_set(new_X, **kwargs), **kwargs
-                )
+                self.obj.predict_proba(self.cook_test_set(new_X, **kwargs), **kwargs)
             )[0]
 
         return self.obj.predict_proba(self.cook_test_set(X, **kwargs), **kwargs)

@@ -162,7 +162,7 @@ def generate_hammersley(
             ]
             yield points
 
-    return np.array(list(func_hammersley()))[1: (n_points + 1), :].transpose()
+    return np.array(list(func_hammersley()))[1 : (n_points + 1), :].transpose()
 
 
 # halton numbers' generation (python)
@@ -175,11 +175,9 @@ def generate_halton(
             points = [get_phi(primes[d], k) for d in moves.range(n_dims)]
             yield points
 
-    return np.array(list(func_halton()))[1: (n_points + 1), :].transpose()
+    return np.array(list(func_halton()))[1 : (n_points + 1), :].transpose()
 
 
 # sobol numbers' generation (python)
-def generate_sobol(
-    n_dims=2, n_points=10, seed=None
-):  # seed, just for 'compatibility'
+def generate_sobol(n_dims=2, n_points=10, seed=None):  # seed, just for 'compatibility'
     return np.array(i4_sobol_generate(m=n_dims, n=n_points, skip=2))

@@ -406,9 +406,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
 
             for name, model in tqdm(self.classifiers):  # do parallel exec
 
-                other_args = (
-                    {}
-                )  # use this trick for `random_state` too --> refactor
+                other_args = {}  # use this trick for `random_state` too --> refactor
                 try:
                     if (
                         "n_jobs" in model().get_params().keys()
@@ -693,9 +691,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                     "Time Taken": TIME,
                 }
             )
-        scores = scores.sort_values(by=self.sort_by, ascending=False).set_index(
-            "Model"
-        )
+        scores = scores.sort_values(by=self.sort_by, ascending=False).set_index("Model")
 
         self.best_model_ = self.models_[scores.index[0]]
 
