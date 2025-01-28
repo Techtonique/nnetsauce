@@ -331,6 +331,9 @@ class MTS(Base):
 
         self.init_n_series_ = X.shape[1]
 
+        self.input_dates = None
+        self.df_ = None
+
         if isinstance(X, pd.DataFrame) is False:
             # input data set is a numpy array
             if xreg is None:
@@ -1307,13 +1310,18 @@ class MTS(Base):
             if verbose == 1:
                 print(f"TRAIN: {train_index}")
                 print(f"TEST: {test_index}")
+                print("X", X)
 
             if isinstance(X, pd.DataFrame):
+                print(X.iloc[train_index, :])
                 self.fit(X.iloc[train_index, :], xreg=xreg, **kwargs)
                 X_test = X.iloc[test_index, :]
+                print(X_test)
             else:
+                print(X[train_index, :])
                 self.fit(X[train_index, :], xreg=xreg, **kwargs)
                 X_test = X[test_index, :]
+                print(X_test)
             X_pred = self.predict(h=int(len(test_index)), level=level, **kwargs)
 
             errors.append(err_func(X_test, X_pred, scoring))
