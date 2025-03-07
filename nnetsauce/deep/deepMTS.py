@@ -8,7 +8,7 @@ from ..mts import MTS
 
 
 class DeepMTS(MTS):
-    """Univariate and multivariate time series (DeepMTS) forecasting with Quasi-Randomized networks (Work in progress /!\)
+    """Univariate and multivariate time series (DeepMTS) forecasting with Quasi-Randomized networks (Work in progress)
 
     Parameters:
 

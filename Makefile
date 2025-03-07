@@ -75,7 +75,7 @@ dist: clean ## builds source and wheel package
 	ls -l dist
 
 install: clean ## install the package to the active Python's site-packages
-	pip install -e .
+	uv pip install -e .
 
 build-site: docs ## export mkdocs website to a folder		
 	cp -rf nnetsauce-docs/* ../../Pro_Website/Techtonique.github.io/nnetsauce

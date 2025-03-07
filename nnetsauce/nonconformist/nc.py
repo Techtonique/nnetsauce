@@ -98,11 +98,6 @@ class RegressionErrFunc(object):
 
 class InverseProbabilityErrFunc(ClassificationErrFunc):
     """Calculates the probability of not predicting the correct class.
-
-    For each correct output in ``y``, nonconformity is defined as
-
-    .. math::
-        1 - \hat{P}(y_i | x) \, .
     """
 
     def __init__(self):
@@ -121,11 +116,6 @@ class InverseProbabilityErrFunc(ClassificationErrFunc):
 class MarginErrFunc(ClassificationErrFunc):
     """
     Calculates the margin error.
-
-    For each correct output in ``y``, nonconformity is defined as
-
-    .. math::
-        0.5 - \dfrac{\hat{P}(y_i | x) - max_{y \, != \, y_i} \hat{P}(y | x)}{2}
     """
 
     def __init__(self):
@@ -144,11 +134,6 @@ class MarginErrFunc(ClassificationErrFunc):
 
 class AbsErrorErrFunc(RegressionErrFunc):
     """Calculates absolute error nonconformity for regression problems.
-
-    For each correct output in ``y``, nonconformity is defined as
-
-    .. math::
-        | y_i - \hat{y}_i |
     """
 
     def __init__(self):
@@ -167,17 +152,6 @@ class AbsErrorErrFunc(RegressionErrFunc):
 
 class SignErrorErrFunc(RegressionErrFunc):
     """Calculates signed error nonconformity for regression problems.
-
-    For each correct output in ``y``, nonconformity is defined as
-
-    .. math::
-        y_i - \hat{y}_i
-
-    References
-    ----------
-    .. [1] Linusson, Henrik, Ulf Johansson, and Tuve Lofstrom.
-        Signed-error conformal regression. Pacific-Asia Conference on Knowledge
-        Discovery and Data Mining. Springer International Publishing, 2014.
     """
 
     def __init__(self):
@@ -205,12 +179,6 @@ class SignErrorErrFunc(RegressionErrFunc):
 # CQR symmetric error function
 class QuantileRegErrFunc(RegressionErrFunc):
     """Calculates conformalized quantile regression error.
-
-    For each correct output in ``y``, nonconformity is defined as
-
-    .. math::
-        max{\hat{q}_low - y, y - \hat{q}_high}
-
     """
 
     def __init__(self):
@@ -234,13 +202,6 @@ class QuantileRegErrFunc(RegressionErrFunc):
 # CQR asymmetric error function
 class QuantileRegAsymmetricErrFunc(RegressionErrFunc):
     """Calculates conformalized quantile regression asymmetric error function.
-
-    For each correct output in ``y``, nonconformity is defined as
-
-    .. math::
-        E_low = \hat{q}_low - y
-        E_high = y - \hat{q}_high
-
     """
 
     def __init__(self):

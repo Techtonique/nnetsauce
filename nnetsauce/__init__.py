@@ -26,6 +26,7 @@ from .quantile.quantileregression import QuantileRegressor
 from .quantile.quantileclassification import QuantileClassifier
 from .randombag.randomBagClassifier import RandomBagClassifier
 from .randombag.randomBagRegressor import RandomBagRegressor
+from .ridge.ridge import RidgeRegressor
 from .ridge2.ridge2Classifier import Ridge2Classifier
 from .ridge2.ridge2Regressor import Ridge2Regressor
 from .ridge2.ridge2MultitaskClassifier import Ridge2MultitaskClassifier
@@ -70,6 +71,7 @@ __all__ = [
     "RandomBagClassifier",
     "RegressorUpdater",
     "ClassifierUpdater",
+    "RidgeRegressor",
     "Ridge2Regressor",
     "Ridge2Classifier",
     "Ridge2MultitaskClassifier",
