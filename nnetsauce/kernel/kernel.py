@@ -1,3 +1,4 @@
+from scipy.special import softmax
 from sklearn.preprocessing import StandardScaler
 from sklearn.base import BaseEstimator, RegressorMixin
 import numpy as np
@@ -5,6 +6,7 @@ import numpy as np
 try:
     import jax.numpy as jnp
     from jax.scipy.special import gammaln, kv
+    from jax.nn import softmax as jaxsoftmax
     from jax import jit
     JAX_AVAILABLE = True
 except ImportError:
@@ -152,7 +154,7 @@ class KernelRidge(BaseEstimator, RegressorMixin):
 
         return self
 
-    def predict(self, X):
+    def predict(self, X, probs=False):
         """
         Predict using the Kernel Ridge Regression model.
 
@@ -167,9 +169,21 @@ class KernelRidge(BaseEstimator, RegressorMixin):
         X = self.scaler.transform(X)
         K = self._get_kernel(X, self.X_fit_)
         if self.backend == "gpu":
-            return jnp.dot(K, self.dual_coef_) + self.y_mean_
+            preds = jnp.dot(K, self.dual_coef_) + self.y_mean_
+            if probs:                
+                # Compute similarity to self.X_fit_ 
+                similarities = jnp.dot(preds, self.X_fit_.T)  # Shape: (n_samples, n_fit_)
+                # Apply softmax to get probabilities
+                return jaxsoftmax(similarities, axis=1)
+            return preds 
         else:
-            return np.dot(K, self.dual_coef_) + self.y_mean_
+            preds = np.dot(K, self.dual_coef_) + self.y_mean_
+            if probs:
+                # Compute similarity to self.X_fit_ 
+                similarities = np.dot(preds, self.X_fit_.T)  # Shape: (n_samples, n_fit_)
+                # Apply softmax to get probabilities
+                return softmax(similarities, axis=1)
+            return preds 
 
     def partial_fit(self, X, y):
         """
