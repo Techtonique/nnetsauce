@@ -112,12 +112,18 @@ class KernelRidge(BaseEstimator, RegressorMixin):
         # Standardize the inputs
         X = self.scaler.fit_transform(X)
         self.X_fit_ = X
+
+        # Center the response
+        self.y_mean_ = np.mean(y)
+        y_centered = y - self.y_mean_
+
         n_samples = X.shape[0]
 
         # Compute the kernel matrix
         K = self._get_kernel(X, X)
         self.K_ = K
-        self.y_fit_ = y
+        self.y_fit_ = y_centered
+
         if isinstance(self.alpha, (list, np.ndarray)):
             # If alpha is a list or array, compute LOOE for each alpha
             self.alphas_ = self.alpha  # Store the list of alphas
@@ -128,7 +134,7 @@ class KernelRidge(BaseEstimator, RegressorMixin):
                 G = K + alpha * np.eye(n_samples)
                 G_inv = np.linalg.inv(G)
                 diag_G_inv = np.diag(G_inv)
-                dual_coef = np.linalg.solve(G, y)
+                dual_coef = np.linalg.solve(G, y_centered)
                 looe = np.sum((dual_coef / diag_G_inv) ** 2)  # Compute LOOE
                 self.dual_coefs_.append(dual_coef)
                 self.looe_.append(looe)
@@ -140,9 +146,9 @@ class KernelRidge(BaseEstimator, RegressorMixin):
         else:
             # If alpha is a single value, proceed as usual
             if self.backend == "gpu":
-                self.dual_coef_ = jnp.linalg.solve(K + self.alpha * jnp.eye(n_samples), y)
+                self.dual_coef_ = jnp.linalg.solve(K + self.alpha * jnp.eye(n_samples), y_centered)
             else:
-                self.dual_coef_ = np.linalg.solve(K + self.alpha * np.eye(n_samples), y)
+                self.dual_coef_ = np.linalg.solve(K + self.alpha * np.eye(n_samples), y_centered)
 
         return self
 
@@ -161,9 +167,9 @@ class KernelRidge(BaseEstimator, RegressorMixin):
         X = self.scaler.transform(X)
         K = self._get_kernel(X, self.X_fit_)
         if self.backend == "gpu":
-            return jnp.dot(K, self.dual_coef_)
+            return jnp.dot(K, self.dual_coef_) + self.y_mean_
         else:
-            return np.dot(K, self.dual_coef_)
+            return np.dot(K, self.dual_coef_) + self.y_mean_
 
     def partial_fit(self, X, y):
         """
@@ -185,7 +191,12 @@ class KernelRidge(BaseEstimator, RegressorMixin):
         if not hasattr(self, "X_fit_"):
             # Initialize with the first batch of data
             self.X_fit_ = X
-            self.y_fit_ = y
+
+            # Center the response
+            self.y_mean_ = np.mean(y)
+            y_centered = y - self.y_mean_
+            self.y_fit_ = y_centered
+
             n_samples = X.shape[0]
 
             # Compute the kernel matrix for the initial data
@@ -198,7 +209,8 @@ class KernelRidge(BaseEstimator, RegressorMixin):
                 self.dual_coef_ = np.zeros(n_samples)
         else:
             # Incrementally update with new data
-            for x_new, y_new in zip(X, y):
+            y_centered = y - self.y_mean_  # Center the new batch of responses
+            for x_new, y_new in zip(X, y_centered):
                 x_new = x_new.reshape(1, -1)  # Ensure x_new is 2D
                 k_new = self._get_kernel(self.X_fit_, x_new).flatten()
 

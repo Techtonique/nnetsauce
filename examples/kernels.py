@@ -11,11 +11,13 @@ dataset = load_diabetes()
 X, y = dataset.data, dataset.target
 
 # Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
-X_train_, X_test_, y_train_, y_test_ = train_test_split(X_train, y_train, test_size=0.7, random_state=42)
+X_train_, X_test_, y_train_, y_test_ = train_test_split(X, y, test_size=0.8, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X_test_, y_test_, test_size=0.2, random_state=42)
 
 # Initialize the KernelRidge model
-model = KernelRidge(alpha=0.1, kernel="rbf", gamma=0.1, nu=1.5).fit(X_train_, y_train_)
+model = KernelRidge(alpha=0.1, kernel="matern", gamma=0.1, nu=1.5).fit(X_train_, y_train_)
+y_pred = model.predict(X_test)
+print(f"RMSE: {np.sqrt(mean_squared_error(y_test, y_pred))}")
 
 # Incremental training using partial_fit
 batch_size = 50
@@ -49,11 +51,14 @@ X = df.drop(columns=["medv"]).values
 y = df["medv"].values
 
 # Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
-X_train_, X_test_, y_train_, y_test_ = train_test_split(X_train, y_train, test_size=0.7, random_state=42)
+X_train_, X_test_, y_train_, y_test_ = train_test_split(X, y, test_size=0.8, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X_test_, y_test_, test_size=0.2, random_state=42)
 
 # Initialize the KernelRidge model
-model = KernelRidge(alpha=0.1, kernel="rbf", gamma=0.1, nu=1.5).fit(X_train_, y_train_)
+model = KernelRidge(alpha=0.1, kernel="matern", gamma=0.1, nu=1.5).fit(X_train_, y_train_)
+y_pred = model.predict(X_test)
+print(f"RMSE: {np.sqrt(mean_squared_error(y_test, y_pred))}")
+
 # Incremental training using partial_fit
 batch_size = 50
 num_batches = X_train.shape[0] // batch_size
@@ -75,11 +80,13 @@ dataset = load_diabetes()
 X, y = dataset.data, dataset.target
 
 # Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
-X_train_, X_test_, y_train_, y_test_ = train_test_split(X_train, y_train, test_size=0.7, random_state=42)
+X_train_, X_test_, y_train_, y_test_ = train_test_split(X, y, test_size=0.8, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X_test_, y_test_, test_size=0.2, random_state=42)
 
 # Initialize the KernelRidge model
-model = KernelRidge(alpha=10**np.linspace(-10, 10, 100), kernel="rbf", gamma=0.1, nu=1.5).fit(X_train_, y_train_)
+model = KernelRidge(alpha=10**np.linspace(-3, 3, 10), kernel="matern", gamma=0.1, nu=1.5).fit(X_train_, y_train_)
+y_pred = model.predict(X_test)
+print(f"RMSE: {np.sqrt(mean_squared_error(y_test, y_pred))}")
 
 # Incremental training using partial_fit
 batch_size = 50
@@ -113,11 +120,14 @@ X = df.drop(columns=["medv"]).values
 y = df["medv"].values
 
 # Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
-X_train_, X_test_, y_train_, y_test_ = train_test_split(X_train, y_train, test_size=0.5, random_state=42)
+X_train_, X_test_, y_train_, y_test_ = train_test_split(X, y, test_size=0.8, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X_test_, y_test_, test_size=0.2, random_state=42)
 
 # Initialize the KernelRidge model
-model = KernelRidge(alpha=10**np.linspace(-10, 10, 100), kernel="rbf", gamma=0.1, nu=1.5).fit(X_train_, y_train_)
+model = KernelRidge(alpha=10**np.linspace(-3, 3, 10), kernel="matern", gamma=0.1, nu=1.5).fit(X_train_, y_train_)
+y_pred = model.predict(X_test)
+print(f"RMSE: {np.sqrt(mean_squared_error(y_test, y_pred))}")
+
 # Incremental training using partial_fit
 batch_size = 50
 num_batches = X_train.shape[0] // batch_size
