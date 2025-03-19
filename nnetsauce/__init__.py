@@ -9,6 +9,7 @@ from .deep.deepRegressor import DeepRegressor
 from .deep.deepMTS import DeepMTS
 from .glm.glmClassifier import GLMClassifier
 from .glm.glmRegressor import GLMRegressor
+from .kernel.kernel import KernelRidge
 from .lazypredict.lazydeepClassifier import LazyDeepClassifier, LazyClassifier
 from .lazypredict.lazydeepRegressor import LazyDeepRegressor, LazyRegressor
 from .lazypredict.lazydeepClassifier import LazyDeepClassifier
@@ -51,6 +52,7 @@ __all__ = [
     "Downloader",
     "GLMClassifier",
     "GLMRegressor",
+    "KernelRidge",
     "LazyClassifier",
     "LazyRegressor",
     "LazyDeepClassifier",

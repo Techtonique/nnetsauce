@@ -103,23 +103,25 @@ class RidgeRegressor(Base, RegressorMixin):
         print(f"rhs shape: {rhs.shape}")
         print(f"Vt shape: {Vt.shape}")
         
-        # Helper function to compute coefficients for a single lambda
-        def compute_coef(lambda_val):
-            div = d2 + lambda_val
-            a = (d * rhs) / div
-            return np.dot(Vt.T, a) / self.X_scale_
-        
         if np.isscalar(self.lambda_):
+            div = d2 + self.lambda_
+            a = (d * rhs) / div
             print(f"\nSingle lambda case:")
             print(f"lambda: {self.lambda_}")
-            self.coef_ = compute_coef(self.lambda_)
+            print(f"div shape: {div.shape}")
+            print(f"a shape: {a.shape}")
+            self.coef_ = np.dot(Vt.T, a) / self.X_scale_
             print(f"coef shape: {self.coef_.shape}")
         else:
-            print(f"\nMultiple lambda case:")
             coefs = []
+            print(f"\nMultiple lambda case:")
             for lambda_ in self.lambda_:
                 print(f"lambda: {lambda_}")
-                coef = compute_coef(lambda_)
+                div = d2 + lambda_
+                print(f"div shape: {div.shape}")
+                a = (d * rhs) / div
+                print(f"a shape: {a.shape}")
+                coef = np.dot(Vt.T, a) / self.X_scale_
                 print(f"coef shape: {coef.shape}")
                 coefs.append(coef)
             self.coef_ = np.array(coefs).T
@@ -167,14 +169,54 @@ class RidgeRegressor(Base, RegressorMixin):
             y_pred : array-like of shape (n_samples,)
                 Returns predicted values.
         """
-        X = np.asarray(X)
-        if X.ndim == 1:
-            X = X.reshape(1, -1)
-            
-        if np.isscalar(self.lambda_):
-            return np.dot(X, self.coef_) + self.y_mean_
+        X = self.cook_test_set(X)
+        
+        if self.backend == "cpu":
+            if np.isscalar(self.lambda_):
+                return mo.safe_sparse_dot(X, self.coef_, backend=self.backend) + self.y_mean_
+            else:
+                return jnp.array([
+                    mo.safe_sparse_dot(X, coef, backend=self.backend) + self.y_mean_
+                    for coef in self.coef_.T
+                ]).T
         else:
-            return np.array([
-                np.dot(X, coef) + self.y_mean_
-                for coef in self.coef_.T
-            ]).T 
+            if np.isscalar(self.lambda_):
+                return mo.safe_sparse_dot(X, self.coef_, backend=self.backend) + self.y_mean_
+            else:
+                return jnp.array([
+                    mo.safe_sparse_dot(X, coef, backend=self.backend) + self.y_mean_
+                    for coef in self.coef_.T
+                ]).T
+                
+    def decision_function(self, X):
+        """Compute the decision function of X.
+        
+        Parameters:
+            X : array-like of shape (n_samples, n_features)
+                Samples
+                
+        Returns:
+            decision : array-like of shape (n_samples,) or (n_samples, n_lambdas)
+                Decision function of the input samples. The order of outputs is the same
+                as that of the provided lambda_ values. For a single lambda, returns
+                array of shape (n_samples,). For multiple lambdas, returns array of shape
+                (n_samples, n_lambdas).
+        """
+        X = self.cook_test_set(X)
+        
+        if self.backend == "cpu":
+            if np.isscalar(self.lambda_):
+                return mo.safe_sparse_dot(X, self.coef_, backend=self.backend)
+            else:
+                return np.array([
+                    mo.safe_sparse_dot(X, coef, backend=self.backend)
+                    for coef in self.coef_.T
+                ]).T
+        else:
+            if np.isscalar(self.lambda_):
+                return mo.safe_sparse_dot(X, self.coef_, backend=self.backend)
+            else:
+                return jnp.array([
+                    mo.safe_sparse_dot(X, coef, backend=self.backend)
+                    for coef in self.coef_.T
+                ]).T 
