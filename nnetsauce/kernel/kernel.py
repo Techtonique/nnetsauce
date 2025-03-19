@@ -32,6 +32,7 @@ class KernelRidge(BaseEstimator, RegressorMixin):
 
     def __init__(self, alpha=1.0, kernel="rbf", gamma=None, nu=1.5, length_scale=1.0, backend="cpu"):
         self.alpha = alpha
+        self.alpha_ = alpha 
         self.kernel = kernel
         self.gamma = gamma
         self.nu = nu
@@ -115,7 +116,8 @@ class KernelRidge(BaseEstimator, RegressorMixin):
 
         # Compute the kernel matrix
         K = self._get_kernel(X, X)
-
+        self.K_ = K
+        self.y_fit_ = y
         if isinstance(self.alpha, (list, np.ndarray)):
             # If alpha is a list or array, compute LOOE for each alpha
             self.alphas_ = self.alpha  # Store the list of alphas
@@ -185,42 +187,59 @@ class KernelRidge(BaseEstimator, RegressorMixin):
             self.X_fit_ = X
             self.y_fit_ = y
             n_samples = X.shape[0]
+
             # Compute the kernel matrix for the initial data
             self.K_ = self._get_kernel(X, X)
-            # Initialize coefficients
-            if self.backend == "gpu":
-                self.dual_coef_ = jnp.zeros(n_samples)
+
+            # Initialize dual coefficients for each alpha
+            if isinstance(self.alpha, (list, np.ndarray)):
+                self.dual_coefs_ = [np.zeros(n_samples) for _ in self.alpha]
             else:
                 self.dual_coef_ = np.zeros(n_samples)
-            # Update coefficients for the initial data
-            for i in range(n_samples):
-                k_i = self.K_[:, i]
-                gamma_i = 1 / (self.K_[i, i] + self.alpha)
-                self.dual_coef_[i] += gamma_i * (y[i] - np.dot(self.dual_coef_, k_i))
         else:
             # Incrementally update with new data
             for x_new, y_new in zip(X, y):
                 x_new = x_new.reshape(1, -1)  # Ensure x_new is 2D
                 k_new = self._get_kernel(self.X_fit_, x_new).flatten()
+
                 # Compute the kernel value for the new data point
                 k_self = self._get_kernel(x_new, x_new).item()
-                # Update the dual coefficients
-                gamma_new = 1 / (k_self + self.alpha)
-                residual = y_new - np.dot(self.dual_coef_, k_new)
-                self.dual_coef_ = np.append(self.dual_coef_, gamma_new * residual)
-                # Update the kernel matrix
-                if self.backend == "gpu":
-                    self.K_ = jnp.block([
-                        [self.K_, k_new[:, None]],
-                        [k_new[None, :], jnp.array([[k_self]])]
-                    ])
+
+                if isinstance(self.alpha, (list, np.ndarray)):
+                    # Update dual coefficients for each alpha
+                    for idx, alpha in enumerate(self.alpha):
+                        gamma_new = 1 / (k_self + alpha)
+                        residual = y_new - np.dot(self.dual_coefs_[idx], k_new)
+                        self.dual_coefs_[idx] = np.append(self.dual_coefs_[idx], gamma_new * residual)
                 else:
-                    self.K_ = np.block([
-                        [self.K_, k_new[:, None]],
-                        [k_new[None, :], np.array([[k_self]])]
-                    ])
-                # Update the stored data (THINK about this and RAM usage)
+                    # Update dual coefficients for a single alpha
+                    gamma_new = 1 / (k_self + self.alpha)
+                    residual = y_new - np.dot(self.dual_coef_, k_new)
+                    self.dual_coef_ = np.append(self.dual_coef_, gamma_new * residual)
+
+                # Update the kernel matrix
+                self.K_ = np.block([
+                    [self.K_, k_new[:, None]],
+                    [k_new[None, :], np.array([[k_self]])]
+                ])
+
+                # Update the stored data
                 self.X_fit_ = np.vstack([self.X_fit_, x_new])
                 self.y_fit_ = np.append(self.y_fit_, y_new)
+
+        # Select the best alpha based on LOOE after the batch
+        if isinstance(self.alpha, (list, np.ndarray)):
+            self.looe_ = []
+            for idx, alpha in enumerate(self.alpha):
+                G = self.K_ + alpha * np.eye(self.K_.shape[0])
+                G_inv = np.linalg.inv(G)
+                diag_G_inv = np.diag(G_inv)
+                looe = np.sum((self.dual_coefs_[idx] / diag_G_inv) ** 2)
+                self.looe_.append(looe)
+
+            # Select the best alpha
+            best_index = np.argmin(self.looe_)
+            self.alpha_ = self.alpha[best_index]
+            self.dual_coef_ = self.dual_coefs_[best_index]
 
         return self
