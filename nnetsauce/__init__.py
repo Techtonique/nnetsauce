@@ -9,6 +9,7 @@ from .deep.deepRegressor import DeepRegressor
 from .deep.deepMTS import DeepMTS
 from .glm.glmClassifier import GLMClassifier
 from .glm.glmRegressor import GLMRegressor
+from .kernel.kernel import KernelRidge
 from .lazypredict.lazydeepClassifier import LazyDeepClassifier, LazyClassifier
 from .lazypredict.lazydeepRegressor import LazyDeepRegressor, LazyRegressor
 from .lazypredict.lazydeepClassifier import LazyDeepClassifier
@@ -26,6 +27,7 @@ from .quantile.quantileregression import QuantileRegressor
 from .quantile.quantileclassification import QuantileClassifier
 from .randombag.randomBagClassifier import RandomBagClassifier
 from .randombag.randomBagRegressor import RandomBagRegressor
+from .ridge.ridge import RidgeRegressor
 from .ridge2.ridge2Classifier import Ridge2Classifier
 from .ridge2.ridge2Regressor import Ridge2Regressor
 from .ridge2.ridge2MultitaskClassifier import Ridge2MultitaskClassifier
@@ -50,6 +52,7 @@ __all__ = [
     "Downloader",
     "GLMClassifier",
     "GLMRegressor",
+    "KernelRidge",
     "LazyClassifier",
     "LazyRegressor",
     "LazyDeepClassifier",
@@ -70,6 +73,7 @@ __all__ = [
     "RandomBagClassifier",
     "RegressorUpdater",
     "ClassifierUpdater",
+    "RidgeRegressor",
     "Ridge2Regressor",
     "Ridge2Classifier",
     "Ridge2MultitaskClassifier",
