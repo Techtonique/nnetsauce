@@ -38,7 +38,7 @@ def flatten(x):
 # check if the response contains only integers
 def is_factor(y):
     # return not np.mod(y, 1).any()
-    return np.issubdtype(y.dtype, np.integer)
+    return np.issubdtype(np.asarray(y).dtype, np.integer)
 
 
 # check if x is float
