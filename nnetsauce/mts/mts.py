@@ -75,6 +75,7 @@ class MTS(Base):
 
         lags: int.
             number of lags used for each time series.
+            If string, lags must be one of 'auto-AIC', 'auto-AICc', or 'auto-BIC'.
 
         type_pi: str.
             type of prediction interval; currently:
@@ -269,6 +270,13 @@ class MTS(Base):
             seed=seed,
             backend=backend,
         )
+
+        # Add validation for lags parameter
+        if isinstance(lags, str):
+            assert lags in ("auto-AIC", "auto-AICc", "auto-BIC"), \
+                "if string, lags must be one of 'auto-AIC', 'auto-AICc', or 'auto-BIC'"
+        else:
+            assert int(lags) == lags, "if numeric, lags parameter should be an integer"
 
         self.obj = obj
         self.n_series = None
