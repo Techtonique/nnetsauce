@@ -273,7 +273,7 @@ class MTS(Base):
 
         # Add validation for lags parameter
         if isinstance(lags, str):
-            assert lags in ("auto-AIC", "auto-AICc", "auto-BIC"), \
+            assert lags in ("AIC", "AICc", "BIC"), \
                 "if string, lags must be one of 'auto-AIC', 'auto-AICc', or 'auto-BIC'"
         else:
             assert int(lags) == lags, "if numeric, lags parameter should be an integer"
@@ -338,6 +338,53 @@ class MTS(Base):
         """
 
         self.init_n_series_ = X.shape[1]
+
+        # Automatic lag selection if requested
+        if isinstance(self.lags, str):
+            max_lags = min(25, X.shape[0] // 4)
+            best_ic = float('inf')
+            best_lags = 1
+
+            if self.verbose:
+                print(f"\nSelecting optimal number of lags using {self.lags}...")
+                iterator = tqdm(range(1, max_lags + 1))
+            else:
+                iterator = range(1, max_lags + 1)
+
+            for lag in iterator:
+                # Try current lag value
+                if self.init_n_series_ > 1:
+                    mts_input = ts.create_train_inputs(X[::-1], lag)
+                else:
+                    mts_input = ts.create_train_inputs(X.reshape(-1, 1)[::-1], lag)
+
+                # Cook training set and fit model
+                dummy_y, scaled_Z = self.cook_training_set(y=np.ones(mts_input[0].shape[0]),
+                                                           X=mts_input[1])
+                residuals_ = []
+
+                for i in range(self.init_n_series_):
+                    y_mean = np.mean(mts_input[0][:, i])
+                    centered_y_i = mts_input[0][:, i] - y_mean
+                    self.obj.fit(X=scaled_Z, y=centered_y_i)
+                    residuals_.append(
+                        (centered_y_i - self.obj.predict(scaled_Z)).tolist()
+                    )
+
+                self.residuals_ = np.asarray(residuals_).T
+                ic = self._compute_information_criterion(criterion=self.lags)
+
+                if self.verbose:
+                    print(f"Trying lags={lag}, {self.lags}={ic:.2f}")
+
+                if ic < best_ic:
+                    best_ic = ic
+                    best_lags = lag
+
+            if self.verbose:
+                print(f"\nSelected {best_lags} lags with {self.lags}={best_ic:.2f}")
+
+            self.lags = best_lags
 
         self.input_dates = None
         self.df_ = None
@@ -1332,3 +1379,36 @@ class MTS(Base):
         res = np.asarray(errors)
 
         return res, describe(res)
+
+    def _compute_information_criterion(self, criterion="AIC"):
+        """Compute information criterion using existing residuals
+        
+        Parameters
+        ----------
+        criterion : str
+            One of 'AIC', 'AICc', or 'BIC'
+            
+        Returns
+        -------
+        float
+            Information criterion value
+        """
+        # Get dimensions
+        n_obs = self.residuals_.shape[0]
+        n_features = self.init_n_series_ * self.lags
+        n_params = (n_features * self.n_hidden_features + 
+                    self.n_hidden_features * self.init_n_series_)
+        
+        # Compute RSS using existing residuals
+        rss = np.sum(self.residuals_**2)
+        
+        # Compute criterion
+        if criterion == "AIC":
+            ic = n_obs * np.log(rss/n_obs) + 2 * n_params
+        elif criterion == "AICc":
+            ic = n_obs * np.log(rss/n_obs) + 2 * n_params * (n_obs/(n_obs - n_params - 1))
+        else:  # BIC
+            ic = n_obs * np.log(rss/n_obs) + n_params * np.log(n_obs)
+        
+        return ic
+
