@@ -75,7 +75,7 @@ class MTS(Base):
 
         lags: int.
             number of lags used for each time series.
-            If string, lags must be one of 'auto-AIC', 'auto-AICc', or 'auto-BIC'.
+            If string, lags must be one of 'AIC', 'AICc', or 'BIC'.
 
         type_pi: str.
             type of prediction interval; currently:
@@ -253,7 +253,6 @@ class MTS(Base):
         verbose=0,
         show_progress=True,
     ):
-        assert int(lags) == lags, "parameter 'lags' should be an integer"
 
         super().__init__(
             n_hidden_features=n_hidden_features,
@@ -273,8 +272,11 @@ class MTS(Base):
 
         # Add validation for lags parameter
         if isinstance(lags, str):
-            assert lags in ("AIC", "AICc", "BIC"), \
-                "if string, lags must be one of 'auto-AIC', 'auto-AICc', or 'auto-BIC'"
+            assert lags in (
+                "AIC",
+                "AICc",
+                "BIC",
+            ), "if string, lags must be one of 'AIC', 'AICc', or 'BIC'"
         else:
             assert int(lags) == lags, "if numeric, lags parameter should be an integer"
 
@@ -342,7 +344,7 @@ class MTS(Base):
         # Automatic lag selection if requested
         if isinstance(self.lags, str):
             max_lags = min(25, X.shape[0] // 4)
-            best_ic = float('inf')
+            best_ic = float("inf")
             best_lags = 1
 
             if self.verbose:
@@ -352,15 +354,22 @@ class MTS(Base):
                 iterator = range(1, max_lags + 1)
 
             for lag in iterator:
+                # Convert DataFrame to numpy array before reversing
+                if isinstance(X, pd.DataFrame):
+                    X_values = X.values[::-1]
+                else:
+                    X_values = X[::-1]
+
                 # Try current lag value
                 if self.init_n_series_ > 1:
-                    mts_input = ts.create_train_inputs(X[::-1], lag)
+                    mts_input = ts.create_train_inputs(X_values, lag)
                 else:
-                    mts_input = ts.create_train_inputs(X.reshape(-1, 1)[::-1], lag)
+                    mts_input = ts.create_train_inputs(X_values.reshape(-1, 1), lag)
 
                 # Cook training set and fit model
-                dummy_y, scaled_Z = self.cook_training_set(y=np.ones(mts_input[0].shape[0]),
-                                                           X=mts_input[1])
+                dummy_y, scaled_Z = self.cook_training_set(
+                    y=np.ones(mts_input[0].shape[0]), X=mts_input[1]
+                )
                 residuals_ = []
 
                 for i in range(self.init_n_series_):
@@ -372,7 +381,9 @@ class MTS(Base):
                     )
 
                 self.residuals_ = np.asarray(residuals_).T
-                ic = self._compute_information_criterion(criterion=self.lags)
+                ic = self._compute_information_criterion(
+                    curr_lags=lag, criterion=self.lags
+                )
 
                 if self.verbose:
                     print(f"Trying lags={lag}, {self.lags}={ic:.2f}")
@@ -1371,7 +1382,7 @@ class MTS(Base):
                 X_test = X.iloc[test_index, :]
             else:
                 self.fit(X[train_index, :], xreg=xreg, **kwargs)
-                X_test = X[test_index, :]                
+                X_test = X[test_index, :]
             X_pred = self.predict(h=int(len(test_index)), level=level, **kwargs)
 
             errors.append(err_func(X_test, X_pred, scoring))
@@ -1380,35 +1391,46 @@ class MTS(Base):
 
         return res, describe(res)
 
-    def _compute_information_criterion(self, criterion="AIC"):
+    def _compute_information_criterion(self, curr_lags, criterion="AIC"):
         """Compute information criterion using existing residuals
-        
+
         Parameters
         ----------
+        curr_lags : int
+            Current number of lags being evaluated
         criterion : str
             One of 'AIC', 'AICc', or 'BIC'
-            
+
         Returns
         -------
         float
-            Information criterion value
+            Information criterion value or inf if parameters exceed observations
         """
         # Get dimensions
         n_obs = self.residuals_.shape[0]
-        n_features = self.init_n_series_ * self.lags
-        n_params = (n_features * self.n_hidden_features + 
-                    self.n_hidden_features * self.init_n_series_)
-        
+        n_features = int(self.init_n_series_ * curr_lags)
+        n_hidden = int(self.n_hidden_features)
+
+        # Calculate number of parameters
+        term1 = int(n_features * n_hidden)
+        term2 = int(n_hidden * self.init_n_series_)
+        n_params = term1 + term2
+
+        # Check if we have enough observations for the number of parameters
+        if n_obs <= n_params + 1:
+            return float("inf")  # Return infinity if too many parameters
+
         # Compute RSS using existing residuals
         rss = np.sum(self.residuals_**2)
-        
+
         # Compute criterion
         if criterion == "AIC":
-            ic = n_obs * np.log(rss/n_obs) + 2 * n_params
+            ic = n_obs * np.log(rss / n_obs) + 2 * n_params
         elif criterion == "AICc":
-            ic = n_obs * np.log(rss/n_obs) + 2 * n_params * (n_obs/(n_obs - n_params - 1))
+            ic = n_obs * np.log(rss / n_obs) + 2 * n_params * (
+                n_obs / (n_obs - n_params - 1)
+            )
         else:  # BIC
-            ic = n_obs * np.log(rss/n_obs) + n_params * np.log(n_obs)
-        
-        return ic
+            ic = n_obs * np.log(rss / n_obs) + n_params * np.log(n_obs)
 
+        return ic

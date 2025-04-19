@@ -8,6 +8,7 @@ try:
     from jax.scipy.special import gammaln, kv
     from jax.nn import softmax as jaxsoftmax
     from jax import jit
+
     JAX_AVAILABLE = True
 except ImportError:
     JAX_AVAILABLE = False
@@ -32,9 +33,17 @@ class KernelRidge(BaseEstimator, RegressorMixin):
         "cpu" or "gpu" (uses JAX if "gpu").
     """
 
-    def __init__(self, alpha=1.0, kernel="rbf", gamma=None, nu=1.5, length_scale=1.0, backend="cpu"):
+    def __init__(
+        self,
+        alpha=1.0,
+        kernel="rbf",
+        gamma=None,
+        nu=1.5,
+        length_scale=1.0,
+        backend="cpu",
+    ):
         self.alpha = alpha
-        self.alpha_ = alpha 
+        self.alpha_ = alpha
         self.kernel = kernel
         self.gamma = gamma
         self.nu = nu
@@ -43,7 +52,9 @@ class KernelRidge(BaseEstimator, RegressorMixin):
         self.scaler = StandardScaler()
 
         if backend == "gpu" and not JAX_AVAILABLE:
-            raise ImportError("JAX is not installed. Please install JAX to use the GPU backend.")
+            raise ImportError(
+                "JAX is not installed. Please install JAX to use the GPU backend."
+            )
 
     def _linear_kernel(self, X, Y):
         return jnp.dot(X, Y.T) if self.backend == "gpu" else np.dot(X, Y.T)
@@ -52,10 +63,18 @@ class KernelRidge(BaseEstimator, RegressorMixin):
         if self.gamma is None:
             self.gamma = 1.0 / X.shape[1]
         if self.backend == "gpu":
-            sq_dists = jnp.sum(X**2, axis=1)[:, None] + jnp.sum(Y**2, axis=1) - 2 * jnp.dot(X, Y.T)
+            sq_dists = (
+                jnp.sum(X**2, axis=1)[:, None]
+                + jnp.sum(Y**2, axis=1)
+                - 2 * jnp.dot(X, Y.T)
+            )
             return jnp.exp(-self.gamma * sq_dists)
         else:
-            sq_dists = np.sum(X**2, axis=1)[:, None] + np.sum(Y**2, axis=1) - 2 * np.dot(X, Y.T)
+            sq_dists = (
+                np.sum(X**2, axis=1)[:, None]
+                + np.sum(Y**2, axis=1)
+                - 2 * np.dot(X, Y.T)
+            )
             return np.exp(-self.gamma * sq_dists)
 
     def _matern_kernel(self, X, Y):
@@ -71,24 +90,32 @@ class KernelRidge(BaseEstimator, RegressorMixin):
         """
         if self.backend == "gpu":
             # Compute pairwise distances
-            dists = jnp.sqrt(jnp.sum((X[:, None, :] - Y[None, :, :])**2, axis=2))
+            dists = jnp.sqrt(jnp.sum((X[:, None, :] - Y[None, :, :]) ** 2, axis=2))
             scaled_dists = jnp.sqrt(2 * self.nu) * dists / self.length_scale
 
             # Matérn kernel formula
-            coeff = (2**(1 - self.nu)) / jnp.exp(gammaln(self.nu))
+            coeff = (2 ** (1 - self.nu)) / jnp.exp(gammaln(self.nu))
             matern_kernel = coeff * (scaled_dists**self.nu) * kv(self.nu, scaled_dists)
-            matern_kernel = jnp.where(dists == 0, 1.0, matern_kernel)  # Handle the case where distance is 0
+            matern_kernel = jnp.where(
+                dists == 0, 1.0, matern_kernel
+            )  # Handle the case where distance is 0
             return matern_kernel
         else:
             # Use NumPy for CPU
-            from scipy.special import gammaln, kv  # Ensure scipy.special is used for CPU
-            dists = np.sqrt(np.sum((X[:, None, :] - Y[None, :, :])**2, axis=2))
+            from scipy.special import (
+                gammaln,
+                kv,
+            )  # Ensure scipy.special is used for CPU
+
+            dists = np.sqrt(np.sum((X[:, None, :] - Y[None, :, :]) ** 2, axis=2))
             scaled_dists = np.sqrt(2 * self.nu) * dists / self.length_scale
 
             # Matérn kernel formula
-            coeff = (2**(1 - self.nu)) / np.exp(gammaln(self.nu))
+            coeff = (2 ** (1 - self.nu)) / np.exp(gammaln(self.nu))
             matern_kernel = coeff * (scaled_dists**self.nu) * kv(self.nu, scaled_dists)
-            matern_kernel = np.where(dists == 0, 1.0, matern_kernel)  # Handle the case where distance is 0
+            matern_kernel = np.where(
+                dists == 0, 1.0, matern_kernel
+            )  # Handle the case where distance is 0
             return matern_kernel
 
     def _get_kernel(self, X, Y):
@@ -148,9 +175,13 @@ class KernelRidge(BaseEstimator, RegressorMixin):
         else:
             # If alpha is a single value, proceed as usual
             if self.backend == "gpu":
-                self.dual_coef_ = jnp.linalg.solve(K + self.alpha * jnp.eye(n_samples), y_centered)
+                self.dual_coef_ = jnp.linalg.solve(
+                    K + self.alpha * jnp.eye(n_samples), y_centered
+                )
             else:
-                self.dual_coef_ = np.linalg.solve(K + self.alpha * np.eye(n_samples), y_centered)
+                self.dual_coef_ = np.linalg.solve(
+                    K + self.alpha * np.eye(n_samples), y_centered
+                )
 
         return self
 
@@ -170,20 +201,24 @@ class KernelRidge(BaseEstimator, RegressorMixin):
         K = self._get_kernel(X, self.X_fit_)
         if self.backend == "gpu":
             preds = jnp.dot(K, self.dual_coef_) + self.y_mean_
-            if probs:                
-                # Compute similarity to self.X_fit_ 
-                similarities = jnp.dot(preds, self.X_fit_.T)  # Shape: (n_samples, n_fit_)
+            if probs:
+                # Compute similarity to self.X_fit_
+                similarities = jnp.dot(
+                    preds, self.X_fit_.T
+                )  # Shape: (n_samples, n_fit_)
                 # Apply softmax to get probabilities
                 return jaxsoftmax(similarities, axis=1)
-            return preds 
+            return preds
         else:
             preds = np.dot(K, self.dual_coef_) + self.y_mean_
             if probs:
-                # Compute similarity to self.X_fit_ 
-                similarities = np.dot(preds, self.X_fit_.T)  # Shape: (n_samples, n_fit_)
+                # Compute similarity to self.X_fit_
+                similarities = np.dot(
+                    preds, self.X_fit_.T
+                )  # Shape: (n_samples, n_fit_)
                 # Apply softmax to get probabilities
                 return softmax(similarities, axis=1)
-            return preds 
+            return preds
 
     def partial_fit(self, X, y):
         """
@@ -200,7 +235,11 @@ class KernelRidge(BaseEstimator, RegressorMixin):
             The updated model.
         """
         # Standardize the inputs
-        X = self.scaler.fit_transform(X) if not hasattr(self, "X_fit_") else self.scaler.transform(X)
+        X = (
+            self.scaler.fit_transform(X)
+            if not hasattr(self, "X_fit_")
+            else self.scaler.transform(X)
+        )
 
         if not hasattr(self, "X_fit_"):
             # Initialize with the first batch of data
@@ -236,7 +275,9 @@ class KernelRidge(BaseEstimator, RegressorMixin):
                     for idx, alpha in enumerate(self.alpha):
                         gamma_new = 1 / (k_self + alpha)
                         residual = y_new - np.dot(self.dual_coefs_[idx], k_new)
-                        self.dual_coefs_[idx] = np.append(self.dual_coefs_[idx], gamma_new * residual)
+                        self.dual_coefs_[idx] = np.append(
+                            self.dual_coefs_[idx], gamma_new * residual
+                        )
                 else:
                     # Update dual coefficients for a single alpha
                     gamma_new = 1 / (k_self + self.alpha)
@@ -244,10 +285,9 @@ class KernelRidge(BaseEstimator, RegressorMixin):
                     self.dual_coef_ = np.append(self.dual_coef_, gamma_new * residual)
 
                 # Update the kernel matrix
-                self.K_ = np.block([
-                    [self.K_, k_new[:, None]],
-                    [k_new[None, :], np.array([[k_self]])]
-                ])
+                self.K_ = np.block(
+                    [[self.K_, k_new[:, None]], [k_new[None, :], np.array([[k_self]])]]
+                )
 
                 # Update the stored data
                 self.X_fit_ = np.vstack([self.X_fit_, x_new])

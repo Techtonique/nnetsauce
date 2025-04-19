@@ -97,8 +97,7 @@ class RegressionErrFunc(object):
 
 
 class InverseProbabilityErrFunc(ClassificationErrFunc):
-    """Calculates the probability of not predicting the correct class.
-    """
+    """Calculates the probability of not predicting the correct class."""
 
     def __init__(self):
         super(InverseProbabilityErrFunc, self).__init__()
@@ -133,8 +132,7 @@ class MarginErrFunc(ClassificationErrFunc):
 
 
 class AbsErrorErrFunc(RegressionErrFunc):
-    """Calculates absolute error nonconformity for regression problems.
-    """
+    """Calculates absolute error nonconformity for regression problems."""
 
     def __init__(self):
         super(AbsErrorErrFunc, self).__init__()
@@ -151,8 +149,7 @@ class AbsErrorErrFunc(RegressionErrFunc):
 
 
 class SignErrorErrFunc(RegressionErrFunc):
-    """Calculates signed error nonconformity for regression problems.
-    """
+    """Calculates signed error nonconformity for regression problems."""
 
     def __init__(self):
         super(SignErrorErrFunc, self).__init__()
@@ -178,8 +175,7 @@ class SignErrorErrFunc(RegressionErrFunc):
 
 # CQR symmetric error function
 class QuantileRegErrFunc(RegressionErrFunc):
-    """Calculates conformalized quantile regression error.
-    """
+    """Calculates conformalized quantile regression error."""
 
     def __init__(self):
         super(QuantileRegErrFunc, self).__init__()
@@ -201,8 +197,7 @@ class QuantileRegErrFunc(RegressionErrFunc):
 
 # CQR asymmetric error function
 class QuantileRegAsymmetricErrFunc(RegressionErrFunc):
-    """Calculates conformalized quantile regression asymmetric error function.
-    """
+    """Calculates conformalized quantile regression asymmetric error function."""
 
     def __init__(self):
         super(QuantileRegAsymmetricErrFunc, self).__init__()

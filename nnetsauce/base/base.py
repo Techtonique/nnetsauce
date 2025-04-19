@@ -832,14 +832,14 @@ class Base(BaseEstimator):
 
 class RidgeRegressor(Base, RegressorMixin):
     """Ridge Regression model with JAX support.
-    
+
     Parameters:
         lambda_: float or array-like
             Ridge regularization parameter(s). Default is 0.
-            
+
         All other parameters are inherited from Base class.
     """
-    
+
     def __init__(
         self,
         lambda_=0.0,
@@ -877,49 +877,50 @@ class RidgeRegressor(Base, RegressorMixin):
             backend=backend,
         )
         self.lambda_ = lambda_
-        
+
     def _center_scale_xy(self, X, y):
         """Center X and y, scale X."""
         n = X.shape[0]
-        
+
         # Center X and y
         X_mean = jnp.mean(X, axis=0)
         y_mean = jnp.mean(y)
         X_centered = X - X_mean
         y_centered = y - y_mean
-        
+
         # Scale X
-        X_scale = jnp.sqrt(jnp.sum(X_centered ** 2, axis=0) / n)
+        X_scale = jnp.sqrt(jnp.sum(X_centered**2, axis=0) / n)
         X_scaled = X_centered / X_scale
-        
+
         return X_scaled, y_centered, X_mean, y_mean, X_scale
-        
+
     def fit(self, X, y, **kwargs):
         """Fit Ridge regression model.
-        
+
         Parameters:
             X : array-like of shape (n_samples, n_features)
                 Training data
             y : array-like of shape (n_samples,)
                 Target values
-                
+
         Returns:
             self : returns an instance of self.
         """
         X, y = self.cook_training_set(y, X)
-        
+
         if self.backend == "cpu":
             # Use numpy for CPU
-            X_scaled, y_centered, self.X_mean_, self.y_mean_, self.X_scale_ = \
+            X_scaled, y_centered, self.X_mean_, self.y_mean_, self.X_scale_ = (
                 self._center_scale_xy(np.array(X), np.array(y))
-            
+            )
+
             # SVD decomposition
             U, d, Vt = np.linalg.svd(X_scaled, full_matrices=False)
-            
+
             # Compute coefficients
             rhs = U.T @ y_centered
-            d2 = d ** 2
-            
+            d2 = d**2
+
             if np.isscalar(self.lambda_):
                 div = d2 + self.lambda_
                 a = (d * rhs) / div
@@ -932,95 +933,111 @@ class RidgeRegressor(Base, RegressorMixin):
                     coef = (Vt.T @ a) / self.X_scale_
                     coefs.append(coef)
                 self.coef_ = np.array(coefs).T
-                
+
         else:
             # Use JAX for GPU/TPU
-            X_scaled, y_centered, self.X_mean_, self.y_mean_, self.X_scale_ = \
+            X_scaled, y_centered, self.X_mean_, self.y_mean_, self.X_scale_ = (
                 self._center_scale_xy(jnp.array(X), jnp.array(y))
-            
+            )
+
             # SVD decomposition
             U, d, Vt = jnp.linalg.svd(X_scaled, full_matrices=False)
-            
+
             # Compute coefficients
             rhs = mo.safe_sparse_dot(U.T, y_centered, backend=self.backend)
-            d2 = d ** 2
-            
+            d2 = d**2
+
             if np.isscalar(self.lambda_):
                 div = d2 + self.lambda_
                 a = (d * rhs) / div
-                self.coef_ = mo.safe_sparse_dot(Vt.T, a, backend=self.backend) / self.X_scale_
+                self.coef_ = (
+                    mo.safe_sparse_dot(Vt.T, a, backend=self.backend) / self.X_scale_
+                )
             else:
                 coefs = []
                 for lambda_ in self.lambda_:
                     div = d2 + lambda_
                     a = (d * rhs) / div
-                    coef = mo.safe_sparse_dot(Vt.T, a, backend=self.backend) / self.X_scale_
+                    coef = (
+                        mo.safe_sparse_dot(Vt.T, a, backend=self.backend)
+                        / self.X_scale_
+                    )
                     coefs.append(coef)
                 self.coef_ = jnp.array(coefs).T
-        
+
         # Compute GCV, HKB and LW criteria
         y_pred = self.predict(X)
         resid = y - y_pred
         n, p = X.shape
         s2 = jnp.sum(resid**2) / (n - p)
-        
+
         if self.backend == "cpu":
             self.HKB_ = (p - 2) * s2 / jnp.sum(self.coef_**2)
             self.LW_ = (p - 2) * s2 * n / jnp.sum(y_pred**2)
-            
+
             if np.isscalar(self.lambda_):
                 div = d2 + self.lambda_
-                self.GCV_ = jnp.sum((y - y_pred)**2) / (n - jnp.sum(d2/div))**2
+                self.GCV_ = jnp.sum((y - y_pred) ** 2) / (n - jnp.sum(d2 / div)) ** 2
             else:
                 self.GCV_ = []
                 for lambda_ in self.lambda_:
                     div = d2 + lambda_
-                    gcv = jnp.sum((y - y_pred)**2) / (n - jnp.sum(d2/div))**2
+                    gcv = jnp.sum((y - y_pred) ** 2) / (n - jnp.sum(d2 / div)) ** 2
                     self.GCV_.append(gcv)
                 self.GCV_ = jnp.array(self.GCV_)
         else:
             self.HKB_ = (p - 2) * s2 / jnp.sum(self.coef_**2)
             self.LW_ = (p - 2) * s2 * n / jnp.sum(y_pred**2)
-            
+
             if np.isscalar(self.lambda_):
                 div = d2 + self.lambda_
-                self.GCV_ = jnp.sum((y - y_pred)**2) / (n - jnp.sum(d2/div))**2
+                self.GCV_ = jnp.sum((y - y_pred) ** 2) / (n - jnp.sum(d2 / div)) ** 2
             else:
                 gcvs = []
                 for lambda_ in self.lambda_:
                     div = d2 + lambda_
-                    gcv = jnp.sum((y - y_pred)**2) / (n - jnp.sum(d2/div))**2
+                    gcv = jnp.sum((y - y_pred) ** 2) / (n - jnp.sum(d2 / div)) ** 2
                     gcvs.append(gcv)
                 self.GCV_ = jnp.array(gcvs)
-                
+
         return self
-        
+
     def predict(self, X):
         """Predict using the Ridge regression model.
-        
+
         Parameters:
             X : array-like of shape (n_samples, n_features)
                 Samples to predict for
-                
+
         Returns:
             y_pred : array-like of shape (n_samples,)
                 Returns predicted values.
         """
         X = self.cook_test_set(X)
-        
+
         if self.backend == "cpu":
             if np.isscalar(self.lambda_):
-                return mo.safe_sparse_dot(X, self.coef_, backend=self.backend) + self.y_mean_
+                return (
+                    mo.safe_sparse_dot(X, self.coef_, backend=self.backend)
+                    + self.y_mean_
+                )
             else:
-                return jnp.array([
-                    mo.safe_sparse_dot(X, coef, backend=self.backend) + self.y_mean_
-                    for coef in self.coef_.T
-                ]).T
+                return jnp.array(
+                    [
+                        mo.safe_sparse_dot(X, coef, backend=self.backend) + self.y_mean_
+                        for coef in self.coef_.T
+                    ]
+                ).T
         else:
             if np.isscalar(self.lambda_):
-                return mo.safe_sparse_dot(X, self.coef_, backend=self.backend) + self.y_mean_
+                return (
+                    mo.safe_sparse_dot(X, self.coef_, backend=self.backend)
+                    + self.y_mean_
+                )
             else:
-                return jnp.array([
-                    mo.safe_sparse_dot(X, coef, backend=self.backend) + self.y_mean_
-                    for coef in self.coef_.T
-                ]).T
+                return jnp.array(
+                    [
+                        mo.safe_sparse_dot(X, coef, backend=self.backend) + self.y_mean_
+                        for coef in self.coef_.T
+                    ]
+                ).T

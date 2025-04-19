@@ -6,4 +6,4 @@
 
 from .ridge import RidgeRegressor
 
-__all__ = ["RidgeRegressor"] 
+__all__ = ["RidgeRegressor"]

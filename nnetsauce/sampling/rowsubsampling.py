@@ -1,6 +1,5 @@
 import numpy as np
 from .helpers import dosubsample
-from .helpers import subsample_indices 
 
 
 class SubSampler:
@@ -51,7 +50,7 @@ class SubSampler:
         self.n_jobs = n_jobs
         self.verbose = verbose
 
-    def subsample(self, method=):
+    def subsample(self):
         """Returns indices of subsampled input data.
 
         Examples:
