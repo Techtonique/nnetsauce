@@ -37,9 +37,35 @@ def flatten(x):
 
 # check if the response contains only integers
 def is_factor(y):
-    # return not np.mod(y, 1).any()
-    return np.issubdtype(np.asarray(y).dtype, np.integer)
-
+    """
+    Determine if the target variable `y` is for classification (True) or regression (False).
+    
+    Parameters:
+    y : array-like
+        Target variable (labels/response variable)
+    
+    Returns:
+    bool
+        True if `y` is categorical (classification), False if numeric (regression)
+    """
+    y_array = np.asarray(y)
+    
+    # Boolean → classification
+    if y_array.dtype == bool:
+        return True
+    
+    # Strings or objects → classification
+    if y_array.dtype.kind in ['U', 'S', 'O']:
+        return True
+    
+    # Numeric types (int/float) with few unique values → classification
+    if y_array.dtype.kind in ['i', 'u', 'f']:
+        unique_values = np.unique(y_array[~np.isnan(y_array)])  # Exclude NaNs
+        if len(unique_values) <= 10:  # Threshold for classification
+            return True
+    
+    # Otherwise → regression
+    return False
 
 # check if x is float
 def is_float(x):
