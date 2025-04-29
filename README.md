@@ -179,6 +179,9 @@ year={2019--2024}
 
 ## References
 
+- Deep Quasi-Randomized neural Networks for classification (2024)
+  https://www.researchgate.net/publication/380701207_Deep_Quasi-Randomized_neural_Networks_for_classification
+
 - Probabilistic Forecasting with nnetsauce (using Density Estimation, Bayesian inference, Conformal prediction and Vine copulas): nnetsauce presentation at sktime meetup (2024) https://www.researchgate.net/publication/382589729_Probabilistic_Forecasting_with_nnetsauce_using_Density_Estimation_Bayesian_inference_Conformal_prediction_and_Vine_copulas
   
 - Probabilistic Forecasting with Randomized/Quasi-Randomized networks at the International Symposium on Forecasting (2024) https://www.researchgate.net/publication/381957724_Probabilistic_Forecasting_with_RandomizedQuasi-Randomized_networks_presentation_at_the_International_Symposium_on_Forecasting_2024
