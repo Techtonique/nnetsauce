@@ -197,6 +197,8 @@ class CustomRegressor(Custom, RegressorMixin):
         """
 
         centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
+        print("in customRegressor.py L.200", centered_y)
+        print("in customRegressor.py L.201", scaled_Z)
 
         if self.level is not None:
             self.obj = PredictionInterval(
