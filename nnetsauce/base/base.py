@@ -582,14 +582,11 @@ class Base(BaseEstimator):
                 )
 
         # Returning model inputs -----
-        print("ns base.py L.585: mx.is_factor(y)", mx.is_factor(y))
         if mx.is_factor(y) is False:  # regression
             # center y
             if y is None:
                 self.y_mean_, centered_y = mo.center_response(self.y_)
             else:
-                print("ns base.py L.591: y", y)
-                print("ns base.py L.592: mo.center_response(y)", mo.center_response(y))
                 self.y_mean_, centered_y = mo.center_response(y)
 
             # y is subsampled

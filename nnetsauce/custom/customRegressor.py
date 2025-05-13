@@ -197,8 +197,6 @@ class CustomRegressor(Custom, RegressorMixin):
         """
 
         centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
-        print("in customRegressor.py L.200", centered_y)
-        print("in customRegressor.py L.201", scaled_Z)
 
         if self.level is not None:
             self.obj = PredictionInterval(
@@ -388,14 +386,9 @@ class CustomRegressor(Custom, RegressorMixin):
                 + self.obj.predict(self.cook_test_set(new_X, **kwargs), **kwargs)
             )[0]
 
-        # len(X.shape) > 1
-        print("self.obj", self.obj)
-        print("X", X)
-        print("self.y_mean_", self.y_mean_)
         preds = self.obj.predict(
             self.cook_test_set(X, **kwargs), **kwargs
         )
-        print("preds", preds)
         return self.y_mean_ + preds
 
     def score(self, X, y, scoring=None):
