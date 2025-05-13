@@ -170,6 +170,7 @@ class CustomRegressor(Custom, RegressorMixin):
         self.intercept_ = None
         self.X_ = None
         self.y_ = None
+        self.y_mean_ = None 
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit custom model to training data (X, y).
@@ -386,9 +387,14 @@ class CustomRegressor(Custom, RegressorMixin):
             )[0]
 
         # len(X.shape) > 1
-        return self.y_mean_ + self.obj.predict(
+        print("self.obj", self.obj)
+        print("X", X)
+        print("self.y_mean_", self.y_mean_)
+        preds = self.obj.predict(
             self.cook_test_set(X, **kwargs), **kwargs
         )
+        print("preds", preds)
+        return self.y_mean_ + preds
 
     def score(self, X, y, scoring=None):
         """Compute the score of the model.
