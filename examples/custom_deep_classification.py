@@ -56,29 +56,29 @@ for model in load_models:
 
     print(clf.score(X_test, y_test))
 
-print("Example 3 - conformal")
+# print("Example 3 - conformal")
 
-for model in load_models: 
+# for model in load_models: 
 
-    data = model()
-    X = data.data
-    y= data.target
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = .3, random_state = 13)
+#     data = model()
+#     X = data.data
+#     y= data.target
+#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = .3, random_state = 13)
 
-    obj = LogisticRegression()
+#     obj = LogisticRegression()
 
-    clf = ns.DeepClassifier(obj, n_layers=2, verbose=1, 
-                            n_clusters=2, n_hidden_features=2, 
-                            level=95, pi_method="tcp")
+#     clf = ns.DeepClassifier(obj, n_layers=2, verbose=1, 
+#                             n_clusters=2, n_hidden_features=2, 
+#                             level=95, pi_method="tcp")
 
-    start = time()
-    clf.fit(X_train, y_train)
-    print(f"\nElapsed: {time() - start} seconds\n")
+#     start = time()
+#     clf.fit(X_train, y_train)
+#     print(f"\nElapsed: {time() - start} seconds\n")
 
-    print(f"clf: {clf}")
+#     print(f"clf: {clf}")
 
-    preds = clf.predict(X_test)
+#     preds = clf.predict(X_test)
 
-    print(f"preds: {preds}")
+#     print(f"preds: {preds}")
 
-    print(f"accuracy:{np.mean(preds.argmax(axis=1) == y_test)}")
+#     print(f"accuracy:{np.mean(preds.argmax(axis=1) == y_test)}")

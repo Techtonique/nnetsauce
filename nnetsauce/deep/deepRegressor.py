@@ -167,8 +167,7 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
                     backend=self.backend,
                 )
             )
-
-        self.stacked_obj.fit(X, y, **kwargs)
+            self.stacked_obj.fit(X, y, **kwargs)
 
         if self.level is not None:
             self.stacked_obj = PredictionInterval(
