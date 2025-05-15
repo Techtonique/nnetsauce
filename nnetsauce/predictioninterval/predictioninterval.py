@@ -75,6 +75,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
         self.scaled_calibrated_residuals_ = None
         self.calibrated_residuals_scaler_ = None
         self.kde_ = None
+        self.y_mean_ = None
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit the `method` to training data (X, y).
@@ -91,6 +92,8 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                 Sample weights.
 
         """
+
+        self.y_mean_ = np.mean(y)
 
         if self.type_split == "random":
 

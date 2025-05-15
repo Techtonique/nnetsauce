@@ -114,6 +114,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         self.n_layers = n_layers
         self.classes_ = None
         self.n_classes_ = None
+        self._estimator_type = "classifier"
 
     def fit(self, X, y, **kwargs):
         """Fit Classification algorithms to X and y.
@@ -188,8 +189,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                     backend=self.backend,
                 )
             )
-
-        self.stacked_obj.fit(X, y, **kwargs)
+            self.stacked_obj.fit(X, y, **kwargs)
 
         if self.level is not None:
             self.stacked_obj = PredictionSet(
