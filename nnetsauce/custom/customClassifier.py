@@ -9,6 +9,7 @@ from .custom import Custom
 from ..predictionset import PredictionSet
 from ..utils import matrixops as mo
 from sklearn.base import ClassifierMixin
+from sklearn.calibration import CalibratedClassifierCV
 
 
 class CustomClassifier(Custom, ClassifierMixin):
@@ -67,12 +68,15 @@ class CustomClassifier(Custom, ClassifierMixin):
 
         row_sample: float
             percentage of rows chosen for training, by stratified bootstrapping
+        
+        cv_calibration: int, cross-validation generator, or iterable, default=None
+            Determines the cross-validation splitting strategy. Same as 
+            `sklearn.calibration.CalibratedClassifierCV`
 
-        level: float
-            confidence level for prediction sets. Default is None.
-
-        pi_method: str
-            method for constructing the prediction sets: 'icp', 'tcp' if level is not None. Default is 'icp'.
+        calibration_method: str
+            {‘sigmoid’, ‘isotonic’}, default=’sigmoid’
+            The method to use for calibration. Same as 
+            `sklearn.calibration.CalibratedClassifierCV`
 
         seed: int
             reproducibility seed for nodes_sim=='uniform'
@@ -150,8 +154,8 @@ class CustomClassifier(Custom, ClassifierMixin):
         type_scaling=("std", "std", "std"),
         col_sample=1,
         row_sample=1,
-        level=None,
-        pi_method="icp",
+        cv_calibration=2,
+        calibration_method="sigmoid",
         seed=123,
         backend="cpu",
     ):
@@ -173,13 +177,41 @@ class CustomClassifier(Custom, ClassifierMixin):
             seed=seed,
             backend=backend,
         )
-        self.level = level
-        self.pi_method = pi_method
         self.coef_ = None
         self.intercept_ = None
         self.type_fit = "classification"
-        if self.level is not None:
-            self.obj = PredictionSet(self.obj, level=self.level, method=self.pi_method)
+        self.cv_calibration = cv_calibration
+        self.calibration_method = calibration_method
+        self.obj = CalibratedClassifierCV(self.obj, cv=self.cv_calibration, 
+                                          method=self.calibration_method)
+
+    def __sklearn_clone__(self):
+        """Create a clone of the estimator.
+        
+        This is required for scikit-learn's calibration system to work properly.
+        """
+        # Create a new instance with the same parameters
+        clone = CustomClassifier(
+            obj=self.obj,
+            n_hidden_features=self.n_hidden_features,
+            activation_name=self.activation_name,
+            a=self.a,
+            nodes_sim=self.nodes_sim,
+            bias=self.bias,
+            dropout=self.dropout,
+            direct_link=self.direct_link,
+            n_clusters=self.n_clusters,
+            cluster_encode=self.cluster_encode,
+            type_clust=self.type_clust,
+            type_scaling=self.type_scaling,
+            col_sample=self.col_sample,
+            row_sample=self.row_sample,
+            cv_calibration=self.cv_calibration,
+            calibration_method=self.calibration_method,
+            seed=self.seed,
+            backend=self.backend
+        )
+        return clone
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit custom model to training data (X, y).
@@ -213,11 +245,6 @@ class CustomClassifier(Custom, ClassifierMixin):
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
         self.classes_ = np.unique(y)
         self.n_classes_ = len(self.classes_)  # for compatibility with
-
-        if self.level is not None:
-            self.obj = PredictionSet(
-                obj=self.obj, method=self.pi_method, level=self.level
-            )
 
         # if sample_weights, else: (must use self.row_index)
         if sample_weight is not None:
@@ -352,11 +379,9 @@ class CustomClassifier(Custom, ClassifierMixin):
                 X.reshape(1, n_features),
                 np.ones(n_features).reshape(1, n_features),
             )
-
             return (
                 self.obj.predict_proba(self.cook_test_set(new_X, **kwargs), **kwargs)
             )[0]
-
         return self.obj.predict_proba(self.cook_test_set(X, **kwargs), **kwargs)
 
     def decision_function(self, X, **kwargs):
@@ -375,9 +400,11 @@ class CustomClassifier(Custom, ClassifierMixin):
             as that of the classes passed to fit.
         """
         if not hasattr(self.obj, "decision_function"):
-            raise AttributeError(
-                "The base classifier doesn't have a decision_function method"
-            )
+            # If base classifier doesn't have decision_function, use predict_proba
+            proba = self.predict_proba(X, **kwargs)
+            if proba.shape[1] == 2:
+                return proba[:, 1]  # For binary classification
+            return proba  # For multiclass
 
         if len(X.shape) == 1:
             n_features = X.shape[0]

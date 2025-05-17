@@ -15,6 +15,7 @@ from copy import deepcopy
 from tqdm import tqdm
 from sklearn import metrics
 from sklearn.base import ClassifierMixin, RegressorMixin
+from sklearn.calibration import CalibratedClassifierCV
 
 try:
     from sklearn.utils import all_estimators
@@ -81,8 +82,8 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         type_scaling=("std", "std", "std"),
         col_sample=1,
         row_sample=1,
-        level=None,
-        pi_method="icp",
+        cv_calibration=2,
+        calibration_method="sigmoid",
         seed=123,
         backend="cpu",
     ):
@@ -101,15 +102,16 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
             type_scaling=type_scaling,
             col_sample=col_sample,
             row_sample=row_sample,
-            level=level,
-            pi_method=pi_method,
             seed=seed,
             backend=backend,
         )
 
         assert n_layers >= 1, "must have n_layers >= 1"
 
-        self.stacked_obj = deepcopy(obj)
+        self.cv_calibration = cv_calibration
+        self.calibration_method = calibration_method
+
+        self.stacked_obj = obj
         self.verbose = verbose
         self.n_layers = n_layers
         self.classes_ = None
@@ -188,8 +190,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                     backend=self.backend,
                 )
             )
-
-        self.stacked_obj.fit(X, y, **kwargs)
+            self.stacked_obj.fit(X, y, **kwargs)
 
         if self.level is not None:
             self.stacked_obj = PredictionSet(

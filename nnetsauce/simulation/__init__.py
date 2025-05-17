@@ -7,6 +7,8 @@ from .nodesimulation import (
 
 from .getsims import getsims, getsimsxreg
 
+from .simulatedistro import simulate_replications
+
 __all__ = [
     "generate_sobol",
     "generate_uniform",
@@ -14,4 +16,5 @@ __all__ = [
     "generate_halton",
     "getsims",
     "getsimsxreg",
+    "simulate_replications"
 ]
