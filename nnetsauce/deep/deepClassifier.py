@@ -248,8 +248,6 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         return self
 
     def predict(self, X):
-        print("self.stacked_obj", self.stacked_obj)
-        print("self.stacked_obj.get_params()", self.stacked_obj.get_params())
         return self.stacked_obj.predict(X)
 
     def predict_proba(self, X):
@@ -575,10 +573,8 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                 ):
                     try:
                         if customize == True:
-                            print(f"\n surrogate: CustomClassifier({est[0]})")
                             surr_obj = ns.CustomClassifier(obj=est[1]())
                         else:
-                            print(f"\n surrogate: {est[0]}")
                             surr_obj = est[1]()
                         res = self.cross_val_optim(
                             X_train=X_train,
@@ -595,7 +591,6 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                             verbose=verbose,
                             seed=seed,
                         )
-                        print(f"\n result: {res}")
                         if customize == True:
                             results.append((f"CustomClassifier({est[0]})", res))
                         else:
@@ -612,10 +607,8 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                 ):
                     try:
                         if customize == True:
-                            print(f"\n surrogate: CustomClassifier({est[0]})")
                             surr_obj = ns.CustomClassifier(obj=est[1]())
                         else:
-                            print(f"\n surrogate: {est[0]}")
                             surr_obj = est[1]()
                         res = self.cross_val_optim(
                             X_train=X_train,
@@ -632,7 +625,6 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                             verbose=verbose,
                             seed=seed,
                         )
-                        print(f"\n result: {res}")
                         if customize == True:
                             results.append((f"CustomClassifier({est[0]})", res))
                         else:
