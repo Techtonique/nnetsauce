@@ -39,7 +39,7 @@ for i, model in enumerate(load_models):
     y= data.target
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = .3, random_state = 13)
 
-    obj = SVC()
+    obj = LogisticRegression()
 
     clf = ns.DeepClassifier(obj, n_layers=2, verbose=1, n_clusters=2, n_hidden_features=2)
 
@@ -69,7 +69,7 @@ for i, model in enumerate(load_models):
     y= data.target
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = .3, random_state = 13)
 
-    obj = SVC()
+    obj = LogisticRegression()
 
     clf = ns.DeepClassifier(obj, n_layers=2, verbose=1, n_clusters=2, n_hidden_features=2)
 

@@ -69,7 +69,7 @@ class CustomClassifier(Custom, ClassifierMixin):
         row_sample: float
             percentage of rows chosen for training, by stratified bootstrapping
         
-        cv_calibration: int, cross-validation generator, or iterable, default=None
+        cv_calibration: int, cross-validation generator, or iterable, default=2
             Determines the cross-validation splitting strategy. Same as 
             `sklearn.calibration.CalibratedClassifierCV`
 
@@ -182,8 +182,10 @@ class CustomClassifier(Custom, ClassifierMixin):
         self.type_fit = "classification"
         self.cv_calibration = cv_calibration
         self.calibration_method = calibration_method
-        self.obj = CalibratedClassifierCV(self.obj, cv=self.cv_calibration, 
+        if self.cv_calibration is not None: 
+            self.obj = CalibratedClassifierCV(self.obj, cv=self.cv_calibration, 
                                           method=self.calibration_method)
+        self._estimator_type = "classifier"
 
     def __sklearn_clone__(self):
         """Create a clone of the estimator.

@@ -16,6 +16,7 @@ from tqdm import tqdm
 from sklearn import metrics
 from sklearn.base import ClassifierMixin, RegressorMixin
 from sklearn.calibration import CalibratedClassifierCV
+from sklearn.frozen import FrozenEstimator
 
 try:
     from sklearn.utils import all_estimators
@@ -105,12 +106,29 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
             seed=seed,
             backend=backend,
         )
-
-        assert n_layers >= 1, "must have n_layers >= 1"
-
+        self.coef_ = None
+        self.intercept_ = None
+        self.type_fit = "classification"
         self.cv_calibration = cv_calibration
         self.calibration_method = calibration_method
+        
+        # Only wrap in CalibratedClassifierCV if not already wrapped
+        # if not isinstance(obj, CalibratedClassifierCV):
+        #     self.obj = CalibratedClassifierCV(
+        #         self.obj, 
+        #         cv=self.cv_calibration,
+        #         method=self.calibration_method
+        #     )
+        # else:
+        self.coef_ = None
+        self.intercept_ = None
+        self.type_fit = "classification"
+        self.cv_calibration = cv_calibration
+        self.calibration_method = calibration_method
+        self.obj = obj
+        self._estimator_type = "classifier"  # Add this line to explicitly mark as classifier
 
+        assert n_layers >= 1, "must have n_layers >= 1"
         self.stacked_obj = obj
         self.verbose = verbose
         self.n_layers = n_layers
@@ -160,6 +178,8 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
             type_scaling=self.type_scaling,
             col_sample=self.col_sample,
             row_sample=self.row_sample,
+            cv_calibration=None,
+            calibration_method=None,
             seed=self.seed,
             backend=self.backend,
         )
@@ -186,17 +206,14 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                     type_scaling=self.type_scaling,
                     col_sample=self.col_sample,
                     row_sample=self.row_sample,
+                    cv_calibration=None,
+                    calibration_method=None,
                     seed=self.seed,
                     backend=self.backend,
                 )
             )
             self.stacked_obj.fit(X, y, **kwargs)
-
-        if self.level is not None:
-            self.stacked_obj = PredictionSet(
-                obj=self.stacked_obj, method=self.pi_method, level=self.level
-            )
-
+        
         return self
 
     def partial_fit(self, X, y, **kwargs):
@@ -231,6 +248,8 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         return self
 
     def predict(self, X):
+        print("self.stacked_obj", self.stacked_obj)
+        print("self.stacked_obj.get_params()", self.stacked_obj.get_params())
         return self.stacked_obj.predict(X)
 
     def predict_proba(self, X):
