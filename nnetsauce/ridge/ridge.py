@@ -61,6 +61,7 @@ class RidgeRegressor(Base, RegressorMixin):
             backend=backend,
         )
         self.lambda_ = lambda_
+        self.scale_ = {}
 
     def _center_scale_xy(self, X, y):
         """Center X and y, scale X."""
@@ -187,31 +188,37 @@ class RidgeRegressor(Base, RegressorMixin):
             y_pred : array-like of shape (n_samples,)
                 Returns predicted values.
         """
-        X = self.cook_test_set(X)
+        # Ensure X is 2D
+        X = np.asarray(X)
+        if X.ndim == 1:
+            X = X.reshape(1, -1)
+            
+        # Center and scale X
+        X_scaled = (X - self.X_mean_) / self.X_scale_
 
         if self.backend == "cpu":
             if np.isscalar(self.lambda_):
                 return (
-                    mo.safe_sparse_dot(X, self.coef_, backend=self.backend)
+                    mo.safe_sparse_dot(X_scaled, self.coef_, backend=self.backend)
                     + self.y_mean_
                 )
             else:
-                return jnp.array(
+                return np.array(
                     [
-                        mo.safe_sparse_dot(X, coef, backend=self.backend) + self.y_mean_
+                        mo.safe_sparse_dot(X_scaled, coef, backend=self.backend) + self.y_mean_
                         for coef in self.coef_.T
                     ]
                 ).T
         else:
             if np.isscalar(self.lambda_):
                 return (
-                    mo.safe_sparse_dot(X, self.coef_, backend=self.backend)
+                    mo.safe_sparse_dot(X_scaled, self.coef_, backend=self.backend)
                     + self.y_mean_
                 )
             else:
                 return jnp.array(
                     [
-                        mo.safe_sparse_dot(X, coef, backend=self.backend) + self.y_mean_
+                        mo.safe_sparse_dot(X_scaled, coef, backend=self.backend) + self.y_mean_
                         for coef in self.coef_.T
                     ]
                 ).T

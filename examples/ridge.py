@@ -41,7 +41,6 @@ print(f"LW estimate: {model.LW_}")
 print("\nComparing coefficients for lambda=1.0:")
 print("Single lambda coefs:", model.coef_)
 print("Multiple lambda coefs (middle column):", model.coef_[:, 1])
-print("Max absolute difference:", np.max(np.abs(model.coef_ - model.coef_[:, 1])))
 
 # With GPU acceleration
 #model = RidgeRegressor(lambda_=1.0, backend="gpu")
