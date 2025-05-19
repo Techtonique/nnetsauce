@@ -114,12 +114,16 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
         # multitask response
         Y = mo.one_hot_encode2(y, self.n_classes_)
 
-        # if sample_weight is None:
-        for i in range(self.n_classes_):
-            self.fit_objs_[i] = deepcopy(
-                self.obj.fit(self.scaled_X_, Y[:, i], **kwargs)
-            )
-        self.classes_ = np.unique(y)
+        try: 
+            for i in range(self.n_classes_):
+                self.fit_objs_[i] = deepcopy(
+                    self.obj.fit(self.scaled_X_, Y[:, i], sample_weight=sample_weight, **kwargs)
+                )
+        except Exception as e:
+            for i in range(self.n_classes_):
+                self.fit_objs_[i] = deepcopy(
+                    self.obj.fit(self.scaled_X_, Y[:, i], **kwargs)
+                )
         return self
 
     def predict(self, X, **kwargs):
@@ -138,31 +142,7 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
             model predictions: {array-like}
 
         """
-        try:
-            preds = self.predict_proba(X, **kwargs)
-            try:
-                DescribeResult = namedtuple(
-                    "DescribeResult", ["mean", "upper", "lower", "median"]
-                )
-                return DescribeResult(
-                    mean=np.argmax(preds.mean, axis=1),
-                    upper=np.argmax(preds.upper, axis=1),
-                    lower=np.argmax(preds.lower, axis=1),
-                    median=np.argmax(preds.median, axis=1),
-                )
-            except Exception as e:
-
-                DescribeResult = namedtuple(
-                    "DescribeResult", ["mean", "upper", "lower"]
-                )
-                return DescribeResult(
-                    mean=np.argmax(preds.mean, axis=1),
-                    upper=np.argmax(preds.upper, axis=1),
-                    lower=np.argmax(preds.lower, axis=1),
-                )
-        except Exception as e:
-
-            return np.argmax(self.predict_proba(X, **kwargs), axis=1)
+        return np.argmax(self.predict_proba(X, **kwargs), axis=1)
 
     def predict_proba(self, X, **kwargs):
         """Predict probabilities for test data X.
@@ -185,7 +165,8 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
 
         probs = np.zeros((shape_X[0], self.n_classes_))
 
-        if len(shape_X) == 1:
+        if len(shape_X) == 1: # one example
+
             n_features = shape_X[0]
 
             new_X = mo.rbind(
@@ -195,113 +176,63 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
 
             Z = self.X_scaler_.transform(new_X, **kwargs)
 
-            try:
-                # Try probabilistic model first (conformal or quantile)
-                probs_upper = np.zeros((shape_X[0], self.n_classes_))
-                probs_lower = np.zeros((shape_X[0], self.n_classes_))
-                probs_median = np.zeros((shape_X[0], self.n_classes_))
+            # Fallback to standard model
+            for i in range(self.n_classes_):
+                print('i ', i)
+                probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)[0]
 
-                # loop on all the classes
-                for i in range(self.n_classes_):
-                    probs_temp = self.fit_objs_[i].predict(Z, **kwargs)
-                    probs_upper[:, i] = probs_temp.upper
-                    probs_lower[:, i] = probs_temp.lower
-                    probs[:, i] = probs_temp.mean
-                    try:
-                        probs_median[:, i] = probs_temp.median
-                    except:
-                        pass
-
-            except Exception as e:
-
-                # Fallback to standard model
-                for i in range(self.n_classes_):
-                    probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)[0]
-
-        else:
+        else: # multiple rows
 
             Z = self.X_scaler_.transform(X, **kwargs)
 
-            try:
-                # Try probabilistic model first (conformal or quantile)
-                probs_upper = np.zeros((shape_X[0], self.n_classes_))
-                probs_lower = np.zeros((shape_X[0], self.n_classes_))
-                probs_median = np.zeros((shape_X[0], self.n_classes_))
-
-                # loop on all the classes
-                for i in range(self.n_classes_):
-                    probs_temp = self.fit_objs_[i].predict(Z, **kwargs)
-                    probs_upper[:, i] = probs_temp.upper
-                    probs_lower[:, i] = probs_temp.lower
-                    probs[:, i] = probs_temp.mean
-                    try:
-                        probs_median[:, i] = probs_temp.median
-                    except:
-                        pass
-
-            except Exception as e:
-
-                # Fallback to standard model
-                for i in range(self.n_classes_):
-                    probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)[0]
+            # Fallback to standard model
+            for i in range(self.n_classes_):
+                print('i ', i)
+                print('probs ', probs)
+                print('self.fit_objs_[i].predict(Z, **kwargs) ', self.fit_objs_[i].predict(Z, **kwargs))
+                probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)
 
         expit_raw_probs = expit(probs)
+        
+        # Add small epsilon to avoid division by zero
+        row_sums = expit_raw_probs.sum(axis=1)[:, None]
+        row_sums[row_sums < 1e-10] = 1e-10
+        
+        return expit_raw_probs / row_sums
 
-        try:
-            expit_raw_probs_upper = expit(probs_upper)
-            expit_raw_probs_lower = expit(probs_lower)
-            try:
-                expit_raw_probs_median = expit(probs_median)
-            except Exception as e:
+    def decision_function(self, X, **kwargs):
+        """Compute the decision function of X.
 
-                pass
-            probs_upper = (
-                expit_raw_probs_upper / expit_raw_probs_upper.sum(axis=1)[:, None]
+        Parameters:
+            X: {array-like}, shape = [n_samples, n_features]
+                Samples to compute decision function for.
+
+            **kwargs: additional parameters to be passed to
+                    self.cook_test_set
+
+        Returns:
+            array-like of shape (n_samples,) or (n_samples, n_classes)
+            Decision function of the input samples. The order of outputs is the same
+            as that of the classes passed to fit.
+        """
+        if not hasattr(self.obj, "decision_function"):
+            # If base classifier doesn't have decision_function, use predict_proba
+            proba = self.predict_proba(X, **kwargs)
+            if proba.shape[1] == 2:
+                return proba[:, 1]  # For binary classification
+            return proba  # For multiclass
+
+        if len(X.shape) == 1:
+            n_features = X.shape[0]
+            new_X = mo.rbind(
+                X.reshape(1, n_features),
+                np.ones(n_features).reshape(1, n_features),
             )
-            probs_lower = (
-                expit_raw_probs_lower / expit_raw_probs_lower.sum(axis=1)[:, None]
-            )
-            probs_upper = np.minimum(probs_upper, 1)
-            probs_lower = np.maximum(probs_lower, 0)
-            try:
-                probs_median = (
-                    expit_raw_probs_median / expit_raw_probs_median.sum(axis=1)[:, None]
+
+            return (
+                self.obj.decision_function(
+                    self.cook_test_set(new_X, **kwargs), **kwargs
                 )
-            except Exception as e:
+            )[0]
 
-                pass
-
-            # Normalize each probability independently to [0,1] range
-            probs = expit_raw_probs
-            probs_upper = np.minimum(expit_raw_probs_upper, 1)
-            probs_lower = np.maximum(expit_raw_probs_lower, 0)
-
-            # Ensure upper >= lower
-            probs_upper = np.maximum(probs_upper, probs_lower)
-
-            try:
-                probs_median = expit_raw_probs_median
-            except Exception as e:
-
-                pass
-
-            try:
-                DescribeResult = namedtuple(
-                    "DescribeResult", ["mean", "upper", "lower", "median"]
-                )
-                return DescribeResult(
-                    mean=probs,
-                    upper=probs_upper,
-                    lower=probs_lower,
-                    median=probs_median,
-                )
-            except Exception as e:
-
-                DescribeResult = namedtuple(
-                    "DescribeResult", ["mean", "upper", "lower"]
-                )
-                return DescribeResult(mean=probs, upper=probs_upper, lower=probs_lower)
-
-        except Exception as e:
-
-            return expit_raw_probs / expit_raw_probs.sum(axis=1)[:, None]
+        return self.obj.decision_function(self.cook_test_set(X, **kwargs), **kwargs)

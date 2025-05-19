@@ -182,10 +182,7 @@ class CustomClassifier(Custom, ClassifierMixin):
         self.type_fit = "classification"
         self.cv_calibration = cv_calibration
         self.calibration_method = calibration_method
-        if self.cv_calibration is not None: 
-            self.obj = CalibratedClassifierCV(self.obj, cv=self.cv_calibration, 
-                                          method=self.calibration_method)
-        self._estimator_type = "classifier"
+        self._estimator_type = "classifier"  # Explicitly mark as classifier
 
     def __sklearn_clone__(self):
         """Create a clone of the estimator.
@@ -246,7 +243,15 @@ class CustomClassifier(Custom, ClassifierMixin):
 
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
         self.classes_ = np.unique(y)
-        self.n_classes_ = len(self.classes_)  # for compatibility with
+        self.n_classes_ = len(self.classes_)  # for compatibility with sklearn
+
+        # Wrap in CalibratedClassifierCV if needed
+        if self.cv_calibration is not None:
+            self.obj = CalibratedClassifierCV(
+                self.obj, 
+                cv=self.cv_calibration,
+                method=self.calibration_method
+            )
 
         # if sample_weights, else: (must use self.row_index)
         if sample_weight is not None:
@@ -254,13 +259,12 @@ class CustomClassifier(Custom, ClassifierMixin):
                 scaled_Z,
                 output_y,
                 sample_weight=sample_weight[self.index_row_].ravel(),
-                # **kwargs
+                **kwargs
             )
-
             return self
 
         # if sample_weight is None:
-        self.obj.fit(scaled_Z, output_y)
+        self.obj.fit(scaled_Z, output_y, **kwargs)
         self.classes_ = np.unique(y)  # for compatibility with sklearn
         self.n_classes_ = len(self.classes_)  # for compatibility with sklearn
 
@@ -320,10 +324,10 @@ class CustomClassifier(Custom, ClassifierMixin):
             return self
 
         # if sample_weight is None:
-        try:
-            self.obj.partial_fit(scaled_Z, output_y)
-        except:
-            raise NotImplementedError
+        #try:
+        self.obj.partial_fit(scaled_Z, output_y)
+        #except:
+        #    raise NotImplementedError
 
         self.classes_ = np.unique(y)  # for compatibility with sklearn
         self.n_classes_ = len(self.classes_)  # for compatibility with sklearn

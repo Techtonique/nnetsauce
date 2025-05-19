@@ -16,18 +16,17 @@ regr = ns.LazyRegressor(verbose=0, ignore_warnings=True, custom_metric=None,
 models = regr.fit(X_train, X_test, y_train, y_test)
 model_dictionary = regr.provide_models(X_train, X_test, y_train, y_test)
 print(models)
-print(model_dictionary["CustomRegressor(RandomForestRegressor)"])
+
 
 regr = ns.LazyRegressor(verbose=0, ignore_warnings=True, custom_metric=None, 
                         preprocess=True)
 models = regr.fit(X_train, X_test, y_train, y_test)
 model_dictionary = regr.provide_models(X_train, X_test, y_train, y_test)
 print(models)
-print(model_dictionary["CustomRegressor(RandomForestRegressor)"])
+
 
 regr2 = ns.LazyRegressor(verbose=0, ignore_warnings=True, custom_metric=None, 
                         preprocess=False)
 models = regr2.fit(X_train, X_test, y_train, y_test)
 model_dictionary = regr2.provide_models(X_train, X_test, y_train, y_test)
 print(models)
-print(model_dictionary["CustomRegressor(RandomForestRegressor)"])

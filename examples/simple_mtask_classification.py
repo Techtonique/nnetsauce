@@ -29,11 +29,12 @@ start = time()
 fit_obj.fit(X_train, y_train)
 print(f"Elapsed {time() - start}") 
 
-print(fit_obj.score(X_test, y_test))
+#print(fit_obj.score(X_test, y_test))
 
 start = time()
 preds = fit_obj.predict(X_test)
 print(f"Elapsed {time() - start}") 
+print("preds", preds)
 print(metrics.classification_report(preds, y_test))
 
 # dataset no. 4 ---------- 
@@ -55,7 +56,7 @@ start = time()
 fit_obj.fit(X_train, y_train)
 print(f"Elapsed {time() - start}") 
 
-print(fit_obj.score(X_test, y_test))
+#print(fit_obj.score(X_test, y_test))
 
 start = time()
 preds = fit_obj.predict(X_test)
@@ -81,7 +82,7 @@ start = time()
 fit_obj.fit(X_train, y_train)
 print(f"Elapsed {time() - start}") 
 
-print(fit_obj.score(X_test, y_test))
+#print(fit_obj.score(X_test, y_test))
 
 start = time()
 preds = fit_obj.predict(X_test)
@@ -107,7 +108,7 @@ start = time()
 fit_obj.fit(X_train, y_train)
 print(f"Elapsed {time() - start}") 
 
-print(fit_obj.score(X_test, y_test))
+#print(fit_obj.score(X_test, y_test))
 
 start = time()
 preds = fit_obj.predict(X_test)

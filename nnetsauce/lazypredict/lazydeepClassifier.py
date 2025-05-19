@@ -354,9 +354,9 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                 if self.predictions:
                     predictions[name] = y_pred
             except Exception as exception:
-                if self.ignore_warnings is False:
-                    print(name + " model failed to execute")
-                    print(exception)
+                 if self.ignore_warnings is False:
+                     print(name + " model failed to execute")
+                     print(exception)
 
         if self.estimators == "all":
             self.classifiers = [
@@ -437,6 +437,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                             row_sample=self.row_sample,
                             seed=self.seed,
                             backend=self.backend,
+                            cv_calibration=None,
                         )
 
                     else:
@@ -457,6 +458,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                             row_sample=self.row_sample,
                             seed=self.seed,
                             backend=self.backend,
+                            cv_calibration=None,
                         )
 
                     layer_clf.fit(X_train, y_train)
@@ -480,6 +482,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                                 row_sample=self.row_sample,
                                 seed=self.seed,
                                 backend=self.backend,
+                                cv_calibration=None,
                             )
                         )
 
@@ -539,9 +542,9 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                     if self.predictions:
                         predictions[name] = y_pred
                 except Exception as exception:
-                    if self.ignore_warnings is False:
-                        print(name + " model failed to execute")
-                        print(exception)
+                     if self.ignore_warnings is False:
+                         print(name + " model failed to execute")
+                         print(exception)
 
         else:  # no preprocessing
 
@@ -566,6 +569,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                             row_sample=self.row_sample,
                             seed=self.seed,
                             backend=self.backend,
+                            cv_calibration=None,
                         )
 
                     else:
@@ -586,6 +590,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                             row_sample=self.row_sample,
                             seed=self.seed,
                             backend=self.backend,
+                            cv_calibration=None,
                         )
 
                     layer_clf.fit(X_train, y_train)
@@ -609,6 +614,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                                 row_sample=self.row_sample,
                                 seed=self.seed,
                                 backend=self.backend,
+                                cv_calibration=None,
                             )
                         )
 
@@ -664,9 +670,9 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                     if self.predictions:
                         predictions[name] = y_pred
                 except Exception as exception:
-                    if self.ignore_warnings is False:
-                        print(name + " model failed to execute")
-                        print(exception)
+                     if self.ignore_warnings is False:
+                         print(name + " model failed to execute")
+                         print(exception)
 
         if self.custom_metric is None:
             scores = pd.DataFrame(

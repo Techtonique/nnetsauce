@@ -42,7 +42,7 @@ print(f"Elapsed {time() - start}")
 
 preds = fit_obj.predict(X_test)                        
 
-print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
+print(fit_obj.score(X_test, y_test, ))
 print(metrics.classification_report(preds, y_test))
 
 
@@ -57,16 +57,13 @@ fit_obj = ns.AdaBoostClassifier(clf,
                                 dropout=0.63078613, n_clusters=2,
                                 type_clust="gmm",
                                 verbose=1, seed = 123, 
-                                method="SAMME.R", level=95, 
-                                pi_method="tcp")  
+                                method="SAMME.R")  
 start = time() 
 fit_obj.fit(X_train, y_train) 
 print(f"Elapsed {time() - start}") 
 
 preds = fit_obj.predict(X_test)                        
 
-# accuracy
-print(f"Accuracy: {np.mean(preds.argmax(axis=1) == y_test)}")
 
 # dataset no. 2 ----------
 

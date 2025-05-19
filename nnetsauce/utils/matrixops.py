@@ -100,13 +100,13 @@ def cluster_covariates(X, n_clusters, seed, type_clust="kmeans", **kwargs):
         X = copy.deepcopy(X.values.astype(float))
 
     if type_clust == "kmeans":
-        kmeans = KMeans(n_clusters=n_clusters, random_state=seed, n_init=10, **kwargs)
+        kmeans = KMeans(n_clusters=n_clusters, random_state=seed, n_init=10)
         kmeans.fit(X)
 
         return kmeans, kmeans.predict(X)
 
     elif type_clust == "gmm":
-        gmm = GaussianMixture(n_components=n_clusters, random_state=seed, **kwargs)
+        gmm = GaussianMixture(n_components=n_clusters, random_state=seed)
         gmm.fit(X)
 
         return gmm, gmm.predict(X)

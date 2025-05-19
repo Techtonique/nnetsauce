@@ -85,14 +85,16 @@ for data in load_datasets:
         regr = ns.DeepRegressor(obj, n_layers=3, 
                                 verbose=1, n_clusters=2, 
                                 n_hidden_features=5, 
-                                level=95, 
-                                pi_method="splitconformal")
+                                )
 
         start = time()
         regr.fit(X_train, y_train)
         print(f"\nElapsed: {time() - start} seconds\n")
 
-        preds = regr.predict(X_test)
+
+
+        preds = regr.predict(X_test, return_pi=True, level=95, 
+                             method="splitconformal")
         #print(f"preds: {preds}")
         coverage = np.mean((y_test >= preds.lower) & (y_test <= preds.upper))
         print(f"test coverage: {coverage} \n")
@@ -112,21 +114,14 @@ for data in load_datasets:
         regr = ns.DeepRegressor(obj, n_layers=3, 
                                 verbose=1, n_clusters=2, 
                                 n_hidden_features=5, 
-                                level=95, 
-                                pi_method="localconformal")
+                                )
 
         start = time()
         regr.fit(X_train, y_train)
         print(f"\nElapsed: {time() - start} seconds\n")
 
-        preds = regr.predict(X_test)
+        preds = regr.predict(X_test, return_pi=True, level=95, 
+                             method="localconformal")
         #print(f"preds: {preds}")
         coverage = np.mean((y_test >= preds.lower) & (y_test <= preds.upper))
         print(f"test coverage: {coverage} \n")
-        plot_func(range(len(y_test))[0:30], y_test[0:30],
-              preds.upper[0:30], preds.lower[0:30],
-              preds.mean[0:30], method_name="Local Conformal")
-        # prediction interval average width
-        width = np.mean(preds.upper - preds.lower)
-        print(f"prediction interval average width: {width} \n")
-        

@@ -56,7 +56,10 @@ for data, name in zip(datasets, dataset_names):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = .2, random_state = 123)
 
 
-    regr = ns.CustomClassifier(PassiveAggressiveClassifier(), n_clusters=0, n_hidden_features=100)
+    regr = ns.CustomClassifier(PassiveAggressiveClassifier(), 
+                               n_clusters=0, 
+                               n_hidden_features=100, 
+                               cv_calibration=None) # as 'CalibratedClassifierCV' object has no attribute 'partial_fit'
     start = time()
     regr.fit(X_train, y_train)
     print(f"Elapsed: {time() - start}s")

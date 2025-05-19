@@ -220,6 +220,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             col_sample=self.col_sample,
             row_sample=self.row_sample,
             seed=self.seed,
+            cv_calibration=None
         )
 
         # 1 - Sequential training -----

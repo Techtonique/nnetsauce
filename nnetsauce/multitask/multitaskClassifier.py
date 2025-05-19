@@ -221,7 +221,6 @@ class MultitaskClassifier(Base, ClassifierMixin):
             model predictions: {array-like}
 
         """
-
         return np.argmax(self.predict_proba(X, **kwargs), axis=1)
 
     def predict_proba(self, X, **kwargs):
@@ -270,3 +269,40 @@ class MultitaskClassifier(Base, ClassifierMixin):
         expit_raw_probs = expit(probs)
 
         return expit_raw_probs / expit_raw_probs.sum(axis=1)[:, None]
+
+    def decision_function(self, X, **kwargs):
+        """Compute the decision function of X.
+
+        Parameters:
+            X: {array-like}, shape = [n_samples, n_features]
+                Samples to compute decision function for.
+
+            **kwargs: additional parameters to be passed to
+                    self.cook_test_set
+
+        Returns:
+            array-like of shape (n_samples,) or (n_samples, n_classes)
+            Decision function of the input samples. The order of outputs is the same
+            as that of the classes passed to fit.
+        """
+        if not hasattr(self.obj, "decision_function"):
+            # If base classifier doesn't have decision_function, use predict_proba
+            proba = self.predict_proba(X, **kwargs)
+            if proba.shape[1] == 2:
+                return proba[:, 1]  # For binary classification
+            return proba  # For multiclass
+
+        if len(X.shape) == 1:
+            n_features = X.shape[0]
+            new_X = mo.rbind(
+                X.reshape(1, n_features),
+                np.ones(n_features).reshape(1, n_features),
+            )
+
+            return (
+                self.obj.decision_function(
+                    self.cook_test_set(new_X, **kwargs), **kwargs
+                )
+            )[0]
+
+        return self.obj.decision_function(self.cook_test_set(X, **kwargs), **kwargs)

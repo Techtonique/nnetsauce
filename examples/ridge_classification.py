@@ -44,7 +44,7 @@ print(fit_obj.score(X_test, y_test))
 print(f"Elapsed {time() - start}") 
 
 # get area under the curve on test set (auc)
-print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
+print(fit_obj.score(X_test, y_test))
 
 
 # create the model with nnetsauce
@@ -66,7 +66,7 @@ print(fit_obj.score(X_test, y_test))
 print(f"Elapsed {time() - start}") 
 
 # get area under the curve on test set (auc)
-print(fit_obj.score(X_test, y_test, scoring="roc_auc"))
+print(fit_obj.score(X_test, y_test))
 
 # dataset no. 2 ----------
 

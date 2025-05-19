@@ -8,6 +8,8 @@ from time import time
 
 print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
+# See also examples/custom_deep_*.py
+
 digits = load_digits()
 X = digits.data
 y = digits.target
@@ -37,17 +39,5 @@ layer2_regr.fit(X_train, y_train)
 
 # Accuracy in layer 2
 print(layer2_regr.score(X_test, y_test))
-
-
-# layer 3 using layer 2 ----
-print(" \n layer 3 ----- \n")
-layer3_regr = ns.CustomClassifier(obj = layer2_regr, n_hidden_features=10, 
-                        direct_link=True, bias=True, dropout=0.7,
-                        nodes_sim='uniform', activation_name='relu', 
-                        n_clusters=2, seed=123)
-layer3_regr.fit(X_train, y_train)
-
-# Accuracy in layer 3
-print(layer3_regr.score(X_test, y_test))
 
 print(f"Elapsed {time() - start}")  

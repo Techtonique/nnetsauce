@@ -123,12 +123,13 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                     self.calibrated_residuals_.reshape(-1, 1)
                 ).ravel()
             )
+            print("absolute_residuals", absolute_residuals)
             try:
                 # numpy version >= 1.22
                 self.quantile_ = np.quantile(
                     a=absolute_residuals, q=self.level / 100, method="higher"
                 )
-            except:
+            except Exception:
                 # numpy version < 1.22
                 self.quantile_ = np.quantile(
                     a=absolute_residuals,
@@ -181,7 +182,8 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                     DescribeResult = namedtuple(
                         "DescribeResult", ("mean", "lower", "upper")
                     )
-
+                    print("pred", pred)
+                    print("self.quantile_", self.quantile_)
                     return DescribeResult(
                         pred, pred - self.quantile_, pred + self.quantile_
                     )

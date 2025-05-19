@@ -21,14 +21,14 @@ verbose=0, ignore_warnings=True, estimators=["ExtraTreesRegressor",
 models = regr2.fit(X_train, X_test, y_train, y_test)
 model_dictionary = regr2.provide_models(X_train, X_test, y_train, y_test)
 print(models)
-print(model_dictionary["DeepCustomRegressor(LassoLarsIC)"])
+
 
 regr = ns.LazyDeepRegressor(n_layers=3, n_hidden_features=2, 
 verbose=0, ignore_warnings=True)
 models = regr.fit(X_train, X_test, y_train, y_test)
 model_dictionary = regr.provide_models(X_train, X_test, y_train, y_test)
 print(models)
-print(model_dictionary["DeepCustomRegressor(LassoLarsIC)"])
+
 
 # with preprocessing
 print("\n\nWith preprocessing")
@@ -47,12 +47,11 @@ verbose=0, ignore_warnings=True, estimators=["ExtraTreesRegressor",
 models = regr2.fit(X_train, X_test, y_train, y_test)
 model_dictionary = regr2.provide_models(X_train, X_test, y_train, y_test)
 print(models)
-print(model_dictionary["DeepCustomRegressor(LassoLarsIC)"])
+
 
 regr = ns.LazyDeepRegressor(n_layers=3, n_hidden_features=2, 
 verbose=0, ignore_warnings=True, preprocess=True)
 models = regr.fit(X_train, X_test, y_train, y_test)
 model_dictionary = regr.provide_models(X_train, X_test, y_train, y_test)
 print(models)
-print(model_dictionary["DeepCustomRegressor(LassoLarsIC)"])
 
