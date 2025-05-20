@@ -178,7 +178,6 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
 
             # Fallback to standard model
             for i in range(self.n_classes_):
-                print('i ', i)
                 probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)[0]
 
         else: # multiple rows
@@ -187,9 +186,6 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
 
             # Fallback to standard model
             for i in range(self.n_classes_):
-                print('i ', i)
-                print('probs ', probs)
-                print('self.fit_objs_[i].predict(Z, **kwargs) ', self.fit_objs_[i].predict(Z, **kwargs))
                 probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)
 
         expit_raw_probs = expit(probs)

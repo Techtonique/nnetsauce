@@ -22,7 +22,7 @@ datasets = [load_diabetes, fetch_california_housing]
 
 dataset_names = ["diabetes", "california_housing"]
 
-regrs = [MLPRegressor(), RandomForestRegressor(), RidgeCV(), KNeighborsRegressor()]
+regrs = [RandomForestRegressor(), RidgeCV(), KNeighborsRegressor()]
 
 for dataset, dataset_name in zip(datasets, dataset_names):
 

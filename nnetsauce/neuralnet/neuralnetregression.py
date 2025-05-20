@@ -3,7 +3,7 @@ try:
     import jax.numpy as jnp
     from jax import grad, jit, vmap
 except ImportError:
-    import numpy as jnp 
+    pass
 
 import numpy as np
 from sklearn.base import BaseEstimator, RegressorMixin
@@ -74,13 +74,10 @@ def loss(
 
 def initialize_params(input_dim, hidden_layer_sizes, random_state=None):
     """Initialize network parameters."""
-    try: 
-        if random_state is not None:
-            rng = jax.random.PRNGKey(random_state)
-        else:
-            rng = jax.random.PRNGKey(0)
-    except Exception:
-        pass 
+    if random_state is not None:
+        rng = jax.random.PRNGKey(random_state)
+    else:
+        rng = jax.random.PRNGKey(0)
 
     # Layer dimensions including input and output
     layer_sizes = [input_dim] + list(hidden_layer_sizes) + [1]
@@ -210,10 +207,7 @@ class NeuralNetRegressor(BaseEstimator, RegressorMixin):
         X = self.scaler_.fit_transform(X)
         # Ensure y is 2D for consistency
         y = y.reshape(-1, 1)
-        try:
-            self.y_mean_ = jnp.mean(y)
-        except Exception:
-            self.y_mean_ = np.mean(y)
+        self.y_mean_ = jnp.mean(y)
         y = y - self.y_mean_
         # Validate or initialize weights
         if self.weights is not None:

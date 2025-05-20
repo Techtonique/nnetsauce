@@ -83,7 +83,7 @@ class QuantileClassifier(BaseEstimator, ClassifierMixin):
         ), "scoring must be 'predictions' or 'residuals'"
         self.obj = obj
         quantileregressor = QuantileRegressor(self.obj)
-        quantileregressor.predict = partial(quantileregressor.predict, return_pi=True)
+        quantileregressor.predict = partial(quantileregressor.predict, return_pi=False)
         self.obj_ = SimpleMultitaskClassifier(quantileregressor)
 
     def fit(self, X, y, **kwargs):

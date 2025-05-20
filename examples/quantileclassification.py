@@ -12,7 +12,7 @@ from sklearn.kernel_ridge import KernelRidge
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.datasets import load_iris, load_breast_cancer, load_wine, load_digits
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report
 from tqdm import tqdm
 
 
@@ -51,17 +51,4 @@ for dataset, dataset_name in zip(datasets, dataset_names):
             
             predictions = classifier.predict(X_test)
 
-            # Check probability ordering
-            is_ordered = np.all(
-                (predictions_proba.lower <= predictions_proba.median) & 
-                (predictions_proba.median <= predictions_proba.upper)
-            )
-            print("Probabilities properly ordered:", is_ordered)
-
-            print("score median", accuracy_score(y_test, predictions.median))
-            print("score mean", accuracy_score(y_test, predictions.mean))
-            print("score lower", accuracy_score(y_test, predictions.lower))
-            print("score upper", accuracy_score(y_test, predictions.upper))
-            print("percentage decision changes up", np.mean(predictions.upper != predictions.mean))
-            print("percentage decision changes down", np.mean(predictions.lower != predictions.mean))
-
+            print("score", classification_report(y_test, predictions))
