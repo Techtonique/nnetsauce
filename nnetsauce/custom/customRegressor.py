@@ -170,6 +170,9 @@ class CustomRegressor(Custom, RegressorMixin):
         self.intercept_ = None
         self.X_ = None
         self.y_ = None
+        self.aic_ = None 
+        self.aicc_ = None
+        self.bic_ = None
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit custom model to training data (X, y).
@@ -218,6 +221,22 @@ class CustomRegressor(Custom, RegressorMixin):
         self.X_ = X
 
         self.y_ = y
+
+        # Compute SSE
+        y_pred = self.predict(X)
+        self.sse_ = np.sum((y - y_pred) ** 2)
+        
+        # Get number of parameters
+        n_params = self.n_hidden_features + X.shape[1]  # hidden features + original features
+        if self.n_clusters > 0:
+            n_params += self.n_clusters  # add clusters if used
+            
+        # Compute information criteria
+        n_samples = X.shape[0]
+        temp = n_samples * np.log(self.sse_/n_samples)
+        self.aic_ = temp + 2 * n_params
+        self.aicc_ = self.aic_ + (2 * n_params * (n_params + 1))/(n_samples - n_params - 1)
+        self.bic_ = temp + n_params * np.log(n_samples)
 
         if hasattr(self.obj, "coef_"):
             self.coef_ = self.obj.coef_

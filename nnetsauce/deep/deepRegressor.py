@@ -21,7 +21,7 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
         verbose : int, optional (default=0)
             Monitor progress when fitting.
 
-        n_layers: int (default=3)
+        n_layers: int (default=2)
             Number of layers. `n_layers = 1` is a simple `CustomRegressor`
 
         All the other parameters are nnetsauce `CustomRegressor`'s
@@ -49,7 +49,7 @@ class DeepRegressor(CustomRegressor, RegressorMixin):
         self,
         obj,
         # Defining depth
-        n_layers=3,
+        n_layers=2,
         verbose=0,
         # CustomRegressor attributes
         n_hidden_features=5,
