@@ -27,6 +27,10 @@ class MLARCH(MTS):
         
         model_residuals: object of class nnetsauce.MTS
             Model for residuals prediction (default: None, uses obj)
+    
+    Examples: 
+
+        See examples/mlarch.py
                         
     """
     def __init__(
@@ -49,17 +53,39 @@ class MLARCH(MTS):
 
         self.mean_residuals_ = None
         self.mean_residuals_wilcoxon_test_ = None
-        self.mean_residuals_kss_test_ = None
+        self.mean_residuals_kpss_test_ = None
         self.standardized_residuals_ = None
 
 
     def fit(self, y):
+        """Fit the MLARCH model to the time series data.
+
+        Parameters
+        ----------
+        y : array-like of shape (n_samples,)
+            The target time series to be fitted.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+
+        Notes
+        -----
+        This method:
+
+        1. Fits the mean model to the time series
+        2. Performs statistical tests on the residuals (Wilcoxon and KPSS)
+        3. Fits the volatility model to the squared residuals
+        4. Computes standardized residuals
+        5. Fits the residuals model to the standardized residuals
+        """
         n = len(y)
         self.model_mean.fit(y.reshape(-1, 1)) 
         # Wilcoxon signed-rank test on residuals (mean = 0)
         self.mean_residuals_wilcoxon_test_ = stats.wilcoxon(self.model_mean.residuals_)
         # KPSS test for stationarity on residuals
-        self.mean_residuals_kss_test_ = kpss(self.model_mean.residuals_, regression='c')
+        self.mean_residuals_kpss_test_ = kpss(self.model_mean.residuals_, regression='c')
         self.model_sigma.fit(np.log(self.model_mean.residuals_.reshape(-1, 1)**2)) 
         # n//2 here because the model is conformalized
         fitted_sigma = self.model_sigma.residuals_ + np.log(self.model_mean.residuals_**2)[(n//2):,:]
@@ -70,6 +96,38 @@ class MLARCH(MTS):
 
 
     def predict(self, h=5, level=95):
+        """Predict (probabilistic) future values of the time series.
+
+        Parameters
+        ----------
+        h : int, default=5
+            The forecast horizon.
+        level : int, default=95
+            The confidence level for prediction intervals.
+
+        Returns
+        -------
+        DescribeResult : namedtuple
+            A named tuple containing:
+
+            - mean : array-like of shape (h,)
+                The mean forecast.
+            - sims : array-like of shape (h, n_replications)
+                The simulated forecasts.
+            - lower : array-like of shape (h,)
+                The lower bound of the prediction interval.
+            - upper : array-like of shape (h,)
+                The upper bound of the prediction interval.
+
+        Notes
+        -----
+        This method:
+        1. Generates mean forecasts using the mean model
+        2. Generates standardized residual forecasts using the residuals model
+        3. Generates volatility forecasts using the sigma model
+        4. Combines these forecasts to generate the final predictions
+        5. Computes prediction intervals at the specified confidence level
+        """
         DescribeResult = namedtuple(
                 "DescribeResult", ("mean", "sims", "lower", "upper")
             )
@@ -88,7 +146,7 @@ class MLARCH(MTS):
         alpha = 1 - level/100
         lower_bound = np.quantile(f, alpha/2, axis=1)
         upper_bound = np.quantile(f, 1-alpha/2, axis=1)
-        
+
         return DescribeResult(mean_f, f, 
                               lower_bound, upper_bound)
 

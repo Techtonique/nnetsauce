@@ -42,11 +42,11 @@ B=1000
 
 plt.plot(stock_prices)
 
-mean_model = ns.MTS(GradientBoostingRegressor())
-model_sigma = ns.MTS(GradientBoostingRegressor(), 
+mean_model = ns.MTS(GradientBoostingRegressor(random_state=42))
+model_sigma = ns.MTS(GradientBoostingRegressor(random_state=42), 
                     lags=2, type_pi="scp2-kde",
                     replications=B)
-model_z = ns.MTS(GradientBoostingRegressor(), 
+model_z = ns.MTS(GradientBoostingRegressor(random_state=42), 
                     type_pi="scp2-kde",
                     replications=B)
 

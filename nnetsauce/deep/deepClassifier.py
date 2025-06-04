@@ -16,7 +16,10 @@ from tqdm import tqdm
 from sklearn import metrics
 from sklearn.base import ClassifierMixin, RegressorMixin
 from sklearn.calibration import CalibratedClassifierCV
-from sklearn.frozen import FrozenEstimator
+try:
+    from sklearn.frozen import FrozenEstimator
+except ImportError:
+    pass 
 
 try:
     from sklearn.utils import all_estimators
