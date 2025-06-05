@@ -92,6 +92,29 @@ class MLARCH(MTS):
         # standardized residuals
         self.standardized_residuals_ = self.model_mean.residuals_[(n//2):,:]/np.sqrt(np.exp(fitted_sigma))
         self.model_residuals.fit(self.standardized_residuals_.reshape(-1, 1))
+
+        # Calculate AIC
+        # Get predictions from all models
+        mean_pred = self.model_mean.predict(h=0).values.ravel()
+        sigma_pred = self.model_sigma.predict(h=0).values.ravel()
+        z_pred = self.model_residuals.predict(h=0).values.ravel()
+        
+        # Calculate combined predictions
+        combined_pred = mean_pred + z_pred * np.sqrt(np.exp(sigma_pred))
+        
+        # Calculate SSE using the last half of the data (matching standardized_residuals_)
+        y_actual = y[(n//2):].ravel()
+        self.sse_ = np.sum((y_actual - combined_pred) ** 2)
+        
+        # Calculate number of parameters (sum of parameters from all three models)
+        n_params = (self.model_mean.n_hidden_features + 1 +  # mean model
+                   self.model_sigma.n_hidden_features + 1 +  # sigma model
+                   self.model_residuals.n_hidden_features + 1)  # residuals model
+        
+        # Calculate AIC
+        n_samples = len(y_actual)
+        self.aic_ = n_samples * np.log(self.sse_/n_samples) + 2 * n_params
+
         return self
 
 

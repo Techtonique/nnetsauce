@@ -235,8 +235,6 @@ class CustomRegressor(Custom, RegressorMixin):
         n_samples = X.shape[0]
         temp = n_samples * np.log(self.sse_/n_samples)
         self.aic_ = temp + 2 * n_params
-        self.aicc_ = self.aic_ + (2 * n_params * (n_params + 1))/(n_samples - n_params - 1)
-        self.bic_ = temp + n_params * np.log(n_samples)
 
         if hasattr(self.obj, "coef_"):
             self.coef_ = self.obj.coef_

@@ -78,6 +78,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
         self.aic_ = None 
         self.aicc_ = None
         self.bic_ = None
+        self.sse_ = None
 
     def fit(self, X, y, sample_weight=None, **kwargs):
         """Fit the `method` to training data (X, y).
@@ -111,6 +112,20 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             X_calibration = X[second_half_idx, :]
             y_train = y[first_half_idx]
             y_calibration = y[second_half_idx]
+        
+        # Calculate AIC
+        # Get predictions
+        preds = self.obj.predict(X_calibration)
+        
+        # Calculate SSE
+        self.sse_ = np.sum((y_calibration - preds) ** 2)
+        
+        # Get number of parameters from the base model
+        n_params = getattr(self.obj, 'n_hidden_features', 0) + X_calibration.shape[1]
+        
+        # Calculate AIC
+        n_samples = len(y_calibration)
+        self.aic_ = n_samples * np.log(self.sse_/n_samples) + 2 * n_params
 
         if self.method == "splitconformal":
 
@@ -137,7 +152,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                     a=absolute_residuals,
                     q=self.level / 100,
                     interpolation="higher",
-                )
+                )            
 
         if self.method == "localconformal":
 
