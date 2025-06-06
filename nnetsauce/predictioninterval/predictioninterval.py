@@ -111,21 +111,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             X_train = X[first_half_idx, :]
             X_calibration = X[second_half_idx, :]
             y_train = y[first_half_idx]
-            y_calibration = y[second_half_idx]
-        
-        # Calculate AIC
-        # Get predictions
-        preds = self.obj.predict(X_calibration)
-        
-        # Calculate SSE
-        self.sse_ = np.sum((y_calibration - preds) ** 2)
-        
-        # Get number of parameters from the base model
-        n_params = getattr(self.obj, 'n_hidden_features', 0) + X_calibration.shape[1]
-        
-        # Calculate AIC
-        n_samples = len(y_calibration)
-        self.aic_ = n_samples * np.log(self.sse_/n_samples) + 2 * n_params
+            y_calibration = y[second_half_idx]        
 
         if self.method == "splitconformal":
 
@@ -162,6 +148,20 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             self.icp_ = IcpRegressor(nc)
             self.icp_.fit(X_train, y_train)
             self.icp_.calibrate(X_calibration, y_calibration)
+        
+        # Calculate AIC
+        # Get predictions
+        preds = self.obj.predict(X_calibration)
+        
+        # Calculate SSE
+        self.sse_ = np.sum((y_calibration - preds) ** 2)
+        
+        # Get number of parameters from the base model
+        n_params = getattr(self.obj, 'n_hidden_features', 0) + X_calibration.shape[1]
+        
+        # Calculate AIC
+        n_samples = len(y_calibration)
+        self.aic_ = n_samples * np.log(self.sse_/n_samples) + 2 * n_params
 
         return self
 
