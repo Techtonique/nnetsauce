@@ -282,7 +282,7 @@ class CustomRegressor(Custom, RegressorMixin):
 
         return self
 
-    def predict(self, X, level=95, method=None, **kwargs):
+    def predict(self, X, level=95, method='splitconformal', **kwargs):
         """Predict test data X.
 
         Parameters:
@@ -295,7 +295,7 @@ class CustomRegressor(Custom, RegressorMixin):
                 Level of confidence (default = 95)
 
             method: str
-                `None`, or 'splitconformal', 'localconformal'
+                'splitconformal', 'localconformal'
                 prediction (if you specify `return_pi = True`)
 
             **kwargs: additional parameters
