@@ -223,8 +223,8 @@ class CustomRegressor(Custom, RegressorMixin):
         self.y_ = y
 
         # Compute SSE
-        y_pred = self.predict(X)
-        self.sse_ = np.sum((y - y_pred) ** 2)
+        centered_y_pred = self.obj.predict(scaled_Z)
+        self.sse_ = np.sum((centered_y - centered_y_pred) ** 2)
         
         # Get number of parameters
         n_params = self.n_hidden_features + X.shape[1]  # hidden features + original features
