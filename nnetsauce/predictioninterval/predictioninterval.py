@@ -161,7 +161,9 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
         
         # Calculate AIC
         n_samples = len(y_calibration)
-        self.aic_ = n_samples * np.log(self.sse_/n_samples) + 2 * n_params
+        temp = n_samples * np.log(self.sse_/n_samples)
+        self.aic_ = temp + 2 * n_params
+        self.bic_ = temp + np.log(n_samples) * n_params
 
         return self
 
