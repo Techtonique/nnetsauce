@@ -65,6 +65,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         print(clf.score(clf.predict(X_test), y_test))
         ```
     """
+    _estimator_type = "classifier"
 
     def __init__(
         self,
@@ -129,7 +130,6 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         self.cv_calibration = cv_calibration
         self.calibration_method = calibration_method
         self.obj = obj
-        self._estimator_type = "classifier"  # Add this line to explicitly mark as classifier
 
         assert n_layers >= 1, "must have n_layers >= 1"
         self.stacked_obj = obj
@@ -636,3 +636,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                         pass
 
         return results
+
+    @property
+    def _estimator_type(self):
+        return "classifier"        

@@ -155,6 +155,7 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
     """
 
     # construct the object -----
+    _estimator_type = "classifier"
 
     def __init__(
         self,
@@ -461,3 +462,8 @@ class AdaBoostClassifier(Boosting, ClassifierMixin):
         sum_ensemble = expit_ensemble_learner.sum(axis=1)
 
         return expit_ensemble_learner / sum_ensemble[:, None]
+
+    @property
+    def _estimator_type(self):
+        return "classifier"            
+

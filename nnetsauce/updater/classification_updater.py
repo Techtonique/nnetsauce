@@ -33,6 +33,7 @@ class ClassifierUpdater(BaseEstimator, ClassifierMixin):
         Updating factor
 
     """
+    _estimator_type = "classifier"
 
     def __init__(self, clf, alpha=0.5):
         self.clf = clf

@@ -10,37 +10,39 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 # Single lambda
 print("\n\n Single lambda")
-model = ns.RidgeRegressor(lambda_=1.0)
+model = ns.RidgeRegressor(reg_lambda=1.0)
 start = time()
 model.fit(X_train, y_train)
 predictions = model.predict(X_test)
 end = time()
 print(f"Time taken: {end - start} seconds")
 print(f"coefs: {model.coef_}")
+print(f"Test RMSE: {np.sqrt(np.mean((predictions - y_test)**2))}")
+
 # Access criteria
-print(f"GCV scores: {model.GCV_}")
-print(f"HKB estimate: {model.HKB_}")
-print(f"LW estimate: {model.LW_}")
+#print(f"GCV scores: {model.GCV_}")
+#print(f"HKB estimate: {model.HKB_}")
+#print(f"LW estimate: {model.LW_}")
 
 
 # Multiple lambdas
-print("\n\n Multiple lambdas")
-model = ns.RidgeRegressor(lambda_=[0.1, 1.0, 10.0])
-start = time()
-model.fit(X_train, y_train)
-end = time()
-print(f"Time taken: {end - start} seconds")
-predictions = model.predict(X_test)  # Returns predictions for each lambda
-print(f"coefs: {model.coef_}")
-# Access criteria
-print(f"GCV scores: {model.GCV_}")
-print(f"HKB estimate: {model.HKB_}")
-print(f"LW estimate: {model.LW_}")
+# print("\n\n Multiple lambdas")
+# model = ns.RidgeRegressor(lambda_=[0.1, 1.0, 10.0])
+# start = time()
+# model.fit(X_train, y_train)
+# end = time()
+# print(f"Time taken: {end - start} seconds")
+# predictions = model.predict(X_test)  # Returns predictions for each lambda
+# print(f"coefs: {model.coef_}")
+# # Access criteria
+# print(f"GCV scores: {model.GCV_}")
+# print(f"HKB estimate: {model.HKB_}")
+# print(f"LW estimate: {model.LW_}")
 
-# Compare coefficients for lambda=1.0
-print("\nComparing coefficients for lambda=1.0:")
-print("Single lambda coefs:", model.coef_)
-print("Multiple lambda coefs (middle column):", model.coef_[:, 1])
+# # Compare coefficients for lambda=1.0
+# print("\nComparing coefficients for lambda=1.0:")
+# print("Single lambda coefs:", model.coef_)
+# print("Multiple lambda coefs (middle column):", model.coef_[:, 1])
 
-# With GPU acceleration
-#model = RidgeRegressor(lambda_=1.0, backend="gpu")
+# # With GPU acceleration
+# #model = RidgeRegressor(lambda_=1.0, backend="gpu")

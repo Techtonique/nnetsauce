@@ -118,6 +118,7 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
     """
 
     # construct the object -----
+    _estimator_type = "classifier"
 
     def __init__(
         self,
@@ -353,3 +354,8 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
 
         if scoring == "neg_log_loss":
             return -skm2.log_loss(y, self.predict_proba(X))
+
+    @property
+    def _estimator_type(self):
+        return "classifier"            
+            

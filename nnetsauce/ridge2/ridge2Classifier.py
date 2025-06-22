@@ -135,6 +135,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
 
 
     """
+    _estimator_type = "classifier"
 
     # construct the object -----
 
@@ -465,3 +466,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
         exp_ZB = np.exp(ZB)
 
         return exp_ZB / exp_ZB.sum(axis=1)[:, None]
+
+    @property
+    def _estimator_type(self):
+        return "classifier"            

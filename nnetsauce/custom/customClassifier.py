@@ -137,6 +137,7 @@ class CustomClassifier(Custom, ClassifierMixin):
     """
 
     # construct the object -----
+    _estimator_type = "classifier" 
 
     def __init__(
         self,
@@ -182,7 +183,6 @@ class CustomClassifier(Custom, ClassifierMixin):
         self.type_fit = "classification"
         self.cv_calibration = cv_calibration
         self.calibration_method = calibration_method
-        self._estimator_type = "classifier"  # Explicitly mark as classifier
 
     def __sklearn_clone__(self):
         """Create a clone of the estimator.
@@ -479,3 +479,7 @@ class CustomClassifier(Custom, ClassifierMixin):
 
         if scoring == "neg_log_loss":
             return -skm2.log_loss(y, self.predict_proba(X))
+
+    @property
+    def _estimator_type(self):
+        return "classifier"

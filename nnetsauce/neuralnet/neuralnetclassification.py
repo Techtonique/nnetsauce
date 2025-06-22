@@ -55,6 +55,7 @@ class NeuralNetClassifier(BaseEstimator, ClassifierMixin):
         set_weights(weights)
             Set the weights of the model.
     """
+    _estimator_type = "classifier"
 
     def __init__(
         self,
@@ -138,3 +139,7 @@ class NeuralNetClassifier(BaseEstimator, ClassifierMixin):
                 n_features is the number of features.
         """
         return self.regr.predict(X)
+
+    @property
+    def _estimator_type(self):
+        return "classifier"            

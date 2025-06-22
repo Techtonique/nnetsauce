@@ -124,6 +124,7 @@ class MultitaskClassifier(Base, ClassifierMixin):
     """
 
     # construct the object -----
+    _estimator_type = "classifier"
 
     def __init__(
         self,
@@ -306,3 +307,8 @@ class MultitaskClassifier(Base, ClassifierMixin):
             )[0]
 
         return self.obj.decision_function(self.cook_test_set(X, **kwargs), **kwargs)
+
+    @property
+    def _estimator_type(self):
+        return "classifier"            
+        

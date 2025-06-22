@@ -129,6 +129,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
     """
 
     # construct the object -----
+    _estimator_type = "classifier"
 
     def __init__(
         self,
@@ -373,3 +374,9 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             ensemble_proba += weights[i] * preds[i]
 
         return ensemble_proba
+
+
+    @property
+    def _estimator_type(self):
+        return "classifier"            
+        
