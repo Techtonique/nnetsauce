@@ -931,9 +931,6 @@ class MTS(Base):
             if "return_std" in kwargs:
 
                 self.preds_std_ = np.asarray(self.preds_std_)
-                print("self.preds_std_", self.preds_std_)
-                print("self.mean_", self.mean_)
-                print("pi_multiplier", pi_multiplier)
 
                 self.lower_ = pd.DataFrame(
                     self.mean_.values - pi_multiplier * self.preds_std_,
