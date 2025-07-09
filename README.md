@@ -171,7 +171,7 @@ Replace `Version x.x.x` by the version number you've used.
 @misc{moudiki2019nnetsauce,
 author={Moudiki, T.},
 title={nnetsauce, {A} package for {S}tatistical/{M}achine {L}earning using {R}andomized and {Q}uasi-{R}andomized (neural) networks.},
-howpublished={\url{https://github.com/thierrymoudiki/nnetsauce}},
+howpublished={\url{https://github.com/Techtonique/nnetsauce}},
 note={BSD 3-Clause Clear License. Version x.x.x},
 year={2019--2024}
 }}
