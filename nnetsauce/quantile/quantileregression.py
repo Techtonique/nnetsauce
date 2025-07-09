@@ -66,7 +66,6 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
         student_multiplier_ : float
             The multiplier for the student.
 
-
     """
 
     def __init__(self, obj, level=95, scoring="predictions"):
@@ -86,7 +85,7 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
         self.scoring_residuals_ = None
         self.student_multiplier_ = None
 
-    def _compute_quantile_loss(self, residuals: np.ndarray, quantile: float) -> float:
+    def _compute_quantile_loss(self, residuals, quantile):
         """
         Compute the quantile loss for a given set of residuals and quantile.
         """
@@ -97,17 +96,19 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
 
     def _optimize_multiplier(
         self,
-        y: np.ndarray,
-        base_predictions: np.ndarray,
-        prev_predictions: np.ndarray = None,
-        scoring_residuals: np.ndarray = None,
-        quantile: float = 0.5,
-    ) -> float:
+        y,
+        base_predictions,
+        prev_predictions,
+        scoring_residuals = None,
+        quantile = 0.5,
+    ):
         """
         Optimize the multiplier for a given quantile.
         """
         if not 0 < quantile < 1:
             raise ValueError("Quantile should be between 0 and 1.")
+        
+        n = len(y)
 
         def objective(log_multiplier):
             """
@@ -137,11 +138,11 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
                     # For first quantile, subtract from conditional expectation
                     predictions = base_predictions - multiplier * np.std(
                         scoring_residuals
-                    )
+                    )/np.sqrt(len(scoring_residuals))
                     # print("predictions", predictions)
                 else:
                     # For other quantiles, add to previous quantile
-                    offset = multiplier * np.std(scoring_residuals)
+                    offset = multiplier * np.std(scoring_residuals)/np.sqrt(len(scoring_residuals))
                     predictions = prev_predictions + offset
             elif self.scoring in ("studentized", "conformal-studentized"):
                 assert (
@@ -181,7 +182,8 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
 
         return np.exp(result.x[0])
 
-    def fit(self, X: np.ndarray, y: np.ndarray):
+
+    def fit(self, X, y):
         """Fit the model to the data.
 
         Parameters:
@@ -193,12 +195,16 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
                 Target values.
         """
         self.obj_ = clone(self.obj)
+
         if self.scoring in ("predictions", "residuals"):
+
             self.obj_.fit(X, y)
             base_predictions = self.obj_.predict(X)
             scoring_residuals = y - base_predictions
             self.scoring_residuals_ = scoring_residuals
+
         elif self.scoring == "conformal":
+
             X_train, X_calib, y_train, y_calib = train_test_split(
                 X, y, test_size=0.5, random_state=42
             )
@@ -210,7 +216,9 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
             # Update base_predictions to use training predictions for optimization
             self.obj_.fit(X_calib, y_calib)
             base_predictions = self.obj_.predict(X_calib)
+
         elif self.scoring in ("studentized", "conformal-studentized"):
+
             # Calculate student multiplier
             if self.scoring == "conformal-studentized":
                 X_train, X_calib, y_train, y_calib = train_test_split(
@@ -220,7 +228,7 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
                 scoring_residuals = y_calib - self.obj_.predict(X_calib)
                 # Calculate studentized multiplier using calibration data
                 self.student_multiplier_ = np.std(y_calib, ddof=1) / np.sqrt(
-                    len(y_calib)
+                    len(y_calib) - 1
                 )
                 self.obj_.fit(X_calib, y_calib)
                 base_predictions = self.obj_.predict(X_calib)
@@ -228,7 +236,7 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
                 self.obj_.fit(X, y)
                 base_predictions = self.obj_.predict(X)
                 scoring_residuals = y - base_predictions
-                self.student_multiplier_ = np.std(y, ddof=1) / np.sqrt(len(y))
+                self.student_multiplier_ = np.std(y, ddof=1) / np.sqrt(len(y) - 1)
 
         # Initialize storage for multipliers
         self.offset_multipliers_ = []
@@ -237,7 +245,9 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
 
         # Fit each quantile sequentially
         for i, quantile in enumerate(self.quantiles):
+
             if self.scoring == "predictions":
+
                 multiplier = self._optimize_multiplier(
                     y=y,
                     base_predictions=base_predictions,
@@ -257,7 +267,9 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
                     # Subsequent quantiles
                     offset = multiplier * np.abs(base_predictions)
                     current_predictions = current_predictions + offset
+
             elif self.scoring == "residuals":
+
                 multiplier = self._optimize_multiplier(
                     y=y,
                     base_predictions=base_predictions,
@@ -273,12 +285,14 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
                     # First quantile (lowest)
                     current_predictions = base_predictions - multiplier * np.std(
                         scoring_residuals
-                    )
+                    )/np.sqrt(len(scoring_residuals))
                 else:
                     # Subsequent quantiles
-                    offset = multiplier * np.std(scoring_residuals)
+                    offset = multiplier * np.std(scoring_residuals)/np.sqrt(len(scoring_residuals))
                     current_predictions = current_predictions + offset
+
             elif self.scoring == "conformal":
+
                 multiplier = self._optimize_multiplier(
                     y=y_calib,
                     base_predictions=base_predictions,
@@ -294,12 +308,14 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
                     # First quantile (lowest)
                     current_predictions = base_predictions - multiplier * np.std(
                         scoring_residuals
-                    )
+                    )/np.sqrt(len(scoring_residuals))
                 else:
                     # Subsequent quantiles
-                    offset = multiplier * np.std(scoring_residuals)
+                    offset = multiplier * np.std(scoring_residuals)/np.sqrt(len(scoring_residuals))
                     current_predictions = current_predictions + offset
+
             elif self.scoring in ("studentized", "conformal-studentized"):
+
                 multiplier = self._optimize_multiplier(
                     y=y_calib if self.scoring == "conformal-studentized" else y,
                     base_predictions=base_predictions,
@@ -320,6 +336,7 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
                     current_predictions = current_predictions + offset
 
         return self
+
 
     def predict(self, X, return_pi=False):
         """Predict the target variable.
@@ -358,12 +375,12 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
             # Generate first quantile
             current_predictions = base_predictions - self.offset_multipliers_[
                 0
-            ] * np.std(self.scoring_residuals_)
+            ] * np.std(self.scoring_residuals_)/np.sqrt(len(self.scoring_residuals_))
             all_predictions.append(current_predictions)
 
             # Generate remaining quantiles
             for multiplier in self.offset_multipliers_[1:]:
-                offset = multiplier * np.std(self.scoring_residuals_)
+                offset = multiplier * np.std(self.scoring_residuals_)/np.sqrt(len(self.scoring_residuals_))
                 current_predictions = current_predictions + offset
                 all_predictions.append(current_predictions)
 
@@ -391,4 +408,5 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
         DescribeResult.lower = np.asarray(all_predictions[0])
         DescribeResult.median = np.asarray(all_predictions[1])
         DescribeResult.upper = np.asarray(all_predictions[2])
+        
         return DescribeResult
