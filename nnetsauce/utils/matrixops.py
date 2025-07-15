@@ -252,7 +252,7 @@ def safe_sparse_dot(a, b, backend="cpu", dense_output=False):
 
     if backend in ("gpu", "tpu") and (sys_platform in ("Linux", "Darwin")):
         # modif when jax.scipy.sparse available
-        return jnp.dot(device_put(a), device_put(b)).block_until_ready()
+        return jnp.dot(device_put(a), device_put(b))#.block_until_ready()
 
     #    if backend == "cpu":
     if a.ndim > 2 or b.ndim > 2:

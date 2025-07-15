@@ -3,6 +3,7 @@ from .base.baseRegressor import BaseRegressor
 from .boosting.adaBoostClassifier import AdaBoostClassifier
 from .custom.customClassifier import CustomClassifier
 from .custom.customRegressor import CustomRegressor
+from .custom.customBackpropRegressor import CustomBackPropRegressor
 from .datasets import Downloader
 from .deep.deepClassifier import DeepClassifier
 from .deep.deepRegressor import DeepRegressor
@@ -32,6 +33,7 @@ from .ridge.ridge import RidgeRegressor
 from .ridge2.ridge2Classifier import Ridge2Classifier
 from .ridge2.ridge2Regressor import Ridge2Regressor
 from .ridge2.ridge2MultitaskClassifier import Ridge2MultitaskClassifier
+from .ridge2.elasticNet2Regressor import ElasticNet2Regressor
 from .rvfl.bayesianrvflRegressor import BayesianRVFLRegressor
 from .rvfl.bayesianrvfl2Regressor import BayesianRVFL2Regressor
 from .sampling import SubSampler
@@ -47,10 +49,12 @@ __all__ = [
     "ClassicalMTS",
     "CustomClassifier",
     "CustomRegressor",
+    "CustomBackPropRegressor",
     "DeepClassifier",
     "DeepRegressor",
     "DeepMTS",
     "Downloader",
+    "ElasticNet2Regressor",
     "GLMClassifier",
     "GLMRegressor",
     "KernelRidge",

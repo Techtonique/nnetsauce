@@ -1,4 +1,5 @@
-
+jax 
+jaxlib
 joblib
 matplotlib
 numpy
