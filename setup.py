@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
-__version__ = '0.36.2'
+__version__ = '0.37.0'
 
 # get the dependencies and installs
 here = path.abspath(path.dirname(__file__))
