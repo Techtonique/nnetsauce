@@ -3,6 +3,7 @@ from .base.baseRegressor import BaseRegressor
 from .boosting.adaBoostClassifier import AdaBoostClassifier
 from .custom.customClassifier import CustomClassifier
 from .custom.customRegressor import CustomRegressor
+from .custom.customBackpropRegressor import CustomBackPropRegressor
 from .datasets import Downloader
 from .deep.deepClassifier import DeepClassifier
 from .deep.deepRegressor import DeepRegressor
@@ -48,6 +49,7 @@ __all__ = [
     "ClassicalMTS",
     "CustomClassifier",
     "CustomRegressor",
+    "CustomBackPropRegressor",
     "DeepClassifier",
     "DeepRegressor",
     "DeepMTS",

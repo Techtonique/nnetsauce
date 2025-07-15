@@ -352,12 +352,6 @@ class Base(BaseEstimator):
                         seed=self.seed,
                     )
 
-                # self.W_ = hash_sim[self.nodes_sim](
-                #             n_dims=n_features,
-                #             n_points=self.n_hidden_features,
-                #             seed=self.seed,
-                #         )
-
                 assert (
                     scaled_X.shape[1] == self.W_.shape[0]
                 ), "check dimensions of covariates X and matrix W"
