@@ -80,7 +80,7 @@ class Optimizer:
         self.verbose = verbose
         self.opt = None
 
-    def fit(self, loss_func, response, x0, **kwargs):
+    def fit(self, loss_func, response, x0, q=None, **kwargs):
         """Fit GLM model to training data (X, y).
 
         Args:

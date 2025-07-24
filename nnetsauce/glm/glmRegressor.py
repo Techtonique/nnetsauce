@@ -4,6 +4,7 @@
 
 import numpy as np
 import sklearn.metrics as skm2
+from sklearn.metrics import mean_pinball_loss
 from .glm import GLM
 from ..utils import matrixops as mo
 from sklearn.base import RegressorMixin
@@ -31,7 +32,11 @@ class GLMRegressor(GLM, RegressorMixin):
             controls compromize between l1 and l2 norm of GLM coefficients on nonlinear features
 
         family: str
-            "gaussian", "laplace" or "poisson" (for now)
+            "gaussian", "laplace", "poisson", or "quantile" (for now)
+        
+        level: int, default=50
+            The level of the quantiles to compute for family = "quantile".
+            Default is the median. 
 
         activation_name: str
             activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
@@ -77,6 +82,9 @@ class GLMRegressor(GLM, RegressorMixin):
 
         seed: int
             reproducibility seed for nodes_sim=='uniform'
+        
+        backend: str
+            "cpu", "gpu", "tpu"
 
     Attributes:
 
@@ -85,7 +93,7 @@ class GLMRegressor(GLM, RegressorMixin):
 
     Examples:
 
-    See [https://github.com/Techtonique/nnetsauce/blob/master/examples/glm_regression.py](https://github.com/Techtonique/nnetsauce/blob/master/examples/glm_regression.py)
+        See [https://github.com/Techtonique/nnetsauce/blob/master/examples/glm_regression.py](https://github.com/Techtonique/nnetsauce/blob/master/examples/glm_regression.py)
 
     """
 
@@ -99,6 +107,7 @@ class GLMRegressor(GLM, RegressorMixin):
         lambda2=0.01,
         alpha2=0.5,
         family="gaussian",
+        level=50,
         activation_name="relu",
         a=0.01,
         nodes_sim="sobol",
@@ -133,6 +142,8 @@ class GLMRegressor(GLM, RegressorMixin):
         )
 
         self.family = family
+        self.level = level 
+        self.q = self.level/100
 
     def gaussian_loss(self, y, row_index, XB):
         return 0.5 * np.mean(np.square(y[row_index] - XB))
@@ -143,28 +154,51 @@ class GLMRegressor(GLM, RegressorMixin):
     def poisson_loss(self, y, row_index, XB):
         return -np.mean(y[row_index] * XB - np.exp(XB))
 
+    def pinball_loss(self, y, row_index, XB, tau=0.5):
+        y = np.array(y[row_index])
+        y_pred = np.array(XB)        
+        return mean_pinball_loss(y, y_pred, alpha=tau)
+        #return np.mean(np.maximum(tau * residuals, (tau - 1) * residuals))                
+
     def loss_func(
-        self, beta, group_index, X, y, row_index=None, type_loss="gaussian", **kwargs
+        self, beta, group_index, X, y, row_index=None, 
+        type_loss="gaussian", **kwargs
     ):
         res = {
             "gaussian": self.gaussian_loss,
             "laplace": self.laplace_loss,
             "poisson": self.poisson_loss,
+            "quantile": self.pinball_loss
         }
 
-        if row_index is None:
-            row_index = range(len(y))
-            XB = self.compute_XB(X, beta=beta)
+        if type_loss != "quantile": 
+
+            if row_index is None:
+                row_index = range(len(y))
+                XB = self.compute_XB(X, beta=beta)
+
+                return res[type_loss](y, row_index, XB) + self.compute_penalty(
+                    group_index=group_index, beta=beta
+                )
+
+            XB = self.compute_XB(X, beta=beta, row_index=row_index)
 
             return res[type_loss](y, row_index, XB) + self.compute_penalty(
                 group_index=group_index, beta=beta
             )
+        
+        else: # quantile 
 
-        XB = self.compute_XB(X, beta=beta, row_index=row_index)
+            assert (self.q > 0 and self.q < 1), "'tau' must be comprised 0 < tau < 1"
 
-        return res[type_loss](y, row_index, XB) + self.compute_penalty(
-            group_index=group_index, beta=beta
-        )
+            if row_index is None:
+                row_index = range(len(y))
+                XB = self.compute_XB(X, beta=beta)
+                return res[type_loss](y, row_index, XB, self.q) 
+
+            XB = self.compute_XB(X, beta=beta, row_index=row_index)
+            return res[type_loss](y, row_index, XB, self.q) 
+
 
     def fit(self, X, y, **kwargs):
         """Fit GLM model to training data (X, y).
@@ -186,20 +220,14 @@ class GLMRegressor(GLM, RegressorMixin):
             self: object
 
         """
-
         self.beta_ = None
-
         self.n_iter = 0
 
-        n, self.group_index = X.shape
+        _, self.group_index = X.shape
 
         centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
-
-        n_Z = scaled_Z.shape[0]
-
         # initialization
         beta_ = np.linalg.lstsq(scaled_Z, centered_y, rcond=None)[0]
-
         # optimization
         # fit(self, loss_func, response, x0, **kwargs):
         # loss_func(self, beta, group_index, X, y,

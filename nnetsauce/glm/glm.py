@@ -167,7 +167,6 @@ class GLM(Base):
             0.5 * (1 - alpha2) * np.sum(np.square(beta2))
             + alpha2 * np.sum(np.abs(beta2))
         )
-
         return res
 
     def compute_penalty(self, group_index, beta):

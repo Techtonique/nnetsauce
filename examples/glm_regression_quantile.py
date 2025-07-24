@@ -22,6 +22,7 @@ opt = ns.Optimizer(type_optim="sgd",
 obj = ns.GLMRegressor(n_hidden_features=3, 
                        lambda1=1e-2, alpha1=0.5,
                        lambda2=1e-2, alpha2=0.5, 
+                       family="quantile",
                        optimizer=opt)
 
 start = time()
@@ -41,6 +42,7 @@ opt2 = ns.Optimizer(type_optim="scd",
 obj2 = ns.GLMRegressor(n_hidden_features=5, 
                        lambda1=1e-2, alpha1=0.5,
                        lambda2=1e-2, alpha2=0.5, 
+                       family="quantile",
                        optimizer=opt2)
 
 start = time()
@@ -58,7 +60,8 @@ opt3 = ns.Optimizer(type_optim="scd",
                     verbose=1)
 obj3 = ns.GLMRegressor(n_hidden_features=5, 
                        lambda1=1e-2, alpha1=0.1,
-                       lambda2=1e-1, alpha2=0.9, 
+                       lambda2=1e-1, alpha2=0.9,
+                       family="quantile", 
                        optimizer=opt3)
 start = time()
 obj3.fit(X_train, y_train)
@@ -74,7 +77,8 @@ opt4 = ns.Optimizer(type_optim="scd",
                     learning_rate=0.01,
                     batch_prop=0.8, 
                     verbose=0)
-obj4 = ns.GLMRegressor(optimizer=opt4)
+obj4 = ns.GLMRegressor(optimizer=opt4, 
+family="quantile")
 
 start = time()
 obj4.fit(X_train, y_train)
@@ -94,7 +98,8 @@ obj5 = ns.GLMRegressor(optimizer=opt5,
                        lambda1=1, 
                        alpha1=0.5, 
                        lambda2=1e-2, 
-                       alpha2=0.1)
+                       alpha2=0.1, 
+                       family="quantile")
 
 start = time()
 obj5.fit(X_train, y_train)

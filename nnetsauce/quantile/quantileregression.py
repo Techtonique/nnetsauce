@@ -89,10 +89,7 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
         """
         Compute the quantile loss for a given set of residuals and quantile.
         """
-        if not 0 < quantile < 1:
-            raise ValueError("Quantile should be between 0 and 1.")
-        loss = quantile * (residuals >= 0) + (quantile - 1) * (residuals < 0)
-        return np.mean(residuals * loss)
+        return np.mean(residuals * (quantile * (residuals >= 0) + (quantile - 1) * (residuals < 0)))
 
     def _optimize_multiplier(
         self,
@@ -162,8 +159,7 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
             else:
                 raise ValueError("Invalid argument 'scoring'")
 
-            residuals = y - predictions
-            return self._compute_quantile_loss(residuals, quantile)
+            return self._compute_quantile_loss(y - predictions, quantile)
 
         # Optimize in log space for numerical stability
         # bounds = [(-10, 10)]  # log space bounds

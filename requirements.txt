@@ -3,6 +3,7 @@ jaxlib
 joblib
 matplotlib
 numpy
+optax
 pandas
 requests
 scipy
