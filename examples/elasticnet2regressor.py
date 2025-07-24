@@ -34,3 +34,31 @@ for i, data in enumerate(load_datasets):
 
     print(f"RMSE for {datasets_names[i]} : {root_mean_squared_error(preds, y_test)}")
 
+    # Example 1: Adam optimizer (Optax)
+    regr = ns.ElasticNet2Regressor(
+        solver="adam",          # Optax optimizer name
+        learning_rate=0.01,     # Learning rate
+        max_iter=1000,          # Max iterations
+        tol=1e-4,              # Tolerance for early stopping
+        verbose=True           # Print progress
+    )
+    start = time()
+    regr.fit(X_train, y_train)
+    preds = regr.predict(X_test)
+    print(f"Adam - RMSE for {datasets_names[i]}: {root_mean_squared_error(preds, y_test)}")
+    print(f"Elapsed: {time() - start:.2f}s\n")
+
+    # Example 2: SGD with momentum (Optax)
+    regr = ns.ElasticNet2Regressor(
+        solver="sgd",           # Stochastic Gradient Descent
+        learning_rate=0.001,    # Smaller learning rate for SGD
+        max_iter=1500,
+        type_loss='quantile',   # Quantile regression
+        quantile=0.5           # Median regression
+    )
+    start = time()
+    regr.fit(X_train, y_train)
+    preds = regr.predict(X_test)
+    print(f"SGD (Quantile) - RMSE for {datasets_names[i]}: {root_mean_squared_error(preds, y_test)}")
+    print(f"Elapsed: {time() - start:.2f}s\n")    
+
