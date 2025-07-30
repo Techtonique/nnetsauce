@@ -283,7 +283,7 @@ class Base(BaseEstimator):
                 **kwargs
             )
 
-            if self.cluster_encode == True:
+            if self.cluster_encode:
                 return mo.one_hot_encode(X_clustered, self.n_clusters).astype(
                     np.float16
                 )
@@ -663,7 +663,7 @@ class Base(BaseEstimator):
                     else self.nn_scaler_.transform(X[:, self.index_col_])
                 )
                 Phi_X = self.create_layer(scaled_X, self.W_)
-                if self.direct_link == True:
+                if self.direct_link:
                     return self.scaler_.transform(
                         mo.cbind(scaled_X, Phi_X, backend=self.backend)
                     )
@@ -687,7 +687,7 @@ class Base(BaseEstimator):
         if self.n_hidden_features > 0:  # if hidden layer
             scaled_X = self.nn_scaler_.transform(augmented_X)
             Phi_X = self.create_layer(scaled_X, self.W_)
-            if self.direct_link == True:
+            if self.direct_link:
                 return self.scaler_.transform(
                     mo.cbind(augmented_X, Phi_X, backend=self.backend)
                 )

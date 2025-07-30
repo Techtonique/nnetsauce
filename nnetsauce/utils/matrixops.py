@@ -81,9 +81,13 @@ def cbind(x, y, backend="cpu"):
 
 
 # center... response
-def center_response(y):
-    y_mean = np.mean(y)
-    return y_mean, (y - y_mean)
+def center_response(y, method="mean"):
+    if method == "mean":
+        y_mean = np.mean(y)
+        return y_mean, (y - y_mean)
+    elif method == "median":
+        y_median = np.median(y)
+        return y_median, (y - y_median)
 
 
 # cluster the covariates
