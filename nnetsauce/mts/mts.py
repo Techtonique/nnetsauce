@@ -17,6 +17,7 @@ from tqdm import tqdm
 from ..base import Base
 from ..sampling import vinecopula_sample
 from ..simulation import getsims, getsimsxreg
+from ..quantile import QuantileRegressor 
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 from ..utils import timeseries as ts
@@ -80,6 +81,7 @@ class MTS(Base):
         type_pi: str.
             type of prediction interval; currently:
             - "gaussian": simple, fast, but: assumes stationarity of Gaussian in-sample residuals and independence in the multivariate case
+            - "quantile": use model-agnostic quantile regression under the hood 
             - "kde": based on Kernel Density Estimation of in-sample residuals
             - "bootstrap": based on independent bootstrap of in-sample residuals
             - "block-bootstrap": based on basic block bootstrap of in-sample residuals
@@ -95,6 +97,9 @@ class MTS(Base):
             'scp-vine-frank', 'scp-vine-gaussian', 'scp-vine-gumbel', 'scp-vine-indep', 'scp-vine-joe', 'scp-vine-student'
             - 'scp2-vine-tll', 'scp2-vine-bb1', 'scp2-vine-bb6', 'scp2-vine-bb7', 'scp2-vine-bb8', 'scp2-vine-clayton',
             'scp2-vine-frank', 'scp2-vine-gaussian', 'scp2-vine-gumbel', 'scp2-vine-indep', 'scp2-vine-joe', 'scp2-vine-student'
+
+        level: int.
+            level of confidence for `type_pi == 'quantile'` (default is `95`)
 
         block_size: int.
             size of block for 'type_pi' in ("block-bootstrap", "scp-block-bootstrap", "scp2-block-bootstrap").
@@ -244,6 +249,7 @@ class MTS(Base):
         type_scaling=("std", "std", "std"),
         lags=1,
         type_pi="kde",
+        level=95,
         block_size=None,
         replications=None,
         kernel="gaussian",
@@ -283,7 +289,11 @@ class MTS(Base):
         self.obj = obj
         self.n_series = None
         self.lags = lags
-        self.type_pi = type_pi
+        self.type_pi = type_pi        
+        self.level = level 
+        if self.type_pi == "quantile":
+            self.obj = QuantileRegressor(self.obj, 
+                                         level=self.level, scoring="conformal")
         self.block_size = block_size
         self.replications = replications
         self.kernel = kernel
@@ -517,6 +527,15 @@ class MTS(Base):
                 residuals_.append(
                     (centered_y_i - self.fit_objs_[i].predict(scaled_Z)).tolist()
                 )
+
+        if self.type_pi == "quantile":
+            for i in iterator:
+                y_mean = np.mean(self.y_[:, i])
+                self.y_means_[i] = y_mean
+                centered_y_i = self.y_[:, i] - y_mean
+                self.centered_y_is_.append(centered_y_i)
+                self.obj.fit(X=scaled_Z, y=centered_y_i)
+                self.fit_objs_[i] = deepcopy(self.obj)
 
         if self.type_pi.startswith("scp"):
             # split conformal prediction
@@ -792,12 +811,20 @@ class MTS(Base):
                     lower_pi_.append(preds_pi.lower[0])
                     upper_pi_.append(preds_pi.upper[0])
 
-            predicted_cooked_new_X = np.asarray(
-                [
-                    np.asarray(self.fit_objs_[i].predict(cooked_new_X)).item()
-                    for i in range(self.init_n_series_)
-                ]
-            )
+            if self.type_pi != "quantile": 
+                predicted_cooked_new_X = np.asarray(
+                    [
+                        np.asarray(self.fit_objs_[i].predict(cooked_new_X)).item()
+                        for i in range(self.init_n_series_)
+                    ]
+                )
+            else:
+                predicted_cooked_new_X = np.asarray(
+                    [
+                        np.asarray(self.fit_objs_[i].predict(cooked_new_X, return_pi=True).upper).item()
+                        for i in range(self.init_n_series_)
+                    ]
+                ) 
 
             preds = np.asarray(y_means_ + predicted_cooked_new_X)
 
@@ -1017,6 +1044,35 @@ class MTS(Base):
                 return DescribeResult(res2[0], res2[1], res2[2])
 
             return res
+
+        if self.type_pi == "quantile":
+
+            DescribeResult = namedtuple("DescribeResult", ("mean"))
+
+            self.mean_ = pd.DataFrame(
+                np.asarray(self.mean_),
+                columns=self.series_names,  # self.df_.columns,
+                index=self.output_dates_,
+            )
+
+            res = DescribeResult(self.mean_)
+
+            if self.xreg_ is not None:
+                if len(self.xreg_.shape) > 1:
+                    res2 = mx.tuple_map(
+                        res,
+                        lambda x: mo.delete_last_columns(
+                            x, num_columns=self.xreg_.shape[1]
+                        ),
+                    )
+                else:
+                    res2 = mx.tuple_map(
+                        res, lambda x: mo.delete_last_columns(x, num_columns=1)
+                    )
+                return DescribeResult(res2[0])
+
+            return res
+
 
         # After prediction loop, ensure sims only contain target columns
         if self.sims_ is not None:

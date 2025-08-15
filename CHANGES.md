@@ -1,3 +1,7 @@
+# version 0.39.0
+
+- Add quantile regression to `MTS` class : 2 ways
+
 # version 0.26.1
 
 - Class `RegressorUpdater`. See [examples](./examples/update_regression.py). 
