@@ -25,6 +25,7 @@ for i, data in enumerate(load_datasets):
 
     print(f"RMSE for {datasets_names[i]} : {root_mean_squared_error(preds, y_test)}")
     print("regr.beta_", regr.beta_)
+    print("regr.gradient_wrt_X(X_test)", regr.gradient_wrt_X(X_test))
 
     regr = ns.ElasticNet2Regressor(solver="cd", type_loss='quantile')
 
@@ -65,4 +66,5 @@ for i, data in enumerate(load_datasets):
     print(f"SGD (Quantile) - RMSE for {datasets_names[i]}: {root_mean_squared_error(preds, y_test)}")
     print(f"Elapsed: {time() - start:.2f}s\n")   
     print("regr.beta_", regr.beta_) 
+    print("regr.gradient_wrt_X(X_test)", regr.gradient_wrt_X(X_test))
 

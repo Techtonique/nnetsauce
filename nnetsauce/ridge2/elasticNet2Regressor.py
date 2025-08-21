@@ -18,11 +18,7 @@ class ElasticNet2Regressor(Ridge2, RegressorMixin):
         activation_name: str = "relu",
         a: float = 0.01,
         nodes_sim: str = "sobol",
-        bias: bool = True,
         dropout: float = 0,
-        n_clusters: int = 2,
-        cluster_encode: bool = True,
-        type_clust: str = "kmeans",
         type_scaling: Tuple[str, str, str] = ("std", "std", "std"),
         lambda1: float = 0.1,
         lambda2: float = 0.1,
@@ -43,11 +39,7 @@ class ElasticNet2Regressor(Ridge2, RegressorMixin):
             activation_name=activation_name,
             a=a,
             nodes_sim=nodes_sim,
-            bias=bias,
             dropout=dropout,
-            n_clusters=n_clusters,
-            cluster_encode=cluster_encode,
-            type_clust=type_clust,
             type_scaling=type_scaling,
             lambda1=lambda1,
             lambda2=lambda2,
@@ -65,6 +57,7 @@ class ElasticNet2Regressor(Ridge2, RegressorMixin):
         self.patience = patience
         self.verbose = verbose
         self.type_fit = "regression"
+        self.n_clusters = 0  
         
         self._validate_parameters()
         self.key = jax.random.PRNGKey(seed)
@@ -224,13 +217,12 @@ class ElasticNet2Regressor(Ridge2, RegressorMixin):
     def fit(self, X: Union[jnp.ndarray, np.ndarray], 
             y: Union[jnp.ndarray, np.ndarray], **kwargs) -> "ElasticNet2Regressor":
         """Fit model with selected optimization method."""
+        assert self.n_clusters == 0, "Cluster encoding not supported in JAX implementation."
         X = jnp.asarray(X)
         y = jnp.asarray(y)
-        
-        centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
+        centered_y, scaled_Z = self.cook_training_set_jax(y=y, X=X, **kwargs)
         centered_y = jnp.asarray(centered_y)
         scaled_Z = jnp.asarray(scaled_Z)
-        
         n_X, p_X = X.shape
         n_Z, p_Z = scaled_Z.shape
 
@@ -256,12 +248,13 @@ class ElasticNet2Regressor(Ridge2, RegressorMixin):
     def predict(self, X: Union[jnp.ndarray, np.ndarray], 
                **kwargs) -> jnp.ndarray:
         """Predict using fitted model."""
+        assert self.n_clusters == 0, "Cluster encoding not supported in JAX implementation."
         X = jnp.asarray(X)
-        
+        print("X in predict", X.shape)
         if len(X.shape) == 1:
             X = X.reshape(1, -1)
             
-        test_features = jnp.asarray(self.cook_test_set(X, **kwargs))
+        test_features = jnp.asarray(self.cook_test_set_jax(X, **kwargs))
         return self._jax_predict(test_features)
 
     def score(self, X: Union[jnp.ndarray, np.ndarray], 
@@ -297,3 +290,13 @@ class ElasticNet2Regressor(Ridge2, RegressorMixin):
         self._validate_parameters()
         self._init_jax_functions()
         return self
+    
+    def gradient_wrt_X(self, X):
+        """Compute gradients of predictions w.r.t. raw input X."""
+        print("X in gradient_wrt_X", X.shape)
+        def predict_fn(x):
+            print("x in predict_fn", x.shape)
+            features = self.cook_test_set_jax(x.reshape(1, -1))
+            print("features in predict_fn", features.shape)
+            return self._predict(features).squeeze()
+        return jax.jacobian(predict_fn)(jnp.asarray(X))    

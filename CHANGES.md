@@ -1,3 +1,8 @@
+# version 0.39.1
+
+- Enhance `predict` method in `MTS` class to handle multiple quantiles (predict whole distribution, 
+  including conformal prediction intervals)
+
 # version 0.39.0
 
 - Add quantile regression to `MTS` class : 2 ways

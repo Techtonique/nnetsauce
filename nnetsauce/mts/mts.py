@@ -348,8 +348,10 @@ class MTS(Base):
 
         self: object
         """
-
-        self.init_n_series_ = X.shape[1]
+        try:
+            self.init_n_series_ = X.shape[1]
+        except IndexError as e:
+            self.init_n_series_ = 1
 
         # Automatic lag selection if requested
         if isinstance(self.lags, str):
@@ -633,9 +635,32 @@ class MTS(Base):
 
             return self.fit(X, xreg, **kwargs)
 
-    def predict(self, h=5, level=95, **kwargs):
+    def predict(self, h=5, level=95, alphas=None, **kwargs):
         """Forecast all the time series, h steps ahead"""
+        if alphas is not None:
+            # Store results
+            result_dict = {}
+            # Loop through alphas and calculate lower/upper for each alpha level
+            # E.g [0.5, 2.5, 5, 16.5, 25, 50]
+            for alpha in alphas:
+                level = 100 * (1 - alpha/100)  # Convert alpha to percentage level
+                # Get the forecast for this alpha
+                res = self.predict(h=h, level=level, **kwargs)                    
+                # Adjust index and collect lower/upper bounds
+                res.lower.index = pd.to_datetime(res.lower.index)
+                res.upper.index = pd.to_datetime(res.upper.index)
+                # Loop over each time series (multivariate) and flatten results
+                if isinstance(res.lower, pd.DataFrame): 
+                    for series in res.lower.columns:  # Assumes 'lower' and 'upper' have multiple series
+                        result_dict[f"lower_{int(100 - alpha)}_{series}"] = res.lower[series].to_numpy().flatten()
+                        result_dict[f"upper_{int(100  - alpha)}_{series}"] = res.upper[series].to_numpy().flatten()
+                else: 
+                    for series_id in range(self.n_series):  # Assumes 'lower' and 'upper' have multiple series
+                        result_dict[f"lower_{int((100 - alpha))}_{series_id}"] = res.lower[series_id,:].to_numpy().flatten()
+                        result_dict[f"upper_{int((100 - alpha))}_{series_id}"] = res.upper[series_id,:].to_numpy().flatten()
+            return pd.DataFrame(result_dict, index=self.output_dates_)
 
+        # only one prediction interval
         self.output_dates_, frequency = ts.compute_output_dates(self.df_, h)
 
         self.level_ = level

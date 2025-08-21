@@ -3,12 +3,14 @@
 # License: BSD 3 Clear
 
 import copy
+import jax 
 import numpy as np
 import pandas as pd
 import platform
 import warnings
 import sklearn.metrics as skm
 
+from typing import Optional
 from collections import namedtuple
 from functools import partial
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
@@ -447,6 +449,83 @@ class Base(BaseEstimator):
             seed=self.seed,
         )
 
+    def _jax_create_layer(self, scaled_X: jnp.ndarray, W: Optional[jnp.ndarray] = None) -> jnp.ndarray:
+        """JAX-compatible version of create_layer that exactly matches the original functionality."""
+        key = jax.random.PRNGKey(self.seed)
+        n_features = scaled_X.shape[1]
+        
+        # Generate weights if not provided
+        if W is None:
+            if self.bias:
+                n_features_1 = n_features + 1
+                shape = (n_features_1, self.n_hidden_features)
+            else:
+                shape = (n_features, self.n_hidden_features)
+            
+            # JAX-compatible weight generation matching original behavior
+            if self.nodes_sim == "sobol":
+                W_np = generate_sobol(
+                    n_dims=n_features_1,
+                    n_points=self.n_hidden_features,
+                    seed=self.seed,
+                )
+                W = jnp.asarray(W_np)
+            elif self.nodes_sim == "hammersley":
+                W_np = generate_hammersley(
+                    n_dims=n_features_1,
+                    n_points=self.n_hidden_features,
+                    seed=self.seed,
+                )
+                W = jnp.asarray(W_np)
+            elif self.nodes_sim == "uniform":
+                key, subkey = jax.random.split(key)
+                W = jax.random.uniform(
+                    subkey,
+                    shape=shape,
+                    minval=-1.0,
+                    maxval=1.0
+                )
+            else:  # halton
+                W_np = generate_halton(
+                    n_dims=n_features_1,
+                    n_points=self.n_hidden_features,
+                    seed=self.seed,
+                )
+                W = jnp.asarray(W_np)
+            
+            self.W_ = np.array(W)  # Store as numpy for original methods
+        
+        # Prepare input with bias if needed
+        if self.bias:
+            X_with_bias = jnp.hstack([jnp.ones((scaled_X.shape[0], 1)), scaled_X])
+            print("X_with_bias shape:", X_with_bias.shape)
+            print("W shape:", W.shape)  
+            linear_output = jnp.dot(X_with_bias, W)
+        else:
+            linear_output = jnp.dot(scaled_X, W)
+        
+        # Apply activation function
+        if self.activation_name == "relu":
+            activated = jax.nn.relu(linear_output)
+        elif self.activation_name == "tanh":
+            activated = jnp.tanh(linear_output)
+        elif self.activation_name == "sigmoid":
+            activated = jax.nn.sigmoid(linear_output)
+        else:  # leaky relu
+            activated = jax.nn.leaky_relu(linear_output, negative_slope=self.a)
+        
+        # Apply dropout
+        if self.dropout > 0:
+            key, subkey = jax.random.split(key)
+            mask = jax.random.bernoulli(
+                subkey,
+                p=1-self.dropout,
+                shape=activated.shape
+            )
+            activated = jnp.where(mask, activated / (1-self.dropout), 0)
+        
+        return activated
+    
     def cook_training_set(self, y=None, X=None, W=None, **kwargs):
         """Create new hidden features for training set, with hidden layer, center the response.
 
@@ -695,6 +774,192 @@ class Base(BaseEstimator):
 
         # if no hidden layer
         return self.scaler_.transform(augmented_X)
+
+    def cook_training_set_jax(self, y=None, X=None, W=None, **kwargs):
+        """JAX-compatible version of cook_training_set that maintains side effects."""
+        # Initialize random key
+        key = jax.random.PRNGKey(self.seed)
+        
+        # Convert inputs to JAX arrays
+        X = jnp.asarray(X) if X is not None else jnp.asarray(self.X_)
+        y = jnp.asarray(y) if y is not None else jnp.asarray(self.y_)
+
+        # Handle column sampling
+        if self.col_sample < 1:
+            n_features = X.shape[1]
+            new_n_features = int(jnp.ceil(n_features * self.col_sample))
+            assert new_n_features >= 1, "Invalid col_sample"
+            
+            key, subkey = jax.random.split(key)
+            index_col = jax.random.choice(
+                subkey,
+                n_features,
+                shape=(new_n_features,),
+                replace=False
+            )
+            self.index_col_ = np.array(index_col)  # Store as numpy for original methods
+            input_X = X[:, index_col]
+            n_features = new_n_features  # Update n_features after column sampling
+        else:
+            input_X = X
+            n_features = X.shape[1]
+
+        augmented_X = input_X
+
+        # JAX-compatible scaling
+        def jax_scale(data, mean=None, std=None):
+            if mean is None:
+                mean = jnp.mean(data, axis=0)
+            if std is None:
+                std = jnp.std(data, axis=0)
+            return (data - mean) / (std + 1e-10), mean, std
+
+        # Hidden layer processing
+        if self.n_hidden_features > 0:
+            # Initialize weights if not provided
+            if W is None:
+                shape = (n_features, self.n_hidden_features)
+                
+                # JAX-compatible weight generation
+                if self.nodes_sim == "uniform":
+                    key, subkey = jax.random.split(key)
+                    W = jax.random.uniform(subkey, shape=shape, 
+                                        minval=-1.0, maxval=1.0) * (1/jnp.sqrt(n_features))
+                else:
+                    # For other sequences, use numpy generation then convert to JAX
+                    if self.nodes_sim == "sobol":
+                        W_np = generate_sobol(
+                            n_dims=shape[0],
+                            n_points=shape[1],
+                            seed=self.seed,
+                        )
+                    elif self.nodes_sim == "hammersley":
+                        W_np = generate_hammersley(
+                            n_dims=shape[0],
+                            n_points=shape[1],
+                            seed=self.seed,
+                        )
+                    elif self.nodes_sim == "halton":
+                        W_np = generate_halton(
+                            n_dims=shape[0],
+                            n_points=shape[1],
+                            seed=self.seed,
+                        )
+                    else:  # default to uniform
+                        key, subkey = jax.random.split(key)
+                        W = jax.random.uniform(subkey, shape=shape,
+                                            minval=-1.0, maxval=1.0) * (1/jnp.sqrt(n_features))
+                    
+                    if self.nodes_sim in ["sobol", "hammersley", "halton"]:
+                        W = jnp.asarray(W_np) * (1/jnp.sqrt(n_features))
+                
+                self.W_ = np.array(W)  # Store as numpy for original methods
+            
+            # Scale features
+            scaled_X, self.nn_mean_, self.nn_std_ = jax_scale(
+                augmented_X,
+                getattr(self, 'nn_mean_', None),
+                getattr(self, 'nn_std_', None)
+            )
+            
+            # Create hidden layer with proper bias handling
+            linear_output = jnp.dot(scaled_X, W)
+            
+            # Apply activation
+            if self.activation_name == "relu":
+                Phi_X = jax.nn.relu(linear_output)
+            elif self.activation_name == "tanh":
+                Phi_X = jnp.tanh(linear_output)
+            elif self.activation_name == "sigmoid":
+                Phi_X = jax.nn.sigmoid(linear_output)
+            else:  # leaky relu
+                Phi_X = jax.nn.leaky_relu(linear_output, negative_slope=self.a)
+            
+            # Apply dropout
+            if self.dropout > 0:
+                key, subkey = jax.random.split(key)
+                mask = jax.random.bernoulli(subkey, p=1-self.dropout, shape=Phi_X.shape)
+                Phi_X = jnp.where(mask, Phi_X / (1-self.dropout), 0)
+            
+            Z = jnp.hstack([scaled_X, Phi_X]) if self.direct_link else Phi_X
+        else:
+            Z = augmented_X
+
+        # Final scaling
+        scaled_Z, self.scale_mean_, self.scale_std_ = jax_scale(
+            Z,
+            getattr(self, 'scale_mean_', None),
+            getattr(self, 'scale_std_', None)
+        )
+
+        # Center response for regression
+        if not hasattr(mx, 'is_factor') or not mx.is_factor(y):  # regression case
+            self.y_mean_ = float(jnp.mean(y))  # Convert to Python float for compatibility
+            centered_y = y - self.y_mean_
+        else:
+            centered_y = y
+
+        # Handle row sampling
+        if self.row_sample < 1:
+            key, subkey = jax.random.split(key)
+            n_samples = Z.shape[0]
+            n_row_sample = int(jnp.ceil(n_samples * self.row_sample))
+            index_row = jax.random.choice(
+                subkey,
+                n_samples,
+                shape=(n_row_sample,),
+                replace=False
+            )
+            self.index_row_ = np.array(index_row)  # Store as numpy for original methods
+            return (
+                centered_y[index_row],
+                scaled_Z[index_row]
+            )
+        
+        return (centered_y, scaled_Z)    
+    
+    def cook_test_set_jax(self, X, **kwargs):
+        """JAX-compatible test set processing with matching dimension handling."""
+        X = jnp.asarray(X)
+        
+        if len(X.shape) == 1:
+            X = X.reshape(1, -1)
+
+        # Handle column sampling
+        input_X = X if self.col_sample == 1 else X[:, jnp.asarray(self.index_col_)]
+
+        augmented_X = input_X
+
+        # JAX-compatible scaling
+        scaled_X = (augmented_X - self.nn_mean_) / (self.nn_std_ + 1e-10)
+
+        # Process hidden layer if needed
+        if self.n_hidden_features > 0:
+            Phi_X = self._jax_create_layer(scaled_X, jnp.asarray(self.W_))
+            Z = jnp.hstack([scaled_X, Phi_X]) if self.direct_link else Phi_X
+        else:
+            Z = augmented_X
+
+        # Final scaling
+        scaled_Z = (Z - self.scale_mean_) / (self.scale_std_ + 1e-10)
+        
+        return scaled_Z
+    
+    def _jax_create_layer(self, X, W):
+        """JAX-compatible hidden layer creation."""
+        #print("X", X.shape)
+        #print("W", W.shape)
+        #print("self.W_", self.W_.shape)
+        linear_output = jnp.dot(X, W)
+        
+        if self.activation_name == "relu":
+            return jax.nn.relu(linear_output)
+        elif self.activation_name == "tanh":
+            return jnp.tanh(linear_output)
+        elif self.activation_name == "sigmoid":
+            return jax.nn.sigmoid(linear_output)
+        else:  # leaky relu
+            return jax.nn.leaky_relu(linear_output, negative_slope=self.a)
 
     def cross_val_score(
         self,
