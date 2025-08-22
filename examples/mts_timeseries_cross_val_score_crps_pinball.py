@@ -29,8 +29,6 @@ testing_index = np.arange(max_idx_train, n)
 df_train = data.iloc[training_index,:]
 df_test = data.iloc[testing_index,:]
 
-print(f"df_train.shape: {df_train.shape}")
-
 regr2 = ElasticNet()
 obj_MTS2 = ns.MTS(regr2, lags = 3, n_hidden_features=7, 
                   replications=100, kernel='gaussian', 
@@ -49,6 +47,22 @@ regr3 = Ridge()
 obj_MTS3 = ns.MTS(regr3, lags = 3, n_hidden_features=7, 
                   replications=100, kernel='gaussian', 
                   seed=24, verbose = 0, type_pi="scp-block-bootstrap", 
+                  show_progress=False)
+print(obj_MTS3.cross_val_score(df_train,                         
+                      verbose = 0,
+                      initial_window=100,
+                      horizon=5,
+                      fixed_window=False,                         
+                      show_progress=True, 
+                      scoring="crps"))
+
+print(f"df_train.shape: {df_train.shape}")
+print(f"df_train.describe(): {df_train.describe()}")
+
+regr3 = Ridge()
+obj_MTS3 = ns.MTS(regr3, lags = 3, n_hidden_features=7, 
+                  replications=100, kernel='gaussian', 
+                  seed=24, verbose = 0, type_pi="scp2-kde", 
                   show_progress=False)
 print(obj_MTS3.cross_val_score(df_train,                         
                       verbose = 0,

@@ -1603,7 +1603,6 @@ class MTS(Base):
                                 y_true_j = X_test[:, j] if p > 1 else X_test
                             except Exception as e:
                                 y_true_j = X_test.iloc[:, j] if p > 1 else X_test.values
-                            print("line. 1580", y_true_j)
                             sims_j = sims_vals[:, :, j]  # (R, h)
                             crps_j = self._crps_ensemble(np.asarray(y_true_j), sims_j)
                             crps_scores.append(np.mean(crps_j))  # average over horizon
