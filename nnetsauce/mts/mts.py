@@ -13,6 +13,7 @@ from functools import partial
 from scipy.stats import describe, norm
 from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import mean_pinball_loss
 from tqdm import tqdm
 from ..base import Base
 from ..sampling import vinecopula_sample
@@ -661,7 +662,9 @@ class MTS(Base):
                 col_name = f"quantile_{q_label}_{series_name}"
                 result_dict[col_name] = q_values[i, :, series_id]
 
-        return pd.DataFrame(result_dict, index=self.output_dates_)
+        df_return_quantiles = pd.DataFrame(result_dict, index=self.output_dates_)
+        
+        return df_return_quantiles
         
     def predict(self, h=5, level=95, quantiles=None, **kwargs):
         """Forecast all the time series, h steps ahead"""        
@@ -1167,7 +1170,44 @@ class MTS(Base):
                 # Use original getsims for backward compatibility
                 self.sims_ = getsims(self.sims_)
 
-    def score(self, X, training_index, testing_index, scoring=None, **kwargs):
+    def _crps_ensemble(self, y_true, simulations, axis=0):
+        """
+        Compute CRPS for ensemble forecasts.
+        
+        Parameters
+        ----------
+        y_true : array of shape (n,)
+            True values
+        simulations : array of shape (R, n) or (n, R)
+            Simulation paths (replications x time)
+        axis : int
+            Axis along which replications are stored
+
+        Returns
+        -------
+        crps : array of shape (n,)
+            CRPS for each time point
+        """
+        from scipy.spatial.distance import cdist
+        import numpy as np
+
+        sims = np.asarray(simulations)
+        if sims.shape[1] == len(y_true):  # (R, n)
+            sims = sims.T  # → (n, R)
+
+        R = sims.shape[1]
+
+        # Mean absolute error between simulations and observation
+        diff_obs = np.abs(sims - y_true[:, None])  # (n, R)
+        term1 = np.mean(diff_obs, axis=1)  # (n,)
+
+        # Mean absolute difference between simulations
+        diff_sims = np.abs(sims[:, None, :] - sims[:, :, None])  # (n, R, R)
+        term2 = np.mean(diff_sims, axis=(1, 2)) / 2  # (n,)
+
+        return term1 - term2
+
+    def score(self, X, training_index, testing_index, scoring=None, alpha=0.5, **kwargs):
         """Train on training_index, score on testing_index."""
 
         assert (
@@ -1203,6 +1243,38 @@ class MTS(Base):
 
         if scoring is None:
             scoring = "neg_root_mean_squared_error"
+        
+        if scoring == "pinball":
+            # Predict requested quantile
+            q_pred = self.predict(h=h, quantiles=[alpha], **kwargs)
+            # Handle multivariate
+            scores = []
+            for j in range(p):
+                series_name = getattr(self, 'series_names', [f"Series_{j}"])[j]
+                q_label = f"{int(alpha * 100):02d}" if (alpha * 100).is_integer() else f"{alpha:.3f}".replace(".", "_")
+                col = f"quantile_{q_label}_{series_name}"
+                if col not in q_pred.columns:
+                    raise ValueError(f"Column '{col}' not found in quantile forecast output.")
+                y_true_j = X_test[:, j]
+                y_pred_j = q_pred[col].values
+                # Compute pinball loss for this series
+                loss = mean_pinball_loss(y_true_j, y_pred_j, alpha=alpha)
+                scores.append(loss)
+            # Return average over series
+            return np.mean(scores)
+        
+        if scoring == "crps":
+            # Ensure simulations exist
+            preds = self.predict(h=h, **kwargs)  # triggers self.sims_
+            # Extract simulations: list of DataFrames → (R, h, p)
+            sims_vals = np.stack([sim.values for sim in self.sims_], axis=0)  # (R, h, p)
+            crps_scores = []
+            for j in range(p):
+                y_true_j = X_test[:, j]
+                sims_j = sims_vals[:, :, j]  # (R, h)
+                crps_j = self._crps_ensemble(y_true_j, sims_j)
+                crps_scores.append(np.mean(crps_j))  # average over horizon
+            return np.mean(crps_scores)  # average over series
 
         # check inputs
         assert scoring in (
