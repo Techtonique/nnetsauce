@@ -1678,7 +1678,7 @@ class MTS(Base):
                             if col not in q_pred.columns:
                                 raise ValueError(
                                     f"Column '{col}' not found in quantile forecast output."
-                                )                            
+                                )
                             try:
                                 y_true_j = X_test[:, j] if p > 1 else X_test
                             except:
