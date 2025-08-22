@@ -1172,42 +1172,67 @@ class MTS(Base):
 
     def _crps_ensemble(self, y_true, simulations, axis=0):
         """
-        Compute CRPS for ensemble forecasts.
-        
+        Compute the Continuous Ranked Probability Score (CRPS) for an ensemble of simulations.
+
+        The CRPS is a measure of the distance between the cumulative distribution 
+        function (CDF) of a forecast and the CDF of the observed value. This method 
+        computes the CRPS in a vectorized form for an ensemble of simulations, efficiently 
+        handling the case where there is only one simulation.
+
         Parameters
         ----------
-        y_true : array of shape (n,)
-            True values
-        simulations : array of shape (R, n) or (n, R)
-            Simulation paths (replications x time)
-        axis : int
-            Axis along which replications are stored
+        y_true : array_like, shape (n,)
+            A 1D array of true values (observations). 
+            Each element represents the true value for a given sample.
+        
+        simulations : array_like, shape (n, R)
+            A 2D array of simulated values. Each row corresponds to a different sample 
+            and each column corresponds to a different simulation of that sample.
+        
+        axis : int, optional, default=0
+            Axis along which to transpose the simulations if needed. 
+            If axis=0, the simulations are transposed to shape (R, n). 
 
         Returns
         -------
-        crps : array of shape (n,)
-            CRPS for each time point
+        crps : ndarray, shape (n,)
+            A 1D array of CRPS scores, one for each sample.
+        
+        Notes
+        -----
+        The CRPS score is computed as:
+        
+        CRPS(y_true, simulations) = E[|X - y|] - 0.5 * E[|X - X'|]
+        
+        Where:
+        - `X` is the ensemble of simulations.
+        - `y` is the true value.
+        - `X'` is a second independent sample from the ensemble.
+        
+        The calculation is vectorized to optimize performance for large datasets.
+        
+        The edge case where `R=1` (only one simulation) is handled by returning 
+        only `term1` (i.e., no ensemble spread).
         """
-        from scipy.spatial.distance import cdist
-        import numpy as np
-
-        sims = np.asarray(simulations)
-        if sims.shape[1] == len(y_true):  # (R, n)
-            sims = sims.T  # → (n, R)
-
-        R = sims.shape[1]
-        # Mean absolute error between simulations and observation
-        try: 
-            diff_obs = np.abs(sims - y_true[:, np.newaxis])  # (n, R)
-        except Exception as e:
-            diff_obs = np.abs(sims - y_true.values[:, np.newaxis])  # (n, R)
-        term1 = np.mean(diff_obs, axis=1)  # (n,)
-        # Mean absolute difference between simulations
-        diff_sims = np.abs(sims[:, None, :] - sims[:, :, None])  # (n, R, R)
-        term2 = np.mean(diff_sims, axis=(1, 2)) / 2  # (n,)
-
-        return term1 - term2
-
+        sims = np.asarray(simulations)  # Convert simulations to numpy array
+        if axis == 0:
+            sims = sims.T  # Transpose if the axis is 0        
+        n, R = sims.shape  # n = number of samples, R = number of simulations        
+        # Term 1: E|X - y|, average absolute difference between simulations and true value
+        term1 = np.mean(np.abs(sims - y_true[:, np.newaxis]), axis=1)                    
+        # Handle edge case: if R == 1, return term1 (no spread in ensemble)
+        if R == 1:
+            return term1        
+        # Term 2: 0.5 * E|X - X'|, using efficient sorted formula
+        sims_sorted = np.sort(sims, axis=1)  # Sort simulations along each row        
+        # Correct coefficients for efficient calculation
+        j = np.arange(R)  # 0-indexed positions in the sorted simulations
+        coefficients = (2 * (j + 1) - R - 1) / (R * (R - 1))  # Efficient coefficient calculation        
+        # Dot product along the second axis (over the simulations)
+        term2 = np.dot(sims_sorted, coefficients)        
+        # Return CRPS score: term1 - 0.5 * term2
+        return term1 - 0.5 * term2
+    
     def score(self, X, training_index, testing_index, scoring=None, alpha=0.5, **kwargs):
         """Train on training_index, score on testing_index."""
 
@@ -1273,7 +1298,7 @@ class MTS(Base):
             for j in range(p):
                 y_true_j = X_test[:, j]
                 sims_j = sims_vals[:, :, j]  # (R, h)
-                crps_j = self._crps_ensemble(y_true_j, sims_j)
+                crps_j = self._crps_ensemble(np.asarray(y_true_j), sims_j)
                 crps_scores.append(np.mean(crps_j))  # average over horizon
             return np.mean(crps_scores)  # average over series
 
@@ -1580,7 +1605,7 @@ class MTS(Base):
                                 y_true_j = X_test.iloc[:, j] if p > 1 else X_test.values
                             print("line. 1580", y_true_j)
                             sims_j = sims_vals[:, :, j]  # (R, h)
-                            crps_j = self._crps_ensemble(y_true_j, sims_j)
+                            crps_j = self._crps_ensemble(np.asarray(y_true_j), sims_j)
                             crps_scores.append(np.mean(crps_j))  # average over horizon
                         return np.mean(crps_scores)  # average over series
                     if scoring == "winkler_score":
