@@ -302,6 +302,7 @@ class MTS(Base):
         self.show_progress = show_progress
         self.series_names = None
         self.input_dates = None
+        self.quantiles = None
         self.fit_objs_ = {}
         self.y_ = None  # MTS responses (most recent observations first)
         self.X_ = None  # MTS lags
@@ -635,29 +636,64 @@ class MTS(Base):
 
             return self.fit(X, xreg, **kwargs)
 
-    def predict(self, h=5, level=95, alphas=None, **kwargs):
-        """Forecast all the time series, h steps ahead"""
-        if alphas is not None:
+    def _predict_quantiles(self, h, quantiles, **kwargs):
+        """Predict arbitrary quantiles from simulated paths."""
+        # Ensure output dates are set
+        self.output_dates_, _ = ts.compute_output_dates(self.df_, h)
+
+        # Trigger full prediction to generate self.sims_
+        if not hasattr(self, 'sims_') or self.sims_ is None:
+            _ = self.predict(h=h, level=95, **kwargs)  # Any level triggers sim
+
+        result_dict = {}
+
+        # Stack simulations: (R, h, n_series)
+        sims_array = np.stack([sim.values for sim in self.sims_], axis=0)
+
+        # Compute quantiles over replication axis
+        q_values = np.quantile(sims_array, quantiles, axis=0)  # (n_q, h, n_series)
+
+        for i, q in enumerate(quantiles):
+            # Clean label: 0.05 → "05", 0.1 → "10", 0.95 → "95"
+            q_label = f"{int(q * 100):02d}" if (q * 100).is_integer() else f"{q:.3f}".replace(".", "_")
+            for series_id in range(self.init_n_series_):
+                series_name = self.series_names[series_id]
+                col_name = f"quantile_{q_label}_{series_name}"
+                result_dict[col_name] = q_values[i, :, series_id]
+
+        return pd.DataFrame(result_dict, index=self.output_dates_)
+        
+    def predict(self, h=5, level=95, quantiles=None, **kwargs):
+        """Forecast all the time series, h steps ahead"""        
+
+        if quantiles is not None:
+            # Validate
+            quantiles = np.asarray(quantiles)
+            if not ((quantiles > 0) & (quantiles < 1)).all():
+                raise ValueError("quantiles must be between 0 and 1.")
+            # Delegate to dedicated method
+            return self._predict_quantiles(h=h, quantiles=quantiles, **kwargs)
+        
+        if isinstance(level, list) or isinstance(level, np.ndarray):
             # Store results
             result_dict = {}
             # Loop through alphas and calculate lower/upper for each alpha level
             # E.g [0.5, 2.5, 5, 16.5, 25, 50]
-            for alpha in alphas:
-                level = 100 * (1 - alpha/100)  # Convert alpha to percentage level
+            for lev in level:
                 # Get the forecast for this alpha
-                res = self.predict(h=h, level=level, **kwargs)                    
+                res = self.predict(h=h, level=lev, **kwargs)                    
                 # Adjust index and collect lower/upper bounds
                 res.lower.index = pd.to_datetime(res.lower.index)
                 res.upper.index = pd.to_datetime(res.upper.index)
                 # Loop over each time series (multivariate) and flatten results
                 if isinstance(res.lower, pd.DataFrame): 
                     for series in res.lower.columns:  # Assumes 'lower' and 'upper' have multiple series
-                        result_dict[f"lower_{int(100 - alpha)}_{series}"] = res.lower[series].to_numpy().flatten()
-                        result_dict[f"upper_{int(100  - alpha)}_{series}"] = res.upper[series].to_numpy().flatten()
+                        result_dict[f"lower_{lev}_{series}"] = res.lower[series].to_numpy().flatten()
+                        result_dict[f"upper_{lev}_{series}"] = res.upper[series].to_numpy().flatten()
                 else: 
                     for series_id in range(self.n_series):  # Assumes 'lower' and 'upper' have multiple series
-                        result_dict[f"lower_{int((100 - alpha))}_{series_id}"] = res.lower[series_id,:].to_numpy().flatten()
-                        result_dict[f"upper_{int((100 - alpha))}_{series_id}"] = res.upper[series_id,:].to_numpy().flatten()
+                        result_dict[f"lower_{lev}_{series_id}"] = res.lower[series_id,:].to_numpy().flatten()
+                        result_dict[f"upper_{lev}_{series_id}"] = res.upper[series_id,:].to_numpy().flatten()
             return pd.DataFrame(result_dict, index=self.output_dates_)
 
         # only one prediction interval
@@ -1488,19 +1524,15 @@ class MTS(Base):
         n_obs = self.residuals_.shape[0]
         n_features = int(self.init_n_series_ * curr_lags)
         n_hidden = int(self.n_hidden_features)
-
         # Calculate number of parameters
         term1 = int(n_features * n_hidden)
         term2 = int(n_hidden * self.init_n_series_)
         n_params = term1 + term2
-
         # Check if we have enough observations for the number of parameters
         if n_obs <= n_params + 1:
             return float("inf")  # Return infinity if too many parameters
-
         # Compute RSS using existing residuals
         rss = np.sum(self.residuals_**2)
-
         # Compute criterion
         if criterion == "AIC":
             ic = n_obs * np.log(rss / n_obs) + 2 * n_params
