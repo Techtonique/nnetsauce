@@ -1665,7 +1665,6 @@ class MTS(Base):
                         # Handle multivariate
                         scores = []
                         p = X_test.shape[1] if len(X_test.shape) > 1 else 1
-                        print("line. 1548", p)
                         for j in range(p):
                             series_name = getattr(
                                 self, "series_names", [f"Series_{j}"]
@@ -1679,9 +1678,7 @@ class MTS(Base):
                             if col not in q_pred.columns:
                                 raise ValueError(
                                     f"Column '{col}' not found in quantile forecast output."
-                                )
-                            print("line. 1555", j)
-                            print("line. 1556", X_test)
+                                )                            
                             try:
                                 y_true_j = X_test[:, j] if p > 1 else X_test
                             except:
@@ -1690,7 +1687,6 @@ class MTS(Base):
                                     if p > 1
                                     else X_test.values
                                 )
-                            print("line. 1561", y_true_j)
                             y_pred_j = q_pred[col].values
                             # Compute pinball loss for this series
                             loss = mean_pinball_loss(
