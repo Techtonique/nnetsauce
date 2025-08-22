@@ -39,7 +39,6 @@ print(df_test.head())
 print(df_test.tail())
 
 print(f"\n 3. fit ElasticNet: ------- \n")
-
 regr3 = linear_model.ElasticNet()
 obj_MTS3 = ns.MTS(regr3, lags = 3, n_hidden_features=7, 
                   replications=100, kernel='gaussian', 
@@ -48,47 +47,7 @@ start = time()
 obj_MTS3.fit(df_train)
 print(f"Elapsed {time()-start} s")
 print("\n\n")
-print(f"obj_MTS3.predict(h=5): {obj_MTS3.predict(h=5, alphas=[0.5, 2.5, 5, 16.5, 25, 50])}")
-print(obj_MTS3.kde_)
-print(f" Predictive simulations #1 {obj_MTS3.sims_[0]}") 
-print(f" Predictive simulations #2 {obj_MTS3.sims_[1]}") 
-print(f" Predictive simulations #3 {obj_MTS3.sims_[2]}") 
-
-print(f"\n 4. fit ElasticNet SCP: ------- \n")
-
-regr3 = linear_model.ElasticNet()
-obj_MTS3 = ns.MTS(regr3, lags = 3, n_hidden_features=7, 
-                  replications=100, kernel='gaussian', 
-                  seed=24, verbose = 1, type_pi="scp-kde")
-start = time()
-obj_MTS3.fit(df_train)
-print(f"Elapsed {time()-start} s")
-print("\n\n")
-print(f"obj_MTS3.predict(h=5): {obj_MTS3.predict(h=5, alphas=[0.5, 2.5, 5, 16.5, 25, 50])}")
-
-print(f"\n 5. ElasticNet2 SCP2: ------- \n")
-
-regr3 = linear_model.ElasticNet()
-obj_MTS3 = ns.MTS(regr3, lags = 3, n_hidden_features=7, 
-                  replications=10, kernel='gaussian', 
-                  seed=24, verbose = 1, type_pi="scp2-kde")
-start = time()
-obj_MTS3.fit(df_train.iloc[:,0])
-print(f"Elapsed {time()-start} s")
-print("\n\n")
-print(f"obj_MTS3.predict(h=5): {obj_MTS3.predict(h=5, alphas=[0.5, 2.5, 5, 16.5, 25, 50])}")
-
-print(f"\n 3. fit ElasticNet: ------- \n")
-
-
-obj_MTS3 = ns.MTS(regr3, lags = 3, n_hidden_features=7, 
-                  replications=100, kernel='gaussian', 
-                  seed=24, verbose = 1, type_pi="kde")
-start = time()
-obj_MTS3.fit(df_train.iloc[:,0])
-print(f"Elapsed {time()-start} s")
-print("\n\n")
-preds = obj_MTS3.predict(h=5, alphas=[0.5, 2.5, 5, 16.5, 25, 50])
+preds = obj_MTS3.predict(h=5, level=[50, 80, 95, 99.5])
 print(f"obj_MTS3.predict(h=5): {preds}")
 print(obj_MTS3.kde_)
 print(f" Predictive simulations #1 {obj_MTS3.sims_[0]}") 
@@ -96,3 +55,58 @@ print(f" Predictive simulations #2 {obj_MTS3.sims_[1]}")
 print(f" Predictive simulations #3 {obj_MTS3.sims_[2]}") 
 preds.plot()
 plt.show()
+
+
+print(f"\n 5. ElasticNet2 SCP2: ------- \n")
+regr3 = ns.ElasticNet2Regressor()
+obj_MTS3 = ns.MTS(regr3, lags = 3, n_hidden_features=7, 
+                  replications=100, kernel='gaussian', 
+                  seed=24, verbose = 1, type_pi="scp2-kde")
+start = time()
+obj_MTS3.fit(df_train.iloc[:,0])
+print(f"Elapsed {time()-start} s")
+print("\n\n")
+preds = obj_MTS3.predict(h=5, level=[50, 80, 95, 99.5])
+print(f"obj_MTS3.predict(h=5): {preds}")
+print(f" Predictive simulations #1 {obj_MTS3.sims_[0]}") 
+print(f" Predictive simulations #2 {obj_MTS3.sims_[1]}") 
+print(f" Predictive simulations #3 {obj_MTS3.sims_[2]}") 
+preds.plot()
+plt.show()
+
+print(f"\n 3. fit ElasticNet: ------- \n")
+regr3 = linear_model.ElasticNet()
+obj_MTS3 = ns.MTS(regr3, lags = 3, n_hidden_features=7, 
+                  replications=100, kernel='gaussian', 
+                  seed=24, verbose = 1, type_pi="kde")
+start = time()
+obj_MTS3.fit(df_train)
+print(f"Elapsed {time()-start} s")
+print("\n\n")
+preds = obj_MTS3.predict(h=5, quantiles=[0.05, 0.5, 0.95])
+print(f"obj_MTS3.predict(h=5): {preds}")
+print(obj_MTS3.kde_)
+print(f" Predictive simulations #1 {obj_MTS3.sims_[0]}") 
+print(f" Predictive simulations #2 {obj_MTS3.sims_[1]}") 
+print(f" Predictive simulations #3 {obj_MTS3.sims_[2]}") 
+preds.plot()
+plt.show()
+
+
+print(f"\n 5. ElasticNet2 SCP2: ------- \n")
+regr3 = ns.ElasticNet2Regressor()
+obj_MTS3 = ns.MTS(regr3, lags = 3, n_hidden_features=7, 
+                  replications=100, kernel='gaussian', 
+                  seed=24, verbose = 1, type_pi="scp2-kde")
+start = time()
+obj_MTS3.fit(df_train.iloc[:,0])
+print(f"Elapsed {time()-start} s")
+print("\n\n")
+preds = obj_MTS3.predict(h=5, quantiles=[0.05, 0.5, 0.95])
+print(f"obj_MTS3.predict(h=5): {preds}")
+print(f" Predictive simulations #1 {obj_MTS3.sims_[0]}") 
+print(f" Predictive simulations #2 {obj_MTS3.sims_[1]}") 
+print(f" Predictive simulations #3 {obj_MTS3.sims_[2]}") 
+preds.plot()
+plt.show()
+

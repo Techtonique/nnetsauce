@@ -13,6 +13,7 @@ from functools import partial
 from scipy.stats import describe, norm
 from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import mean_pinball_loss
 from tqdm import tqdm
 from ..base import Base
 from ..sampling import vinecopula_sample
@@ -302,6 +303,7 @@ class MTS(Base):
         self.show_progress = show_progress
         self.series_names = None
         self.input_dates = None
+        self.quantiles = None
         self.fit_objs_ = {}
         self.y_ = None  # MTS responses (most recent observations first)
         self.X_ = None  # MTS lags
@@ -635,29 +637,66 @@ class MTS(Base):
 
             return self.fit(X, xreg, **kwargs)
 
-    def predict(self, h=5, level=95, alphas=None, **kwargs):
-        """Forecast all the time series, h steps ahead"""
-        if alphas is not None:
+    def _predict_quantiles(self, h, quantiles, **kwargs):
+        """Predict arbitrary quantiles from simulated paths."""
+        # Ensure output dates are set
+        self.output_dates_, _ = ts.compute_output_dates(self.df_, h)
+
+        # Trigger full prediction to generate self.sims_
+        if not hasattr(self, 'sims_') or self.sims_ is None:
+            _ = self.predict(h=h, level=95, **kwargs)  # Any level triggers sim
+
+        result_dict = {}
+
+        # Stack simulations: (R, h, n_series)
+        sims_array = np.stack([sim.values for sim in self.sims_], axis=0)
+
+        # Compute quantiles over replication axis
+        q_values = np.quantile(sims_array, quantiles, axis=0)  # (n_q, h, n_series)
+
+        for i, q in enumerate(quantiles):
+            # Clean label: 0.05 → "05", 0.1 → "10", 0.95 → "95"
+            q_label = f"{int(q * 100):02d}" if (q * 100).is_integer() else f"{q:.3f}".replace(".", "_")
+            for series_id in range(self.init_n_series_):
+                series_name = self.series_names[series_id]
+                col_name = f"quantile_{q_label}_{series_name}"
+                result_dict[col_name] = q_values[i, :, series_id]
+
+        df_return_quantiles = pd.DataFrame(result_dict, index=self.output_dates_)
+
+        return df_return_quantiles
+        
+    def predict(self, h=5, level=95, quantiles=None, **kwargs):
+        """Forecast all the time series, h steps ahead"""        
+
+        if quantiles is not None:
+            # Validate
+            quantiles = np.asarray(quantiles)
+            if not ((quantiles > 0) & (quantiles < 1)).all():
+                raise ValueError("quantiles must be between 0 and 1.")
+            # Delegate to dedicated method
+            return self._predict_quantiles(h=h, quantiles=quantiles, **kwargs)
+        
+        if isinstance(level, list) or isinstance(level, np.ndarray):
             # Store results
             result_dict = {}
             # Loop through alphas and calculate lower/upper for each alpha level
             # E.g [0.5, 2.5, 5, 16.5, 25, 50]
-            for alpha in alphas:
-                level = 100 * (1 - alpha/100)  # Convert alpha to percentage level
+            for lev in level:
                 # Get the forecast for this alpha
-                res = self.predict(h=h, level=level, **kwargs)                    
+                res = self.predict(h=h, level=lev, **kwargs)                    
                 # Adjust index and collect lower/upper bounds
                 res.lower.index = pd.to_datetime(res.lower.index)
                 res.upper.index = pd.to_datetime(res.upper.index)
                 # Loop over each time series (multivariate) and flatten results
                 if isinstance(res.lower, pd.DataFrame): 
                     for series in res.lower.columns:  # Assumes 'lower' and 'upper' have multiple series
-                        result_dict[f"lower_{int(100 - alpha)}_{series}"] = res.lower[series].to_numpy().flatten()
-                        result_dict[f"upper_{int(100  - alpha)}_{series}"] = res.upper[series].to_numpy().flatten()
+                        result_dict[f"lower_{lev}_{series}"] = res.lower[series].to_numpy().flatten()
+                        result_dict[f"upper_{lev}_{series}"] = res.upper[series].to_numpy().flatten()
                 else: 
                     for series_id in range(self.n_series):  # Assumes 'lower' and 'upper' have multiple series
-                        result_dict[f"lower_{int((100 - alpha))}_{series_id}"] = res.lower[series_id,:].to_numpy().flatten()
-                        result_dict[f"upper_{int((100 - alpha))}_{series_id}"] = res.upper[series_id,:].to_numpy().flatten()
+                        result_dict[f"lower_{lev}_{series_id}"] = res.lower[series_id,:].to_numpy().flatten()
+                        result_dict[f"upper_{lev}_{series_id}"] = res.upper[series_id,:].to_numpy().flatten()
             return pd.DataFrame(result_dict, index=self.output_dates_)
 
         # only one prediction interval
@@ -1131,7 +1170,70 @@ class MTS(Base):
                 # Use original getsims for backward compatibility
                 self.sims_ = getsims(self.sims_)
 
-    def score(self, X, training_index, testing_index, scoring=None, **kwargs):
+    def _crps_ensemble(self, y_true, simulations, axis=0):
+        """
+        Compute the Continuous Ranked Probability Score (CRPS) for an ensemble of simulations.
+
+        The CRPS is a measure of the distance between the cumulative distribution 
+        function (CDF) of a forecast and the CDF of the observed value. This method 
+        computes the CRPS in a vectorized form for an ensemble of simulations, efficiently 
+        handling the case where there is only one simulation.
+
+        Parameters
+        ----------
+        y_true : array_like, shape (n,)
+            A 1D array of true values (observations). 
+            Each element represents the true value for a given sample.
+        
+        simulations : array_like, shape (n, R)
+            A 2D array of simulated values. Each row corresponds to a different sample 
+            and each column corresponds to a different simulation of that sample.
+        
+        axis : int, optional, default=0
+            Axis along which to transpose the simulations if needed. 
+            If axis=0, the simulations are transposed to shape (R, n). 
+
+        Returns
+        -------
+        crps : ndarray, shape (n,)
+            A 1D array of CRPS scores, one for each sample.
+        
+        Notes
+        -----
+        The CRPS score is computed as:
+        
+        CRPS(y_true, simulations) = E[|X - y|] - 0.5 * E[|X - X'|]
+        
+        Where:
+        - `X` is the ensemble of simulations.
+        - `y` is the true value.
+        - `X'` is a second independent sample from the ensemble.
+        
+        The calculation is vectorized to optimize performance for large datasets.
+        
+        The edge case where `R=1` (only one simulation) is handled by returning 
+        only `term1` (i.e., no ensemble spread).
+        """
+        sims = np.asarray(simulations)  # Convert simulations to numpy array
+        if axis == 0:
+            sims = sims.T  # Transpose if the axis is 0        
+        n, R = sims.shape  # n = number of samples, R = number of simulations        
+        # Term 1: E|X - y|, average absolute difference between simulations and true value
+        term1 = np.mean(np.abs(sims - y_true[:, np.newaxis]), axis=1)                    
+        # Handle edge case: if R == 1, return term1 (no spread in ensemble)
+        if R == 1:
+            return term1        
+        # Term 2: 0.5 * E|X - X'|, using efficient sorted formula
+        sims_sorted = np.sort(sims, axis=1)  # Sort simulations along each row        
+        # Correct coefficients for efficient calculation
+        j = np.arange(R)  # 0-indexed positions in the sorted simulations
+        coefficients = (2 * (j + 1) - R - 1) / (R * (R - 1))  # Efficient coefficient calculation        
+        # Dot product along the second axis (over the simulations)
+        term2 = np.dot(sims_sorted, coefficients)        
+        # Return CRPS score: term1 - 0.5 * term2
+        return term1 - 0.5 * term2
+    
+    def score(self, X, training_index, testing_index, scoring=None, alpha=0.5, **kwargs):
         """Train on training_index, score on testing_index."""
 
         assert (
@@ -1167,6 +1269,38 @@ class MTS(Base):
 
         if scoring is None:
             scoring = "neg_root_mean_squared_error"
+        
+        if scoring == "pinball":
+            # Predict requested quantile
+            q_pred = self.predict(h=h, quantiles=[alpha], **kwargs)
+            # Handle multivariate
+            scores = []
+            for j in range(p):
+                series_name = getattr(self, 'series_names', [f"Series_{j}"])[j]
+                q_label = f"{int(alpha * 100):02d}" if (alpha * 100).is_integer() else f"{alpha:.3f}".replace(".", "_")
+                col = f"quantile_{q_label}_{series_name}"
+                if col not in q_pred.columns:
+                    raise ValueError(f"Column '{col}' not found in quantile forecast output.")
+                y_true_j = X_test[:, j]
+                y_pred_j = q_pred[col].values
+                # Compute pinball loss for this series
+                loss = mean_pinball_loss(y_true_j, y_pred_j, alpha=alpha)
+                scores.append(loss)
+            # Return average over series
+            return np.mean(scores)
+        
+        if scoring == "crps":
+            # Ensure simulations exist
+            preds = self.predict(h=h, **kwargs)  # triggers self.sims_
+            # Extract simulations: list of DataFrames → (R, h, p)
+            sims_vals = np.stack([sim.values for sim in self.sims_], axis=0)  # (R, h, p)
+            crps_scores = []
+            for j in range(p):
+                y_true_j = X_test[:, j]
+                sims_j = sims_vals[:, :, j]  # (R, h)
+                crps_j = self._crps_ensemble(np.asarray(y_true_j), sims_j)
+                crps_scores.append(np.mean(crps_j))  # average over horizon
+            return np.mean(crps_scores)  # average over series
 
         # check inputs
         assert scoring in (
@@ -1345,6 +1479,7 @@ class MTS(Base):
         fixed_window=False,
         show_progress=True,
         level=95,
+        alpha=0.5,
         **kwargs,
     ):
         """Evaluate a score by time series cross-validation.
@@ -1384,6 +1519,13 @@ class MTS(Base):
 
             show_progress: boolean
                 if True, a progress bar is printed
+            
+            level: int
+                confidence level for prediction intervals
+            
+            alpha: float
+                quantile level for pinball loss if scoring='pinball'
+                0 < alpha < 1
 
             **kwargs: dict
                 additional parameters to be passed to `fit` and `predict`
@@ -1405,6 +1547,8 @@ class MTS(Base):
         if isinstance(scoring, str):
 
             assert scoring in (
+                "pinball",
+                "crps",
                 "root_mean_squared_error",
                 "mean_squared_error",
                 "mean_error",
@@ -1413,12 +1557,56 @@ class MTS(Base):
                 "mean_absolute_percentage_error",
                 "winkler_score",
                 "coverage",
-            ), "must have scoring in ('root_mean_squared_error', 'mean_squared_error', 'mean_error', 'mean_absolute_error', 'mean_error', 'mean_percentage_error', 'mean_absolute_percentage_error',  'winkler_score', 'coverage')"
+            ), "must have scoring in ('pinball', 'crps', 'root_mean_squared_error', 'mean_squared_error', 'mean_error', 'mean_absolute_error', 'mean_error', 'mean_percentage_error', 'mean_absolute_percentage_error',  'winkler_score', 'coverage')"
 
-            def err_func(X_test, X_pred, scoring):
+            def err_func(X_test, X_pred, scoring, alpha=0.5):
                 if (self.replications is not None) or (
                     self.type_pi == "gaussian"
                 ):  # probabilistic
+                    if scoring == "pinball":
+                        # Predict requested quantile
+                        q_pred = self.predict(
+                            h=len(X_test), quantiles=[alpha], **kwargs
+                        )
+                        # Handle multivariate
+                        scores = []
+                        p = X_test.shape[1] if len(X_test.shape) > 1 else 1
+                        print("line. 1548", p)
+                        for j in range(p):
+                            series_name = getattr(self, 'series_names', [f"Series_{j}"])[j]
+                            q_label = f"{int(alpha * 100):02d}" if (alpha * 100).is_integer() else f"{alpha:.3f}".replace(".", "_")
+                            col = f"quantile_{q_label}_{series_name}"
+                            if col not in q_pred.columns:
+                                raise ValueError(f"Column '{col}' not found in quantile forecast output.")
+                            print("line. 1555", j)
+                            print("line. 1556", X_test)
+                            try: 
+                                y_true_j = X_test[:, j] if p > 1 else X_test
+                            except:
+                                y_true_j = X_test.iloc[:, j] if p > 1 else X_test.values
+                            print("line. 1561", y_true_j)
+                            y_pred_j = q_pred[col].values
+                            # Compute pinball loss for this series
+                            loss = mean_pinball_loss(y_true_j, y_pred_j, alpha=alpha)
+                            scores.append(loss)
+                        # Return average over series
+                        return np.mean(scores)
+                    elif scoring == "crps":
+                        # Ensure simulations exist
+                        _ = self.predict(h=len(X_test), **kwargs)  # triggers self.sims_
+                        # Extract simulations: list of DataFrames → (R, h, p)
+                        sims_vals = np.stack([sim.values for sim in self.sims_], axis=0)  # (R, h, p)
+                        crps_scores = []
+                        p = X_test.shape[1] if len(X_test.shape) > 1 else 1
+                        for j in range(p):
+                            try: 
+                                y_true_j = X_test[:, j] if p > 1 else X_test
+                            except Exception as e:
+                                y_true_j = X_test.iloc[:, j] if p > 1 else X_test.values
+                            sims_j = sims_vals[:, :, j]  # (R, h)
+                            crps_j = self._crps_ensemble(np.asarray(y_true_j), sims_j)
+                            crps_scores.append(np.mean(crps_j))  # average over horizon
+                        return np.mean(crps_scores)  # average over series
                     if scoring == "winkler_score":
                         return winkler_score(X_pred, X_test, level=level)
                     elif scoring == "coverage":
@@ -1463,7 +1651,7 @@ class MTS(Base):
                 X_test = X[test_index, :]
             X_pred = self.predict(h=int(len(test_index)), level=level, **kwargs)
 
-            errors.append(err_func(X_test, X_pred, scoring))
+            errors.append(err_func(X_test, X_pred, scoring, alpha=alpha))
 
         res = np.asarray(errors)
 
@@ -1488,19 +1676,15 @@ class MTS(Base):
         n_obs = self.residuals_.shape[0]
         n_features = int(self.init_n_series_ * curr_lags)
         n_hidden = int(self.n_hidden_features)
-
         # Calculate number of parameters
         term1 = int(n_features * n_hidden)
         term2 = int(n_hidden * self.init_n_series_)
         n_params = term1 + term2
-
         # Check if we have enough observations for the number of parameters
         if n_obs <= n_params + 1:
             return float("inf")  # Return infinity if too many parameters
-
         # Compute RSS using existing residuals
         rss = np.sum(self.residuals_**2)
-
         # Compute criterion
         if criterion == "AIC":
             ic = n_obs * np.log(rss / n_obs) + 2 * n_params
