@@ -55,6 +55,7 @@ class NeuralNetClassifier(BaseEstimator, ClassifierMixin):
         set_weights(weights)
             Set the weights of the model.
     """
+
     _estimator_type = "classifier"
 
     def __init__(
@@ -142,4 +143,4 @@ class NeuralNetClassifier(BaseEstimator, ClassifierMixin):
 
     @property
     def _estimator_type(self):
-        return "classifier"            
+        return "classifier"

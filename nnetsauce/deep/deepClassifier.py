@@ -16,10 +16,11 @@ from tqdm import tqdm
 from sklearn import metrics
 from sklearn.base import ClassifierMixin, RegressorMixin
 from sklearn.calibration import CalibratedClassifierCV
+
 try:
     from sklearn.frozen import FrozenEstimator
 except ImportError:
-    pass 
+    pass
 
 try:
     from sklearn.utils import all_estimators
@@ -65,6 +66,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         print(clf.score(clf.predict(X_test), y_test))
         ```
     """
+
     _estimator_type = "classifier"
 
     def __init__(
@@ -115,11 +117,11 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         self.type_fit = "classification"
         self.cv_calibration = cv_calibration
         self.calibration_method = calibration_method
-        
+
         # Only wrap in CalibratedClassifierCV if not already wrapped
         # if not isinstance(obj, CalibratedClassifierCV):
         #     self.obj = CalibratedClassifierCV(
-        #         self.obj, 
+        #         self.obj,
         #         cv=self.cv_calibration,
         #         method=self.calibration_method
         #     )
@@ -216,7 +218,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                 )
             )
             self.stacked_obj.fit(X, y, **kwargs)
-        
+
         return self
 
     def partial_fit(self, X, y, **kwargs):
@@ -453,7 +455,9 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
             int(np.ceil(res.best_params["nodes_sim"]))
         ]
         res.best_params["dropout"] = res.best_params["dropout"]
-        res.best_params["n_clusters"] = int(np.ceil(res.best_params["n_clusters"]))
+        res.best_params["n_clusters"] = int(
+            np.ceil(res.best_params["n_clusters"])
+        )
         res.best_params["type_clust"] = num_to_type_clust[
             int(np.ceil(res.best_params["type_clust"]))
         ]
@@ -463,7 +467,9 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
             self.set_params(**res.best_params, verbose=0, seed=seed)
             preds = self.fit(X_train, y_train).predict(X_test)
             # check error on y_test
-            oos_err = getattr(metrics, scoring + "_score")(y_true=y_test, y_pred=preds)
+            oos_err = getattr(metrics, scoring + "_score")(
+                y_true=y_test, y_pred=preds
+            )
             result = namedtuple("result", res._fields + ("test_" + scoring,))
             return result(*res, oos_err)
         else:
@@ -639,4 +645,4 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
 
     @property
     def _estimator_type(self):
-        return "classifier"        
+        return "classifier"

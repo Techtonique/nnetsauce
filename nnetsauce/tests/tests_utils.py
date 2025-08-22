@@ -38,7 +38,9 @@ class TestUtils(ut.TestCase):
         A = np.array([[1, 2], [3, 4]])
         B = np.array([[4, 3], [2, 1]])
         self.assertTrue(
-            np.allclose(mo.rbind(A, B), np.array([[1, 2], [3, 4], [4, 3], [2, 1]]))
+            np.allclose(
+                mo.rbind(A, B), np.array([[1, 2], [3, 4], [4, 3], [2, 1]])
+            )
         )
 
     # 2 - tests misc
@@ -46,7 +48,9 @@ class TestUtils(ut.TestCase):
     def test_merge_two_dicts(self):
         x = {"a": 3, "b": 5}
         y = {"c": 1, "d": 4}
-        self.assertEqual(mx.merge_two_dicts(x, y), {"a": 3, "b": 5, "c": 1, "d": 4})
+        self.assertEqual(
+            mx.merge_two_dicts(x, y), {"a": 3, "b": 5, "c": 1, "d": 4}
+        )
 
     # 3 - psd_check -----
 
@@ -66,7 +70,9 @@ class TestUtils(ut.TestCase):
     # 4 - lm
 
     def test_inv_penalized_cov(self):
-        X, y = datasets.make_regression(n_samples=5, n_features=2, random_state=123)
+        X, y = datasets.make_regression(
+            n_samples=5, n_features=2, random_state=123
+        )
         self.assertTrue(
             np.allclose(
                 lmf.inv_penalized_cov(X, lam=0.1),
@@ -79,12 +85,16 @@ class TestUtils(ut.TestCase):
         )
 
     def test_lmf_beta_hat(self):
-        X, y = datasets.make_regression(n_samples=5, n_features=2, random_state=123)
+        X, y = datasets.make_regression(
+            n_samples=5, n_features=2, random_state=123
+        )
         self.assertTrue(
             np.allclose(
                 lmf.beta_hat(X, y, lam=0.1), np.array([43.30170911, 5.68353528])
             )
-            & np.allclose(lmf.beta_hat(X, y), np.array([43.85722447, 5.96778966]))
+            & np.allclose(
+                lmf.beta_hat(X, y), np.array([43.85722447, 5.96778966])
+            )
         )
 
     # 5 - MTS
@@ -92,7 +102,9 @@ class TestUtils(ut.TestCase):
     def test_MTS_train_inputs(self):
         np.random.seed(123)
         X = np.random.rand(5, 2)
-        self.assertEqual(ts.create_train_inputs(X, 2)[1][1, 1], 0.42310646012446096)
+        self.assertEqual(
+            ts.create_train_inputs(X, 2)[1][1, 1], 0.42310646012446096
+        )
 
     def test_MTS_reformat_response(self):
         np.random.seed(123)

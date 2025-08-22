@@ -12,6 +12,7 @@ from tqdm import tqdm
 from sklearn.base import BaseEstimator, RegressorMixin
 from scipy.stats import norm
 from sklearn.metrics import mean_pinball_loss
+
 # import your matrix operations helper if needed (mo.rbind)
 
 
@@ -24,7 +25,7 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
 
     base_model : str
         The name of the base model (e.g., 'RidgeCV').
-    
+
     type_grad : {'finitediff', 'autodiff'}, optional
         Type of gradient computation to use (default='finitediff').
 
@@ -58,23 +59,31 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
 
     """
 
-    def __init__(self, base_model, 
-        type_grad='finitediff',
-        lr=1e-4, optimizer='gd', 
-        eps=1e-3, batch_size=32, 
-        alpha=0.0, l1_ratio=0.0, 
-        type_loss="mse", q=0.5,
-        backend='cpu',
-        **kwargs):
+    def __init__(
+        self,
+        base_model,
+        type_grad="finitediff",
+        lr=1e-4,
+        optimizer="gd",
+        eps=1e-3,
+        batch_size=32,
+        alpha=0.0,
+        l1_ratio=0.0,
+        type_loss="mse",
+        q=0.5,
+        backend="cpu",
+        **kwargs,
+    ):
         super().__init__(base_model, True, **kwargs)
         self.base_model = base_model
         self.custom_kwargs = kwargs
         self.backend = backend
-        self.model = ns.CustomRegressor(self.base_model, 
-            backend=self.backend,
-                                        **self.custom_kwargs)
-        assert isinstance(self.model, ns.CustomRegressor),\
-         "'model' must be of class ns.CustomRegressor"
+        self.model = ns.CustomRegressor(
+            self.base_model, backend=self.backend, **self.custom_kwargs
+        )
+        assert isinstance(
+            self.model, ns.CustomRegressor
+        ), "'model' must be of class ns.CustomRegressor"
         self.type_grad = type_grad
         self.lr = lr
         self.optimizer = optimizer
@@ -111,14 +120,16 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
             The computed loss value.
         """
         y_pred = self.model.predict(X)
-        if self.type_loss == "mse": 
-            loss = np.mean((y - y_pred) ** 2)            
+        if self.type_loss == "mse":
+            loss = np.mean((y - y_pred) ** 2)
         elif self.type_loss == "quantile":
             loss = mean_pinball_loss(y, y_pred, alpha=self.q, **kwargs)
         W = self.model.W_
         l1 = np.sum(np.abs(W))
-        l2 = np.sum(W ** 2)
-        return loss + self.alpha * (self.l1_ratio * l1 + 0.5 * (1 - self.l1_ratio) * l2)
+        l2 = np.sum(W**2)
+        return loss + self.alpha * (
+            self.l1_ratio * l1 + 0.5 * (1 - self.l1_ratio) * l2
+        )
 
     def _compute_grad(self, X, y):
         """
@@ -139,8 +150,10 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
         ndarray
             Gradient array with the same shape as W_.
         """
-        if self.type_grad == 'autodiff':
-            raise NotImplementedError("Automatic differentiation is not implemented yet.")
+        if self.type_grad == "autodiff":
+            raise NotImplementedError(
+                "Automatic differentiation is not implemented yet."
+            )
             # Use JAX for automatic differentiation
             W = deepcopy(self.model.W_)
             W_flat = W.flatten()
@@ -162,7 +175,7 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
 
             self.model.W_ = W
             return grad
-        
+
         # Finite difference gradient computation
         W = deepcopy(self.model.W_)
         shape = W.shape
@@ -178,8 +191,10 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
 
         for i in range(n_params):
             h_i = h_vec[i]
-            Wp = W_flat.copy(); Wp[i] += h_i
-            Wm = W_flat.copy(); Wm[i] -= h_i
+            Wp = W_flat.copy()
+            Wp[i] += h_i
+            Wm = W_flat.copy()
+            Wm[i] -= h_i
 
             self.model.W_ = Wp.reshape(shape)
             loss_plus[i] = self._loss(X, y)
@@ -197,7 +212,16 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
         self.model.W_ = W  # restore original
         return grad
 
-    def fit(self, X, y, epochs=10, verbose=True, show_progress=True, sample_weight=None, **kwargs):
+    def fit(
+        self,
+        X,
+        y,
+        epochs=10,
+        verbose=True,
+        show_progress=True,
+        sample_weight=None,
+        **kwargs,
+    ):
         """
         Fit the model using finite difference optimization.
 
@@ -230,7 +254,7 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
 
         self : object
             Returns self.
-        """        
+        """
 
         self.model.fit(X, y)
 
@@ -239,40 +263,50 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
         for epoch in iterator:
             grad = self._compute_grad(X, y)
 
-            if self.optimizer == 'gd':
+            if self.optimizer == "gd":
                 self.model.W_ -= self.lr * grad
                 self.model.W_ = np.clip(self.model.W_, 0, 1)
-                #print("self.model.W_", self.model.W_)
+                # print("self.model.W_", self.model.W_)
 
-            elif self.optimizer == 'sgd':
+            elif self.optimizer == "sgd":
                 # Sample a mini-batch for stochastic gradient
                 n_samples = X.shape[0]
-                idxs = np.random.choice(n_samples, self.batch_size, replace=False)
+                idxs = np.random.choice(
+                    n_samples, self.batch_size, replace=False
+                )
                 if isinstance(X, pd.DataFrame):
-                    X_batch = X.iloc[idxs,:]
-                else: 
-                    X_batch = X[idxs,:]
+                    X_batch = X.iloc[idxs, :]
+                else:
+                    X_batch = X[idxs, :]
                 y_batch = y[idxs]
                 grad = self._compute_grad(X_batch, y_batch)
 
                 self.model.W_ -= self.lr * grad
                 self.model.W_ = np.clip(self.model.W_, 0, 1)
 
-            elif self.optimizer == 'adam':
+            elif self.optimizer == "adam":
                 if self.opt_state is None:
-                    self.opt_state = {'m': np.zeros_like(grad), 'v': np.zeros_like(grad), 't': 0}
+                    self.opt_state = {
+                        "m": np.zeros_like(grad),
+                        "v": np.zeros_like(grad),
+                        "t": 0,
+                    }
                 beta1, beta2, eps = 0.9, 0.999, 1e-8
-                self.opt_state['t'] += 1
-                self.opt_state['m'] = beta1 * self.opt_state['m'] + (1 - beta1) * grad
-                self.opt_state['v'] = beta2 * self.opt_state['v'] + (1 - beta2) * (grad ** 2)
-                m_hat = self.opt_state['m'] / (1 - beta1 ** self.opt_state['t'])
-                v_hat = self.opt_state['v'] / (1 - beta2 ** self.opt_state['t'])
+                self.opt_state["t"] += 1
+                self.opt_state["m"] = (
+                    beta1 * self.opt_state["m"] + (1 - beta1) * grad
+                )
+                self.opt_state["v"] = beta2 * self.opt_state["v"] + (
+                    1 - beta2
+                ) * (grad**2)
+                m_hat = self.opt_state["m"] / (1 - beta1 ** self.opt_state["t"])
+                v_hat = self.opt_state["v"] / (1 - beta2 ** self.opt_state["t"])
 
                 self.model.W_ -= self.lr * m_hat / (np.sqrt(v_hat) + eps)
                 self.model.W_ = np.clip(self.model.W_, 0, 1)
-                #print("self.model.W_", self.model.W_)
+                # print("self.model.W_", self.model.W_)
 
-            elif self.optimizer == 'cd':  # coordinate descent
+            elif self.optimizer == "cd":  # coordinate descent
 
                 W_shape = self.model.W_.shape
                 W_flat_size = self.model.W_.size
@@ -297,7 +331,7 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
             self.loss_history_.append(loss)
 
             if verbose:
-                print(f"Epoch {epoch+1}: Loss = {loss:.6f}")                
+                print(f"Epoch {epoch+1}: Loss = {loss:.6f}")
 
         # if sample_weights, else: (must use self.row_index)
         if sample_weight in kwargs:
@@ -305,15 +339,14 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
                 X,
                 y,
                 sample_weight=sample_weight[self.index_row_].ravel(),
-                **kwargs
+                **kwargs,
             )
 
             return self
 
         return self
 
-
-    def predict(self, X, level=95, method='splitconformal', **kwargs):
+    def predict(self, X, level=95, method="splitconformal", **kwargs):
         """
         Predict using the trained model.
 
@@ -335,7 +368,7 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
 
         Returns
         -------
-        
+
         array or tuple
             Model predictions, or a tuple with prediction intervals or standard deviations if requested.
         """
@@ -352,13 +385,11 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
                     np.ones(n_features).reshape(1, n_features),
                 )
 
-                mean_, std_ = self.model.predict(
-                    new_X, return_std=True
-                )[0]
+                mean_, std_ = self.model.predict(new_X, return_std=True)[0]
 
-                preds =  mean_
-                lower =  (mean_ - pi_multiplier * std_)
-                upper =  (mean_ + pi_multiplier * std_)
+                preds = mean_
+                lower = mean_ - pi_multiplier * std_
+                upper = mean_ + pi_multiplier * std_
 
                 DescribeResults = namedtuple(
                     "DescribeResults", ["mean", "std", "lower", "upper"]
@@ -367,13 +398,11 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
                 return DescribeResults(preds, std_, lower, upper)
 
             # len(X.shape) > 1
-            mean_, std_ = self.model.predict(
-                X, return_std=True
-            )
+            mean_, std_ = self.model.predict(X, return_std=True)
 
-            preds =  mean_
-            lower =  (mean_ - pi_multiplier * std_)
-            upper =  (mean_ + pi_multiplier * std_)
+            preds = mean_
+            lower = mean_ - pi_multiplier * std_
+            upper = mean_ + pi_multiplier * std_
 
             DescribeResults = namedtuple(
                 "DescribeResults", ["mean", "std", "lower", "upper"]
@@ -419,12 +448,7 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
                 np.ones(n_features).reshape(1, n_features),
             )
 
-            return (
-                0
-                + self.model.predict(new_X, **kwargs)
-            )[0]
+            return (0 + self.model.predict(new_X, **kwargs))[0]
 
         # len(X.shape) > 1
-        return  self.model.predict(
-            X, **kwargs
-        )
+        return self.model.predict(X, **kwargs)

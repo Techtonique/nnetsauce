@@ -174,7 +174,9 @@ class TestCustom(ut.TestCase):
         self.assertTrue(np.allclose(pred5, 1))
         self.assertTrue(np.allclose(pred6, 1))
         self.assertTrue(np.allclose(pred6_proba1[0], 0.50507336, atol=1e-6))
-        self.assertTrue(np.allclose(pred6_proba2[3, 0], 0.4836233209751839, atol=1e-6))
+        self.assertTrue(
+            np.allclose(pred6_proba2[3, 0], 0.4836233209751839, atol=1e-6)
+        )
         self.assertTrue(np.allclose(score6, 0.94999999999999996))
         self.assertTrue(np.allclose(score7, 0.85))
         self.assertTrue(np.allclose(rmse9, 76.12747461579583))

@@ -208,7 +208,9 @@ def cross_val_score(
                 elif scoring == "coverage":
                     return coverage(X_pred, X_test, level=level)
                 else:
-                    return mean_errors(pred=X_pred.mean, actual=X_test, scoring=scoring)
+                    return mean_errors(
+                        pred=X_pred.mean, actual=X_test, scoring=scoring
+                    )
             else:  # not probabilistic
                 return mean_errors(pred=X_pred, actual=X_test, scoring=scoring)
 
@@ -235,7 +237,9 @@ def cross_val_score(
         else:
             estimator.fit(X[train_index, :], xreg=xreg, **kwargs)
             X_test = X[test_index, :]
-        X_pred = estimator.predict(h=int(len(test_index)), level=level, **kwargs)
+        X_pred = estimator.predict(
+            h=int(len(test_index)), level=level, **kwargs
+        )
 
         errors.append(err_func(X_test, X_pred, scoring))
 

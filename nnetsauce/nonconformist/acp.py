@@ -85,7 +85,9 @@ class RandomSubSampler(object):
                 y, n_iter=n_samples, test_size=self.cal_portion
             )
         else:
-            splits = ShuffleSplit(y.size, n_iter=n_samples, test_size=self.cal_portion)
+            splits = ShuffleSplit(
+                y.size, n_iter=n_samples, test_size=self.cal_portion
+            )
 
         for train, cal in splits:
             yield train, cal
@@ -217,7 +219,9 @@ class AggregatedCp(BaseEstimator):
                 For regression problems: Prediction interval (minimum and maximum
                 boundaries) for the set of test patterns.
         """
-        is_regression = self.predictor.__class__.get_problem_type() == "regression"
+        is_regression = (
+            self.predictor.__class__.get_problem_type() == "regression"
+        )
 
         n_examples = x.shape[0]
 
@@ -225,7 +229,9 @@ class AggregatedCp(BaseEstimator):
             signs = np.arange(0.01, 1.0, 0.01)
             pred = np.zeros((n_examples, 2, signs.size))
             for i, s in enumerate(signs):
-                predictions = np.dstack([p.predict(x, s) for p in self.predictors])
+                predictions = np.dstack(
+                    [p.predict(x, s) for p in self.predictors]
+                )
                 predictions = self.agg_func(predictions)
                 pred[:, :, i] = predictions
             return pred
@@ -291,7 +297,9 @@ class CrossConformalClassifier(AggregatedCp):
         )
 
     def predict(self, x, significance=None):
-        ncal_ngt_neq = np.stack([p._get_stats(x) for p in self.predictors], axis=3)
+        ncal_ngt_neq = np.stack(
+            [p._get_stats(x) for p in self.predictors], axis=3
+        )
         ncal_ngt_neq = ncal_ngt_neq.sum(axis=3)
 
         p = calc_p(
@@ -355,7 +363,9 @@ class BootstrapConformalClassifier(AggregatedCp):
         )
 
     def predict(self, x, significance=None):
-        ncal_ngt_neq = np.stack([p._get_stats(x) for p in self.predictors], axis=3)
+        ncal_ngt_neq = np.stack(
+            [p._get_stats(x) for p in self.predictors], axis=3
+        )
         ncal_ngt_neq = ncal_ngt_neq.sum(axis=3)
 
         p = calc_p(

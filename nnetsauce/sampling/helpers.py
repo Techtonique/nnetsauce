@@ -55,7 +55,9 @@ def subsample_indices(
     if isinstance(data, pd.DataFrame):
         is_dataframe = True
         if label_col is not None and label_col not in data.columns:
-            raise ValueError(f"Column '{label_col}' does not exist in the DataFrame.")
+            raise ValueError(
+                f"Column '{label_col}' does not exist in the DataFrame."
+            )
         X = data.drop(columns=[label_col] if label_col else []).values
         labels = data[label_col].values if label_col else None
     elif isinstance(data, np.ndarray):
@@ -75,7 +77,9 @@ def subsample_indices(
             X = data
             labels = None
     else:
-        raise TypeError("Input data must be a Pandas DataFrame or a NumPy array.")
+        raise TypeError(
+            "Input data must be a Pandas DataFrame or a NumPy array."
+        )
 
     if method == "random":
         # Simple random sampling
@@ -87,7 +91,9 @@ def subsample_indices(
 
     elif method == "stratified":
         if labels is None:
-            raise ValueError("For stratified sampling, 'label_col' must be specified.")
+            raise ValueError(
+                "For stratified sampling, 'label_col' must be specified."
+            )
         # Stratified sampling
         _, _, _, subsample_indices = train_test_split(
             np.arange(data.shape[0]),
@@ -100,9 +106,9 @@ def subsample_indices(
 
     elif method == "gmm":
         # GMM-based sampling
-        gmm = GaussianMixture(n_components=n_components, random_state=random_state).fit(
-            X
-        )
+        gmm = GaussianMixture(
+            n_components=n_components, random_state=random_state
+        ).fit(X)
 
         # Assign each row to a cluster
         clusters = gmm.predict(X)
@@ -168,7 +174,9 @@ def subsample_indices(
 
 def dosubsample(y, row_sample=0.8, seed=123, n_jobs=None, verbose=False):
     index = []
-    assert (row_sample < 1) & (row_sample >= 0), "'row_sample' must be < 1 and >= 0"
+    assert (row_sample < 1) & (
+        row_sample >= 0
+    ), "'row_sample' must be < 1 and >= 0"
     n_obs = len(y)
     n_obs_out = np.ceil(n_obs * row_sample)
 

@@ -170,7 +170,7 @@ class CustomRegressor(Custom, RegressorMixin):
         self.intercept_ = None
         self.X_ = None
         self.y_ = None
-        self.aic_ = None 
+        self.aic_ = None
         self.aicc_ = None
         self.bic_ = None
 
@@ -225,15 +225,17 @@ class CustomRegressor(Custom, RegressorMixin):
         # Compute SSE
         centered_y_pred = self.obj.predict(scaled_Z)
         self.sse_ = np.sum((centered_y - centered_y_pred) ** 2)
-        
+
         # Get number of parameters
-        n_params = self.n_hidden_features + X.shape[1]  # hidden features + original features
+        n_params = (
+            self.n_hidden_features + X.shape[1]
+        )  # hidden features + original features
         if self.n_clusters > 0:
             n_params += self.n_clusters  # add clusters if used
-            
+
         # Compute information criteria
         n_samples = X.shape[0]
-        temp = n_samples * np.log(self.sse_/n_samples)
+        temp = n_samples * np.log(self.sse_ / n_samples)
         self.aic_ = temp + 2 * n_params
         self.bic_ = temp + np.log(n_samples) * n_params
 
@@ -283,7 +285,7 @@ class CustomRegressor(Custom, RegressorMixin):
 
         return self
 
-    def predict(self, X, level=95, method='splitconformal', **kwargs):
+    def predict(self, X, level=95, method="splitconformal", **kwargs):
         """Predict test data X.
 
         Parameters:
@@ -400,7 +402,9 @@ class CustomRegressor(Custom, RegressorMixin):
 
             return (
                 self.y_mean_
-                + self.obj.predict(self.cook_test_set(new_X, **kwargs), **kwargs)
+                + self.obj.predict(
+                    self.cook_test_set(new_X, **kwargs), **kwargs
+                )
             )[0]
 
         # len(X.shape) > 1

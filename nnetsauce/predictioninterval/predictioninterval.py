@@ -75,7 +75,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
         self.scaled_calibrated_residuals_ = None
         self.calibrated_residuals_scaler_ = None
         self.kde_ = None
-        self.aic_ = None 
+        self.aic_ = None
         self.aicc_ = None
         self.bic_ = None
         self.sse_ = None
@@ -111,7 +111,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             X_train = X[first_half_idx, :]
             X_calibration = X[second_half_idx, :]
             y_train = y[first_half_idx]
-            y_calibration = y[second_half_idx]        
+            y_calibration = y[second_half_idx]
 
         if self.method == "splitconformal":
 
@@ -138,30 +138,34 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                     a=absolute_residuals,
                     q=self.level / 100,
                     interpolation="higher",
-                )            
+                )
 
         if self.method == "localconformal":
 
             mad_estimator = ExtraTreesRegressor()
-            normalizer = RegressorNormalizer(self.obj, mad_estimator, AbsErrorErrFunc())
+            normalizer = RegressorNormalizer(
+                self.obj, mad_estimator, AbsErrorErrFunc()
+            )
             nc = RegressorNc(self.obj, AbsErrorErrFunc(), normalizer)
             self.icp_ = IcpRegressor(nc)
             self.icp_.fit(X_train, y_train)
             self.icp_.calibrate(X_calibration, y_calibration)
-        
+
         # Calculate AIC
         # Get predictions
         preds = self.obj.predict(X_calibration)
-        
+
         # Calculate SSE
         self.sse_ = np.sum((y_calibration - preds) ** 2)
-        
+
         # Get number of parameters from the base model
-        n_params = getattr(self.obj, 'n_hidden_features', 0) + X_calibration.shape[1]
-        
+        n_params = (
+            getattr(self.obj, "n_hidden_features", 0) + X_calibration.shape[1]
+        )
+
         # Calculate AIC
         n_samples = len(y_calibration)
-        temp = n_samples * np.log(self.sse_/n_samples)
+        temp = n_samples * np.log(self.sse_ / n_samples)
         self.aic_ = temp + 2 * n_params
         self.bic_ = temp + np.log(n_samples) * n_params
 
@@ -244,7 +248,9 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                         ]
                     ).T
                 elif self.type_pi == "kde":
-                    self.kde_ = gaussian_kde(dataset=self.scaled_calibrated_residuals_)
+                    self.kde_ = gaussian_kde(
+                        dataset=self.scaled_calibrated_residuals_
+                    )
                     self.sims_ = np.asarray(
                         [
                             pred
@@ -257,14 +263,20 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                     ).T
 
                 self.mean_ = np.mean(self.sims_, axis=1)
-                self.lower_ = np.quantile(self.sims_, q=self.alpha_ / 200, axis=1)
-                self.upper_ = np.quantile(self.sims_, q=1 - self.alpha_ / 200, axis=1)
+                self.lower_ = np.quantile(
+                    self.sims_, q=self.alpha_ / 200, axis=1
+                )
+                self.upper_ = np.quantile(
+                    self.sims_, q=1 - self.alpha_ / 200, axis=1
+                )
 
                 DescribeResult = namedtuple(
                     "DescribeResult", ("mean", "sims", "lower", "upper")
                 )
 
-                return DescribeResult(self.mean_, self.sims_, self.lower_, self.upper_)
+                return DescribeResult(
+                    self.mean_, self.sims_, self.lower_, self.upper_
+                )
 
         if self.method == "localconformal":
 

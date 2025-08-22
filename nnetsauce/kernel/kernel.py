@@ -90,12 +90,16 @@ class KernelRidge(BaseEstimator, RegressorMixin):
         """
         if self.backend == "gpu":
             # Compute pairwise distances
-            dists = jnp.sqrt(jnp.sum((X[:, None, :] - Y[None, :, :]) ** 2, axis=2))
+            dists = jnp.sqrt(
+                jnp.sum((X[:, None, :] - Y[None, :, :]) ** 2, axis=2)
+            )
             scaled_dists = jnp.sqrt(2 * self.nu) * dists / self.length_scale
 
             # Matérn kernel formula
             coeff = (2 ** (1 - self.nu)) / jnp.exp(gammaln(self.nu))
-            matern_kernel = coeff * (scaled_dists**self.nu) * kv(self.nu, scaled_dists)
+            matern_kernel = (
+                coeff * (scaled_dists**self.nu) * kv(self.nu, scaled_dists)
+            )
             matern_kernel = jnp.where(
                 dists == 0, 1.0, matern_kernel
             )  # Handle the case where distance is 0
@@ -107,12 +111,16 @@ class KernelRidge(BaseEstimator, RegressorMixin):
                 kv,
             )  # Ensure scipy.special is used for CPU
 
-            dists = np.sqrt(np.sum((X[:, None, :] - Y[None, :, :]) ** 2, axis=2))
+            dists = np.sqrt(
+                np.sum((X[:, None, :] - Y[None, :, :]) ** 2, axis=2)
+            )
             scaled_dists = np.sqrt(2 * self.nu) * dists / self.length_scale
 
             # Matérn kernel formula
             coeff = (2 ** (1 - self.nu)) / np.exp(gammaln(self.nu))
-            matern_kernel = coeff * (scaled_dists**self.nu) * kv(self.nu, scaled_dists)
+            matern_kernel = (
+                coeff * (scaled_dists**self.nu) * kv(self.nu, scaled_dists)
+            )
             matern_kernel = np.where(
                 dists == 0, 1.0, matern_kernel
             )  # Handle the case where distance is 0
@@ -282,11 +290,16 @@ class KernelRidge(BaseEstimator, RegressorMixin):
                     # Update dual coefficients for a single alpha
                     gamma_new = 1 / (k_self + self.alpha)
                     residual = y_new - np.dot(self.dual_coef_, k_new)
-                    self.dual_coef_ = np.append(self.dual_coef_, gamma_new * residual)
+                    self.dual_coef_ = np.append(
+                        self.dual_coef_, gamma_new * residual
+                    )
 
                 # Update the kernel matrix
                 self.K_ = np.block(
-                    [[self.K_, k_new[:, None]], [k_new[None, :], np.array([[k_self]])]]
+                    [
+                        [self.K_, k_new[:, None]],
+                        [k_new[None, :], np.array([[k_self]])],
+                    ]
                 )
 
                 # Update the stored data

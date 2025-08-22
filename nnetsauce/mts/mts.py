@@ -18,7 +18,7 @@ from tqdm import tqdm
 from ..base import Base
 from ..sampling import vinecopula_sample
 from ..simulation import getsims, getsimsxreg
-from ..quantile import QuantileRegressor 
+from ..quantile import QuantileRegressor
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 from ..utils import timeseries as ts
@@ -82,7 +82,7 @@ class MTS(Base):
         type_pi: str.
             type of prediction interval; currently:
             - "gaussian": simple, fast, but: assumes stationarity of Gaussian in-sample residuals and independence in the multivariate case
-            - "quantile": use model-agnostic quantile regression under the hood 
+            - "quantile": use model-agnostic quantile regression under the hood
             - "kde": based on Kernel Density Estimation of in-sample residuals
             - "bootstrap": based on independent bootstrap of in-sample residuals
             - "block-bootstrap": based on basic block bootstrap of in-sample residuals
@@ -285,16 +285,19 @@ class MTS(Base):
                 "BIC",
             ), "if string, lags must be one of 'AIC', 'AICc', or 'BIC'"
         else:
-            assert int(lags) == lags, "if numeric, lags parameter should be an integer"
+            assert (
+                int(lags) == lags
+            ), "if numeric, lags parameter should be an integer"
 
         self.obj = obj
         self.n_series = None
         self.lags = lags
-        self.type_pi = type_pi        
-        self.level = level 
+        self.type_pi = type_pi
+        self.level = level
         if self.type_pi == "quantile":
-            self.obj = QuantileRegressor(self.obj, 
-                                         level=self.level, scoring="conformal")
+            self.obj = QuantileRegressor(
+                self.obj, level=self.level, scoring="conformal"
+            )
         self.block_size = block_size
         self.replications = replications
         self.kernel = kernel
@@ -362,7 +365,9 @@ class MTS(Base):
             best_lags = 1
 
             if self.verbose:
-                print(f"\nSelecting optimal number of lags using {self.lags}...")
+                print(
+                    f"\nSelecting optimal number of lags using {self.lags}..."
+                )
                 iterator = tqdm(range(1, max_lags + 1))
             else:
                 iterator = range(1, max_lags + 1)
@@ -378,7 +383,9 @@ class MTS(Base):
                 if self.init_n_series_ > 1:
                     mts_input = ts.create_train_inputs(X_values, lag)
                 else:
-                    mts_input = ts.create_train_inputs(X_values.reshape(-1, 1), lag)
+                    mts_input = ts.create_train_inputs(
+                        X_values.reshape(-1, 1), lag
+                    )
 
                 # Cook training set and fit model
                 dummy_y, scaled_Z = self.cook_training_set(
@@ -407,7 +414,9 @@ class MTS(Base):
                     best_lags = lag
 
             if self.verbose:
-                print(f"\nSelected {best_lags} lags with {self.lags}={best_ic:.2f}")
+                print(
+                    f"\nSelected {best_lags} lags with {self.lags}={best_ic:.2f}"
+                )
 
             self.lags = best_lags
 
@@ -418,7 +427,9 @@ class MTS(Base):
             # input data set is a numpy array
             if xreg is None:
                 X = pd.DataFrame(X)
-                self.series_names = ["series" + str(i) for i in range(X.shape[1])]
+                self.series_names = [
+                    "series" + str(i) for i in range(X.shape[1])
+                ]
             else:
                 # xreg is not None
                 X = mo.cbind(X, xreg)
@@ -494,7 +505,9 @@ class MTS(Base):
             mts_input = ts.create_train_inputs(X[::-1], self.lags)
         else:
             # univariate time series
-            mts_input = ts.create_train_inputs(X.reshape(-1, 1)[::-1], self.lags)
+            mts_input = ts.create_train_inputs(
+                X.reshape(-1, 1)[::-1], self.lags
+            )
 
         self.y_ = mts_input[0]
 
@@ -529,7 +542,9 @@ class MTS(Base):
                 self.obj.fit(X=scaled_Z, y=centered_y_i)
                 self.fit_objs_[i] = deepcopy(self.obj)
                 residuals_.append(
-                    (centered_y_i - self.fit_objs_[i].predict(scaled_Z)).tolist()
+                    (
+                        centered_y_i - self.fit_objs_[i].predict(scaled_Z)
+                    ).tolist()
                 )
 
         if self.type_pi == "quantile":
@@ -555,7 +570,10 @@ class MTS(Base):
                 residuals_.append(
                     (
                         self.y_[second_half_idx, i]
-                        - (y_mean_temp + self.obj.predict(scaled_Z[second_half_idx, :]))
+                        - (
+                            y_mean_temp
+                            + self.obj.predict(scaled_Z[second_half_idx, :])
+                        )
                     ).tolist()
                 )
                 # fit on the second half
@@ -625,7 +643,9 @@ class MTS(Base):
 
         assert self.df_ is not None, "fit() must be called before partial_fit()"
 
-        if (isinstance(X, pd.DataFrame) is False) and isinstance(X, pd.Series) is False:
+        if (isinstance(X, pd.DataFrame) is False) and isinstance(
+            X, pd.Series
+        ) is False:
             if len(X.shape) == 1:
                 X = X.reshape(1, -1)
 
@@ -633,7 +653,9 @@ class MTS(Base):
 
         else:
             if len(X.shape) == 1:
-                X = pd.DataFrame(X.values.reshape(1, -1), columns=self.df_.columns)
+                X = pd.DataFrame(
+                    X.values.reshape(1, -1), columns=self.df_.columns
+                )
 
             return self.fit(X, xreg, **kwargs)
 
@@ -643,7 +665,7 @@ class MTS(Base):
         self.output_dates_, _ = ts.compute_output_dates(self.df_, h)
 
         # Trigger full prediction to generate self.sims_
-        if not hasattr(self, 'sims_') or self.sims_ is None:
+        if not hasattr(self, "sims_") or self.sims_ is None:
             _ = self.predict(h=h, level=95, **kwargs)  # Any level triggers sim
 
         result_dict = {}
@@ -652,22 +674,30 @@ class MTS(Base):
         sims_array = np.stack([sim.values for sim in self.sims_], axis=0)
 
         # Compute quantiles over replication axis
-        q_values = np.quantile(sims_array, quantiles, axis=0)  # (n_q, h, n_series)
+        q_values = np.quantile(
+            sims_array, quantiles, axis=0
+        )  # (n_q, h, n_series)
 
         for i, q in enumerate(quantiles):
             # Clean label: 0.05 → "05", 0.1 → "10", 0.95 → "95"
-            q_label = f"{int(q * 100):02d}" if (q * 100).is_integer() else f"{q:.3f}".replace(".", "_")
+            q_label = (
+                f"{int(q * 100):02d}"
+                if (q * 100).is_integer()
+                else f"{q:.3f}".replace(".", "_")
+            )
             for series_id in range(self.init_n_series_):
                 series_name = self.series_names[series_id]
                 col_name = f"quantile_{q_label}_{series_name}"
                 result_dict[col_name] = q_values[i, :, series_id]
 
-        df_return_quantiles = pd.DataFrame(result_dict, index=self.output_dates_)
+        df_return_quantiles = pd.DataFrame(
+            result_dict, index=self.output_dates_
+        )
 
         return df_return_quantiles
-        
+
     def predict(self, h=5, level=95, quantiles=None, **kwargs):
-        """Forecast all the time series, h steps ahead"""        
+        """Forecast all the time series, h steps ahead"""
 
         if quantiles is not None:
             # Validate
@@ -676,7 +706,7 @@ class MTS(Base):
                 raise ValueError("quantiles must be between 0 and 1.")
             # Delegate to dedicated method
             return self._predict_quantiles(h=h, quantiles=quantiles, **kwargs)
-        
+
         if isinstance(level, list) or isinstance(level, np.ndarray):
             # Store results
             result_dict = {}
@@ -684,19 +714,33 @@ class MTS(Base):
             # E.g [0.5, 2.5, 5, 16.5, 25, 50]
             for lev in level:
                 # Get the forecast for this alpha
-                res = self.predict(h=h, level=lev, **kwargs)                    
+                res = self.predict(h=h, level=lev, **kwargs)
                 # Adjust index and collect lower/upper bounds
                 res.lower.index = pd.to_datetime(res.lower.index)
                 res.upper.index = pd.to_datetime(res.upper.index)
                 # Loop over each time series (multivariate) and flatten results
-                if isinstance(res.lower, pd.DataFrame): 
-                    for series in res.lower.columns:  # Assumes 'lower' and 'upper' have multiple series
-                        result_dict[f"lower_{lev}_{series}"] = res.lower[series].to_numpy().flatten()
-                        result_dict[f"upper_{lev}_{series}"] = res.upper[series].to_numpy().flatten()
-                else: 
-                    for series_id in range(self.n_series):  # Assumes 'lower' and 'upper' have multiple series
-                        result_dict[f"lower_{lev}_{series_id}"] = res.lower[series_id,:].to_numpy().flatten()
-                        result_dict[f"upper_{lev}_{series_id}"] = res.upper[series_id,:].to_numpy().flatten()
+                if isinstance(res.lower, pd.DataFrame):
+                    for (
+                        series
+                    ) in (
+                        res.lower.columns
+                    ):  # Assumes 'lower' and 'upper' have multiple series
+                        result_dict[f"lower_{lev}_{series}"] = (
+                            res.lower[series].to_numpy().flatten()
+                        )
+                        result_dict[f"upper_{lev}_{series}"] = (
+                            res.upper[series].to_numpy().flatten()
+                        )
+                else:
+                    for series_id in range(
+                        self.n_series
+                    ):  # Assumes 'lower' and 'upper' have multiple series
+                        result_dict[f"lower_{lev}_{series_id}"] = (
+                            res.lower[series_id, :].to_numpy().flatten()
+                        )
+                        result_dict[f"upper_{lev}_{series_id}"] = (
+                            res.upper[series_id, :].to_numpy().flatten()
+                        )
             return pd.DataFrame(result_dict, index=self.output_dates_)
 
         # only one prediction interval
@@ -716,7 +760,9 @@ class MTS(Base):
 
         self.sims_ = None  # do not remove (/!\)
 
-        y_means_ = np.asarray([self.y_means_[i] for i in range(self.init_n_series_)])
+        y_means_ = np.asarray(
+            [self.y_means_[i] for i in range(self.init_n_series_)]
+        )
 
         n_features = self.init_n_series_ * self.lags
 
@@ -862,7 +908,9 @@ class MTS(Base):
                 self.preds_std_.append(
                     [
                         np.asarray(
-                            self.fit_objs_[i].predict(cooked_new_X, return_std=True)[1]
+                            self.fit_objs_[i].predict(
+                                cooked_new_X, return_std=True
+                            )[1]
                         ).item()
                         for i in range(self.n_series)
                     ]
@@ -875,26 +923,32 @@ class MTS(Base):
                     lower_pi_.append(preds_pi.lower[0])
                     upper_pi_.append(preds_pi.upper[0])
 
-            if self.type_pi != "quantile": 
+            if self.type_pi != "quantile":
                 predicted_cooked_new_X = np.asarray(
                     [
-                        np.asarray(self.fit_objs_[i].predict(cooked_new_X)).item()
+                        np.asarray(
+                            self.fit_objs_[i].predict(cooked_new_X)
+                        ).item()
                         for i in range(self.init_n_series_)
                     ]
                 )
             else:
                 predicted_cooked_new_X = np.asarray(
                     [
-                        np.asarray(self.fit_objs_[i].predict(cooked_new_X, return_pi=True).upper).item()
+                        np.asarray(
+                            self.fit_objs_[i]
+                            .predict(cooked_new_X, return_pi=True)
+                            .upper
+                        ).item()
                         for i in range(self.init_n_series_)
                     ]
-                ) 
+                )
 
             preds = np.asarray(y_means_ + predicted_cooked_new_X)
 
             # Create full row with both predictions and external regressors
             if self.xreg_ is not None and "xreg" in kwargs:
-                next_xreg = kwargs["xreg"].iloc[i : i + 1].values.flatten()
+                next_xreg = kwargs["xreg"].iloc[i: i + 1].values.flatten()
                 full_row = np.concatenate([preds, next_xreg])
             else:
                 full_row = preds
@@ -975,22 +1029,30 @@ class MTS(Base):
                 else:
                     medianf.append(np.median(sims_ix, axis=1))
                 lower.append(np.quantile(sims_ix, q=self.alpha_ / 200, axis=1))
-                upper.append(np.quantile(sims_ix, q=1 - self.alpha_ / 200, axis=1))
+                upper.append(
+                    np.quantile(sims_ix, q=1 - self.alpha_ / 200, axis=1)
+                )
             self.mean_ = pd.DataFrame(
                 np.asarray(meanf).T,
-                columns=self.series_names[: self.init_n_series_],  # self.df_.columns,
+                columns=self.series_names[
+                    : self.init_n_series_
+                ],  # self.df_.columns,
                 index=self.output_dates_,
             )
 
             self.lower_ = pd.DataFrame(
                 np.asarray(lower).T,
-                columns=self.series_names[: self.init_n_series_],  # self.df_.columns,
+                columns=self.series_names[
+                    : self.init_n_series_
+                ],  # self.df_.columns,
                 index=self.output_dates_,
             )
 
             self.upper_ = pd.DataFrame(
                 np.asarray(upper).T,
-                columns=self.series_names[: self.init_n_series_],  # self.df_.columns,
+                columns=self.series_names[
+                    : self.init_n_series_
+                ],  # self.df_.columns,
                 index=self.output_dates_,
             )
 
@@ -1005,13 +1067,17 @@ class MTS(Base):
             except Exception as e:
                 pass
 
-            return DescribeResult(self.mean_, self.sims_, self.lower_, self.upper_)
+            return DescribeResult(
+                self.mean_, self.sims_, self.lower_, self.upper_
+            )
 
         if (
             (("return_std" in kwargs) or ("return_pi" in kwargs))
             and (self.type_pi not in ("gaussian", "scp"))
         ) or "vine" in self.type_pi:
-            DescribeResult = namedtuple("DescribeResult", ("mean", "lower", "upper"))
+            DescribeResult = namedtuple(
+                "DescribeResult", ("mean", "lower", "upper")
+            )
 
             self.mean_ = pd.DataFrame(
                 np.asarray(self.mean_),
@@ -1071,7 +1137,9 @@ class MTS(Base):
 
         if self.type_pi == "gaussian":
 
-            DescribeResult = namedtuple("DescribeResult", ("mean", "lower", "upper"))
+            DescribeResult = namedtuple(
+                "DescribeResult", ("mean", "lower", "upper")
+            )
 
             self.mean_ = pd.DataFrame(
                 np.asarray(self.mean_),
@@ -1137,7 +1205,6 @@ class MTS(Base):
 
             return res
 
-
         # After prediction loop, ensure sims only contain target columns
         if self.sims_ is not None:
             if self.verbose == 1:
@@ -1161,11 +1228,18 @@ class MTS(Base):
                 for sim in self.sims_
             )
 
-        if self.type_pi in ("kde", "bootstrap", "block-bootstrap", "vine-copula"):
+        if self.type_pi in (
+            "kde",
+            "bootstrap",
+            "block-bootstrap",
+            "vine-copula",
+        ):
             if self.xreg_ is not None:
                 # Use getsimsxreg when external regressors are present
                 target_cols = self.df_.columns[: self.init_n_series_]
-                self.sims_ = getsimsxreg(self.sims_, self.output_dates_, target_cols)
+                self.sims_ = getsimsxreg(
+                    self.sims_, self.output_dates_, target_cols
+                )
             else:
                 # Use original getsims for backward compatibility
                 self.sims_ = getsims(self.sims_)
@@ -1173,7 +1247,7 @@ class MTS(Base):
     def _crps_ensemble(self, y_true, simulations, axis=0):
         """
         Compute CRPS for ensemble forecasts.
-        
+
         Parameters
         ----------
         y_true : array of shape (n,)
@@ -1197,7 +1271,7 @@ class MTS(Base):
 
         R = sims.shape[1]
         # Mean absolute error between simulations and observation
-        try: 
+        try:
             diff_obs = np.abs(sims - y_true[:, np.newaxis])  # (n, R)
         except Exception as e:
             diff_obs = np.abs(sims - y_true.values[:, np.newaxis])  # (n, R)
@@ -1208,7 +1282,15 @@ class MTS(Base):
 
         return term1 - term2
 
-    def score(self, X, training_index, testing_index, scoring=None, alpha=0.5, **kwargs):
+    def score(
+        self,
+        X,
+        training_index,
+        testing_index,
+        scoring=None,
+        alpha=0.5,
+        **kwargs,
+    ):
         """Train on training_index, score on testing_index."""
 
         assert (
@@ -1244,18 +1326,24 @@ class MTS(Base):
 
         if scoring is None:
             scoring = "neg_root_mean_squared_error"
-        
+
         if scoring == "pinball":
             # Predict requested quantile
             q_pred = self.predict(h=h, quantiles=[alpha], **kwargs)
             # Handle multivariate
             scores = []
             for j in range(p):
-                series_name = getattr(self, 'series_names', [f"Series_{j}"])[j]
-                q_label = f"{int(alpha * 100):02d}" if (alpha * 100).is_integer() else f"{alpha:.3f}".replace(".", "_")
+                series_name = getattr(self, "series_names", [f"Series_{j}"])[j]
+                q_label = (
+                    f"{int(alpha * 100):02d}"
+                    if (alpha * 100).is_integer()
+                    else f"{alpha:.3f}".replace(".", "_")
+                )
                 col = f"quantile_{q_label}_{series_name}"
                 if col not in q_pred.columns:
-                    raise ValueError(f"Column '{col}' not found in quantile forecast output.")
+                    raise ValueError(
+                        f"Column '{col}' not found in quantile forecast output."
+                    )
                 y_true_j = X_test[:, j]
                 y_pred_j = q_pred[col].values
                 # Compute pinball loss for this series
@@ -1263,12 +1351,14 @@ class MTS(Base):
                 scores.append(loss)
             # Return average over series
             return np.mean(scores)
-        
+
         if scoring == "crps":
             # Ensure simulations exist
             preds = self.predict(h=h, **kwargs)  # triggers self.sims_
             # Extract simulations: list of DataFrames → (R, h, p)
-            sims_vals = np.stack([sim.values for sim in self.sims_], axis=0)  # (R, h, p)
+            sims_vals = np.stack(
+                [sim.values for sim in self.sims_], axis=0
+            )  # (R, h, p)
             crps_scores = []
             for j in range(p):
                 y_true_j = X_test[:, j]
@@ -1294,7 +1384,9 @@ class MTS(Base):
             "explained_variance": skm2.explained_variance_score,
             "neg_mean_absolute_error": skm2.mean_absolute_error,
             "neg_mean_squared_error": lambda x, y: np.mean((x - y) ** 2),
-            "neg_root_mean_squared_error": lambda x, y: np.sqrt(np.mean((x - y) ** 2)),
+            "neg_root_mean_squared_error": lambda x, y: np.sqrt(
+                np.mean((x - y) ** 2)
+            ),
             "neg_mean_squared_log_error": skm2.mean_squared_log_error,
             "neg_median_absolute_error": skm2.median_absolute_error,
             "r2": skm2.r2_score,
@@ -1494,10 +1586,10 @@ class MTS(Base):
 
             show_progress: boolean
                 if True, a progress bar is printed
-            
+
             level: int
                 confidence level for prediction intervals
-            
+
             alpha: float
                 quantile level for pinball loss if scoring='pinball'
                 0 < alpha < 1
@@ -1548,40 +1640,64 @@ class MTS(Base):
                         p = X_test.shape[1] if len(X_test.shape) > 1 else 1
                         print("line. 1548", p)
                         for j in range(p):
-                            series_name = getattr(self, 'series_names', [f"Series_{j}"])[j]
-                            q_label = f"{int(alpha * 100):02d}" if (alpha * 100).is_integer() else f"{alpha:.3f}".replace(".", "_")
+                            series_name = getattr(
+                                self, "series_names", [f"Series_{j}"]
+                            )[j]
+                            q_label = (
+                                f"{int(alpha * 100):02d}"
+                                if (alpha * 100).is_integer()
+                                else f"{alpha:.3f}".replace(".", "_")
+                            )
                             col = f"quantile_{q_label}_{series_name}"
                             if col not in q_pred.columns:
-                                raise ValueError(f"Column '{col}' not found in quantile forecast output.")
+                                raise ValueError(
+                                    f"Column '{col}' not found in quantile forecast output."
+                                )
                             print("line. 1555", j)
                             print("line. 1556", X_test)
-                            try: 
+                            try:
                                 y_true_j = X_test[:, j] if p > 1 else X_test
                             except:
-                                y_true_j = X_test.iloc[:, j] if p > 1 else X_test.values
+                                y_true_j = (
+                                    X_test.iloc[:, j]
+                                    if p > 1
+                                    else X_test.values
+                                )
                             print("line. 1561", y_true_j)
                             y_pred_j = q_pred[col].values
                             # Compute pinball loss for this series
-                            loss = mean_pinball_loss(y_true_j, y_pred_j, alpha=alpha)
+                            loss = mean_pinball_loss(
+                                y_true_j, y_pred_j, alpha=alpha
+                            )
                             scores.append(loss)
                         # Return average over series
                         return np.mean(scores)
                     elif scoring == "crps":
                         # Ensure simulations exist
-                        _ = self.predict(h=len(X_test), **kwargs)  # triggers self.sims_
+                        _ = self.predict(
+                            h=len(X_test), **kwargs
+                        )  # triggers self.sims_
                         # Extract simulations: list of DataFrames → (R, h, p)
-                        sims_vals = np.stack([sim.values for sim in self.sims_], axis=0)  # (R, h, p)
+                        sims_vals = np.stack(
+                            [sim.values for sim in self.sims_], axis=0
+                        )  # (R, h, p)
                         crps_scores = []
                         p = X_test.shape[1] if len(X_test.shape) > 1 else 1
                         for j in range(p):
-                            try: 
+                            try:
                                 y_true_j = X_test[:, j] if p > 1 else X_test
                             except Exception as e:
-                                y_true_j = X_test.iloc[:, j] if p > 1 else X_test.values
+                                y_true_j = (
+                                    X_test.iloc[:, j]
+                                    if p > 1
+                                    else X_test.values
+                                )
                             print("line. 1580", y_true_j)
                             sims_j = sims_vals[:, :, j]  # (R, h)
                             crps_j = self._crps_ensemble(y_true_j, sims_j)
-                            crps_scores.append(np.mean(crps_j))  # average over horizon
+                            crps_scores.append(
+                                np.mean(crps_j)
+                            )  # average over horizon
                         return np.mean(crps_scores)  # average over series
                     if scoring == "winkler_score":
                         return winkler_score(X_pred, X_test, level=level)
@@ -1592,7 +1708,9 @@ class MTS(Base):
                             pred=X_pred.mean, actual=X_test, scoring=scoring
                         )
                 else:  # not probabilistic
-                    return mean_errors(pred=X_pred, actual=X_test, scoring=scoring)
+                    return mean_errors(
+                        pred=X_pred, actual=X_test, scoring=scoring
+                    )
 
         else:  # isinstance(scoring, str) = False
 
@@ -1609,7 +1727,9 @@ class MTS(Base):
             test_indices.append(test_index)
 
         if show_progress is True:
-            iterator = tqdm(zip(train_indices, test_indices), total=len(train_indices))
+            iterator = tqdm(
+                zip(train_indices, test_indices), total=len(train_indices)
+            )
         else:
             iterator = zip(train_indices, test_indices)
 

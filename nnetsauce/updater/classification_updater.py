@@ -33,6 +33,7 @@ class ClassifierUpdater(BaseEstimator, ClassifierMixin):
         Updating factor
 
     """
+
     _estimator_type = "classifier"
 
     def __init__(self, clf, alpha=0.5):
@@ -50,9 +51,13 @@ class ClassifierUpdater(BaseEstimator, ClassifierMixin):
 
     def fit(self, X, y, **kwargs):
 
-        raise NotImplementedError("fit method is not implemented for ClassifierUpdater")
+        raise NotImplementedError(
+            "fit method is not implemented for ClassifierUpdater"
+        )
 
-        if isinstance(self.clf, CustomClassifier):  # nnetsauce model not deep ---
+        if isinstance(
+            self.clf, CustomClassifier
+        ):  # nnetsauce model not deep ---
             if check_is_fitted(self.clf) == False:
                 self.clf.fit(X, y, **kwargs)
                 self.n_obs_ = X.shape[0]

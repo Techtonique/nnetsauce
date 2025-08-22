@@ -115,7 +115,9 @@ class ClassicalMTS(Base):
 
             X = pd.DataFrame(X)
             if self.n_series > 1:
-                self.series_names = ["series" + str(i) for i in range(X.shape[1])]
+                self.series_names = [
+                    "series" + str(i) for i in range(X.shape[1])
+                ]
             else:
                 self.series_names = "series0"
 
@@ -184,11 +186,15 @@ class ClassicalMTS(Base):
         pi_multiplier = norm.ppf(1 - self.alpha_ / 200)
 
         # Named tuple for forecast results
-        DescribeResult = namedtuple("DescribeResult", ("mean", "lower", "upper"))
+        DescribeResult = namedtuple(
+            "DescribeResult", ("mean", "lower", "upper")
+        )
 
         if self.model == "VAR":
-            mean_forecast, lower_bound, upper_bound = self.obj.forecast_interval(
-                self.obj.endog, steps=h, alpha=self.alpha_ / 100, **kwargs
+            mean_forecast, lower_bound, upper_bound = (
+                self.obj.forecast_interval(
+                    self.obj.endog, steps=h, alpha=self.alpha_ / 100, **kwargs
+                )
             )
 
         elif self.model == "VECM":
@@ -255,7 +261,9 @@ class ClassicalMTS(Base):
                 upper_bound, name=self.series_names, index=self.output_dates_
             )
 
-        return DescribeResult(mean=self.mean_, lower=self.lower_, upper=self.upper_)
+        return DescribeResult(
+            mean=self.mean_, lower=self.lower_, upper=self.upper_
+        )
 
     def _compute_confidence_intervals(self, forecast_result, alpha):
         """
@@ -326,7 +334,9 @@ class ClassicalMTS(Base):
             "explained_variance": skm2.explained_variance_score,
             "neg_mean_absolute_error": skm2.mean_absolute_error,
             "neg_mean_squared_error": lambda x, y: np.mean((x - y) ** 2),
-            "neg_root_mean_squared_error": lambda x, y: np.sqrt(np.mean((x - y) ** 2)),
+            "neg_root_mean_squared_error": lambda x, y: np.sqrt(
+                np.mean((x - y) ** 2)
+            ),
             "neg_mean_squared_log_error": skm2.mean_squared_log_error,
             "neg_median_absolute_error": skm2.median_absolute_error,
             "r2": skm2.r2_score,
@@ -592,7 +602,9 @@ class ClassicalMTS(Base):
                             pred=X_pred.mean, actual=X_test, scoring=scoring
                         )
                 else:  # not probabilistic
-                    return mean_errors(pred=X_pred, actual=X_test, scoring=scoring)
+                    return mean_errors(
+                        pred=X_pred, actual=X_test, scoring=scoring
+                    )
 
         else:  # isinstance(scoring, str) = False
 
@@ -609,7 +621,9 @@ class ClassicalMTS(Base):
             test_indices.append(test_index)
 
         if show_progress is True:
-            iterator = tqdm(zip(train_indices, test_indices), total=len(train_indices))
+            iterator = tqdm(
+                zip(train_indices, test_indices), total=len(train_indices)
+            )
         else:
             iterator = zip(train_indices, test_indices)
 

@@ -200,7 +200,9 @@ class MultitaskClassifier(Base, ClassifierMixin):
 
         # if sample_weight is None:
         for i in range(self.n_classes_):
-            self.fit_objs_[i] = deepcopy(self.obj.fit(scaled_Z, Y[:, i], **kwargs))
+            self.fit_objs_[i] = deepcopy(
+                self.obj.fit(scaled_Z, Y[:, i], **kwargs)
+            )
 
         self.classes_ = np.unique(y)
         return self
@@ -306,9 +308,10 @@ class MultitaskClassifier(Base, ClassifierMixin):
                 )
             )[0]
 
-        return self.obj.decision_function(self.cook_test_set(X, **kwargs), **kwargs)
+        return self.obj.decision_function(
+            self.cook_test_set(X, **kwargs), **kwargs
+        )
 
     @property
     def _estimator_type(self):
-        return "classifier"            
-        
+        return "classifier"

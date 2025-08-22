@@ -33,10 +33,10 @@ class GLMRegressor(GLM, RegressorMixin):
 
         family: str
             "gaussian", "laplace", "poisson", or "quantile" (for now)
-        
+
         level: int, default=50
             The level of the quantiles to compute for family = "quantile".
-            Default is the median. 
+            Default is the median.
 
         activation_name: str
             activation function: 'relu', 'tanh', 'sigmoid', 'prelu' or 'elu'
@@ -82,7 +82,7 @@ class GLMRegressor(GLM, RegressorMixin):
 
         seed: int
             reproducibility seed for nodes_sim=='uniform'
-        
+
         backend: str
             "cpu", "gpu", "tpu"
 
@@ -142,8 +142,8 @@ class GLMRegressor(GLM, RegressorMixin):
         )
 
         self.family = family
-        self.level = level 
-        self.q = self.level/100
+        self.level = level
+        self.q = self.level / 100
 
     def gaussian_loss(self, y, row_index, XB):
         return 0.5 * np.mean(np.square(y[row_index] - XB))
@@ -156,22 +156,28 @@ class GLMRegressor(GLM, RegressorMixin):
 
     def pinball_loss(self, y, row_index, XB, tau=0.5):
         y = np.array(y[row_index])
-        y_pred = np.array(XB)        
+        y_pred = np.array(XB)
         return mean_pinball_loss(y, y_pred, alpha=tau)
-        #return np.mean(np.maximum(tau * residuals, (tau - 1) * residuals))                
+        # return np.mean(np.maximum(tau * residuals, (tau - 1) * residuals))
 
     def loss_func(
-        self, beta, group_index, X, y, row_index=None, 
-        type_loss="gaussian", **kwargs
+        self,
+        beta,
+        group_index,
+        X,
+        y,
+        row_index=None,
+        type_loss="gaussian",
+        **kwargs
     ):
         res = {
             "gaussian": self.gaussian_loss,
             "laplace": self.laplace_loss,
             "poisson": self.poisson_loss,
-            "quantile": self.pinball_loss
+            "quantile": self.pinball_loss,
         }
 
-        if type_loss != "quantile": 
+        if type_loss != "quantile":
 
             if row_index is None:
                 row_index = range(len(y))
@@ -186,19 +192,20 @@ class GLMRegressor(GLM, RegressorMixin):
             return res[type_loss](y, row_index, XB) + self.compute_penalty(
                 group_index=group_index, beta=beta
             )
-        
-        else: # quantile 
 
-            assert (self.q > 0 and self.q < 1), "'tau' must be comprised 0 < tau < 1"
+        else:  # quantile
+
+            assert (
+                self.q > 0 and self.q < 1
+            ), "'tau' must be comprised 0 < tau < 1"
 
             if row_index is None:
                 row_index = range(len(y))
                 XB = self.compute_XB(X, beta=beta)
-                return res[type_loss](y, row_index, XB, self.q) 
+                return res[type_loss](y, row_index, XB, self.q)
 
             XB = self.compute_XB(X, beta=beta, row_index=row_index)
-            return res[type_loss](y, row_index, XB, self.q) 
-
+            return res[type_loss](y, row_index, XB, self.q)
 
     def fit(self, X, y, **kwargs):
         """Fit GLM model to training data (X, y).
@@ -274,10 +281,13 @@ class GLMRegressor(GLM, RegressorMixin):
             )
 
             return (
-                self.y_mean_ + np.dot(self.cook_test_set(new_X, **kwargs), self.beta_)
+                self.y_mean_
+                + np.dot(self.cook_test_set(new_X, **kwargs), self.beta_)
             )[0]
 
-        return self.y_mean_ + np.dot(self.cook_test_set(X, **kwargs), self.beta_)
+        return self.y_mean_ + np.dot(
+            self.cook_test_set(X, **kwargs), self.beta_
+        )
 
     def score(self, X, y, scoring=None):
         """Compute the score of the model.

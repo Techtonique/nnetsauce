@@ -209,9 +209,9 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
             np.repeat(1, X_.shape[1])
         )
         C = mo.crossprod(x=Phi_X_, y=X_, backend=self.backend)
-        D = mo.crossprod(x=Phi_X_, backend=self.backend) + self.lambda2 * np.diag(
-            np.repeat(1, Phi_X_.shape[1])
-        )
+        D = mo.crossprod(
+            x=Phi_X_, backend=self.backend
+        ) + self.lambda2 * np.diag(np.repeat(1, Phi_X_.shape[1]))
 
         if sys_platform in ("Linux", "Darwin"):
             B_inv = pinv(B) if self.backend == "cpu" else jpinv(B)
@@ -357,5 +357,4 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
 
     @property
     def _estimator_type(self):
-        return "classifier"            
-            
+        return "classifier"

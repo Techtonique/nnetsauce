@@ -3,7 +3,7 @@
 # License: BSD 3 Clear
 
 import copy
-import jax 
+import jax
 import numpy as np
 import pandas as pd
 import platform
@@ -132,7 +132,9 @@ class Base(BaseEstimator):
         sys_platform = platform.system()
 
         if (sys_platform == "Windows") and (backend in ("gpu", "tpu")):
-            warnings.warn("No GPU/TPU computing on Windows yet, backend set to 'cpu'")
+            warnings.warn(
+                "No GPU/TPU computing on Windows yet, backend set to 'cpu'"
+            )
             backend = "cpu"
 
         assert activation_name in (
@@ -208,7 +210,9 @@ class Base(BaseEstimator):
             activation_options = {
                 "relu": ac.relu if (self.backend == "cpu") else jnn.relu,
                 "tanh": np.tanh if (self.backend == "cpu") else jnp.tanh,
-                "sigmoid": (ac.sigmoid if (self.backend == "cpu") else jnn.sigmoid),
+                "sigmoid": (
+                    ac.sigmoid if (self.backend == "cpu") else jnn.sigmoid
+                ),
                 "prelu": partial(ac.prelu, a=a),
                 "elu": (
                     partial(ac.elu, a=a)
@@ -218,10 +222,16 @@ class Base(BaseEstimator):
             }
         else:  # on Windows currently, no JAX
             activation_options = {
-                "relu": (ac.relu if (self.backend == "cpu") else NotImplementedError),
-                "tanh": (np.tanh if (self.backend == "cpu") else NotImplementedError),
+                "relu": (
+                    ac.relu if (self.backend == "cpu") else NotImplementedError
+                ),
+                "tanh": (
+                    np.tanh if (self.backend == "cpu") else NotImplementedError
+                ),
                 "sigmoid": (
-                    ac.sigmoid if (self.backend == "cpu") else NotImplementedError
+                    ac.sigmoid
+                    if (self.backend == "cpu")
+                    else NotImplementedError
                 ),
                 "prelu": partial(ac.prelu, a=a),
                 "elu": (
@@ -293,10 +303,14 @@ class Base(BaseEstimator):
             return X_clustered.astype(np.float16)
 
         # if predict == True, encode test set
-        X_clustered = self.clustering_obj_.predict(self.clustering_scaler_.transform(X))
+        X_clustered = self.clustering_obj_.predict(
+            self.clustering_scaler_.transform(X)
+        )
 
         if self.cluster_encode == True:
-            return mo.one_hot_encode(X_clustered, self.n_clusters).astype(np.float16)
+            return mo.one_hot_encode(X_clustered, self.n_clusters).astype(
+                np.float16
+            )
 
         return X_clustered.astype(np.float16)
 
@@ -360,7 +374,9 @@ class Base(BaseEstimator):
 
                 return mo.dropout(
                     x=self.activation_func(
-                        mo.safe_sparse_dot(a=scaled_X, b=self.W_, backend=self.backend)
+                        mo.safe_sparse_dot(
+                            a=scaled_X, b=self.W_, backend=self.backend
+                        )
                     ),
                     drop_prob=self.dropout,
                     seed=self.seed,
@@ -449,11 +465,13 @@ class Base(BaseEstimator):
             seed=self.seed,
         )
 
-    def _jax_create_layer(self, scaled_X: jnp.ndarray, W: Optional[jnp.ndarray] = None) -> jnp.ndarray:
+    def _jax_create_layer(
+        self, scaled_X: jnp.ndarray, W: Optional[jnp.ndarray] = None
+    ) -> jnp.ndarray:
         """JAX-compatible version of create_layer that exactly matches the original functionality."""
         key = jax.random.PRNGKey(self.seed)
         n_features = scaled_X.shape[1]
-        
+
         # Generate weights if not provided
         if W is None:
             if self.bias:
@@ -461,7 +479,7 @@ class Base(BaseEstimator):
                 shape = (n_features_1, self.n_hidden_features)
             else:
                 shape = (n_features, self.n_hidden_features)
-            
+
             # JAX-compatible weight generation matching original behavior
             if self.nodes_sim == "sobol":
                 W_np = generate_sobol(
@@ -480,10 +498,7 @@ class Base(BaseEstimator):
             elif self.nodes_sim == "uniform":
                 key, subkey = jax.random.split(key)
                 W = jax.random.uniform(
-                    subkey,
-                    shape=shape,
-                    minval=-1.0,
-                    maxval=1.0
+                    subkey, shape=shape, minval=-1.0, maxval=1.0
                 )
             else:  # halton
                 W_np = generate_halton(
@@ -492,18 +507,20 @@ class Base(BaseEstimator):
                     seed=self.seed,
                 )
                 W = jnp.asarray(W_np)
-            
+
             self.W_ = np.array(W)  # Store as numpy for original methods
-        
+
         # Prepare input with bias if needed
         if self.bias:
-            X_with_bias = jnp.hstack([jnp.ones((scaled_X.shape[0], 1)), scaled_X])
+            X_with_bias = jnp.hstack(
+                [jnp.ones((scaled_X.shape[0], 1)), scaled_X]
+            )
             print("X_with_bias shape:", X_with_bias.shape)
-            print("W shape:", W.shape)  
+            print("W shape:", W.shape)
             linear_output = jnp.dot(X_with_bias, W)
         else:
             linear_output = jnp.dot(scaled_X, W)
-        
+
         # Apply activation function
         if self.activation_name == "relu":
             activated = jax.nn.relu(linear_output)
@@ -513,19 +530,17 @@ class Base(BaseEstimator):
             activated = jax.nn.sigmoid(linear_output)
         else:  # leaky relu
             activated = jax.nn.leaky_relu(linear_output, negative_slope=self.a)
-        
+
         # Apply dropout
         if self.dropout > 0:
             key, subkey = jax.random.split(key)
             mask = jax.random.bernoulli(
-                subkey,
-                p=1-self.dropout,
-                shape=activated.shape
+                subkey, p=1 - self.dropout, shape=activated.shape
             )
-            activated = jnp.where(mask, activated / (1-self.dropout), 0)
-        
+            activated = jnp.where(mask, activated / (1 - self.dropout), 0)
+
         return activated
-    
+
     def cook_training_set(self, y=None, X=None, W=None, **kwargs):
         """Create new hidden features for training set, with hidden layer, center the response.
 
@@ -667,9 +682,13 @@ class Base(BaseEstimator):
                 n, p = Z.shape
 
                 self.subsampler_ = (
-                    SubSampler(y=self.y_, row_sample=self.row_sample, seed=self.seed)
+                    SubSampler(
+                        y=self.y_, row_sample=self.row_sample, seed=self.seed
+                    )
                     if y is None
-                    else SubSampler(y=y, row_sample=self.row_sample, seed=self.seed)
+                    else SubSampler(
+                        y=y, row_sample=self.row_sample, seed=self.seed
+                    )
                 )
 
                 self.index_row_ = self.subsampler_.subsample()
@@ -692,7 +711,9 @@ class Base(BaseEstimator):
             n, p = Z.shape
 
             self.subsampler_ = (
-                SubSampler(y=self.y_, row_sample=self.row_sample, seed=self.seed)
+                SubSampler(
+                    y=self.y_, row_sample=self.row_sample, seed=self.seed
+                )
                 if y is None
                 else SubSampler(y=y, row_sample=self.row_sample, seed=self.seed)
             )
@@ -703,7 +724,9 @@ class Base(BaseEstimator):
             # classification
             return (
                 y[self.index_row_].reshape(n_row_sample),
-                self.scaler_.transform(Z[self.index_row_, :].reshape(n_row_sample, p)),
+                self.scaler_.transform(
+                    Z[self.index_row_, :].reshape(n_row_sample, p)
+                ),
             )
         # y is not subsampled
         # classification
@@ -753,7 +776,9 @@ class Base(BaseEstimator):
 
         # data with clustering: self.n_clusters > 0 -----
         if self.col_sample == 1:
-            predicted_clusters = self.encode_clusters(X=X, predict=True, **kwargs)
+            predicted_clusters = self.encode_clusters(
+                X=X, predict=True, **kwargs
+            )
             augmented_X = mo.cbind(X, predicted_clusters, backend=self.backend)
         else:
             predicted_clusters = self.encode_clusters(
@@ -779,7 +804,7 @@ class Base(BaseEstimator):
         """JAX-compatible version of cook_training_set that maintains side effects."""
         # Initialize random key
         key = jax.random.PRNGKey(self.seed)
-        
+
         # Convert inputs to JAX arrays
         X = jnp.asarray(X) if X is not None else jnp.asarray(self.X_)
         y = jnp.asarray(y) if y is not None else jnp.asarray(self.y_)
@@ -789,17 +814,18 @@ class Base(BaseEstimator):
             n_features = X.shape[1]
             new_n_features = int(jnp.ceil(n_features * self.col_sample))
             assert new_n_features >= 1, "Invalid col_sample"
-            
+
             key, subkey = jax.random.split(key)
             index_col = jax.random.choice(
-                subkey,
-                n_features,
-                shape=(new_n_features,),
-                replace=False
+                subkey, n_features, shape=(new_n_features,), replace=False
             )
-            self.index_col_ = np.array(index_col)  # Store as numpy for original methods
+            self.index_col_ = np.array(
+                index_col
+            )  # Store as numpy for original methods
             input_X = X[:, index_col]
-            n_features = new_n_features  # Update n_features after column sampling
+            n_features = (
+                new_n_features  # Update n_features after column sampling
+            )
         else:
             input_X = X
             n_features = X.shape[1]
@@ -819,12 +845,13 @@ class Base(BaseEstimator):
             # Initialize weights if not provided
             if W is None:
                 shape = (n_features, self.n_hidden_features)
-                
+
                 # JAX-compatible weight generation
                 if self.nodes_sim == "uniform":
                     key, subkey = jax.random.split(key)
-                    W = jax.random.uniform(subkey, shape=shape, 
-                                        minval=-1.0, maxval=1.0) * (1/jnp.sqrt(n_features))
+                    W = jax.random.uniform(
+                        subkey, shape=shape, minval=-1.0, maxval=1.0
+                    ) * (1 / jnp.sqrt(n_features))
                 else:
                     # For other sequences, use numpy generation then convert to JAX
                     if self.nodes_sim == "sobol":
@@ -847,24 +874,25 @@ class Base(BaseEstimator):
                         )
                     else:  # default to uniform
                         key, subkey = jax.random.split(key)
-                        W = jax.random.uniform(subkey, shape=shape,
-                                            minval=-1.0, maxval=1.0) * (1/jnp.sqrt(n_features))
-                    
+                        W = jax.random.uniform(
+                            subkey, shape=shape, minval=-1.0, maxval=1.0
+                        ) * (1 / jnp.sqrt(n_features))
+
                     if self.nodes_sim in ["sobol", "hammersley", "halton"]:
-                        W = jnp.asarray(W_np) * (1/jnp.sqrt(n_features))
-                
+                        W = jnp.asarray(W_np) * (1 / jnp.sqrt(n_features))
+
                 self.W_ = np.array(W)  # Store as numpy for original methods
-            
+
             # Scale features
             scaled_X, self.nn_mean_, self.nn_std_ = jax_scale(
                 augmented_X,
-                getattr(self, 'nn_mean_', None),
-                getattr(self, 'nn_std_', None)
+                getattr(self, "nn_mean_", None),
+                getattr(self, "nn_std_", None),
             )
-            
+
             # Create hidden layer with proper bias handling
             linear_output = jnp.dot(scaled_X, W)
-            
+
             # Apply activation
             if self.activation_name == "relu":
                 Phi_X = jax.nn.relu(linear_output)
@@ -874,13 +902,15 @@ class Base(BaseEstimator):
                 Phi_X = jax.nn.sigmoid(linear_output)
             else:  # leaky relu
                 Phi_X = jax.nn.leaky_relu(linear_output, negative_slope=self.a)
-            
+
             # Apply dropout
             if self.dropout > 0:
                 key, subkey = jax.random.split(key)
-                mask = jax.random.bernoulli(subkey, p=1-self.dropout, shape=Phi_X.shape)
-                Phi_X = jnp.where(mask, Phi_X / (1-self.dropout), 0)
-            
+                mask = jax.random.bernoulli(
+                    subkey, p=1 - self.dropout, shape=Phi_X.shape
+                )
+                Phi_X = jnp.where(mask, Phi_X / (1 - self.dropout), 0)
+
             Z = jnp.hstack([scaled_X, Phi_X]) if self.direct_link else Phi_X
         else:
             Z = augmented_X
@@ -888,13 +918,17 @@ class Base(BaseEstimator):
         # Final scaling
         scaled_Z, self.scale_mean_, self.scale_std_ = jax_scale(
             Z,
-            getattr(self, 'scale_mean_', None),
-            getattr(self, 'scale_std_', None)
+            getattr(self, "scale_mean_", None),
+            getattr(self, "scale_std_", None),
         )
 
         # Center response for regression
-        if not hasattr(mx, 'is_factor') or not mx.is_factor(y):  # regression case
-            self.y_mean_ = float(jnp.mean(y))  # Convert to Python float for compatibility
+        if not hasattr(mx, "is_factor") or not mx.is_factor(
+            y
+        ):  # regression case
+            self.y_mean_ = float(
+                jnp.mean(y)
+            )  # Convert to Python float for compatibility
             centered_y = y - self.y_mean_
         else:
             centered_y = y
@@ -905,28 +939,26 @@ class Base(BaseEstimator):
             n_samples = Z.shape[0]
             n_row_sample = int(jnp.ceil(n_samples * self.row_sample))
             index_row = jax.random.choice(
-                subkey,
-                n_samples,
-                shape=(n_row_sample,),
-                replace=False
+                subkey, n_samples, shape=(n_row_sample,), replace=False
             )
-            self.index_row_ = np.array(index_row)  # Store as numpy for original methods
-            return (
-                centered_y[index_row],
-                scaled_Z[index_row]
-            )
-        
-        return (centered_y, scaled_Z)    
-    
+            self.index_row_ = np.array(
+                index_row
+            )  # Store as numpy for original methods
+            return (centered_y[index_row], scaled_Z[index_row])
+
+        return (centered_y, scaled_Z)
+
     def cook_test_set_jax(self, X, **kwargs):
         """JAX-compatible test set processing with matching dimension handling."""
         X = jnp.asarray(X)
-        
+
         if len(X.shape) == 1:
             X = X.reshape(1, -1)
 
         # Handle column sampling
-        input_X = X if self.col_sample == 1 else X[:, jnp.asarray(self.index_col_)]
+        input_X = (
+            X if self.col_sample == 1 else X[:, jnp.asarray(self.index_col_)]
+        )
 
         augmented_X = input_X
 
@@ -942,16 +974,16 @@ class Base(BaseEstimator):
 
         # Final scaling
         scaled_Z = (Z - self.scale_mean_) / (self.scale_std_ + 1e-10)
-        
+
         return scaled_Z
-    
+
     def _jax_create_layer(self, X, W):
         """JAX-compatible hidden layer creation."""
-        #print("X", X.shape)
-        #print("W", W.shape)
-        #print("self.W_", self.W_.shape)
+        # print("X", X.shape)
+        # print("W", W.shape)
+        # print("self.W_", self.W_.shape)
         linear_output = jnp.dot(X, W)
-        
+
         if self.activation_name == "relu":
             return jax.nn.relu(linear_output)
         elif self.activation_name == "tanh":
@@ -1210,7 +1242,8 @@ class RidgeRegressor(Base, RegressorMixin):
                 div = d2 + self.lambda_
                 a = (d * rhs) / div
                 self.coef_ = (
-                    mo.safe_sparse_dot(Vt.T, a, backend=self.backend) / self.X_scale_
+                    mo.safe_sparse_dot(Vt.T, a, backend=self.backend)
+                    / self.X_scale_
                 )
             else:
                 coefs = []
@@ -1236,12 +1269,17 @@ class RidgeRegressor(Base, RegressorMixin):
 
             if np.isscalar(self.lambda_):
                 div = d2 + self.lambda_
-                self.GCV_ = jnp.sum((y - y_pred) ** 2) / (n - jnp.sum(d2 / div)) ** 2
+                self.GCV_ = (
+                    jnp.sum((y - y_pred) ** 2) / (n - jnp.sum(d2 / div)) ** 2
+                )
             else:
                 self.GCV_ = []
                 for lambda_ in self.lambda_:
                     div = d2 + lambda_
-                    gcv = jnp.sum((y - y_pred) ** 2) / (n - jnp.sum(d2 / div)) ** 2
+                    gcv = (
+                        jnp.sum((y - y_pred) ** 2)
+                        / (n - jnp.sum(d2 / div)) ** 2
+                    )
                     self.GCV_.append(gcv)
                 self.GCV_ = jnp.array(self.GCV_)
         else:
@@ -1250,12 +1288,17 @@ class RidgeRegressor(Base, RegressorMixin):
 
             if np.isscalar(self.lambda_):
                 div = d2 + self.lambda_
-                self.GCV_ = jnp.sum((y - y_pred) ** 2) / (n - jnp.sum(d2 / div)) ** 2
+                self.GCV_ = (
+                    jnp.sum((y - y_pred) ** 2) / (n - jnp.sum(d2 / div)) ** 2
+                )
             else:
                 gcvs = []
                 for lambda_ in self.lambda_:
                     div = d2 + lambda_
-                    gcv = jnp.sum((y - y_pred) ** 2) / (n - jnp.sum(d2 / div)) ** 2
+                    gcv = (
+                        jnp.sum((y - y_pred) ** 2)
+                        / (n - jnp.sum(d2 / div)) ** 2
+                    )
                     gcvs.append(gcv)
                 self.GCV_ = jnp.array(gcvs)
 
@@ -1283,7 +1326,8 @@ class RidgeRegressor(Base, RegressorMixin):
             else:
                 return jnp.array(
                     [
-                        mo.safe_sparse_dot(X, coef, backend=self.backend) + self.y_mean_
+                        mo.safe_sparse_dot(X, coef, backend=self.backend)
+                        + self.y_mean_
                         for coef in self.coef_.T
                     ]
                 ).T
@@ -1296,7 +1340,8 @@ class RidgeRegressor(Base, RegressorMixin):
             else:
                 return jnp.array(
                     [
-                        mo.safe_sparse_dot(X, coef, backend=self.backend) + self.y_mean_
+                        mo.safe_sparse_dot(X, coef, backend=self.backend)
+                        + self.y_mean_
                         for coef in self.coef_.T
                     ]
                 ).T

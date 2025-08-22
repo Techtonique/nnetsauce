@@ -160,7 +160,15 @@ class GLMClassifier(GLM, ClassifierMixin):
         return -np.mean(np.sum(Y[row_index, :] * XB, axis=1) - logsumexp(XB))
 
     def loss_func(
-        self, beta, group_index, X, Y, y, row_index=None, type_loss="logit", **kwargs
+        self,
+        beta,
+        group_index,
+        X,
+        Y,
+        y,
+        row_index=None,
+        type_loss="logit",
+        **kwargs
     ):
         res = {
             "logit": self.logit_loss,
@@ -381,4 +389,4 @@ class GLMClassifier(GLM, ClassifierMixin):
 
     @property
     def _estimator_type(self):
-        return "classifier"            
+        return "classifier"

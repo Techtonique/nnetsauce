@@ -115,10 +115,15 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
         # multitask response
         Y = mo.one_hot_encode2(y, self.n_classes_)
 
-        try: 
+        try:
             for i in range(self.n_classes_):
                 self.fit_objs_[i] = deepcopy(
-                    self.obj.fit(self.scaled_X_, Y[:, i], sample_weight=sample_weight, **kwargs)
+                    self.obj.fit(
+                        self.scaled_X_,
+                        Y[:, i],
+                        sample_weight=sample_weight,
+                        **kwargs
+                    )
                 )
         except Exception as e:
             for i in range(self.n_classes_):
@@ -166,7 +171,7 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
 
         probs = np.zeros((shape_X[0], self.n_classes_))
 
-        if len(shape_X) == 1: # one example
+        if len(shape_X) == 1:  # one example
 
             n_features = shape_X[0]
 
@@ -181,7 +186,7 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
             for i in range(self.n_classes_):
                 probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)[0]
 
-        else: # multiple rows
+        else:  # multiple rows
 
             Z = self.X_scaler_.transform(X, **kwargs)
 
@@ -190,11 +195,11 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
                 probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)
 
         expit_raw_probs = expit(probs)
-        
+
         # Add small epsilon to avoid division by zero
         row_sums = expit_raw_probs.sum(axis=1)[:, None]
         row_sums[row_sums < 1e-10] = 1e-10
-        
+
         return expit_raw_probs / row_sums
 
     def decision_function(self, X, **kwargs):
@@ -232,8 +237,10 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
                 )
             )[0]
 
-        return self.obj.decision_function(self.cook_test_set(X, **kwargs), **kwargs)
+        return self.obj.decision_function(
+            self.cook_test_set(X, **kwargs), **kwargs
+        )
 
     @property
     def _estimator_type(self):
-        return "classifier"            
+        return "classifier"

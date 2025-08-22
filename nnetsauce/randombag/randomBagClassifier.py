@@ -221,7 +221,7 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
             col_sample=self.col_sample,
             row_sample=self.row_sample,
             seed=self.seed,
-            cv_calibration=None
+            cv_calibration=None,
         )
 
         # 1 - Sequential training -----
@@ -246,7 +246,8 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
         if self.verbose == 1:
             voters_list = Parallel(n_jobs=self.n_jobs, prefer="threads")(
-                delayed(fit_estimators)(m) for m in tqdm(range(self.n_estimators))
+                delayed(fit_estimators)(m)
+                for m in tqdm(range(self.n_estimators))
             )
         else:
             voters_list = Parallel(n_jobs=self.n_jobs, prefer="threads")(
@@ -354,7 +355,8 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
         if self.verbose == 1:
             preds = Parallel(n_jobs=self.n_jobs, prefer="threads")(
-                delayed(predict_estimator)(m) for m in tqdm(range(self.n_estimators))
+                delayed(predict_estimator)(m)
+                for m in tqdm(range(self.n_estimators))
             )
 
         else:
@@ -375,8 +377,6 @@ class RandomBagClassifier(RandomBag, ClassifierMixin):
 
         return ensemble_proba
 
-
     @property
     def _estimator_type(self):
-        return "classifier"            
-        
+        return "classifier"

@@ -12,7 +12,9 @@ from functools import partial
 from ..utils import matrixops as mo
 
 
-def predict_internal(params, inputs, activation_func="relu", dropout=0.0, seed=123):
+def predict_internal(
+    params, inputs, activation_func="relu", dropout=0.0, seed=123
+):
     # Ensure inputs is 2D with correct shape
     inputs = jnp.asarray(inputs)
     if len(inputs.shape) == 1:
@@ -22,15 +24,21 @@ def predict_internal(params, inputs, activation_func="relu", dropout=0.0, seed=1
     if activation_func == "tanh":
         for W, b in params[:-1]:  # All layers except last
             outputs = jnp.dot(inputs, W) + b
-            inputs = mo.dropout(x=jnp.tanh(outputs), drop_prob=dropout, seed=seed)
+            inputs = mo.dropout(
+                x=jnp.tanh(outputs), drop_prob=dropout, seed=seed
+            )
     elif activation_func == "relu":
         for W, b in params[:-1]:
             outputs = jnp.dot(inputs, W) + b
-            inputs = mo.dropout(x=jnp.maximum(0, outputs), drop_prob=dropout, seed=seed)
+            inputs = mo.dropout(
+                x=jnp.maximum(0, outputs), drop_prob=dropout, seed=seed
+            )
     elif activation_func == "sigmoid":
         for W, b in params[:-1]:
             outputs = jnp.dot(inputs, W) + b
-            inputs = mo.dropout(x=jax.nn.sigmoid(outputs), drop_prob=dropout, seed=seed)
+            inputs = mo.dropout(
+                x=jax.nn.sigmoid(outputs), drop_prob=dropout, seed=seed
+            )
     elif activation_func == "linear":
         for W, b in params[:-1]:
             outputs = jnp.dot(inputs, W) + b
@@ -64,8 +72,12 @@ def loss(
     mse = jnp.sum((preds - targets) ** 2)
 
     # Calculate L1 and L2 regularization for all parameters
-    l1_penalty = sum(jnp.sum(jnp.abs(W)) + jnp.sum(jnp.abs(b)) for W, b in params)
-    l2_penalty = sum(jnp.sum(jnp.square(W)) + jnp.sum(jnp.square(b)) for W, b in params)
+    l1_penalty = sum(
+        jnp.sum(jnp.abs(W)) + jnp.sum(jnp.abs(b)) for W, b in params
+    )
+    l2_penalty = sum(
+        jnp.sum(jnp.square(W)) + jnp.sum(jnp.square(b)) for W, b in params
+    )
 
     # Combine MSE with elastic net regularization
     res = mse + alpha * (l1_ratio * l1_penalty + (1 - l1_ratio) * l2_penalty)
@@ -243,7 +255,9 @@ class NeuralNetRegressor(BaseEstimator, RegressorMixin):
     def get_weights(self):
         """Return the current weights of the model."""
         if self.weights is None:
-            raise ValueError("No weights available. Model has not been fitted yet.")
+            raise ValueError(
+                "No weights available. Model has not been fitted yet."
+            )
         return self.weights
 
     def set_weights(self, weights):

@@ -74,7 +74,9 @@ class ClassIcpCvHelper(BaseIcpCvHelper, ClassifierMixin):
         super(ClassIcpCvHelper, self).__init__(icp, calibration_portion)
 
     def fit(self, x, y):
-        split = StratifiedShuffleSplit(y, n_iter=1, test_size=self.calibration_portion)
+        split = StratifiedShuffleSplit(
+            y, n_iter=1, test_size=self.calibration_portion
+        )
         for train, cal in split:
             self.icp.fit(x[train, :], y[train])
             self.icp.calibrate(x[cal, :], y[cal])
@@ -202,7 +204,9 @@ def cross_val_score(
         for j, (train, test) in enumerate(cv):
             if verbose:
                 sys.stdout.write(
-                    "\riter {}/{} fold {}/{}".format(i + 1, iterations, j + 1, folds)
+                    "\riter {}/{} fold {}/{}".format(
+                        i + 1, iterations, j + 1, folds
+                    )
                 )
             m = clone(model)
             m.fit(x[train, :], y[train], **fit_params)
@@ -462,7 +466,9 @@ def class_one_c(prediction, y, significance):
     only a single class label) of a conformal classification model.
     """
     prediction = prediction > significance
-    n_singletons = np.sum(1 for _ in filter(lambda x: np.sum(x) == 1, prediction))
+    n_singletons = np.sum(
+        1 for _ in filter(lambda x: np.sum(x) == 1, prediction)
+    )
     return n_singletons / y.size
 
 

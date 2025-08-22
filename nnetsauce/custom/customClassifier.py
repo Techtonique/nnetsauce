@@ -68,14 +68,14 @@ class CustomClassifier(Custom, ClassifierMixin):
 
         row_sample: float
             percentage of rows chosen for training, by stratified bootstrapping
-        
+
         cv_calibration: int, cross-validation generator, or iterable, default=2
-            Determines the cross-validation splitting strategy. Same as 
+            Determines the cross-validation splitting strategy. Same as
             `sklearn.calibration.CalibratedClassifierCV`
 
         calibration_method: str
             {‘sigmoid’, ‘isotonic’}, default=’sigmoid’
-            The method to use for calibration. Same as 
+            The method to use for calibration. Same as
             `sklearn.calibration.CalibratedClassifierCV`
 
         seed: int
@@ -137,7 +137,7 @@ class CustomClassifier(Custom, ClassifierMixin):
     """
 
     # construct the object -----
-    _estimator_type = "classifier" 
+    _estimator_type = "classifier"
 
     def __init__(
         self,
@@ -186,7 +186,7 @@ class CustomClassifier(Custom, ClassifierMixin):
 
     def __sklearn_clone__(self):
         """Create a clone of the estimator.
-        
+
         This is required for scikit-learn's calibration system to work properly.
         """
         # Create a new instance with the same parameters
@@ -208,7 +208,7 @@ class CustomClassifier(Custom, ClassifierMixin):
             cv_calibration=self.cv_calibration,
             calibration_method=self.calibration_method,
             seed=self.seed,
-            backend=self.backend
+            backend=self.backend,
         )
         return clone
 
@@ -248,9 +248,7 @@ class CustomClassifier(Custom, ClassifierMixin):
         # Wrap in CalibratedClassifierCV if needed
         if self.cv_calibration is not None:
             self.obj = CalibratedClassifierCV(
-                self.obj, 
-                cv=self.cv_calibration,
-                method=self.calibration_method
+                self.obj, cv=self.cv_calibration, method=self.calibration_method
             )
 
         # if sample_weights, else: (must use self.row_index)
@@ -324,9 +322,9 @@ class CustomClassifier(Custom, ClassifierMixin):
             return self
 
         # if sample_weight is None:
-        #try:
+        # try:
         self.obj.partial_fit(scaled_Z, output_y)
-        #except:
+        # except:
         #    raise NotImplementedError
 
         self.classes_ = np.unique(y)  # for compatibility with sklearn
@@ -358,7 +356,9 @@ class CustomClassifier(Custom, ClassifierMixin):
                 np.ones(n_features).reshape(1, n_features),
             )
 
-            return (self.obj.predict(self.cook_test_set(new_X, **kwargs), **kwargs))[0]
+            return (
+                self.obj.predict(self.cook_test_set(new_X, **kwargs), **kwargs)
+            )[0]
 
         return self.obj.predict(self.cook_test_set(X, **kwargs), **kwargs)
 
@@ -386,7 +386,9 @@ class CustomClassifier(Custom, ClassifierMixin):
                 np.ones(n_features).reshape(1, n_features),
             )
             return (
-                self.obj.predict_proba(self.cook_test_set(new_X, **kwargs), **kwargs)
+                self.obj.predict_proba(
+                    self.cook_test_set(new_X, **kwargs), **kwargs
+                )
             )[0]
         return self.obj.predict_proba(self.cook_test_set(X, **kwargs), **kwargs)
 
@@ -425,7 +427,9 @@ class CustomClassifier(Custom, ClassifierMixin):
                 )
             )[0]
 
-        return self.obj.decision_function(self.cook_test_set(X, **kwargs), **kwargs)
+        return self.obj.decision_function(
+            self.cook_test_set(X, **kwargs), **kwargs
+        )
 
     def score(self, X, y, scoring=None):
         """Scoring function for classification.

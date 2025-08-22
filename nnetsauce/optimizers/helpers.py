@@ -252,7 +252,9 @@ def scd(
 
             losses.append(f(x))
 
-            if (len(losses) > 3) and (np.abs(np.diff(losses[-2:])[0]) < tolerance):
+            if (len(losses) > 3) and (
+                np.abs(np.diff(losses[-2:])[0]) < tolerance
+            ):
                 break
 
             if verbose == 2:
@@ -285,7 +287,9 @@ def scd(
                 xx[j] = value_x
                 return res
 
-            decay_rate = (1 + decay * i) if (method == "poly") else np.exp(decay * i)
+            decay_rate = (
+                (1 + decay * i) if (method == "poly") else np.exp(decay * i)
+            )
 
             diff = -np.asarray(x)
 
@@ -304,7 +308,9 @@ def scd(
             if verbose == 2:
                 print(f"\n x new: {np.asarray(x)}")
 
-            if (len(losses) > 3) and (np.abs(np.diff(losses[-2:])[0]) < tolerance):
+            if (len(losses) > 3) and (
+                np.abs(np.diff(losses[-2:])[0]) < tolerance
+            ):
                 break
 
             if verbose == 2:
@@ -389,7 +395,9 @@ def sgd(
 
             losses.append(f(x))
 
-            if (len(losses) > 3) and (np.abs(np.diff(losses[-2:])[0]) < tolerance):
+            if (len(losses) > 3) and (
+                np.abs(np.diff(losses[-2:])[0]) < tolerance
+            ):
                 break
 
             if verbose == 2:
@@ -419,7 +427,9 @@ def sgd(
             # grad_i = numerical_gradient(objective, x)
             grad_i = calc_grad(objective, x)
 
-            decay_rate = (1 + decay * i) if (method == "poly") else np.exp(decay * i)
+            decay_rate = (
+                (1 + decay * i) if (method == "poly") else np.exp(decay * i)
+            )
 
             diff = -np.asarray(x)
 
@@ -436,7 +446,9 @@ def sgd(
 
             losses.append(f(x))
 
-            if (len(losses) > 3) and (np.abs(np.diff(losses[-2:])[0]) < tolerance):
+            if (len(losses) > 3) and (
+                np.abs(np.diff(losses[-2:])[0]) < tolerance
+            ):
                 break
 
             if verbose == 2:

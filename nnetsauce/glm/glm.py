@@ -172,7 +172,7 @@ class GLM(Base):
     def compute_penalty(self, group_index, beta):
         return self.penalty(
             beta1=beta[0:group_index],
-            beta2=beta[group_index : len(beta)],
+            beta2=beta[group_index: len(beta)],
             lambda1=self.lambda1,
             lambda2=self.lambda2,
             alpha1=self.alpha1,

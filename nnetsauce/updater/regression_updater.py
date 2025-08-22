@@ -49,7 +49,9 @@ class RegressorUpdater(BaseEstimator, RegressorMixin):
 
     def fit(self, X, y, **kwargs):
 
-        if isinstance(self.regr, CustomRegressor):  # nnetsauce model not deep ---
+        if isinstance(
+            self.regr, CustomRegressor
+        ):  # nnetsauce model not deep ---
             if check_is_fitted(self.regr) == False:
                 self.regr.fit(X, y, **kwargs)
                 self.n_obs_ = X.shape[0]

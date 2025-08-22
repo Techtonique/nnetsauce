@@ -13,7 +13,9 @@ class TestTimeSeriesSplit(ut.TestCase):
 
         tscv2 = ns.utils.TimeSeriesSplit()
 
-        splits2 = tscv2.split(X[:-1], initial_window=3, horizon=2, fixed_window=False)
+        splits2 = tscv2.split(
+            X[:-1], initial_window=3, horizon=2, fixed_window=False
+        )
 
         train, test = next(splits2)
         self.assertTrue(np.allclose(train[2], 2))
@@ -29,7 +31,9 @@ class TestTimeSeriesSplit(ut.TestCase):
 
         tscv3 = ns.utils.TimeSeriesSplit()
 
-        splits3 = tscv3.split(X[:-1], initial_window=3, horizon=2, fixed_window=True)
+        splits3 = tscv3.split(
+            X[:-1], initial_window=3, horizon=2, fixed_window=True
+        )
 
         train, test = next(splits3)
         self.assertTrue(np.allclose(train[2], 2))

@@ -354,9 +354,9 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                 if self.predictions:
                     predictions[name] = y_pred
             except Exception as exception:
-                 if self.ignore_warnings is False:
-                     print(name + " model failed to execute")
-                     print(exception)
+                if self.ignore_warnings is False:
+                    print(name + " model failed to execute")
+                    print(exception)
 
         if self.estimators == "all":
             self.classifiers = [
@@ -406,7 +406,9 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
 
             for name, model in tqdm(self.classifiers):  # do parallel exec
 
-                other_args = {}  # use this trick for `random_state` too --> refactor
+                other_args = (
+                    {}
+                )  # use this trick for `random_state` too --> refactor
                 try:
                     if (
                         "n_jobs" in model().get_params().keys()
@@ -542,9 +544,9 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                     if self.predictions:
                         predictions[name] = y_pred
                 except Exception as exception:
-                     if self.ignore_warnings is False:
-                         print(name + " model failed to execute")
-                         print(exception)
+                    if self.ignore_warnings is False:
+                        print(name + " model failed to execute")
+                        print(exception)
 
         else:  # no preprocessing
 
@@ -670,9 +672,9 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                     if self.predictions:
                         predictions[name] = y_pred
                 except Exception as exception:
-                     if self.ignore_warnings is False:
-                         print(name + " model failed to execute")
-                         print(exception)
+                    if self.ignore_warnings is False:
+                        print(name + " model failed to execute")
+                        print(exception)
 
         if self.custom_metric is None:
             scores = pd.DataFrame(
@@ -697,7 +699,9 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                     "Time Taken": TIME,
                 }
             )
-        scores = scores.sort_values(by=self.sort_by, ascending=False).set_index("Model")
+        scores = scores.sort_values(by=self.sort_by, ascending=False).set_index(
+            "Model"
+        )
 
         self.best_model_ = self.models_[scores.index[0]]
 

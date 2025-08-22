@@ -135,6 +135,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
 
 
     """
+
     _estimator_type = "classifier"
 
     # construct the object -----
@@ -222,7 +223,10 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
             # (K, n) %*% (n, p) -> (K, p)
             if hessian is False:
                 grad = (
-                    -mo.safe_sparse_dot(a=(Y - probs).T, b=X, backend=self.backend) / n
+                    -mo.safe_sparse_dot(
+                        a=(Y - probs).T, b=X, backend=self.backend
+                    )
+                    / n
                 )
                 grad += self.lambda1 * B[0:init_p, :].sum(axis=0)[:, None]
                 grad += self.lambda2 * B[init_p:p, :].sum(axis=0)[:, None]
@@ -373,7 +377,9 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
         if self.solver == "L-BFGS-B-lstsq":
             opt = minimize(
                 fun=loglik_func,
-                x0=np.linalg.lstsq(scaled_Z, Y, rcond=None)[0].flatten(order="F"),
+                x0=np.linalg.lstsq(scaled_Z, Y, rcond=None)[0].flatten(
+                    order="F"
+                ),
                 jac=grad_func,
                 method="L-BFGS-B",
             )
@@ -383,7 +389,9 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
         if self.solver in "Newton-CG-lstsq":
             opt = minimize(
                 fun=loglik_func,
-                x0=np.linalg.lstsq(scaled_Z, Y, rcond=None)[0].flatten(order="F"),
+                x0=np.linalg.lstsq(scaled_Z, Y, rcond=None)[0].flatten(
+                    order="F"
+                ),
                 jac=grad_func,
                 hess=hessian_func,
                 method="Newton-CG",
@@ -394,7 +402,9 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
         if self.solver in "trust-ncg-lstsq":
             opt = minimize(
                 fun=loglik_func,
-                x0=np.linalg.lstsq(scaled_Z, Y, rcond=None)[0].flatten(order="F"),
+                x0=np.linalg.lstsq(scaled_Z, Y, rcond=None)[0].flatten(
+                    order="F"
+                ),
                 jac=grad_func,
                 hess=hessian_func,
                 method="trust-ncg",
@@ -469,4 +479,4 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
 
     @property
     def _estimator_type(self):
-        return "classifier"            
+        return "classifier"

@@ -95,7 +95,9 @@ class TcpClassifier(BaseEstimator, ClassifierMixin):
 
         self.smoothing = smoothing
 
-        self.base_icp = IcpClassifier(self.nc_function, self.condition, self.smoothing)
+        self.base_icp = IcpClassifier(
+            self.nc_function, self.condition, self.smoothing
+        )
 
         self.classes = None
 

@@ -32,6 +32,7 @@ class RidgeRegressor(BaseEstimator, RegressorMixin):
             type of backend; must be in ('cpu', 'gpu', 'tpu')
 
     """
+
     def __init__(self, reg_lambda=0.1, backend="cpu"):
         assert backend in (
             "cpu",
@@ -49,7 +50,7 @@ class RidgeRegressor(BaseEstimator, RegressorMixin):
 
         self.reg_lambda = reg_lambda
         self.backend = backend
-        self.coef_ = None 
+        self.coef_ = None
 
     def fit(self, X, y, **kwargs):
         """Fit matrixops (classifier) to training data (X, y)
@@ -103,12 +104,15 @@ class RidgeRegressor(BaseEstimator, RegressorMixin):
                     self.coef_ = mo.safe_sparse_dot(hat_matrix, centered_y)
             return self
 
-        x = jinv(mo.crossprod(X_, backend=self.backend)
-            + self.reg_lambda * jnp.eye(X_.shape[1]))
+        x = jinv(
+            mo.crossprod(X_, backend=self.backend)
+            + self.reg_lambda * jnp.eye(X_.shape[1])
+        )
 
         hat_matrix = mo.tcrossprod(x, X_, backend=self.backend)
-        self.coef_ = mo.safe_sparse_dot(hat_matrix, centered_y, 
-            backend=self.backend)
+        self.coef_ = mo.safe_sparse_dot(
+            hat_matrix, centered_y, backend=self.backend
+        )
         return self
 
     def predict(self, X, **kwargs):

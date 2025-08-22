@@ -35,8 +35,12 @@ class TS_Split(ut.TestCase):
             # print("TRAIN:", train_index2, "TEST:", test_index2)
 
         self.assertTrue(
-            np.allclose(train_index, [0, 1, 2, 3, 4, 5, 6])  # with fixed_window=False
+            np.allclose(
+                train_index, [0, 1, 2, 3, 4, 5, 6]
+            )  # with fixed_window=False
             & np.allclose(test_index, [7, 8, 9])  # with fixed_window=False
-            & np.allclose(train_index2, [2, 3, 4, 5, 6])  # with fixed_window=True
+            & np.allclose(
+                train_index2, [2, 3, 4, 5, 6]
+            )  # with fixed_window=True
             & np.allclose(test_index2, [7, 8, 9])
         )  # with fixed_window=True

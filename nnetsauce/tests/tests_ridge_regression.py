@@ -11,7 +11,9 @@ np.random.seed(123)
 
 class TestRidge2Regressor(ut.TestCase):
     def test_Ridge2Regressor(self):
-        X, y = datasets.make_regression(n_samples=25, n_features=3, random_state=123)
+        X, y = datasets.make_regression(
+            n_samples=25, n_features=3, random_state=123
+        )
 
         fit_obj = ns.Ridge2Regressor(
             n_hidden_features=10,
@@ -246,7 +248,9 @@ class TestRidge2Regressor(ut.TestCase):
         self.assertTrue(np.allclose(np.round(rmse2, 3), 19.947, atol=1e-3))
         self.assertTrue(np.allclose(np.round(rmse3, 3), 1.934, atol=1e-3))
         self.assertTrue(np.allclose(np.round(rmse4, 3), 10.097, atol=1e-3))
-        self.assertTrue(np.allclose(np.round(rmse5, 3), 22.200957971897672, atol=1e-3))
+        self.assertTrue(
+            np.allclose(np.round(rmse5, 3), 22.200957971897672, atol=1e-3)
+        )
         self.assertTrue(np.allclose(np.round(rmse6, 3), 0.614, atol=1e-3))
         self.assertTrue(np.allclose(np.round(rmse7, 3), 6.789, atol=1e-3))
         self.assertTrue(
@@ -255,8 +259,12 @@ class TestRidge2Regressor(ut.TestCase):
                 np.round(np.sqrt(fit_obj7.score(X_test, y_test)), 3),
             )
         )
-        self.assertTrue(np.allclose(fit_obj.predict(X_test[0, :]), 335.65187002147786))
-        self.assertFalse(np.allclose(fit_obj2.predict(X_test[0, :]), 283.416245307822))
+        self.assertTrue(
+            np.allclose(fit_obj.predict(X_test[0, :]), 335.65187002147786)
+        )
+        self.assertFalse(
+            np.allclose(fit_obj2.predict(X_test[0, :]), 283.416245307822)
+        )
         self.assertTrue(np.allclose(rmse8, 22.454022827189487, atol=1e-3))
         self.assertTrue(np.allclose(rmse9, 21.466986827736815))
         self.assertTrue(np.allclose(rmse10, 0.8446477775597262))
@@ -265,7 +273,9 @@ class TestRidge2Regressor(ut.TestCase):
         self.assertTrue(np.allclose(np.round(rmse13, 3), 4.054, atol=1e-3))
 
     def test_score(self):
-        X, y = datasets.make_regression(n_samples=100, n_features=3, random_state=123)
+        X, y = datasets.make_regression(
+            n_samples=100, n_features=3, random_state=123
+        )
 
         fit_obj = ns.Ridge2Regressor(
             n_hidden_features=5,

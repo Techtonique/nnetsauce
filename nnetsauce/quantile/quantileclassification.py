@@ -24,7 +24,9 @@ from sklearn.metrics import mean_squared_error
 from warnings import filterwarnings
 
 from .quantileregression import QuantileRegressor
-from nnetsauce.multitask.simplemultitaskClassifier import SimpleMultitaskClassifier
+from nnetsauce.multitask.simplemultitaskClassifier import (
+    SimpleMultitaskClassifier,
+)
 
 filterwarnings("ignore")
 
@@ -83,7 +85,9 @@ class QuantileClassifier(BaseEstimator, ClassifierMixin):
         ), "scoring must be 'predictions' or 'residuals'"
         self.obj = obj
         quantileregressor = QuantileRegressor(self.obj)
-        quantileregressor.predict = partial(quantileregressor.predict, return_pi=False)
+        quantileregressor.predict = partial(
+            quantileregressor.predict, return_pi=False
+        )
         self.obj_ = SimpleMultitaskClassifier(quantileregressor)
 
     def fit(self, X, y, **kwargs):

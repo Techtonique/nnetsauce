@@ -13,7 +13,9 @@ np.random.seed(123)
 
 class TestBase(ut.TestCase):
     def test_base(self):
-        X, y = datasets.make_regression(n_samples=25, n_features=3, random_state=123)
+        X, y = datasets.make_regression(
+            n_samples=25, n_features=3, random_state=123
+        )
 
         fit_obj = ns.BaseRegressor(
             n_hidden_features=10,
@@ -264,7 +266,9 @@ class TestBase(ut.TestCase):
         self.assertTrue(test_check(rmse13, 1e-12))
 
     def test_score(self):
-        X, y = datasets.make_regression(n_samples=25, n_features=3, random_state=123)
+        X, y = datasets.make_regression(
+            n_samples=25, n_features=3, random_state=123
+        )
 
         fit_obj = ns.BaseRegressor(
             n_hidden_features=5,

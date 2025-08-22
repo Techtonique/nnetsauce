@@ -139,7 +139,9 @@ class BaseRegressor(Base, RegressorMixin):
 
         centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
 
-        fit_obj = lmf.beta_Sigma_hat(X=scaled_Z, y=centered_y, backend=self.backend)
+        fit_obj = lmf.beta_Sigma_hat(
+            X=scaled_Z, y=centered_y, backend=self.backend
+        )
 
         self.beta_ = fit_obj["beta_hat"]
 

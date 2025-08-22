@@ -42,13 +42,17 @@ def bootstrap(x, h, block_size=None, seed=123):
         indices = []
         for i in range(num_blocks):
             np.random.seed(seed + i * 100)
-            start_index = np.random.randint(0, time_series_length - block_size + 1)
-            block_indices = all_indices[start_index : start_index + block_size]
+            start_index = np.random.randint(
+                0, time_series_length - block_size + 1
+            )
+            block_indices = all_indices[start_index: start_index + block_size]
             indices.extend(block_indices)
 
     else:  # block_size is None
 
-        indices = np.random.choice(range(time_series_length), size=h, replace=True)
+        indices = np.random.choice(
+            range(time_series_length), size=h, replace=True
+        )
 
     if ndim == 1:
         return x[np.array(indices[:h])]
@@ -135,7 +139,7 @@ def create_lags(x, k, n=None):
 
     x_ = x[::-1]
 
-    z = [x_[i : (n_k + i + 1)] for i in range(k_)]
+    z = [x_[i: (n_k + i + 1)] for i in range(k_)]
 
     if n is None:
         return np.column_stack(z)
@@ -151,7 +155,7 @@ def create_lags(x, k, n=None):
 def create_train_inputs(X, k):
     n_k = X.shape[0] - k
 
-    z = [X[i : n_k + i, :] for i in range(1, (k + 1))]
+    z = [X[i: n_k + i, :] for i in range(1, (k + 1))]
 
     return (X[0:n_k, :], np.column_stack(z))
 
@@ -198,7 +202,9 @@ def winkler_score(obj, actual, level=95, per_series=False):
         return np.mean(score)
 
 
-def mean_errors(pred, actual, scoring="root_mean_squared_error", per_series=False):
+def mean_errors(
+    pred, actual, scoring="root_mean_squared_error", per_series=False
+):
 
     if isinstance(pred, pd.DataFrame):
         pred = pred.values
@@ -219,7 +225,9 @@ def mean_errors(pred, actual, scoring="root_mean_squared_error", per_series=Fals
         if scoring == "mean_percentage_error":
             return np.asarray(np.mean(diff / actual, axis=0) * 100).tolist()
         if scoring == "mean_absolute_percentage_error":
-            return np.asarray(np.mean(np.abs(diff / actual), axis=0) * 100).tolist()
+            return np.asarray(
+                np.mean(np.abs(diff / actual), axis=0) * 100
+            ).tolist()
         if scoring == "root_mean_squared_error":
             return np.sqrt(np.mean(np.square(diff), axis=0)).tolist()
         if scoring == "mean_squared_error":

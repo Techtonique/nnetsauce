@@ -16,5 +16,5 @@ __all__ = [
     "generate_halton",
     "getsims",
     "getsimsxreg",
-    "simulate_replications"
+    "simulate_replications",
 ]

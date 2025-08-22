@@ -12,7 +12,9 @@ def getsims(input_data, ix):
     if isinstance(input_data[0], tuple):  # GP posterior
         h = len(input_data)
         n_sims = len(input_data[0][0][0])
-        res = [[input_data[hx][ix][0][i] for i in range(n_sims)] for hx in range(h)]
+        res = [
+            [input_data[hx][ix][0][i] for i in range(n_sims)] for hx in range(h)
+        ]
         return np.asarray(res)
 
 
