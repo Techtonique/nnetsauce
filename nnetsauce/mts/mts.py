@@ -663,7 +663,7 @@ class MTS(Base):
                 result_dict[col_name] = q_values[i, :, series_id]
 
         df_return_quantiles = pd.DataFrame(result_dict, index=self.output_dates_)
-        
+
         return df_return_quantiles
         
     def predict(self, h=5, level=95, quantiles=None, **kwargs):
@@ -1196,11 +1196,12 @@ class MTS(Base):
             sims = sims.T  # → (n, R)
 
         R = sims.shape[1]
-
         # Mean absolute error between simulations and observation
-        diff_obs = np.abs(sims - y_true[:, None])  # (n, R)
+        try: 
+            diff_obs = np.abs(sims - y_true[:, np.newaxis])  # (n, R)
+        except Exception as e:
+            diff_obs = np.abs(sims - y_true.values[:, np.newaxis])  # (n, R)
         term1 = np.mean(diff_obs, axis=1)  # (n,)
-
         # Mean absolute difference between simulations
         diff_sims = np.abs(sims[:, None, :] - sims[:, :, None])  # (n, R, R)
         term2 = np.mean(diff_sims, axis=(1, 2)) / 2  # (n,)
@@ -1453,6 +1454,7 @@ class MTS(Base):
         fixed_window=False,
         show_progress=True,
         level=95,
+        alpha=0.5,
         **kwargs,
     ):
         """Evaluate a score by time series cross-validation.
@@ -1492,6 +1494,13 @@ class MTS(Base):
 
             show_progress: boolean
                 if True, a progress bar is printed
+            
+            level: int
+                confidence level for prediction intervals
+            
+            alpha: float
+                quantile level for pinball loss if scoring='pinball'
+                0 < alpha < 1
 
             **kwargs: dict
                 additional parameters to be passed to `fit` and `predict`
@@ -1513,6 +1522,8 @@ class MTS(Base):
         if isinstance(scoring, str):
 
             assert scoring in (
+                "pinball",
+                "crps",
                 "root_mean_squared_error",
                 "mean_squared_error",
                 "mean_error",
@@ -1521,12 +1532,57 @@ class MTS(Base):
                 "mean_absolute_percentage_error",
                 "winkler_score",
                 "coverage",
-            ), "must have scoring in ('root_mean_squared_error', 'mean_squared_error', 'mean_error', 'mean_absolute_error', 'mean_error', 'mean_percentage_error', 'mean_absolute_percentage_error',  'winkler_score', 'coverage')"
+            ), "must have scoring in ('pinball', 'crps', 'root_mean_squared_error', 'mean_squared_error', 'mean_error', 'mean_absolute_error', 'mean_error', 'mean_percentage_error', 'mean_absolute_percentage_error',  'winkler_score', 'coverage')"
 
-            def err_func(X_test, X_pred, scoring):
+            def err_func(X_test, X_pred, scoring, alpha=0.5):
                 if (self.replications is not None) or (
                     self.type_pi == "gaussian"
                 ):  # probabilistic
+                    if scoring == "pinball":
+                        # Predict requested quantile
+                        q_pred = self.predict(
+                            h=len(X_test), quantiles=[alpha], **kwargs
+                        )
+                        # Handle multivariate
+                        scores = []
+                        p = X_test.shape[1] if len(X_test.shape) > 1 else 1
+                        print("line. 1548", p)
+                        for j in range(p):
+                            series_name = getattr(self, 'series_names', [f"Series_{j}"])[j]
+                            q_label = f"{int(alpha * 100):02d}" if (alpha * 100).is_integer() else f"{alpha:.3f}".replace(".", "_")
+                            col = f"quantile_{q_label}_{series_name}"
+                            if col not in q_pred.columns:
+                                raise ValueError(f"Column '{col}' not found in quantile forecast output.")
+                            print("line. 1555", j)
+                            print("line. 1556", X_test)
+                            try: 
+                                y_true_j = X_test[:, j] if p > 1 else X_test
+                            except:
+                                y_true_j = X_test.iloc[:, j] if p > 1 else X_test.values
+                            print("line. 1561", y_true_j)
+                            y_pred_j = q_pred[col].values
+                            # Compute pinball loss for this series
+                            loss = mean_pinball_loss(y_true_j, y_pred_j, alpha=alpha)
+                            scores.append(loss)
+                        # Return average over series
+                        return np.mean(scores)
+                    elif scoring == "crps":
+                        # Ensure simulations exist
+                        _ = self.predict(h=len(X_test), **kwargs)  # triggers self.sims_
+                        # Extract simulations: list of DataFrames → (R, h, p)
+                        sims_vals = np.stack([sim.values for sim in self.sims_], axis=0)  # (R, h, p)
+                        crps_scores = []
+                        p = X_test.shape[1] if len(X_test.shape) > 1 else 1
+                        for j in range(p):
+                            try: 
+                                y_true_j = X_test[:, j] if p > 1 else X_test
+                            except Exception as e:
+                                y_true_j = X_test.iloc[:, j] if p > 1 else X_test.values
+                            print("line. 1580", y_true_j)
+                            sims_j = sims_vals[:, :, j]  # (R, h)
+                            crps_j = self._crps_ensemble(y_true_j, sims_j)
+                            crps_scores.append(np.mean(crps_j))  # average over horizon
+                        return np.mean(crps_scores)  # average over series
                     if scoring == "winkler_score":
                         return winkler_score(X_pred, X_test, level=level)
                     elif scoring == "coverage":
@@ -1571,7 +1627,7 @@ class MTS(Base):
                 X_test = X[test_index, :]
             X_pred = self.predict(h=int(len(test_index)), level=level, **kwargs)
 
-            errors.append(err_func(X_test, X_pred, scoring))
+            errors.append(err_func(X_test, X_pred, scoring, alpha=alpha))
 
         res = np.asarray(errors)
 
