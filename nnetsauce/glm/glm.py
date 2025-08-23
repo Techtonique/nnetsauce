@@ -146,29 +146,13 @@ class GLM(Base):
         return mo.safe_sparse_dot(X[row_index, :], self.beta_, backend=self.backend)
 
     def compute_XB2(self, X, beta=None, row_index=None):
-        if self.backend != "cpu":
-            raise NotImplementedError(
-                "GLM.compute_XB is only implemented for backend='cpu'"
-            )
         def f00(X):
-            if self.backend != "cpu":
-                raise NotImplementedError(
-                "GLM.compute_XB is only implemented for backend='cpu'"
-            )
             return mo.safe_sparse_dot(X, self.beta_, backend=self.backend)
 
         def f01(X):
-            if self.backend != "cpu":
-                raise NotImplementedError(
-                "GLM.compute_XB is only implemented for backend='cpu'"
-            )
             return mo.safe_sparse_dot(X[row_index, :], self.beta_, backend=self.backend)
 
         def f11(X):
-            if self.backend != "cpu":
-                raise NotImplementedError(
-                "GLM.compute_XB is only implemented for backend='cpu'"
-            )
             return mo.safe_sparse_dot(X[row_index, :], beta, backend=self.backend)
 
         def f10(X):
@@ -186,10 +170,6 @@ class GLM(Base):
         return h_result[result_code](X)
 
     def penalty(self, beta1, beta2, lambda1, lambda2, alpha1, alpha2):
-        if self.backend != "cpu":
-            raise NotImplementedError(
-                "GLM.compute_XB is only implemented for backend='cpu'"
-            )
         res = lambda1 * (
             0.5 * (1 - alpha1) * np.sum(np.square(beta1))
             + alpha1 * np.sum(np.abs(beta1))
@@ -201,10 +181,6 @@ class GLM(Base):
         return res
 
     def compute_penalty(self, group_index, beta):
-        if self.backend != "cpu":
-            raise NotImplementedError(
-                "GLM.compute_XB is only implemented for backend='cpu'"
-            )
         return self.penalty(
             beta1=beta[0:group_index],
             beta2=beta[group_index: len(beta)],

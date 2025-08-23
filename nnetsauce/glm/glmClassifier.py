@@ -10,7 +10,10 @@ from ..utils import misc as mx
 from sklearn.base import ClassifierMixin
 from ..optimizers import Optimizer
 from scipy.special import logsumexp, expit, erf
-
+try: 
+    import jax.numpy as jnp
+except ImportError:
+    pass
 
 class GLMClassifier(GLM, ClassifierMixin):
     """Generalized 'linear' models using quasi-randomized networks (classification)
@@ -244,7 +247,10 @@ class GLMClassifier(GLM, ClassifierMixin):
         Y = self.optimizer.one_hot_encode(output_y, self.n_classes)
 
         # initialization
-        beta_ = np.linalg.lstsq(scaled_Z, Y, rcond=None)[0]
+        if self.backend == "cpu":
+            beta_ = np.linalg.lstsq(scaled_Z, Y, rcond=None)[0]
+        else:
+            beta_ = jnp.linalg.lstsq(scaled_Z, Y, rcond=None)[0]
 
         # optimization
         # fit(self, loss_func, response, x0, **kwargs):

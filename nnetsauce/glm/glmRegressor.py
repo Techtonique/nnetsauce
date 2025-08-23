@@ -9,6 +9,10 @@ from .glm import GLM
 from ..utils import matrixops as mo
 from sklearn.base import RegressorMixin
 from ..optimizers import Optimizer
+try: 
+    import jax.numpy as jnp
+except ImportError:
+    pass
 
 
 class GLMRegressor(GLM, RegressorMixin):
@@ -239,7 +243,10 @@ class GLMRegressor(GLM, RegressorMixin):
 
         centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
         # initialization
-        beta_ = np.linalg.lstsq(scaled_Z, centered_y, rcond=None)[0]
+        if self.backend == "cpu":
+            beta_ = np.linalg.lstsq(scaled_Z, centered_y, rcond=None)[0]
+        else:
+            beta_ = jnp.linalg.lstsq(scaled_Z, centered_y, rcond=None)[0]
         # optimization
         # fit(self, loss_func, response, x0, **kwargs):
         # loss_func(self, beta, group_index, X, y,
