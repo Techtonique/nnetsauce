@@ -33,7 +33,6 @@ from .ridge.ridge import RidgeRegressor
 from .ridge2.ridge2Classifier import Ridge2Classifier
 from .ridge2.ridge2Regressor import Ridge2Regressor
 from .ridge2.ridge2MultitaskClassifier import Ridge2MultitaskClassifier
-from .ridge2.elasticNet2Regressor import ElasticNet2Regressor
 from .rvfl.bayesianrvflRegressor import BayesianRVFLRegressor
 from .rvfl.bayesianrvfl2Regressor import BayesianRVFL2Regressor
 from .sampling import SubSampler
@@ -54,7 +53,6 @@ __all__ = [
     "DeepRegressor",
     "DeepMTS",
     "Downloader",
-    "ElasticNet2Regressor",
     "GLMClassifier",
     "GLMRegressor",
     "KernelRidge",

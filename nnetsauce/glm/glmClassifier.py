@@ -73,6 +73,9 @@ class GLMClassifier(GLM, ClassifierMixin):
 
         optimizer: object
             optimizer, from class nnetsauce.Optimizer
+        
+        backend: str.
+            "cpu" or "gpu" or "tpu".
 
         seed: int
             reproducibility seed for nodes_sim=='uniform'
@@ -110,6 +113,7 @@ class GLMClassifier(GLM, ClassifierMixin):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         optimizer=Optimizer(),
+        backend="cpu",
         seed=123,
     ):
         super().__init__(
@@ -129,6 +133,7 @@ class GLMClassifier(GLM, ClassifierMixin):
             type_clust=type_clust,
             type_scaling=type_scaling,
             optimizer=optimizer,
+            backend=backend,
             seed=seed,
         )
 

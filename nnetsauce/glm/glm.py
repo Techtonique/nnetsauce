@@ -8,6 +8,7 @@
 import numpy as np
 from ..base import Base
 from ..optimizers import Optimizer
+from ..utils import matrixops as mo
 
 
 class GLM(Base):
@@ -71,6 +72,9 @@ class GLM(Base):
 
         optimizer: object
             optimizer, from class nnetsauce.utils.Optimizer
+        
+        backend: str.
+            "cpu" or "gpu" or "tpu".
 
         seed: int
             reproducibility seed for nodes_sim=='uniform' and clustering
@@ -101,6 +105,7 @@ class GLM(Base):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         optimizer=Optimizer(),
+        backend="cpu",
         seed=123,
     ):
         super().__init__(
@@ -115,6 +120,7 @@ class GLM(Base):
             cluster_encode=cluster_encode,
             type_clust=type_clust,
             type_scaling=type_scaling,
+            backend=backend,
             seed=seed,
         )
 
@@ -123,33 +129,54 @@ class GLM(Base):
         self.lambda2 = lambda2
         self.alpha2 = alpha2
         self.optimizer = optimizer
+        self.backend = backend
         self.beta_ = None
 
-    def compute_XB(self, X, beta=None, row_index=None):
+    def compute_XB(self, X, beta=None, row_index=None):        
         if beta is not None:
             if row_index is None:
-                return np.dot(X, beta)
+                return mo.safe_sparse_dot(X, beta, backend=self.backend)
 
-            return np.dot(X[row_index, :], beta)
+            return mo.safe_sparse_dot(X[row_index, :], beta, backend=self.backend)
 
         # self.beta_ is None in this case
         if row_index is None:
-            return np.dot(X, self.beta_)
+            return mo.safe_sparse_dot(X, self.beta_, backend=self.backend)
 
-        return np.dot(X[row_index, :], self.beta_)
+        return mo.safe_sparse_dot(X[row_index, :], self.beta_, backend=self.backend)
 
     def compute_XB2(self, X, beta=None, row_index=None):
+        if self.backend != "cpu":
+            raise NotImplementedError(
+                "GLM.compute_XB is only implemented for backend='cpu'"
+            )
         def f00(X):
-            return np.dot(X, self.beta_)
+            if self.backend != "cpu":
+                raise NotImplementedError(
+                "GLM.compute_XB is only implemented for backend='cpu'"
+            )
+            return mo.safe_sparse_dot(X, self.beta_, backend=self.backend)
 
         def f01(X):
-            return np.dot(X[row_index, :], self.beta_)
+            if self.backend != "cpu":
+                raise NotImplementedError(
+                "GLM.compute_XB is only implemented for backend='cpu'"
+            )
+            return mo.safe_sparse_dot(X[row_index, :], self.beta_, backend=self.backend)
 
         def f11(X):
-            return np.dot(X[row_index, :], beta)
+            if self.backend != "cpu":
+                raise NotImplementedError(
+                "GLM.compute_XB is only implemented for backend='cpu'"
+            )
+            return mo.safe_sparse_dot(X[row_index, :], beta, backend=self.backend)
 
         def f10(X):
-            return np.dot(X, beta)
+            if self.backend != "cpu":
+                raise NotImplementedError(
+                "GLM.compute_XB is only implemented for backend='cpu'"
+            )
+            return mo.safe_sparse_dot(X, beta, backend=self.backend)
 
         h_result = {"00": f00, "01": f01, "11": f11, "10": f10}
 
@@ -159,6 +186,10 @@ class GLM(Base):
         return h_result[result_code](X)
 
     def penalty(self, beta1, beta2, lambda1, lambda2, alpha1, alpha2):
+        if self.backend != "cpu":
+            raise NotImplementedError(
+                "GLM.compute_XB is only implemented for backend='cpu'"
+            )
         res = lambda1 * (
             0.5 * (1 - alpha1) * np.sum(np.square(beta1))
             + alpha1 * np.sum(np.abs(beta1))
@@ -170,6 +201,10 @@ class GLM(Base):
         return res
 
     def compute_penalty(self, group_index, beta):
+        if self.backend != "cpu":
+            raise NotImplementedError(
+                "GLM.compute_XB is only implemented for backend='cpu'"
+            )
         return self.penalty(
             beta1=beta[0:group_index],
             beta2=beta[group_index: len(beta)],

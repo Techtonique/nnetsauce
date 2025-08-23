@@ -84,6 +84,9 @@ build-site: docs ## export mkdocs website to a folder
 run-custom: ## run all custom examples with one command
 	find examples -maxdepth 2 -name "*custom*.py" -exec  python3 {} \;
 
+run-glm: ## run all custom examples with one command
+	find examples -maxdepth 2 -name "*glm*.py" -exec  python3 {} \;
+
 run-examples: ## run all examples with one command
 	find examples -maxdepth 2 -name "*.py" -exec  python3 {} \;
 

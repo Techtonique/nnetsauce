@@ -79,6 +79,9 @@ class GLMRegressor(GLM, RegressorMixin):
 
         optimizer: object
             optimizer, from class nnetsauce.utils.Optimizer
+        
+        backend: str.
+            "cpu" or "gpu" or "tpu".
 
         seed: int
             reproducibility seed for nodes_sim=='uniform'
@@ -119,6 +122,7 @@ class GLMRegressor(GLM, RegressorMixin):
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
         optimizer=Optimizer(),
+        backend="cpu",
         seed=123,
     ):
         super().__init__(
@@ -138,6 +142,7 @@ class GLMRegressor(GLM, RegressorMixin):
             type_clust=type_clust,
             type_scaling=type_scaling,
             optimizer=optimizer,
+            backend=backend,
             seed=seed,
         )
 

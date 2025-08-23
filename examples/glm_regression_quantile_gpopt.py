@@ -11,11 +11,7 @@ from time import time
 import numpy as np
 from sklearn.model_selection import cross_val_score
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import pinball_loss, make_scorer
-
-# Define the custom scorer using sklearn's pinball_loss
-def mean_pinball_loss(y_true, y_pred, quantile=0.5):
-    return pinball_loss(y_true, y_pred, alpha=quantile)
+from sklearn.metrics import mean_pinball_loss, make_scorer
 
 # Create the scorer for use in cross_val_score
 mean_pinball_scorer = make_scorer(mean_pinball_loss, quantile=0.5, greater_is_better=False)
