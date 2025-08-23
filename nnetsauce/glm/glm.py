@@ -72,7 +72,7 @@ class GLM(Base):
 
         optimizer: object
             optimizer, from class nnetsauce.utils.Optimizer
-        
+
         backend: str.
             "cpu" or "gpu" or "tpu".
 
@@ -132,34 +132,42 @@ class GLM(Base):
         self.backend = backend
         self.beta_ = None
 
-    def compute_XB(self, X, beta=None, row_index=None):        
+    def compute_XB(self, X, beta=None, row_index=None):
         if beta is not None:
             if row_index is None:
                 return mo.safe_sparse_dot(X, beta, backend=self.backend)
 
-            return mo.safe_sparse_dot(X[row_index, :], beta, backend=self.backend)
+            return mo.safe_sparse_dot(
+                X[row_index, :], beta, backend=self.backend
+            )
 
         # self.beta_ is None in this case
         if row_index is None:
             return mo.safe_sparse_dot(X, self.beta_, backend=self.backend)
 
-        return mo.safe_sparse_dot(X[row_index, :], self.beta_, backend=self.backend)
+        return mo.safe_sparse_dot(
+            X[row_index, :], self.beta_, backend=self.backend
+        )
 
     def compute_XB2(self, X, beta=None, row_index=None):
         def f00(X):
             return mo.safe_sparse_dot(X, self.beta_, backend=self.backend)
 
         def f01(X):
-            return mo.safe_sparse_dot(X[row_index, :], self.beta_, backend=self.backend)
+            return mo.safe_sparse_dot(
+                X[row_index, :], self.beta_, backend=self.backend
+            )
 
         def f11(X):
-            return mo.safe_sparse_dot(X[row_index, :], beta, backend=self.backend)
+            return mo.safe_sparse_dot(
+                X[row_index, :], beta, backend=self.backend
+            )
 
         def f10(X):
             if self.backend != "cpu":
                 raise NotImplementedError(
-                "GLM.compute_XB is only implemented for backend='cpu'"
-            )
+                    "GLM.compute_XB is only implemented for backend='cpu'"
+                )
             return mo.safe_sparse_dot(X, beta, backend=self.backend)
 
         h_result = {"00": f00, "01": f01, "11": f11, "10": f10}

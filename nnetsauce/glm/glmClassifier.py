@@ -10,10 +10,12 @@ from ..utils import misc as mx
 from sklearn.base import ClassifierMixin
 from ..optimizers import Optimizer
 from scipy.special import logsumexp, expit, erf
-try: 
+
+try:
     import jax.numpy as jnp
 except ImportError:
     pass
+
 
 class GLMClassifier(GLM, ClassifierMixin):
     """Generalized 'linear' models using quasi-randomized networks (classification)
@@ -76,7 +78,7 @@ class GLMClassifier(GLM, ClassifierMixin):
 
         optimizer: object
             optimizer, from class nnetsauce.Optimizer
-        
+
         backend: str.
             "cpu" or "gpu" or "tpu".
 

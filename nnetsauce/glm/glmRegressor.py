@@ -9,7 +9,8 @@ from .glm import GLM
 from ..utils import matrixops as mo
 from sklearn.base import RegressorMixin
 from ..optimizers import Optimizer
-try: 
+
+try:
     import jax.numpy as jnp
 except ImportError:
     pass
@@ -83,7 +84,7 @@ class GLMRegressor(GLM, RegressorMixin):
 
         optimizer: object
             optimizer, from class nnetsauce.utils.Optimizer
-        
+
         backend: str.
             "cpu" or "gpu" or "tpu".
 
