@@ -623,6 +623,9 @@ class MTS(Base):
     def partial_fit(self, X, xreg=None, **kwargs):
         """Update the model with new observations X, with optional regressors xreg
 
+        This is essentially a copy of fit() but uses partial_fit() on the underlying models
+        when available, otherwise falls back to fit().
+
         Parameters:
 
         X: {array-like}, shape = [n_samples, n_features]
@@ -640,25 +643,303 @@ class MTS(Base):
 
         self: object
         """
-
-        assert self.df_ is not None, "fit() must be called before partial_fit()"
-
-        if (isinstance(X, pd.DataFrame) is False) and isinstance(
-            X, pd.Series
-        ) is False:
-            if len(X.shape) == 1:
-                X = X.reshape(1, -1)
-
+        
+        # Check if this is the first call (no previous fit)
+        first_fit = self.df_ is None
+        
+        if first_fit:
+            # First time: use regular fit
             return self.fit(X, xreg, **kwargs)
+        
+        # === Copy of fit() method with partial_fit modifications ===
+        
+        try:
+            self.init_n_series_ = X.shape[1]
+        except IndexError as e:
+            self.init_n_series_ = 1
 
-        else:
-            if len(X.shape) == 1:
-                X = pd.DataFrame(
-                    X.values.reshape(1, -1), columns=self.df_.columns
+        # Automatic lag selection if requested (same as fit)
+        if isinstance(self.lags, str):
+            max_lags = min(25, X.shape[0] // 4)
+            best_ic = float("inf")
+            best_lags = 1
+
+            if self.verbose:
+                print(f"\nSelecting optimal number of lags using {self.lags}...")
+                iterator = tqdm(range(1, max_lags + 1))
+            else:
+                iterator = range(1, max_lags + 1)
+
+            for lag in iterator:
+                # Convert DataFrame to numpy array before reversing
+                if isinstance(X, pd.DataFrame):
+                    X_values = X.values[::-1]
+                else:
+                    X_values = X[::-1]
+
+                # Try current lag value
+                if self.init_n_series_ > 1:
+                    mts_input = ts.create_train_inputs(X_values, lag)
+                else:
+                    mts_input = ts.create_train_inputs(X_values.reshape(-1, 1), lag)
+
+                # Cook training set and fit model
+                dummy_y, scaled_Z = self.cook_training_set(
+                    y=np.ones(mts_input[0].shape[0]), X=mts_input[1]
+                )
+                residuals_ = []
+
+                for i in range(self.init_n_series_):
+                    y_mean = np.mean(mts_input[0][:, i])
+                    centered_y_i = mts_input[0][:, i] - y_mean
+                    self.obj.fit(X=scaled_Z, y=centered_y_i)
+                    residuals_.append(
+                        (centered_y_i - self.obj.predict(scaled_Z)).tolist()
+                    )
+
+                self.residuals_ = np.asarray(residuals_).T
+                ic = self._compute_information_criterion(
+                    curr_lags=lag, criterion=self.lags
                 )
 
-            return self.fit(X, xreg, **kwargs)
+                if self.verbose:
+                    print(f"Trying lags={lag}, {self.lags}={ic:.2f}")
 
+                if ic < best_ic:
+                    best_ic = ic
+                    best_lags = lag
+
+            if self.verbose:
+                print(f"\nSelected {best_lags} lags with {self.lags}={best_ic:.2f}")
+
+            self.lags = best_lags
+
+        # Data preprocessing (same as fit)
+        if isinstance(X, pd.DataFrame) is False:
+            # input data set is a numpy array
+            if xreg is None:
+                X = pd.DataFrame(X)
+                self.series_names = ["series" + str(i) for i in range(X.shape[1])]
+            else:
+                # xreg is not None
+                X = mo.cbind(X, xreg)
+                self.xreg_ = xreg
+        else:  # input data set is a DataFrame with column names
+            X_index = None
+            if X.index is not None:
+                X_index = X.index
+            if xreg is None:
+                X = copy.deepcopy(mo.convert_df_to_numeric(X))
+            else:
+                X = copy.deepcopy(mo.cbind(mo.convert_df_to_numeric(X), xreg))
+                self.xreg_ = xreg
+            if X_index is not None:
+                X.index = X_index
+            self.series_names = X.columns.tolist()
+
+        # Data concatenation (same as fit)
+        if isinstance(X, pd.DataFrame):
+            if self.df_ is None:
+                self.df_ = X
+                X = X.values
+            else:
+                input_dates_prev = pd.DatetimeIndex(self.df_.index.values)
+                frequency = pd.infer_freq(input_dates_prev)
+                self.df_ = pd.concat([self.df_, X], axis=0)
+                self.input_dates = pd.date_range(
+                    start=input_dates_prev[0],
+                    periods=len(input_dates_prev) + X.shape[0],
+                    freq=frequency,
+                ).values.tolist()
+                self.df_.index = self.input_dates
+                X = self.df_.values
+            self.df_.columns = self.series_names
+        else:
+            if self.df_ is None:
+                self.df_ = pd.DataFrame(X, columns=self.series_names)
+            else:
+                self.df_ = pd.concat(
+                    [self.df_, pd.DataFrame(X, columns=self.series_names)],
+                    axis=0,
+                )
+
+        self.input_dates = ts.compute_input_dates(self.df_)
+
+        try:
+            # multivariate time series
+            n, p = X.shape
+        except:
+            # univariate time series
+            n = X.shape[0]
+            p = 1
+        self.n_obs_ = n
+
+        rep_1_n = np.repeat(1, n)
+
+        self.y_ = None
+        self.X_ = None
+        self.n_series = p
+        # NOTE: Don't clear fit_objs_ and y_means_ for partial_fit
+        # self.fit_objs_.clear()  # REMOVED for partial_fit
+        # self.y_means_.clear()   # REMOVED for partial_fit
+        residuals_ = []
+        self.residuals_ = None
+        self.residuals_sims_ = None
+        self.kde_ = None
+        self.sims_ = None
+        self.scaled_Z_ = None
+        self.centered_y_is_ = []
+
+        if self.init_n_series_ > 1:
+            # multivariate time series
+            mts_input = ts.create_train_inputs(X[::-1], self.lags)
+        else:
+            # univariate time series
+            mts_input = ts.create_train_inputs(X.reshape(-1, 1)[::-1], self.lags)
+
+        self.y_ = mts_input[0]
+        self.X_ = mts_input[1]
+
+        dummy_y, scaled_Z = self.cook_training_set(y=rep_1_n, X=self.X_)
+        self.scaled_Z_ = scaled_Z
+
+        # loop on all the time series and adjust self.obj - MODIFIED for partial_fit
+        if self.verbose > 0:
+            print(f"\n Partially fitting {type(self.obj).__name__} to multivariate time series... \n")
+
+        if self.show_progress is True:
+            iterator = tqdm(range(self.init_n_series_))
+        else:
+            iterator = range(self.init_n_series_)
+
+        if self.type_pi in (
+            "gaussian",
+            "kde",
+            "bootstrap",
+            "block-bootstrap",
+        ) or self.type_pi.startswith("vine"):
+            for i in iterator:
+                y_mean = np.mean(self.y_[:, i])
+                self.y_means_[i] = y_mean
+                centered_y_i = self.y_[:, i] - y_mean
+                self.centered_y_is_.append(centered_y_i)
+                
+                # KEY CHANGE: Use partial_fit if available, otherwise fall back to fit
+                if hasattr(self.fit_objs_[i], 'partial_fit'):
+                    try:
+                        self.fit_objs_[i].partial_fit(X=scaled_Z, y=centered_y_i)
+                    except Exception as e:
+                        if self.verbose > 0:
+                            print(f"partial_fit failed for series {i}, using fit(): {e}")
+                        self.fit_objs_[i].fit(X=scaled_Z, y=centered_y_i)
+                else:
+                    self.fit_objs_[i].fit(X=scaled_Z, y=centered_y_i)
+                
+                residuals_.append(
+                    (centered_y_i - self.fit_objs_[i].predict(scaled_Z)).tolist()
+                )
+
+        if self.type_pi == "quantile":
+            for i in iterator:
+                y_mean = np.mean(self.y_[:, i])
+                self.y_means_[i] = y_mean
+                centered_y_i = self.y_[:, i] - y_mean
+                self.centered_y_is_.append(centered_y_i)
+                
+                # KEY CHANGE: Use partial_fit if available
+                if hasattr(self.fit_objs_[i], 'partial_fit'):
+                    try:
+                        self.fit_objs_[i].partial_fit(X=scaled_Z, y=centered_y_i)
+                    except Exception as e:
+                        if self.verbose > 0:
+                            print(f"partial_fit failed for series {i}, using fit(): {e}")
+                        self.fit_objs_[i].fit(X=scaled_Z, y=centered_y_i)
+                else:
+                    self.fit_objs_[i].fit(X=scaled_Z, y=centered_y_i)
+
+        if self.type_pi.startswith("scp"):
+            # split conformal prediction
+            for i in iterator:
+                n_y = self.y_.shape[0]
+                n_y_half = n_y // 2
+                first_half_idx = range(0, n_y_half)
+                second_half_idx = range(n_y_half, n_y)
+                y_mean_temp = np.mean(self.y_[first_half_idx, i])
+                centered_y_i_temp = self.y_[first_half_idx, i] - y_mean_temp
+                
+                # KEY CHANGE: Use partial_fit if available for first half
+                if hasattr(self.fit_objs_[i], 'partial_fit'):
+                    try:
+                        self.fit_objs_[i].partial_fit(X=scaled_Z[first_half_idx, :], y=centered_y_i_temp)
+                    except Exception as e:
+                        if self.verbose > 0:
+                            print(f"partial_fit failed for series {i} (first half), using fit(): {e}")
+                        self.fit_objs_[i].fit(X=scaled_Z[first_half_idx, :], y=centered_y_i_temp)
+                else:
+                    self.fit_objs_[i].fit(X=scaled_Z[first_half_idx, :], y=centered_y_i_temp)
+                
+                # calibrated residuals actually
+                residuals_.append(
+                    (
+                        self.y_[second_half_idx, i]
+                        - (y_mean_temp + self.fit_objs_[i].predict(scaled_Z[second_half_idx, :]))
+                    ).tolist()
+                )
+                
+                # fit on the second half
+                y_mean = np.mean(self.y_[second_half_idx, i])
+                self.y_means_[i] = y_mean
+                centered_y_i = self.y_[second_half_idx, i] - y_mean
+                
+                # KEY CHANGE: Use partial_fit if available for second half
+                if hasattr(self.fit_objs_[i], 'partial_fit'):
+                    try:
+                        self.fit_objs_[i].partial_fit(X=scaled_Z[second_half_idx, :], y=centered_y_i)
+                    except Exception as e:
+                        if self.verbose > 0:
+                            print(f"partial_fit failed for series {i} (second half), using fit(): {e}")
+                        self.fit_objs_[i].fit(X=scaled_Z[second_half_idx, :], y=centered_y_i)
+                else:
+                    self.fit_objs_[i].fit(X=scaled_Z[second_half_idx, :], y=centered_y_i)
+
+        # Rest of the method is identical to fit()
+        self.residuals_ = np.asarray(residuals_).T
+
+        if self.type_pi == "gaussian":
+            self.gaussian_preds_std_ = np.std(self.residuals_, axis=0)
+
+        if self.type_pi.startswith("scp2"):
+            # Calculate mean and standard deviation for each column
+            data_mean = np.mean(self.residuals_, axis=0)
+            self.residuals_std_dev_ = np.std(self.residuals_, axis=0)
+            # Center and scale the array using broadcasting
+            self.residuals_ = (
+                self.residuals_ - data_mean[np.newaxis, :]
+            ) / self.residuals_std_dev_[np.newaxis, :]
+
+        if self.replications != None and "kde" in self.type_pi:
+            if self.verbose > 0:
+                print(f"\n Simulate residuals using {self.kernel} kernel... \n")
+            assert self.kernel in (
+                "gaussian",
+                "tophat",
+            ), "currently, 'kernel' must be either 'gaussian' or 'tophat'"
+            kernel_bandwidths = {"bandwidth": np.logspace(-6, 6, 150)}
+            grid = GridSearchCV(
+                KernelDensity(kernel=self.kernel, **kwargs),
+                param_grid=kernel_bandwidths,
+            )
+            grid.fit(self.residuals_)
+
+            if self.verbose > 0:
+                print(
+                    f"\n Best parameters for {self.kernel} kernel: {grid.best_params_} \n"
+                )
+
+            self.kde_ = grid.best_estimator_
+
+        return self
+    
     def _predict_quantiles(self, h, quantiles, **kwargs):
         """Predict arbitrary quantiles from simulated paths."""
         # Ensure output dates are set

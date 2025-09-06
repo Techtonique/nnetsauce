@@ -391,10 +391,7 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
 
         Returns:
             self: object
-        """
-        
-        import numpy as np
-        
+        """        
         # Input validation
         X = np.asarray(X)
         y = np.asarray(y)
