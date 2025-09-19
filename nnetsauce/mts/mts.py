@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import sklearn.metrics as skm2
 import matplotlib.pyplot as plt
+import warnings 
 from collections import namedtuple
 from copy import deepcopy
 from functools import partial
@@ -832,7 +833,8 @@ class MTS(Base):
                         if self.verbose > 0:
                             print(f"partial_fit failed for series {i}, using fit(): {e}")
                         self.fit_objs_[i].fit(X=scaled_Z, y=centered_y_i)
-                else:
+                else:                    
+                    warnings.warn(f"partial_fit failed for series {i}, falling back to fit(): {e}", RuntimeWarning)
                     self.fit_objs_[i].fit(X=scaled_Z, y=centered_y_i)
                 
                 residuals_.append(
