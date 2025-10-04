@@ -13,6 +13,7 @@ from ..nonconformist import IcpRegressor
 from ..nonconformist import RegressorNc
 from ..nonconformist import RegressorNormalizer, AbsErrorErrFunc
 from ..utils import Progbar
+from ..simulation import simulate_replications
 
 
 class PredictionInterval(BaseEstimator, RegressorMixin):
@@ -32,12 +33,14 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             equivalent to a miscoverage error of 5 (%)
 
         replications: an integer;
-            Number of replications for simulated conformal (default is `None`),
-            for type_pi = "bootstrap" or "kde"
+            Number of replications for simulated conformal (default is `None`)            
 
         type_pi: a string;
             type of prediction interval: currently `None`
-            (split conformal without simulation), "kde" or "bootstrap"
+            (split conformal without simulation)
+            for type_pi in: 
+                - 'bootstrap': Bootstrap resampling.
+                - 'kde': Kernel Density Estimation.
 
         type_split: a string;
             "random" (random split of data) or "sequential" (sequential split of data)
@@ -214,6 +217,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                     return pred
 
             else:  # self.method == "splitconformal" and if self.replications is not None, type_pi must be used
+                raise NotImplementedError
 
                 if self.type_pi is None:
                     self.type_pi = "kde"
@@ -225,8 +229,8 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
 
                 assert self.type_pi in (
                     "bootstrap",
-                    "kde",
-                ), "`self.type_pi` must be in ('bootstrap', 'kde')"
+                    "kde", "normal", "ecdf", "permutation", "smooth-bootstrap"
+                ), "`self.type_pi` must be in ('bootstrap', 'kde', 'normal', 'ecdf', 'permutation', 'smooth-bootstrap')"
 
                 if self.type_pi == "bootstrap":
                     np.random.seed(self.seed)
@@ -258,6 +262,25 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                             * self.kde_.resample(
                                 size=X.shape[0], seed=self.seed + i
                             ).ravel()
+                            for i in range(self.replications)
+                        ]
+                    ).T
+                else: # self.type_pi == "normal" or "ecdf" or "permutation" or "smooth-bootstrap"                    
+
+                    self.residuals_sims_ = np.asarray(
+                        simulate_replications(
+                            data=self.scaled_calibrated_residuals_,
+                            method=self.type_pi,
+                            num_replications=self.replications,
+                            n_obs=X.shape[0],
+                            seed=self.seed,
+                        )
+                    ).T
+                    self.sims_ = np.asarray(
+                        [
+                            pred
+                            + self.calibrated_residuals_scaler_.scale_[0]
+                            * self.residuals_sims_[:, i].ravel()
                             for i in range(self.replications)
                         ]
                     ).T

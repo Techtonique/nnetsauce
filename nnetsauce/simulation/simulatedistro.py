@@ -5,7 +5,9 @@ from scipy.stats import gaussian_kde, norm
 from scipy.interpolate import interp1d
 
 
-def simulate_distribution(data, method="bootstrap", num_samples=1000, **kwargs):
+def simulate_distribution(data, method="bootstrap", 
+                          num_samples=1000, 
+                          seed=123, **kwargs):
     """
     Simulate the distribution of an input vector using various methods.
 
@@ -19,6 +21,7 @@ def simulate_distribution(data, method="bootstrap", num_samples=1000, **kwargs):
                       - 'permutation': Permutation resampling.
                       - 'smooth-bootstrap': Smoothed bootstrap with added noise.
         num_samples (int): Number of samples to generate.
+        seed (int): Random seed for reproducibility.
         kwargs: Additional parameters for specific methods:
                 - kde_bandwidth (str or float): Bandwidth for KDE ('scott', 'silverman', or float).
                 - dist (str): Parametric distribution type ('normal').
@@ -37,6 +40,8 @@ def simulate_distribution(data, method="bootstrap", num_samples=1000, **kwargs):
     ], f"Unknown method '{method}'. Choose from 'bootstrap', 'kde', 'parametric', 'ecdf', 'permutation', or 'smooth_bootstrap'."
 
     data = np.array(data)
+
+    np.random.seed(seed)
 
     if method == "bootstrap":
         simulated_data = np.random.choice(data, size=num_samples, replace=True)
@@ -84,7 +89,8 @@ def simulate_distribution(data, method="bootstrap", num_samples=1000, **kwargs):
 
 
 def simulate_replications(
-    data, method="kde", num_replications=10, n_obs=None, **kwargs
+    data, method="kde", num_replications=10, n_obs=None, 
+    seed=123, **kwargs
 ):
     """
     Create multiple replications of the input's distribution using a specified simulation method.
@@ -101,6 +107,7 @@ def simulate_replications(
         num_samples (int): Number of samples in each replication.
         num_replications (int): Number of replications to generate.
         n_obs (int): Number of observations to generate for each replication.
+        seed (int): Random seed for reproducibility.
         kwargs: Additional parameters for specific methods.
 
     Returns:
@@ -113,7 +120,8 @@ def simulate_replications(
 
     for _ in range(num_replications):
         simulated_data = simulate_distribution(
-            data, method=method, num_samples=num_samples, **kwargs
+            data, method=method, num_samples=num_samples, seed=seed, 
+            **kwargs
         )
         replications.append(simulated_data)
 

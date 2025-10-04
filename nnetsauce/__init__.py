@@ -1,3 +1,4 @@
+from .attention import AttentionMechanism
 from .base.base import Base
 from .base.baseRegressor import BaseRegressor
 from .boosting.adaBoostClassifier import AdaBoostClassifier
@@ -42,6 +43,7 @@ from .votingregressor import MedianVotingRegressor
 
 __all__ = [
     "AdaBoostClassifier",
+    "AttentionMechanism",
     "Base",
     "BaseRegressor",
     "BayesianRVFLRegressor",
