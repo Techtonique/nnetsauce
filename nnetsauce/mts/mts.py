@@ -1430,14 +1430,20 @@ class MTS(Base):
                 index=self.output_dates_,
             )
 
+            # Use Bayesian std if available, otherwise use gaussian residual std
+            if "return_std" in kwargs and len(self.preds_std_) > 0:
+                preds_std_to_use = np.asarray(self.preds_std_)
+            else:
+                preds_std_to_use = self.gaussian_preds_std_
+
             self.lower_ = pd.DataFrame(
-                self.mean_.values - pi_multiplier * self.gaussian_preds_std_,
+                self.mean_.values - pi_multiplier * preds_std_to_use,
                 columns=self.series_names,  # self.df_.columns,
                 index=self.output_dates_,
             )
 
             self.upper_ = pd.DataFrame(
-                self.mean_.values + pi_multiplier * self.gaussian_preds_std_,
+                self.mean_.values + pi_multiplier * preds_std_to_use,
                 columns=self.series_names,  # self.df_.columns,
                 index=self.output_dates_,
             )

@@ -13,7 +13,7 @@ from time import time
 
 print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
-subprocess.check_call([sys.executable, "-m", "pip", "install", "statsmodels"])
+#subprocess.check_call([sys.executable, "-m", "pip", "install", "statsmodels"])
 from statsmodels.stats.diagnostic import acorr_ljungbox
 
 np.random.seed(1235)
@@ -49,6 +49,7 @@ print("\n")
 print(obj_MTS.predict(h=5, return_std=True))
 # print(f" stats.describe(obj_MTS.residuals_, axis=0, bias=False) \n {stats.describe(obj_MTS.residuals_, axis=0, bias=False)} ")
 # print([acorr_ljungbox(obj_MTS.residuals_[:,i], boxpierce=True, auto_lag=True, return_df=True) for i in range(obj_MTS.residuals_.shape[1])])
+obj_MTS.plot()
 
 print(f"\n 2. fit ARDRegression: ------- \n")
 
@@ -64,6 +65,7 @@ print(obj_MTS2.kde_)
 print("\n\n")
 print(obj_MTS2.predict(h=5, return_std=True))
 print("\n\n")
+obj_MTS2.plot()
 
 print(f"\n 3. fit ElasticNet: ------- \n")
 
