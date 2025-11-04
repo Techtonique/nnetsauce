@@ -26,6 +26,7 @@ from .neuralnet.neuralnetregression import NeuralNetRegressor
 from .neuralnet.neuralnetclassification import NeuralNetClassifier
 from .optimizers.optimizer import Optimizer
 from .predictioninterval import PredictionInterval
+from .predictionset import PredictionSet
 from .quantile.quantileregression import QuantileRegressor
 from .quantile.quantileclassification import QuantileClassifier
 from .randombag.randomBagClassifier import RandomBagClassifier
@@ -72,6 +73,7 @@ __all__ = [
     "NeuralNetRegressor",
     "NeuralNetClassifier",
     "PredictionInterval",
+    "PredictionSet",
     "SimpleMultitaskClassifier",
     "Optimizer",
     "QuantileRegressor",

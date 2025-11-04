@@ -85,7 +85,7 @@ xreg_test = pd.DataFrame(
 
 # Fit model
 model = ns.MTS(RidgeCV(alphas=10**np.linspace(-3, 3, 100)), 
-               replications=100,
+               replications=5,
                lags=25,
                type_pi="scp2-kde",
                kernel='gaussian',

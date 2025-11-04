@@ -1402,6 +1402,8 @@ class MTS(Base):
 
             res = DescribeResult(self.mean_, self.lower_, self.upper_)
 
+            print("\n res", res)
+
             if self.xreg_ is not None:
                 if len(self.xreg_.shape) > 1:
                     res2 = mx.tuple_map(
@@ -1450,6 +1452,8 @@ class MTS(Base):
 
             res = DescribeResult(self.mean_, self.lower_, self.upper_)
 
+            print("\n res", res)
+
             if self.xreg_ is not None:
                 if len(self.xreg_.shape) > 1:
                     res2 = mx.tuple_map(
@@ -1477,6 +1481,8 @@ class MTS(Base):
             )
 
             res = DescribeResult(self.mean_)
+
+            print("\n res", res)
 
             if self.xreg_ is not None:
                 if len(self.xreg_.shape) > 1:
