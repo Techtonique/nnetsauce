@@ -39,12 +39,16 @@ from ..utils import TimeSeriesSplit
 
 
 class ClassicalMTS(Base):
-    """Multivariate time series (FactorMTS) forecasting with Factor models
+    """Time series with statistical models (statsmodels), mostly for benchmarks
 
     Parameters:
 
         model: type of model: str.
             currently, 'VAR', 'VECM', 'ARIMA', 'ETS', 'Theta'
+            Default is None 
+        
+        obj: object 
+            A time series model from statsmodels
 
     Attributes:
 
@@ -60,21 +64,25 @@ class ClassicalMTS(Base):
 
     # construct the object -----
 
-    def __init__(self, model="VAR"):
+    def __init__(self, model="VAR", obj=None):
 
-        self.model = model
-        if self.model == "VAR":
-            self.obj = VAR
-        elif self.model == "VECM":
-            self.obj = VECM
-        elif self.model == "ARIMA":
-            self.obj = ARIMA
-        elif self.model == "ETS":
-            self.obj = ExponentialSmoothing
-        elif self.model == "Theta":
-            self.obj = ThetaModel
-        else:
-            raise ValueError("model not recognized")
+        if obj is not None: 
+            self.model = None 
+            self.obj = obj 
+        else: 
+            self.model = model
+            if self.model == "VAR":
+                self.obj = VAR
+            elif self.model == "VECM":
+                self.obj = VECM
+            elif self.model == "ARIMA":
+                self.obj = ARIMA
+            elif self.model == "ETS":
+                self.obj = ExponentialSmoothing
+            elif self.model == "Theta":
+                self.obj = ThetaModel
+            else:
+                raise ValueError("model not recognized")
         self.n_series = None
         self.replications = None
         self.mean_ = None
@@ -88,7 +96,7 @@ class ClassicalMTS(Base):
         self.level_ = None
 
     def fit(self, X, **kwargs):
-        """Fit FactorMTS model to training data X, with optional regressors xreg
+        """Fit ClassicalMTS model to training data X, with optional regressors xreg
 
         Parameters:
 
@@ -146,9 +154,17 @@ class ClassicalMTS(Base):
             self.df_ = pd.DataFrame(X, columns=self.series_names)
 
         if self.model == "Theta":
-            self.obj = self.obj(self.df_, **kwargs).fit()
+            try: 
+                self.obj = self.obj(self.df_, **kwargs).fit()
+            except Exception as e:
+                self.obj = self.obj(self.df_.values, **kwargs).fit()              
+            self.residuals_ = None 
         else:
-            self.obj = self.obj(X, **kwargs).fit(**kwargs)
+            self.obj = self.obj(X, **kwargs).fit()
+            try: 
+                self.residuals_ = self.obj.resid 
+            except Exception as e: # Theta
+                self.residuals_ = None             
 
         return self
 
@@ -170,17 +186,11 @@ class ClassicalMTS(Base):
         """
 
         self.output_dates_, frequency = ts.compute_output_dates(self.df_, h)
-
         self.level_ = level
-
         self.lower_ = None  # do not remove (/!\)
-
         self.upper_ = None  # do not remove (/!\)
-
         self.sims_ = None  # do not remove (/!\)
-
         self.level_ = level
-
         self.alpha_ = 100 - level
 
         pi_multiplier = norm.ppf(1 - self.alpha_ / 200)
@@ -190,53 +200,112 @@ class ClassicalMTS(Base):
             "DescribeResult", ("mean", "lower", "upper")
         )
 
-        if self.model == "VAR":
-            mean_forecast, lower_bound, upper_bound = (
-                self.obj.forecast_interval(
-                    self.obj.endog, steps=h, alpha=self.alpha_ / 100, **kwargs
+        if self.obj is not None: # try all the special cases of the else section (there's probably a better way)
+
+            try: 
+
+                mean_forecast, lower_bound, upper_bound = (
+                    self.obj.forecast_interval(
+                        self.obj.endog, steps=h, alpha=self.alpha_ / 100, **kwargs
+                    )
                 )
-            )
+            
+            except Exception as e: 
 
-        elif self.model == "VECM":
-            forecast_result = self.obj.predict(steps=h)
-            mean_forecast = forecast_result
-            lower_bound, upper_bound = self._compute_confidence_intervals(
-                forecast_result, alpha=self.alpha_ / 100, **kwargs
-            )
+                try: 
 
-        elif self.model == "ARIMA":
-            forecast_result = self.obj.get_forecast(steps=h)
-            mean_forecast = forecast_result.predicted_mean
-            lower_bound = forecast_result.conf_int()[:, 0]
-            upper_bound = forecast_result.conf_int()[:, 1]
+                    forecast_result = self.obj.predict(steps=h)
+                    mean_forecast = forecast_result
+                    lower_bound, upper_bound = self._compute_confidence_intervals(
+                        forecast_result, alpha=self.alpha_ / 100, **kwargs
+                    )
+                
+                except Exception as e: 
 
-        elif self.model == "ETS":
-            forecast_result = self.obj.forecast(steps=h)
-            residuals = self.obj.resid
-            std_errors = np.std(residuals)
-            mean_forecast = forecast_result
-            lower_bound = forecast_result - pi_multiplier * std_errors
-            upper_bound = forecast_result + pi_multiplier * std_errors
+                    try: 
 
-        elif self.model == "Theta":
-            try:
-                mean_forecast = self.obj.forecast(steps=h).values
-                forecast_result = self.obj.prediction_intervals(
-                    steps=h, alpha=self.alpha_ / 100, **kwargs
+                        forecast_result = self.obj.get_forecast(steps=h)
+                        mean_forecast = forecast_result.predicted_mean
+                        lower_bound = forecast_result.conf_int()[:, 0]
+                        upper_bound = forecast_result.conf_int()[:, 1]
+                    
+                    except Exception as e:
+
+                        try:
+
+                            forecast_result = self.obj.forecast(steps=h)
+                            residuals = self.obj.resid
+                            std_errors = np.std(residuals)
+                            mean_forecast = forecast_result
+                            lower_bound = forecast_result - pi_multiplier * std_errors
+                            upper_bound = forecast_result + pi_multiplier * std_errors 
+                        
+                        except Exception as e:
+
+                            try:
+                                mean_forecast = self.obj.forecast(steps=h).values
+                                forecast_result = self.obj.prediction_intervals(
+                                    steps=h, alpha=self.alpha_ / 100, **kwargs
+                                )
+                                lower_bound = forecast_result["lower"].values
+                                upper_bound = forecast_result["upper"].values
+                            except Exception:
+                                mean_forecast = self.obj.forecast(steps=h)
+                                forecast_result = self.obj.prediction_intervals(
+                                    steps=h, alpha=self.alpha_ / 100, **kwargs
+                                )
+                                lower_bound = forecast_result["lower"]
+                                upper_bound = forecast_result["upper"]
+
+        else: 
+
+            if self.model == "VAR":
+                mean_forecast, lower_bound, upper_bound = (
+                    self.obj.forecast_interval(
+                        self.obj.endog, steps=h, alpha=self.alpha_ / 100, **kwargs
+                    )
                 )
-                lower_bound = forecast_result["lower"].values
-                upper_bound = forecast_result["upper"].values
-            except Exception:
-                mean_forecast = self.obj.forecast(steps=h)
-                forecast_result = self.obj.prediction_intervals(
-                    steps=h, alpha=self.alpha_ / 100, **kwargs
+
+            elif self.model == "VECM":
+                forecast_result = self.obj.predict(steps=h)
+                mean_forecast = forecast_result
+                lower_bound, upper_bound = self._compute_confidence_intervals(
+                    forecast_result, alpha=self.alpha_ / 100, **kwargs
                 )
-                lower_bound = forecast_result["lower"]
-                upper_bound = forecast_result["upper"]
 
-        else:
+            elif self.model == "ARIMA":
+                forecast_result = self.obj.get_forecast(steps=h)
+                mean_forecast = forecast_result.predicted_mean
+                lower_bound = forecast_result.conf_int()[:, 0]
+                upper_bound = forecast_result.conf_int()[:, 1]
 
-            raise ValueError("model not recognized")
+            elif self.model == "ETS":
+                forecast_result = self.obj.forecast(steps=h)
+                residuals = self.obj.resid
+                std_errors = np.std(residuals)
+                mean_forecast = forecast_result
+                lower_bound = forecast_result - pi_multiplier * std_errors
+                upper_bound = forecast_result + pi_multiplier * std_errors
+
+            elif self.model == "Theta":
+                try:
+                    mean_forecast = self.obj.forecast(steps=h).values
+                    forecast_result = self.obj.prediction_intervals(
+                        steps=h, alpha=self.alpha_ / 100, **kwargs
+                    )
+                    lower_bound = forecast_result["lower"].values
+                    upper_bound = forecast_result["upper"].values
+                except Exception:
+                    mean_forecast = self.obj.forecast(steps=h)
+                    forecast_result = self.obj.prediction_intervals(
+                        steps=h, alpha=self.alpha_ / 100, **kwargs
+                    )
+                    lower_bound = forecast_result["lower"]
+                    upper_bound = forecast_result["upper"]
+
+            else:
+
+                raise ValueError("model not recognized")
 
         try:
             self.mean_ = pd.DataFrame(

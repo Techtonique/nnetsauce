@@ -1,6 +1,9 @@
 import subprocess
 
-subprocess.check_call(["uv", "pip", "install", "yfinance"])
+try:
+    subprocess.check_call(["uv", "pip", "install", "yfinance"])
+except Exception as e: 
+    subprocess.check_call(["pip", "install", "yfinance"])
 
 import numpy as np
 import yfinance as yf
