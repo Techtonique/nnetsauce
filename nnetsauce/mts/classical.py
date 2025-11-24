@@ -28,7 +28,7 @@ except ImportError:
     pass
 
 from tqdm import tqdm
-from ..base import Base
+from .mts import MTS
 from ..sampling import vinecopula_sample
 from ..simulation import getsims
 from ..utils import matrixops as mo
@@ -38,7 +38,7 @@ from ..utils import convert_df_to_numeric, coverage, winkler_score, mean_errors
 from ..utils import TimeSeriesSplit
 
 
-class ClassicalMTS(Base):
+class ClassicalMTS(MTS):
     """Time series with statistical models (statsmodels), mostly for benchmarks
 
     Parameters:

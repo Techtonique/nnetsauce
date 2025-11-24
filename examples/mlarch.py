@@ -29,7 +29,7 @@ history = ticker_data.history(period="1y")
 
 # Extract the 'Close' price series as a numpy array
 # You can choose 'Open', 'High', 'Low', or 'Close' depending on your needs
-stock_prices = history['Close'].values
+stock_prices = history['Close'].values[1:]
 
 print(f"Imported {len(stock_prices)} daily closing prices for {ticker_symbol}")
 print("First 5 prices:", stock_prices[:5])
@@ -41,11 +41,12 @@ y = stock_prices[:(n_points-h)]
 y_test = stock_prices[(n_points-h):] 
 n = len(y)
 level=90
-B=1000
+B=250
 
 plt.plot(stock_prices)
 
-mean_model = ns.MTS(GradientBoostingRegressor(random_state=42))
+mean_model = ns.MTS(GradientBoostingRegressor(random_state=42), 
+type_pi="gaussian")
 model_sigma = ns.MTS(GradientBoostingRegressor(random_state=42), 
                     lags=2, type_pi="scp2-kde",
                     replications=B)
@@ -61,36 +62,4 @@ objMLARCH.fit(y)
 
 preds = objMLARCH.predict(h=20, level=level)
 
-mean_f = preds.mean
-lower_bound = preds.lower
-upper_bound = preds.upper
-
-# Create a time index for the forecasts
-forecast_index = np.arange(len(y), len(y) + h)
-original_index = np.arange(len(y))
-
-# Plotting
-plt.figure(figsize=(12, 6))
-
-# Plot original series
-plt.plot(original_index, y, label='Original Series', color='blue')
-
-# Plot mean forecast
-plt.plot(forecast_index, mean_f, label='Mean Forecast', 
-         color='red', linestyle='--')
-
-# Plot true value
-plt.plot(forecast_index, y_test, label='True test value', 
-         color='green', linestyle='--')
-
-# Plot prediction intervals
-# Use the level from the results dictionary for the label
-plt.fill_between(forecast_index, lower_bound, upper_bound, color='orange', 
-                 alpha=0.3, label=f'{level}% Prediction Interval')
-
-plt.title('Time Series Forecasting')
-plt.xlabel('Time')
-plt.ylabel('Value')
-plt.legend()
-plt.grid(True)
-plt.show()
+print("preds", preds)
