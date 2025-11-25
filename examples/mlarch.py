@@ -1,93 +1,58 @@
-import subprocess
-
-subprocess.check_call(["uv", "pip", "install", "yfinance"])
-
-import numpy as np
-import yfinance as yf
+# ============================================================================
+# COMPLETE EXAMPLE: Stock Returns Modeling
+# ============================================================================
+import numpy as np 
+import pandas as pd
 import nnetsauce as ns 
-import matplotlib.pyplot as plt 
-from sklearn.linear_model import RidgeCV
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from sklearn.svm import SVR
-from sklearn.neighbors import KNeighborsRegressor
-from statsmodels.tsa.stattools import kpss
-from scipy import stats
+import numpy as np
+import pandas as pd
+from collections import namedtuple
+from scipy.stats import norm
+from sklearn.linear_model import Ridge, RidgeCV
+from nnetsauce import MTS, MLARCH
+import matplotlib.pyplot as plt
 
 
-# Define the ticker symbol
-ticker_symbol = "MSFT"  # Example: Apple Inc.
+log_returns = pd.read_csv("https://raw.githubusercontent.com/Techtonique/datasets/refs/heads/main/time_series/multivariate/log_returns.csv")
+log_returns.drop(columns=["Unnamed: 0"], inplace=True)
+log_returns.index = pd.date_range(start="2024-04-24", periods=len(log_returns), freq="B")
 
-# Get data for the ticker
-ticker_data = yf.Ticker(ticker_symbol)
+# Convert to log returns (stationary)
+print(f"Converted to {len(log_returns)} log returns")
+print(f"Returns: mean={np.mean(log_returns)}, std={np.std(log_returns)}")
 
-# Get the historical prices for a specific period (e.g., 1 year)
-# You can adjust the start and end dates as needed
-history = ticker_data.history(period="1y")
+# Train/test split
+h = 10  # Forecast horizon
+returns_train = log_returns[:-h]
+returns_test = log_returns[-h:]
 
-# Extract the 'Close' price series as a numpy array
-# You can choose 'Open', 'High', 'Low', or 'Close' depending on your needs
-stock_prices = history['Close'].values
+print(f"\nTrain: {len(returns_train)} returns, Test: {len(returns_test)} returns")
 
-print(f"Imported {len(stock_prices)} daily closing prices for {ticker_symbol}")
-print("First 5 prices:", stock_prices[:5])
-print("Last 5 prices:", stock_prices[-5:])
+# Create models with better regularization
+mean_model = MTS(obj=Ridge(alpha=0.1), lags=5)
+sigma_model = RidgeCV(alphas=[0.01, 0.1, 1.0, 10.0])  # Cross-validate
+resid_model = MTS(obj=Ridge(alpha=0.1), lags=3)
 
-n_points = len(stock_prices)
-h = 20
-y = stock_prices[:(n_points-h)] 
-y_test = stock_prices[(n_points-h):] 
-n = len(y)
-level=90
-B=1000
+# Fit MLARCH on returns
+mlarch = MLARCH(mean_model, sigma_model, resid_model, lags_vol=10)
+mlarch.fit(returns_train)
 
-plt.plot(stock_prices)
+print(f"\nModel fitted:")
+print(f"  Fitted volatility: {mlarch.fitted_volatility_mean_:.6f} ± {mlarch.fitted_volatility_std_:.6f}")
+print(f"  Standardized residuals: mean={mlarch.z_mean_:.6f}, std={mlarch.z_std_:.6f}")
 
-mean_model = ns.MTS(GradientBoostingRegressor(random_state=42))
-model_sigma = ns.MTS(GradientBoostingRegressor(random_state=42), 
-                    lags=2, type_pi="scp2-kde",
-                    replications=B)
-model_z = ns.MTS(GradientBoostingRegressor(random_state=42), 
-                    type_pi="scp2-kde",
-                    replications=B)
+# Predict returns
+forecast_returns = mlarch.predict(h=h, level=95, return_sims=False)
 
-objMLARCH = ns.MLARCH(model_mean = mean_model,
-                      model_sigma = model_sigma, 
-                      model_residuals = model_z)
+# Evaluate
+coverage_returns = np.mean((returns_test >= forecast_returns.lower) &
+                           (returns_test <= forecast_returns.upper))
 
-objMLARCH.fit(y)
+mae_returns = np.mean(np.abs(returns_test - forecast_returns.mean))
 
-preds = objMLARCH.predict(h=20, level=level)
-
-mean_f = preds.mean
-lower_bound = preds.lower
-upper_bound = preds.upper
-
-# Create a time index for the forecasts
-forecast_index = np.arange(len(y), len(y) + h)
-original_index = np.arange(len(y))
-
-# Plotting
-plt.figure(figsize=(12, 6))
-
-# Plot original series
-plt.plot(original_index, y, label='Original Series', color='blue')
-
-# Plot mean forecast
-plt.plot(forecast_index, mean_f, label='Mean Forecast', 
-         color='red', linestyle='--')
-
-# Plot true value
-plt.plot(forecast_index, y_test, label='True test value', 
-         color='green', linestyle='--')
-
-# Plot prediction intervals
-# Use the level from the results dictionary for the label
-plt.fill_between(forecast_index, lower_bound, upper_bound, color='orange', 
-                 alpha=0.3, label=f'{level}% Prediction Interval')
-
-plt.title('Time Series Forecasting')
-plt.xlabel('Time')
-plt.ylabel('Value')
-plt.legend()
-plt.grid(True)
-plt.show()
+print(f"\n{'='*60}")
+print(f"RESULTS")
+print(f"{'='*60}")
+print(f"Returns Coverage: {coverage_returns:.1%} (target: 95%)")
+print(f"MAE (returns):    {mae_returns:.6f}")
+print(f"\nForecast summary:")
