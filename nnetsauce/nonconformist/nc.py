@@ -158,7 +158,6 @@ class SignErrorErrFunc(RegressionErrFunc):
         return prediction - y
 
     def apply_inverse(self, nc, significance):
-
         err_high = -nc
         err_low = nc
 
@@ -263,7 +262,6 @@ class RegressorNormalizer(BaseScorer):
         self.normalizer_model.fit(x, log_err)
 
     def score(self, x, y=None):
-
         ######################################################################
         # Optional: use logarithmic function as in the original implementation
         # available in https://github.com/donlnz/nonconformist

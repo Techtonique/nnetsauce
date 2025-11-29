@@ -218,7 +218,6 @@ class DeepMTS(MTS):
         self.n_layers = int(n_layers)
 
         if self.n_layers > 1:
-
             for _ in range(self.n_layers - 1):
                 obj = CustomRegressor(
                     obj=deepcopy(obj),

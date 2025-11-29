@@ -403,9 +403,7 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
             )
 
         if self.preprocess is True:
-
             for name, model in tqdm(self.classifiers):  # do parallel exec
-
                 other_args = (
                     {}
                 )  # use this trick for `random_state` too --> refactor
@@ -549,7 +547,6 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
                         print(exception)
 
         else:  # no preprocessing
-
             for name, model in tqdm(self.classifiers):  # do parallel exec
                 start = time.time()
                 try:
@@ -706,7 +703,6 @@ class LazyDeepClassifier(Custom, ClassifierMixin):
         self.best_model_ = self.models_[scores.index[0]]
 
         if self.predictions is True:
-
             return scores, predictions
 
         return scores

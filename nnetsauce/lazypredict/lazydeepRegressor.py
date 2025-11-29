@@ -327,9 +327,9 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                     }
 
                     if self.custom_metric:
-                        scores_verbose[self.custom_metric.__name__] = (
-                            custom_metric
-                        )
+                        scores_verbose[
+                            self.custom_metric.__name__
+                        ] = custom_metric
 
                     print(scores_verbose)
                 if self.predictions:
@@ -352,7 +352,6 @@ class LazyDeepRegressor(Custom, RegressorMixin):
             ]
 
         if self.preprocess is True:
-
             for name, model in tqdm(self.regressors):  # do parallel exec
                 start = time.time()
                 try:
@@ -456,9 +455,9 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                         }
 
                         if self.custom_metric:
-                            scores_verbose[self.custom_metric.__name__] = (
-                                custom_metric
-                            )
+                            scores_verbose[
+                                self.custom_metric.__name__
+                            ] = custom_metric
 
                         print(scores_verbose)
                     if self.predictions:
@@ -469,7 +468,6 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                         print(exception)
 
         else:  # no preprocessing
-
             for name, model in tqdm(self.regressors):  # do parallel exec
                 start = time.time()
                 try:
@@ -569,9 +567,9 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                         }
 
                         if self.custom_metric:
-                            scores_verbose[self.custom_metric.__name__] = (
-                                custom_metric
-                            )
+                            scores_verbose[
+                                self.custom_metric.__name__
+                            ] = custom_metric
 
                         print(scores_verbose)
                     if self.predictions:
@@ -600,7 +598,6 @@ class LazyDeepRegressor(Custom, RegressorMixin):
         self.best_model_ = self.models_[scores.index[0]]
 
         if self.predictions is True:
-
             return scores, predictions
 
         return scores

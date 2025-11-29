@@ -78,7 +78,7 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
 
         beta_: {array-like}
             regression coefficients
-        
+
         coef_: {array-like}
             alias for `beta_`, regression coefficients
 
@@ -249,36 +249,36 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
 
     def partial_fit(self, X, y, learning_rate=0.01, decay=0.001, **kwargs):
         """Incrementally fit the Ridge model using SGD-style updates.
-        
+
         Uses the update rule: w_{n+1} = w_n + γ_n * x_n * [y_n - x_n^T * w_n] - γ_n * λ * w_n
         for online learning with individual samples.
 
         Args:
             X: {array-like}, shape = [n_samples, n_features]
                 Training vectors for this batch
-                
+
             y: array-like, shape = [n_samples]
                 Target values for this batch
-                
+
             learning_rate: float, default=0.01
                 Initial learning rate for SGD updates
-                
+
             decay: float, default=0.001
                 Learning rate decay parameter
-                
+
             **kwargs: additional parameters to be passed to self.cook_training_set
 
         Returns:
             self: object
         """
-        
+
         # Input validation
         X = np.asarray(X)
         y = np.asarray(y)
-        
+
         if X.shape[0] != y.shape[0]:
             raise ValueError("X and y must have the same number of samples")
-        
+
         # Handle first call
         if not self._is_fitted:
             # Initialize learning parameters
@@ -286,14 +286,14 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
             self.decay = decay
             self._step_count = 0
             self._is_fitted = True
-        
+
         # Process the batch
         centered_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
-        
+
         # Get dimensions
         n_samples, n_features_total = scaled_Z.shape
         n_original_features = X.shape[1]
-        
+
         # Determine feature dimensions for regularization
         if self.n_clusters > 0:
             if self.cluster_encode:
@@ -302,44 +302,52 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
                 n_direct_features = n_original_features + 1
         else:
             n_direct_features = n_original_features
-        
+
         # Initialize beta_ if first time
-        if not hasattr(self, 'beta_') or self.beta_ is None:
+        if not hasattr(self, "beta_") or self.beta_ is None:
             # For regression, beta_ is 1D (single output)
             self.beta_ = np.zeros(n_features_total)
-        
+
         # Precompute indices for regularization
         direct_indices = slice(0, n_direct_features)
         hidden_indices = slice(n_direct_features, n_features_total)
-        
+
         # Process each sample with SGD
         for i in range(n_samples):
             self._step_count += 1
-            
+
             # Current learning rate with decay
-            current_lr = self.initial_learning_rate / (1 + self.decay * self._step_count)
-            
+            current_lr = self.initial_learning_rate / (
+                1 + self.decay * self._step_count
+            )
+
             # Current sample and target
             x_i = scaled_Z[i, :]  # Feature vector
-            y_i = centered_y[i] if centered_y.ndim == 1 else centered_y[i, 0]  # Scalar target
-            
+            y_i = (
+                centered_y[i] if centered_y.ndim == 1 else centered_y[i, 0]
+            )  # Scalar target
+
             # Prediction: x_i^T * beta
             prediction = x_i @ self.beta_
-            
+
             # Error: y_i - prediction
             error = y_i - prediction
-            
+
             # Gradient update: current_lr * x_i * error
             gradient_update = current_lr * x_i * error
-            
+
             # Regularization terms (more efficient indexing)
             reg_update = np.zeros_like(self.beta_)
-            reg_update[direct_indices] = current_lr * self.lambda1 * self.beta_[direct_indices]
-            reg_update[hidden_indices] = current_lr * self.lambda2 * self.beta_[hidden_indices]
-            
+            reg_update[direct_indices] = (
+                current_lr * self.lambda1 * self.beta_[direct_indices]
+            )
+            reg_update[hidden_indices] = (
+                current_lr * self.lambda2 * self.beta_[hidden_indices]
+            )
+
             # Combined update: beta = beta + gradient_update - reg_update
             self.beta_ += gradient_update - reg_update
-        
+
         self.coef_ = self.beta_  # sklearn compatibility
-        
+
         return self

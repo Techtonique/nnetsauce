@@ -35,7 +35,6 @@ def bootstrap(x, h, block_size=None, seed=123):
         ndim = x.shape[1]
 
     if block_size is not None:
-
         num_blocks = (time_series_length + block_size - 1) // block_size
         all_indices = np.arange(time_series_length)
 
@@ -49,7 +48,6 @@ def bootstrap(x, h, block_size=None, seed=123):
             indices.extend(block_indices)
 
     else:  # block_size is None
-
         indices = np.random.choice(
             range(time_series_length), size=h, replace=True
         )
@@ -64,11 +62,51 @@ def bootstrap(x, h, block_size=None, seed=123):
 def compute_input_dates(df):
     input_dates = df.index.values
 
-    frequency = pd.infer_freq(pd.DatetimeIndex(input_dates))
+    # If index is not a DatetimeIndex, return as-is (no date conversion needed)
+    if not isinstance(df.index, pd.DatetimeIndex):
+        # For non-datetime indices, return a simple date range starting from today
+        # This maintains compatibility with the expected return type
+        n_dates = len(input_dates)
+        today = pd.Timestamp.today()
+        input_dates = pd.date_range(
+            start=today, periods=n_dates, freq="D"
+        ).values.tolist()
+        df_input_dates = pd.DataFrame({"date": input_dates})
+        return pd.to_datetime(df_input_dates["date"]).dt.date
 
-    input_dates = pd.date_range(
-        start=input_dates[0], periods=len(input_dates), freq=frequency
-    ).values.tolist()
+    # Check if we have at least 3 dates to infer frequency
+    if len(input_dates) >= 3:
+        try:
+            frequency = pd.infer_freq(pd.DatetimeIndex(input_dates))
+        except (ValueError, TypeError):
+            frequency = None
+    else:
+        # If fewer than 3 dates, try to get frequency from the index if it's a DatetimeIndex
+        try:
+            frequency = df.index.freq
+        except (AttributeError, TypeError):
+            frequency = None
+
+    # If frequency is available, use it to create date range
+    if frequency is not None:
+        input_dates = pd.date_range(
+            start=input_dates[0], periods=len(input_dates), freq=frequency
+        ).values.tolist()
+    else:
+        # If frequency cannot be inferred, use the dates as-is
+        if isinstance(input_dates[0], (pd.Timestamp, np.datetime64)):
+            input_dates = pd.to_datetime(input_dates).values.tolist()
+        else:
+            # If not datetime, create a simple date range
+            n_dates = len(input_dates)
+            start_date = (
+                pd.to_datetime(input_dates[0])
+                if len(input_dates) > 0
+                else pd.Timestamp.today()
+            )
+            input_dates = pd.date_range(
+                start=start_date, periods=n_dates, freq="D"
+            ).values.tolist()
 
     df_input_dates = pd.DataFrame({"date": input_dates})
 
@@ -106,7 +144,6 @@ def compute_output_dates(df, horizon):
 
 
 def coverage(obj, actual, level=95, per_series=False):
-
     alpha = 1 - level / 100
     lt = obj.lower
     ut = obj.upper
@@ -168,7 +205,6 @@ def reformat_response(X, k):
 
 
 def winkler_score(obj, actual, level=95, per_series=False):
-
     alpha = 1 - level / 100
     lt = obj.lower
     ut = obj.upper
@@ -205,7 +241,6 @@ def winkler_score(obj, actual, level=95, per_series=False):
 def mean_errors(
     pred, actual, scoring="root_mean_squared_error", per_series=False
 ):
-
     if isinstance(pred, pd.DataFrame):
         pred = pred.values
     elif isinstance(pred, tuple):
@@ -217,7 +252,6 @@ def mean_errors(
     diff = pred - actual
 
     if per_series == True:
-
         if scoring == "mean_error":
             return np.mean(diff, axis=0).tolist()
         if scoring == "mean_absolute_error":
@@ -239,7 +273,6 @@ def mean_errors(
             ]
 
     else:
-
         if scoring == "mean_error":
             return np.mean(diff)
         if scoring == "mean_absolute_error":

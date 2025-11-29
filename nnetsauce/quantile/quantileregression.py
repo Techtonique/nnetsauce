@@ -201,14 +201,12 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
         self.obj_ = clone(self.obj)
 
         if self.scoring in ("predictions", "residuals"):
-
             self.obj_.fit(X, y)
             base_predictions = self.obj_.predict(X)
             scoring_residuals = y - base_predictions
             self.scoring_residuals_ = scoring_residuals
 
         elif self.scoring == "conformal":
-
             X_train, X_calib, y_train, y_calib = train_test_split(
                 X, y, test_size=0.5, random_state=42
             )
@@ -222,7 +220,6 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
             base_predictions = self.obj_.predict(X_calib)
 
         elif self.scoring in ("studentized", "conformal-studentized"):
-
             # Calculate student multiplier
             if self.scoring == "conformal-studentized":
                 X_train, X_calib, y_train, y_calib = train_test_split(
@@ -251,9 +248,7 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
 
         # Fit each quantile sequentially
         for i, quantile in enumerate(self.quantiles):
-
             if self.scoring == "predictions":
-
                 multiplier = self._optimize_multiplier(
                     y=y,
                     base_predictions=base_predictions,
@@ -275,7 +270,6 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
                     current_predictions = current_predictions + offset
 
             elif self.scoring == "residuals":
-
                 multiplier = self._optimize_multiplier(
                     y=y,
                     base_predictions=base_predictions,
@@ -305,7 +299,6 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
                     current_predictions = current_predictions + offset
 
             elif self.scoring == "conformal":
-
                 multiplier = self._optimize_multiplier(
                     y=y_calib,
                     base_predictions=base_predictions,
@@ -335,7 +328,6 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
                     current_predictions = current_predictions + offset
 
             elif self.scoring in ("studentized", "conformal-studentized"):
-
                 multiplier = self._optimize_multiplier(
                     y=y_calib if self.scoring == "conformal-studentized" else y,
                     base_predictions=base_predictions,
@@ -376,7 +368,6 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
         all_predictions = []
 
         if self.scoring == "predictions":
-
             # Generate first quantile
             current_predictions = base_predictions - self.offset_multipliers_[
                 0
@@ -390,7 +381,6 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
                 all_predictions.append(current_predictions)
 
         elif self.scoring in ("residuals", "conformal"):
-
             # Generate first quantile
             current_predictions = base_predictions - self.offset_multipliers_[
                 0

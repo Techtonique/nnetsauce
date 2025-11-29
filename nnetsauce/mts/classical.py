@@ -45,9 +45,9 @@ class ClassicalMTS(MTS):
 
         model: type of model: str.
             currently, 'VAR', 'VECM', 'ARIMA', 'ETS', 'Theta'
-            Default is None 
-        
-        obj: object 
+            Default is None
+
+        obj: object
             A time series model from statsmodels
 
     Attributes:
@@ -65,11 +65,10 @@ class ClassicalMTS(MTS):
     # construct the object -----
 
     def __init__(self, model="VAR", obj=None):
-
-        if obj is not None: 
-            self.model = None 
-            self.obj = obj 
-        else: 
+        if obj is not None:
+            self.model = None
+            self.obj = obj
+        else:
             self.model = model
             if self.model == "VAR":
                 self.obj = VAR
@@ -120,7 +119,6 @@ class ClassicalMTS(MTS):
         if (isinstance(X, pd.DataFrame) is False) and isinstance(
             X, pd.Series
         ) is False:  # input data set is a numpy array
-
             X = pd.DataFrame(X)
             if self.n_series > 1:
                 self.series_names = [
@@ -130,7 +128,6 @@ class ClassicalMTS(MTS):
                 self.series_names = "series0"
 
         else:  # input data set is a DataFrame or Series with column names
-
             X_index = None
             if X.index is not None and len(X.shape) > 1:
                 X_index = X.index
@@ -154,17 +151,17 @@ class ClassicalMTS(MTS):
             self.df_ = pd.DataFrame(X, columns=self.series_names)
 
         if self.model == "Theta":
-            try: 
+            try:
                 self.obj = self.obj(self.df_, **kwargs).fit()
             except Exception as e:
-                self.obj = self.obj(self.df_.values, **kwargs).fit()              
-            self.residuals_ = None 
+                self.obj = self.obj(self.df_.values, **kwargs).fit()
+            self.residuals_ = None
         else:
             self.obj = self.obj(X, **kwargs).fit()
-            try: 
-                self.residuals_ = self.obj.resid 
-            except Exception as e: # Theta
-                self.residuals_ = None             
+            try:
+                self.residuals_ = self.obj.resid
+            except Exception as e:  # Theta
+                self.residuals_ = None
 
         return self
 
@@ -200,50 +197,54 @@ class ClassicalMTS(MTS):
             "DescribeResult", ("mean", "lower", "upper")
         )
 
-        if self.obj is not None: # try all the special cases of the else section (there's probably a better way)
-
-            try: 
-
-                mean_forecast, lower_bound, upper_bound = (
-                    self.obj.forecast_interval(
-                        self.obj.endog, steps=h, alpha=self.alpha_ / 100, **kwargs
-                    )
+        if (
+            self.obj is not None
+        ):  # try all the special cases of the else section (there's probably a better way)
+            try:
+                (
+                    mean_forecast,
+                    lower_bound,
+                    upper_bound,
+                ) = self.obj.forecast_interval(
+                    self.obj.endog, steps=h, alpha=self.alpha_ / 100, **kwargs
                 )
-            
-            except Exception as e: 
 
-                try: 
-
+            except Exception as e:
+                try:
                     forecast_result = self.obj.predict(steps=h)
                     mean_forecast = forecast_result
-                    lower_bound, upper_bound = self._compute_confidence_intervals(
+                    (
+                        lower_bound,
+                        upper_bound,
+                    ) = self._compute_confidence_intervals(
                         forecast_result, alpha=self.alpha_ / 100, **kwargs
                     )
-                
-                except Exception as e: 
 
-                    try: 
-
+                except Exception as e:
+                    try:
                         forecast_result = self.obj.get_forecast(steps=h)
                         mean_forecast = forecast_result.predicted_mean
                         lower_bound = forecast_result.conf_int()[:, 0]
                         upper_bound = forecast_result.conf_int()[:, 1]
-                    
+
                     except Exception as e:
-
                         try:
-
                             forecast_result = self.obj.forecast(steps=h)
                             residuals = self.obj.resid
                             std_errors = np.std(residuals)
                             mean_forecast = forecast_result
-                            lower_bound = forecast_result - pi_multiplier * std_errors
-                            upper_bound = forecast_result + pi_multiplier * std_errors 
-                        
-                        except Exception as e:
+                            lower_bound = (
+                                forecast_result - pi_multiplier * std_errors
+                            )
+                            upper_bound = (
+                                forecast_result + pi_multiplier * std_errors
+                            )
 
+                        except Exception as e:
                             try:
-                                mean_forecast = self.obj.forecast(steps=h).values
+                                mean_forecast = self.obj.forecast(
+                                    steps=h
+                                ).values
                                 forecast_result = self.obj.prediction_intervals(
                                     steps=h, alpha=self.alpha_ / 100, **kwargs
                                 )
@@ -257,13 +258,14 @@ class ClassicalMTS(MTS):
                                 lower_bound = forecast_result["lower"]
                                 upper_bound = forecast_result["upper"]
 
-        else: 
-
+        else:
             if self.model == "VAR":
-                mean_forecast, lower_bound, upper_bound = (
-                    self.obj.forecast_interval(
-                        self.obj.endog, steps=h, alpha=self.alpha_ / 100, **kwargs
-                    )
+                (
+                    mean_forecast,
+                    lower_bound,
+                    upper_bound,
+                ) = self.obj.forecast_interval(
+                    self.obj.endog, steps=h, alpha=self.alpha_ / 100, **kwargs
                 )
 
             elif self.model == "VECM":
@@ -304,7 +306,6 @@ class ClassicalMTS(MTS):
                     upper_bound = forecast_result["upper"]
 
             else:
-
                 raise ValueError("model not recognized")
 
         try:
@@ -646,7 +647,6 @@ class ClassicalMTS(MTS):
         )
 
         if isinstance(scoring, str):
-
             assert scoring in (
                 "root_mean_squared_error",
                 "mean_squared_error",
@@ -676,7 +676,6 @@ class ClassicalMTS(MTS):
                     )
 
         else:  # isinstance(scoring, str) = False
-
             err_func = scoring
 
         errors = []
@@ -697,7 +696,6 @@ class ClassicalMTS(MTS):
             iterator = zip(train_indices, test_indices)
 
         for train_index, test_index in iterator:
-
             if verbose == 1:
                 print(f"TRAIN: {train_index}")
                 print(f"TEST: {test_index}")

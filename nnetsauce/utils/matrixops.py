@@ -21,21 +21,15 @@ except ImportError:
 
 # column bind
 def cbind(x, y, backend="cpu"):
-
     if isinstance(x, pd.DataFrame) and isinstance(y, pd.DataFrame):
-
         return pd.concat([x, y], axis=1)
 
     else:  # x or y are numpy arrays
-
         if isinstance(x, pd.DataFrame) == False and isinstance(y, pd.DataFrame):
-
             if len(x.shape) == 1:
-
                 col_names = ["series0"] + y.columns.tolist()
 
             else:
-
                 col_names = [
                     "series" + str(i) for i in range(x.shape[1])
                 ] + y.columns.tolist()
@@ -43,7 +37,6 @@ def cbind(x, y, backend="cpu"):
             if backend in ("gpu", "tpu") and (
                 platform.system() in ("Linux", "Darwin")
             ):
-
                 res = jnp.column_stack((x.values, y))
 
                 return pd.DataFrame(res, columns=col_names)
@@ -53,13 +46,10 @@ def cbind(x, y, backend="cpu"):
             return pd.DataFrame(res, columns=col_names)
 
         if isinstance(x, pd.DataFrame) and isinstance(y, pd.DataFrame) == False:
-
             if len(y.shape) == 1:
-
                 col_names = x.columns.tolist() + ["series0"]
 
             else:
-
                 col_names = x.columns.tolist() + [
                     "series" + str(i) for i in range(x.shape[1])
                 ]
@@ -67,7 +57,6 @@ def cbind(x, y, backend="cpu"):
             if backend in ("gpu", "tpu") and (
                 platform.system() in ("Linux", "Darwin")
             ):
-
                 res = jnp.column_stack((x.values, y))
 
                 return pd.DataFrame(res, columns=col_names)
@@ -80,7 +69,6 @@ def cbind(x, y, backend="cpu"):
         if backend in ("gpu", "tpu") and (
             platform.system() in ("Linux", "Darwin")
         ):
-
             return jnp.column_stack((x, y))
 
         return np.column_stack((x, y))
@@ -98,7 +86,6 @@ def center_response(y, method="mean"):
 
 # cluster the covariates
 def cluster_covariates(X, n_clusters, seed, type_clust="kmeans", **kwargs):
-
     if isinstance(X, pd.DataFrame):
         if len(X.shape) == 1:
             X = pd.DataFrame(X.values.reshape(1, -1), columns=X.columns)
@@ -309,7 +296,6 @@ def safe_sparse_dot(a, b, backend="cpu", dense_output=False):
 # Obtain this for JAX
 # scale... covariates
 def scale_covariates(X, choice="std", scaler=None):
-
     if len(X.shape) == 1:
         if isinstance(X, pd.DataFrame):
             X = pd.DataFrame(X.values.reshape(1, -1), columns=X.columns)
@@ -318,7 +304,6 @@ def scale_covariates(X, choice="std", scaler=None):
 
     # online training (scaler is already fitted)
     if scaler is not None:
-
         try:
             scaler.partial_fit(X)
         except Exception as e:
@@ -344,7 +329,6 @@ def scale_covariates(X, choice="std", scaler=None):
         scaler = MaxAbsScaler()
 
     else:  # 'robust'
-
         if sparse.issparse(X):
             scaler = RobustScaler(
                 copy=True, with_centering=False, with_scaling=True

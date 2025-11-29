@@ -281,7 +281,6 @@ class Base(BaseEstimator):
             X = X.reshape(1, -1)
 
         if predict is False:  # encode training set
-
             # scale input data before clustering
             self.clustering_scaler_, scaled_X = mo.scale_covariates(
                 X, choice=self.type_scaling[2], scaler=self.clustering_scaler_
@@ -570,7 +569,6 @@ class Base(BaseEstimator):
             ), "must have len(self.type_scaling) >= 2 when self.n_hidden_features > 0"
 
         if X is None:
-
             if self.col_sample == 1:
                 input_X = self.X_
             else:
@@ -587,7 +585,6 @@ class Base(BaseEstimator):
                 input_X = self.X_[:, self.index_col_]
 
         else:  # X is not None # keep X vs self.X_
-
             if isinstance(X, pd.DataFrame):
                 X = copy.deepcopy(X.values.astype(float))
 
@@ -610,7 +607,6 @@ class Base(BaseEstimator):
             # data without any clustering: self.n_clusters is None -----
 
             if self.n_hidden_features > 0:  # with hidden layer
-
                 self.nn_scaler_, scaled_X = mo.scale_covariates(
                     input_X, choice=self.type_scaling[1], scaler=self.nn_scaler_
                 )
@@ -634,7 +630,6 @@ class Base(BaseEstimator):
                 )
 
         else:
-
             # data with clustering: self.n_clusters is not None ----- # keep
 
             augmented_X = mo.cbind(
@@ -644,7 +639,6 @@ class Base(BaseEstimator):
             )
 
             if self.n_hidden_features > 0:  # with hidden layer
-
                 self.nn_scaler_, scaled_X = mo.scale_covariates(
                     augmented_X,
                     choice=self.type_scaling[1],
@@ -1201,9 +1195,13 @@ class RidgeRegressor(Base, RegressorMixin):
 
         if self.backend == "cpu":
             # Use numpy for CPU
-            X_scaled, y_centered, self.X_mean_, self.y_mean_, self.X_scale_ = (
-                self._center_scale_xy(np.array(X), np.array(y))
-            )
+            (
+                X_scaled,
+                y_centered,
+                self.X_mean_,
+                self.y_mean_,
+                self.X_scale_,
+            ) = self._center_scale_xy(np.array(X), np.array(y))
 
             # SVD decomposition
             U, d, Vt = np.linalg.svd(X_scaled, full_matrices=False)
@@ -1227,9 +1225,13 @@ class RidgeRegressor(Base, RegressorMixin):
 
         else:
             # Use JAX for GPU/TPU
-            X_scaled, y_centered, self.X_mean_, self.y_mean_, self.X_scale_ = (
-                self._center_scale_xy(jnp.array(X), jnp.array(y))
-            )
+            (
+                X_scaled,
+                y_centered,
+                self.X_mean_,
+                self.y_mean_,
+                self.X_scale_,
+            ) = self._center_scale_xy(jnp.array(X), jnp.array(y))
 
             # SVD decomposition
             U, d, Vt = jnp.linalg.svd(X_scaled, full_matrices=False)

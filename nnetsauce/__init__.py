@@ -20,6 +20,7 @@ from .lazypredict.lazydeepMTS import LazyDeepMTS, LazyMTS
 from .mts.mts import MTS
 from .mts.mlarch import MLARCH
 from .mts.classical import ClassicalMTS
+from .mts.stackedmts import MTSStacker
 from .multitask.multitaskClassifier import MultitaskClassifier
 from .multitask.simplemultitaskClassifier import SimpleMultitaskClassifier
 from .neuralnet.neuralnetregression import NeuralNetRegressor
@@ -69,6 +70,7 @@ __all__ = [
     "MLARCH",
     "MedianVotingRegressor",
     "MTS",
+    "MTSStacker",
     "MultitaskClassifier",
     "NeuralNetRegressor",
     "NeuralNetClassifier",

@@ -182,7 +182,6 @@ def dosubsample(y, row_sample=0.8, seed=123, n_jobs=None, verbose=False):
 
     # preproc -----
     if is_factor(y):  # classification
-
         classes, n_elem_classes = np.unique(y, return_counts=True)
         n_classes = len(classes)
         y_as_classes = y.copy()
@@ -202,7 +201,6 @@ def dosubsample(y, row_sample=0.8, seed=123, n_jobs=None, verbose=False):
             )
 
     else:  # regression
-
         h = np.histogram(y, bins="auto")
         n_elem_classes = np.asarray(h[0], dtype=np.int32)
         freqs_hist = np.zeros_like(n_elem_classes, dtype=float)
@@ -236,7 +234,6 @@ def dosubsample(y, row_sample=0.8, seed=123, n_jobs=None, verbose=False):
         print(f"main loop...")
 
     if n_jobs is None:
-
         if verbose is True:
             iterator = tqdm(range(n_classes))
         else:

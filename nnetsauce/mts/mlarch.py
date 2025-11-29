@@ -34,7 +34,7 @@ class MLARCH:
             raise ValueError(f"Series length {n} must be > lags {lags}")
         X = np.zeros((n - lags, lags))
         for i in range(lags):
-            X[:, i] = y[i:(n - lags + i)]
+            X[:, i] = y[i: (n - lags + i)]
         return X
 
     def fit(self, y, **kwargs):
@@ -62,7 +62,7 @@ class MLARCH:
         mean_residuals = self.model_mean.residuals_.ravel()
 
         # Step 2: Fit ARCH volatility model on lagged squared residuals
-        resid_squared = mean_residuals ** 2
+        resid_squared = mean_residuals**2
         X_vol = self._create_lags(resid_squared, self.lags_vol)
         y_vol = np.log(resid_squared[self.lags_vol:] + 1e-8)
 
@@ -73,12 +73,16 @@ class MLARCH:
         fitted_sigma = np.exp(fitted_log_sigma)
 
         # Step 3: Compute standardized residuals with proper scaling
-        standardized_residuals = mean_residuals[self.lags_vol:] / np.sqrt(fitted_sigma)
+        standardized_residuals = mean_residuals[self.lags_vol:] / np.sqrt(
+            fitted_sigma
+        )
 
         # Enforce zero mean and unit variance
         self.z_mean_ = np.mean(standardized_residuals)
         self.z_std_ = np.std(standardized_residuals)
-        standardized_residuals = (standardized_residuals - self.z_mean_) / self.z_std_
+        standardized_residuals = (
+            standardized_residuals - self.z_mean_
+        ) / self.z_std_
 
         # Step 4: Fit residuals model
         self.model_residuals.fit(standardized_residuals.reshape(-1, 1))
@@ -109,7 +113,9 @@ class MLARCH:
         DescribeResult
             Named tuple with mean, sims, lower, upper
         """
-        DescribeResult = namedtuple("DescribeResult", ("mean", "sims", "lower", "upper"))
+        DescribeResult = namedtuple(
+            "DescribeResult", ("mean", "sims", "lower", "upper")
+        )
 
         # Get mean forecast
         mean_forecast = self.model_mean.predict(h=h).values.ravel()
@@ -136,28 +142,35 @@ class MLARCH:
         sims = None
         if return_sims:
             preds_z_for_sims = self.model_residuals.predict(h=h)
-            if hasattr(preds_z_for_sims, 'sims') and isinstance(preds_z_for_sims.sims, pd.DataFrame):
+            if hasattr(preds_z_for_sims, "sims") and isinstance(
+                preds_z_for_sims.sims, pd.DataFrame
+            ):
                 sims_z_normalized = preds_z_for_sims.sims
                 n_sims = sims_z_normalized.shape[1]
 
                 sims = np.zeros((h, n_sims))
                 for sim_idx in range(n_sims):
                     # Rescale simulations
-                    z_sim = sims_z_normalized.iloc[:, sim_idx].values * self.z_std_ + self.z_mean_
-                    sims[:, sim_idx] = mean_forecast + z_sim * np.sqrt(sigma_forecast)
+                    z_sim = (
+                        sims_z_normalized.iloc[:, sim_idx].values * self.z_std_
+                        + self.z_mean_
+                    )
+                    sims[:, sim_idx] = mean_forecast + z_sim * np.sqrt(
+                        sigma_forecast
+                    )
 
                 alpha = 1 - level / 100
                 lower_bound = np.quantile(sims, alpha / 2, axis=1)
                 upper_bound = np.quantile(sims, 1 - alpha / 2, axis=1)
             else:
                 # Fallback to Gaussian
-                z_score = norm.ppf(1 - (1 - level/100) / 2)
+                z_score = norm.ppf(1 - (1 - level / 100) / 2)
                 margin = z_score * np.sqrt(sigma_forecast) * self.z_std_
                 lower_bound = point_forecast - margin
                 upper_bound = point_forecast + margin
         else:
             # Gaussian intervals with proper scaling
-            z_score = norm.ppf(1 - (1 - level/100) / 2)
+            z_score = norm.ppf(1 - (1 - level / 100) / 2)
             margin = z_score * np.sqrt(sigma_forecast) * self.z_std_
             lower_bound = point_forecast - margin
             upper_bound = point_forecast + margin

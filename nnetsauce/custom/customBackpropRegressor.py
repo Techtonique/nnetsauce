@@ -307,7 +307,6 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
                 # print("self.model.W_", self.model.W_)
 
             elif self.optimizer == "cd":  # coordinate descent
-
                 W_shape = self.model.W_.shape
                 W_flat_size = self.model.W_.size
                 W_flat = self.model.W_.flatten()
@@ -373,12 +372,10 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
             Model predictions, or a tuple with prediction intervals or standard deviations if requested.
         """
         if "return_std" in kwargs:
-
             alpha = 100 - level
             pi_multiplier = norm.ppf(1 - alpha / 200)
 
             if len(X.shape) == 1:
-
                 n_features = X.shape[0]
                 new_X = mo.rbind(
                     X.reshape(1, n_features),
@@ -441,7 +438,6 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
 
         # "return_std" not in kwargs
         if len(X.shape) == 1:
-
             n_features = X.shape[0]
             new_X = mo.rbind(
                 X.reshape(1, n_features),

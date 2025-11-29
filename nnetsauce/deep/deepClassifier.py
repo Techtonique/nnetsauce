@@ -574,9 +574,7 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
         results = []
 
         for est in all_estimators():
-
             if surrogate_objs is None:
-
                 if issubclass(est[1], RegressorMixin) and (
                     est[0] not in removed_regressors
                 ):
@@ -608,7 +606,6 @@ class DeepClassifier(CustomClassifier, ClassifierMixin):
                         pass
 
             else:
-
                 if (
                     issubclass(est[1], RegressorMixin)
                     and (est[0] not in removed_regressors)

@@ -188,7 +188,6 @@ class GLMRegressor(GLM, RegressorMixin):
         }
 
         if type_loss != "quantile":
-
             if row_index is None:
                 row_index = range(len(y))
                 XB = self.compute_XB(X, beta=beta)
@@ -204,7 +203,6 @@ class GLMRegressor(GLM, RegressorMixin):
             )
 
         else:  # quantile
-
             assert (
                 self.q > 0 and self.q < 1
             ), "'tau' must be comprised 0 < tau < 1"

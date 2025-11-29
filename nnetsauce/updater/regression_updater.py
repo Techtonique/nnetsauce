@@ -48,7 +48,6 @@ class RegressorUpdater(BaseEstimator, RegressorMixin):
             pass
 
     def fit(self, X, y, **kwargs):
-
         if isinstance(
             self.regr, CustomRegressor
         ):  # nnetsauce model not deep ---
@@ -84,7 +83,6 @@ class RegressorUpdater(BaseEstimator, RegressorMixin):
         return self.regr.predict(X)
 
     def partial_fit(self, X, y):
-
         assert hasattr(
             self.regr, "coef_"
         ), "model must be fitted first (i.e have 'coef_' attribute)"
@@ -100,7 +98,6 @@ class RegressorUpdater(BaseEstimator, RegressorMixin):
         self.updating_factor_ = self.n_obs_ ** (-self.alpha)
 
         if isinstance(self.regr, Base):  # nnetsauce model ---
-
             newX = deepcopy(X)
 
             if isinstance(
@@ -113,7 +110,6 @@ class RegressorUpdater(BaseEstimator, RegressorMixin):
                     newx = newX.ravel()
 
         else:  # an sklearn model ---
-
             if isinstance(X, pd.DataFrame):
                 newx = X.values.ravel()
             else:

@@ -50,7 +50,6 @@ class ClassifierUpdater(BaseEstimator, ClassifierMixin):
             pass
 
     def fit(self, X, y, **kwargs):
-
         raise NotImplementedError(
             "fit method is not implemented for ClassifierUpdater"
         )
@@ -86,7 +85,6 @@ class ClassifierUpdater(BaseEstimator, ClassifierMixin):
         return self
 
     def predict(self, X):
-
         raise NotImplementedError(
             "predict method is not implemented for ClassifierUpdater"
         )
@@ -94,7 +92,6 @@ class ClassifierUpdater(BaseEstimator, ClassifierMixin):
         return self.clf.predict(X)
 
     def partial_fit(self, X, y):
-
         raise NotImplementedError(
             "partial_fit method is not implemented for ClassifierUpdater"
         )
@@ -114,7 +111,6 @@ class ClassifierUpdater(BaseEstimator, ClassifierMixin):
         self.updating_factor_ = self.n_obs_ ** (-self.alpha)
 
         if isinstance(self.clf, Base):  # nnetsauce model ---
-
             newX = deepcopy(X)
 
             if isinstance(
@@ -127,7 +123,6 @@ class ClassifierUpdater(BaseEstimator, ClassifierMixin):
                     newx = newX.ravel()
 
         else:  # an sklearn model ---
-
             if isinstance(X, pd.DataFrame):
                 newx = X.values.ravel()
             else:

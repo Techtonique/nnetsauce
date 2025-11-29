@@ -3,7 +3,6 @@ import pandas as pd
 
 
 def getsims(input_data, ix):
-
     if isinstance(input_data[0], pd.DataFrame):  # kde
         n_sims = len(input_data)
         res = [input_data[i].iloc[:, ix].values for i in range(n_sims)]

@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import sklearn.metrics as skm2
 import matplotlib.pyplot as plt
-import warnings 
+import warnings
 from collections import namedtuple
 from copy import deepcopy
 from functools import partial
@@ -261,7 +261,6 @@ class MTS(Base):
         verbose=0,
         show_progress=True,
     ):
-
         super().__init__(
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,
@@ -305,7 +304,7 @@ class MTS(Base):
         self.agg = agg
         self.verbose = verbose
         self.show_progress = show_progress
-        self.series_names = None
+        self.series_names = ["series0"]
         self.input_dates = None
         self.quantiles = None
         self.fit_objs_ = {}
@@ -437,7 +436,6 @@ class MTS(Base):
                 self.xreg_ = xreg
 
         else:  # input data set is a DataFrame with column names
-
             X_index = None
             if X.index is not None:
                 X_index = X.index
@@ -622,10 +620,7 @@ class MTS(Base):
         return self
 
     def partial_fit(self, X, xreg=None, **kwargs):
-        """Update the model with new observations X, with optional regressors xreg
-
-        This is essentially a copy of fit() but uses partial_fit() on the underlying models
-        when available, otherwise falls back to fit().
+        """partial_fit MTS model to training data X, with optional regressors xreg
 
         Parameters:
 
@@ -644,29 +639,21 @@ class MTS(Base):
 
         self: object
         """
-        
-        # Check if this is the first call (no previous fit)
-        first_fit = self.df_ is None
-        
-        if first_fit:
-            # First time: use regular fit
-            return self.fit(X, xreg, **kwargs)
-        
-        # === Copy of fit() method with partial_fit modifications ===
-        
         try:
             self.init_n_series_ = X.shape[1]
         except IndexError as e:
             self.init_n_series_ = 1
 
-        # Automatic lag selection if requested (same as fit)
+        # Automatic lag selection if requested
         if isinstance(self.lags, str):
             max_lags = min(25, X.shape[0] // 4)
             best_ic = float("inf")
             best_lags = 1
 
             if self.verbose:
-                print(f"\nSelecting optimal number of lags using {self.lags}...")
+                print(
+                    f"\nSelecting optimal number of lags using {self.lags}..."
+                )
                 iterator = tqdm(range(1, max_lags + 1))
             else:
                 iterator = range(1, max_lags + 1)
@@ -682,9 +669,11 @@ class MTS(Base):
                 if self.init_n_series_ > 1:
                     mts_input = ts.create_train_inputs(X_values, lag)
                 else:
-                    mts_input = ts.create_train_inputs(X_values.reshape(-1, 1), lag)
+                    mts_input = ts.create_train_inputs(
+                        X_values.reshape(-1, 1), lag
+                    )
 
-                # Cook training set and fit model
+                # Cook training set and partial_fit model
                 dummy_y, scaled_Z = self.cook_training_set(
                     y=np.ones(mts_input[0].shape[0]), X=mts_input[1]
                 )
@@ -693,7 +682,7 @@ class MTS(Base):
                 for i in range(self.init_n_series_):
                     y_mean = np.mean(mts_input[0][:, i])
                     centered_y_i = mts_input[0][:, i] - y_mean
-                    self.obj.fit(X=scaled_Z, y=centered_y_i)
+                    self.obj.partial_fit(X=scaled_Z, y=centered_y_i)
                     residuals_.append(
                         (centered_y_i - self.obj.predict(scaled_Z)).tolist()
                     )
@@ -711,20 +700,30 @@ class MTS(Base):
                     best_lags = lag
 
             if self.verbose:
-                print(f"\nSelected {best_lags} lags with {self.lags}={best_ic:.2f}")
+                print(
+                    f"\nSelected {best_lags} lags with {self.lags}={best_ic:.2f}"
+                )
 
             self.lags = best_lags
 
-        # Data preprocessing (same as fit)
+        self.input_dates = None
+        self.df_ = None
+
         if isinstance(X, pd.DataFrame) is False:
             # input data set is a numpy array
             if xreg is None:
                 X = pd.DataFrame(X)
-                self.series_names = ["series" + str(i) for i in range(X.shape[1])]
+                if len(X.shape) > 1:
+                    self.series_names = [
+                        "series" + str(i) for i in range(X.shape[1])
+                    ]
+                else:
+                    self.series_names = ["series0"]
             else:
                 # xreg is not None
                 X = mo.cbind(X, xreg)
                 self.xreg_ = xreg
+
         else:  # input data set is a DataFrame with column names
             X_index = None
             if X.index is not None:
@@ -738,7 +737,6 @@ class MTS(Base):
                 X.index = X_index
             self.series_names = X.columns.tolist()
 
-        # Data concatenation (same as fit)
         if isinstance(X, pd.DataFrame):
             if self.df_ is None:
                 self.df_ = X
@@ -780,9 +778,8 @@ class MTS(Base):
         self.y_ = None
         self.X_ = None
         self.n_series = p
-        # NOTE: Don't clear fit_objs_ and y_means_ for partial_fit
-        # self.fit_objs_.clear()  # REMOVED for partial_fit
-        # self.y_means_.clear()   # REMOVED for partial_fit
+        self.fit_objs_.clear()
+        self.y_means_.clear()
         residuals_ = []
         self.residuals_ = None
         self.residuals_sims_ = None
@@ -796,17 +793,23 @@ class MTS(Base):
             mts_input = ts.create_train_inputs(X[::-1], self.lags)
         else:
             # univariate time series
-            mts_input = ts.create_train_inputs(X.reshape(-1, 1)[::-1], self.lags)
+            mts_input = ts.create_train_inputs(
+                X.reshape(-1, 1)[::-1], self.lags
+            )
 
         self.y_ = mts_input[0]
+
         self.X_ = mts_input[1]
 
         dummy_y, scaled_Z = self.cook_training_set(y=rep_1_n, X=self.X_)
+
         self.scaled_Z_ = scaled_Z
 
-        # loop on all the time series and adjust self.obj - MODIFIED for partial_fit
+        # loop on all the time series and adjust self.obj.partial_fit
         if self.verbose > 0:
-            print(f"\n Partially fitting {type(self.obj).__name__} to multivariate time series... \n")
+            print(
+                f"\n Adjusting {type(self.obj).__name__} to multivariate time series... \n"
+            )
 
         if self.show_progress is True:
             iterator = tqdm(range(self.init_n_series_))
@@ -824,21 +827,12 @@ class MTS(Base):
                 self.y_means_[i] = y_mean
                 centered_y_i = self.y_[:, i] - y_mean
                 self.centered_y_is_.append(centered_y_i)
-                
-                # KEY CHANGE: Use partial_fit if available, otherwise fall back to fit
-                if hasattr(self.fit_objs_[i], 'partial_fit'):
-                    try:
-                        self.fit_objs_[i].partial_fit(X=scaled_Z, y=centered_y_i)
-                    except Exception as e:
-                        if self.verbose > 0:
-                            print(f"partial_fit failed for series {i}, using fit(): {e}")
-                        self.fit_objs_[i].fit(X=scaled_Z, y=centered_y_i)
-                else:                    
-                    warnings.warn(f"partial_fit failed for series {i}, falling back to fit(): {e}", RuntimeWarning)
-                    self.fit_objs_[i].fit(X=scaled_Z, y=centered_y_i)
-                
+                self.obj.partial_fit(X=scaled_Z, y=centered_y_i)
+                self.fit_objs_[i] = deepcopy(self.obj)
                 residuals_.append(
-                    (centered_y_i - self.fit_objs_[i].predict(scaled_Z)).tolist()
+                    (
+                        centered_y_i - self.fit_objs_[i].predict(scaled_Z)
+                    ).tolist()
                 )
 
         if self.type_pi == "quantile":
@@ -847,17 +841,8 @@ class MTS(Base):
                 self.y_means_[i] = y_mean
                 centered_y_i = self.y_[:, i] - y_mean
                 self.centered_y_is_.append(centered_y_i)
-                
-                # KEY CHANGE: Use partial_fit if available
-                if hasattr(self.fit_objs_[i], 'partial_fit'):
-                    try:
-                        self.fit_objs_[i].partial_fit(X=scaled_Z, y=centered_y_i)
-                    except Exception as e:
-                        if self.verbose > 0:
-                            print(f"partial_fit failed for series {i}, using fit(): {e}")
-                        self.fit_objs_[i].fit(X=scaled_Z, y=centered_y_i)
-                else:
-                    self.fit_objs_[i].fit(X=scaled_Z, y=centered_y_i)
+                self.obj.partial_fit(X=scaled_Z, y=centered_y_i)
+                self.fit_objs_[i] = deepcopy(self.obj)
 
         if self.type_pi.startswith("scp"):
             # split conformal prediction
@@ -868,43 +853,28 @@ class MTS(Base):
                 second_half_idx = range(n_y_half, n_y)
                 y_mean_temp = np.mean(self.y_[first_half_idx, i])
                 centered_y_i_temp = self.y_[first_half_idx, i] - y_mean_temp
-                
-                # KEY CHANGE: Use partial_fit if available for first half
-                if hasattr(self.fit_objs_[i], 'partial_fit'):
-                    try:
-                        self.fit_objs_[i].partial_fit(X=scaled_Z[first_half_idx, :], y=centered_y_i_temp)
-                    except Exception as e:
-                        if self.verbose > 0:
-                            print(f"partial_fit failed for series {i} (first half), using fit(): {e}")
-                        self.fit_objs_[i].fit(X=scaled_Z[first_half_idx, :], y=centered_y_i_temp)
-                else:
-                    self.fit_objs_[i].fit(X=scaled_Z[first_half_idx, :], y=centered_y_i_temp)
-                
+                self.obj.partial_fit(
+                    X=scaled_Z[first_half_idx, :], y=centered_y_i_temp
+                )
                 # calibrated residuals actually
                 residuals_.append(
                     (
                         self.y_[second_half_idx, i]
-                        - (y_mean_temp + self.fit_objs_[i].predict(scaled_Z[second_half_idx, :]))
+                        - (
+                            y_mean_temp
+                            + self.obj.predict(scaled_Z[second_half_idx, :])
+                        )
                     ).tolist()
                 )
-                
-                # fit on the second half
+                # partial_fit on the second half
                 y_mean = np.mean(self.y_[second_half_idx, i])
                 self.y_means_[i] = y_mean
                 centered_y_i = self.y_[second_half_idx, i] - y_mean
-                
-                # KEY CHANGE: Use partial_fit if available for second half
-                if hasattr(self.fit_objs_[i], 'partial_fit'):
-                    try:
-                        self.fit_objs_[i].partial_fit(X=scaled_Z[second_half_idx, :], y=centered_y_i)
-                    except Exception as e:
-                        if self.verbose > 0:
-                            print(f"partial_fit failed for series {i} (second half), using fit(): {e}")
-                        self.fit_objs_[i].fit(X=scaled_Z[second_half_idx, :], y=centered_y_i)
-                else:
-                    self.fit_objs_[i].fit(X=scaled_Z[second_half_idx, :], y=centered_y_i)
+                self.obj.partial_fit(
+                    X=scaled_Z[second_half_idx, :], y=centered_y_i
+                )
+                self.fit_objs_[i] = deepcopy(self.obj)
 
-        # Rest of the method is identical to fit()
         self.residuals_ = np.asarray(residuals_).T
 
         if self.type_pi == "gaussian":
@@ -941,7 +911,7 @@ class MTS(Base):
             self.kde_ = grid.best_estimator_
 
         return self
-    
+
     def _predict_quantiles(self, h, quantiles, **kwargs):
         """Predict arbitrary quantiles from simulated paths."""
         # Ensure output dates are set
@@ -1182,7 +1152,6 @@ class MTS(Base):
         mean_ = deepcopy(self.mean_)
 
         for i in range(h):
-
             new_obs = ts.reformat_response(mean_, self.lags)
             new_X = new_obs.reshape(1, -1)
             cooked_new_X = self.cook_test_set(new_X, **kwargs)
@@ -1245,7 +1214,9 @@ class MTS(Base):
 
         # Final output should only include the target columns
         self.mean_ = pd.DataFrame(
-            mean_[0:h, : self.init_n_series_][::-1],
+            mean_[0: min(h, self.n_obs_ - self.lags), : self.init_n_series_][
+                ::-1
+            ],
             columns=self.df_.columns[: self.init_n_series_],
             index=self.output_dates_,
         )
@@ -1255,7 +1226,6 @@ class MTS(Base):
             (("return_std" not in kwargs) and ("return_pi" not in kwargs))
             and (self.type_pi not in ("gaussian", "scp"))
         ) or ("vine" in self.type_pi):
-
             if self.replications is None:
                 return self.mean_.iloc[:, : self.init_n_series_]
 
@@ -1266,7 +1236,6 @@ class MTS(Base):
             upper = []
 
             if "scp2" in self.type_pi:
-
                 if self.verbose == 1:
                     self.sims_ = tuple(
                         (
@@ -1286,7 +1255,6 @@ class MTS(Base):
                         )
                     )
             else:
-
                 if self.verbose == 1:
                     self.sims_ = tuple(
                         (
@@ -1369,7 +1337,6 @@ class MTS(Base):
             )
 
             if "return_std" in kwargs:
-
                 self.preds_std_ = np.asarray(self.preds_std_)
 
                 self.lower_ = pd.DataFrame(
@@ -1385,7 +1352,6 @@ class MTS(Base):
                 )
 
             if "return_pi" in kwargs:
-
                 self.lower_ = pd.DataFrame(
                     np.asarray(lower_pi_).reshape(h, self.n_series)
                     + y_means_[np.newaxis, :],
@@ -1401,8 +1367,6 @@ class MTS(Base):
                 )
 
             res = DescribeResult(self.mean_, self.lower_, self.upper_)
-
-            print("\n res", res)
 
             if self.xreg_ is not None:
                 if len(self.xreg_.shape) > 1:
@@ -1421,7 +1385,6 @@ class MTS(Base):
             return res
 
         if self.type_pi == "gaussian":
-
             DescribeResult = namedtuple(
                 "DescribeResult", ("mean", "lower", "upper")
             )
@@ -1452,8 +1415,6 @@ class MTS(Base):
 
             res = DescribeResult(self.mean_, self.lower_, self.upper_)
 
-            print("\n res", res)
-
             if self.xreg_ is not None:
                 if len(self.xreg_.shape) > 1:
                     res2 = mx.tuple_map(
@@ -1471,7 +1432,6 @@ class MTS(Base):
             return res
 
         if self.type_pi == "quantile":
-
             DescribeResult = namedtuple("DescribeResult", ("mean"))
 
             self.mean_ = pd.DataFrame(
@@ -1481,8 +1441,6 @@ class MTS(Base):
             )
 
             res = DescribeResult(self.mean_)
-
-            print("\n res", res)
 
             if self.xreg_ is not None:
                 if len(self.xreg_.shape) > 1:
@@ -1934,7 +1892,6 @@ class MTS(Base):
         )
 
         if isinstance(scoring, str):
-
             assert scoring in (
                 "pinball",
                 "crps",
@@ -2032,7 +1989,6 @@ class MTS(Base):
                     )
 
         else:  # isinstance(scoring, str) = False
-
             err_func = scoring
 
         errors = []
@@ -2053,7 +2009,6 @@ class MTS(Base):
             iterator = zip(train_indices, test_indices)
 
         for train_index, test_index in iterator:
-
             if verbose == 1:
                 print(f"TRAIN: {train_index}")
                 print(f"TEST: {test_index}")

@@ -5,9 +5,9 @@ from scipy.stats import gaussian_kde, norm
 from scipy.interpolate import interp1d
 
 
-def simulate_distribution(data, method="bootstrap", 
-                          num_samples=1000, 
-                          seed=123, **kwargs):
+def simulate_distribution(
+    data, method="bootstrap", num_samples=1000, seed=123, **kwargs
+):
     """
     Simulate the distribution of an input vector using various methods.
 
@@ -89,8 +89,7 @@ def simulate_distribution(data, method="bootstrap",
 
 
 def simulate_replications(
-    data, method="kde", num_replications=10, n_obs=None, 
-    seed=123, **kwargs
+    data, method="kde", num_replications=10, n_obs=None, seed=123, **kwargs
 ):
     """
     Create multiple replications of the input's distribution using a specified simulation method.
@@ -120,8 +119,7 @@ def simulate_replications(
 
     for _ in range(num_replications):
         simulated_data = simulate_distribution(
-            data, method=method, num_samples=num_samples, seed=seed, 
-            **kwargs
+            data, method=method, num_samples=num_samples, seed=seed, **kwargs
         )
         replications.append(simulated_data)
 

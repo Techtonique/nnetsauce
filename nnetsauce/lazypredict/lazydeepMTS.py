@@ -360,7 +360,6 @@ class LazyDeepMTS(MTS):
                     per_series=per_series,
                 )
             except Exception:
-
                 continue
 
             names.append(name)
@@ -609,7 +608,6 @@ class LazyDeepMTS(MTS):
                         print(exception)
 
         else:  # no preprocessing
-
             for name, model in tqdm(self.regressors):  # do parallel exec
                 start = time.time()
                 try:
@@ -683,7 +681,6 @@ class LazyDeepMTS(MTS):
                             )
 
                     else:
-
                         if self.h is None:
                             X_pred = pipe.predict(
                                 h=X_test.shape[0],
@@ -750,7 +747,6 @@ class LazyDeepMTS(MTS):
                         if (self.replications is not None) or (
                             self.type_pi == "gaussian"
                         ):
-
                             if isinstance(X_test, pd.DataFrame):
                                 X_test_h = X_test.iloc[0: self.h, :]
                                 rmse = mean_errors(
@@ -816,7 +812,6 @@ class LazyDeepMTS(MTS):
                                     per_series=per_series,
                                 )
                         else:  # no prediction interval
-
                             if isinstance(X_test, pd.DataFrame):
                                 X_test_h = X_test.iloc[0: self.h, :]
                                 rmse = mean_errors(
@@ -948,7 +943,6 @@ class LazyDeepMTS(MTS):
             pass
 
         if self.predictions is True:
-
             return scores, predictions
 
         return scores

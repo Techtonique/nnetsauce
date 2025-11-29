@@ -17,7 +17,6 @@ print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
 class TestLazyCustom(ut.TestCase):
     def test_custom(self):
-
         # regr
         X, y = datasets.make_regression(
             n_samples=15, n_features=3, random_state=123

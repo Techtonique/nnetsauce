@@ -187,7 +187,6 @@ def cross_val_score(
     )
 
     if isinstance(scoring, str):
-
         assert scoring in (
             "root_mean_squared_error",
             "mean_squared_error",
@@ -215,7 +214,6 @@ def cross_val_score(
                 return mean_errors(pred=X_pred, actual=X_test, scoring=scoring)
 
     else:  # isinstance(scoring, str) = False
-
         err_func = scoring
 
     errors = []
@@ -226,7 +224,6 @@ def cross_val_score(
         iterator = tscv_obj
 
     for train_index, test_index in iterator:
-
         if verbose == 1:
             print(f"TRAIN: {train_index}")
             print(f"TEST: {test_index}")

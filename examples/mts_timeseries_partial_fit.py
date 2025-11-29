@@ -38,7 +38,7 @@ obj_MTS = ns.MTS(regr, lags = 1, n_hidden_features=5,
 
 print(df_train.tail())
 
-obj_MTS.fit(df_train)
+obj_MTS.fit(df_train.values)
 
 print("SGDRegressor() ----------")
 print("coef_", obj_MTS.obj.coef_)
@@ -47,7 +47,7 @@ print(obj_MTS.predict().mean)
 print(obj_MTS.predict().lower)
 print(obj_MTS.predict().upper)
 
-obj_MTS.partial_fit(df_test.iloc[[0], :])
+obj_MTS.partial_fit(df_test.iloc[[0], :].values)
 
 print("coef_", obj_MTS.obj.coef_)
 
@@ -55,7 +55,7 @@ print(obj_MTS.predict().mean)
 print(obj_MTS.predict().lower)
 print(obj_MTS.predict().upper)
 
-obj_MTS.partial_fit(df_test.iloc[[1], :])
+obj_MTS.partial_fit(df_test.iloc[[1], :].values)
 
 print("coef_", obj_MTS.obj.coef_)
 
@@ -71,7 +71,7 @@ regr = ns.RegressorUpdater(LassoCV(), alpha=0.1)
 obj_MTS = ns.MTS(regr, lags = 2, n_hidden_features=0, 
                  verbose = 1, replications=100)
 
-obj_MTS.fit(df_train)
+obj_MTS.fit(df_train.values)
 print("ns.RegressorUpdater(LassoCV(), alpha=0.1) ----------")
 print(obj_MTS.obj.coef_)
 
@@ -79,7 +79,7 @@ print(obj_MTS.predict().mean)
 print(obj_MTS.predict().lower)
 print(obj_MTS.predict().upper)
 
-obj_MTS.partial_fit(df_test.iloc[[0], :])
+obj_MTS.partial_fit(df_test.iloc[[0], :].values)
 
 print("coef_", obj_MTS.obj.coef_)
 
@@ -87,7 +87,7 @@ print(obj_MTS.predict().mean)
 print(obj_MTS.predict().lower)
 print(obj_MTS.predict().upper)
 
-obj_MTS.partial_fit(df_test.iloc[[1], :])
+obj_MTS.partial_fit(df_test.iloc[[1], :].values)
 
 print("coef_", obj_MTS.obj.coef_)
 

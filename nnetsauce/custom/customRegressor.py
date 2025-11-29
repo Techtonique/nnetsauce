@@ -321,12 +321,10 @@ class CustomRegressor(Custom, RegressorMixin):
         """
 
         if "return_std" in kwargs:
-
             alpha = 100 - level
             pi_multiplier = norm.ppf(1 - alpha / 200)
 
             if len(X.shape) == 1:
-
                 n_features = X.shape[0]
                 new_X = mo.rbind(
                     X.reshape(1, n_features),
@@ -393,7 +391,6 @@ class CustomRegressor(Custom, RegressorMixin):
 
         # "return_std" not in kwargs
         if len(X.shape) == 1:
-
             n_features = X.shape[0]
             new_X = mo.rbind(
                 X.reshape(1, n_features),

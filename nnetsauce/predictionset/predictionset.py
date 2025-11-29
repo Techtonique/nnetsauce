@@ -43,7 +43,6 @@ class PredictionSet(BaseEstimator, ClassifierMixin):
         level=None,
         seed=123,
     ):
-
         self.obj = obj
         self.method = method
         self.level = level
@@ -81,7 +80,6 @@ class PredictionSet(BaseEstimator, ClassifierMixin):
 
         """
         if self.method == "icp":
-
             X_train, X_calibration, y_train, y_calibration = train_test_split(
                 X, y, test_size=0.5, random_state=self.seed
             )
@@ -89,7 +87,6 @@ class PredictionSet(BaseEstimator, ClassifierMixin):
             self.icp_.calibrate(X_calibration, y_calibration)
 
         elif self.method == "tcp":
-
             self.tcp_.fit(X, y)
 
         return self

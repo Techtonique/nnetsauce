@@ -33,12 +33,12 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             equivalent to a miscoverage error of 5 (%)
 
         replications: an integer;
-            Number of replications for simulated conformal (default is `None`)            
+            Number of replications for simulated conformal (default is `None`)
 
         type_pi: a string;
             type of prediction interval: currently `None`
             (split conformal without simulation)
-            for type_pi in: 
+            for type_pi in:
                 - 'bootstrap': Bootstrap resampling.
                 - 'kde': Kernel Density Estimation.
 
@@ -61,7 +61,6 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
         agg="mean",
         seed=123,
     ):
-
         self.obj = obj
         self.method = method
         self.level = level
@@ -100,13 +99,11 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
         """
 
         if self.type_split == "random":
-
             X_train, X_calibration, y_train, y_calibration = train_test_split(
                 X, y, test_size=0.5, random_state=self.seed
             )
 
         elif self.type_split == "sequential":
-
             n_x = X.shape[0]
             n_x_half = n_x // 2
             first_half_idx = range(0, n_x_half)
@@ -117,7 +114,6 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             y_calibration = y[second_half_idx]
 
         if self.method == "splitconformal":
-
             self.obj.fit(X_train, y_train)
             preds_calibration = self.obj.predict(X_calibration)
             self.calibrated_residuals_ = y_calibration - preds_calibration
@@ -144,7 +140,6 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                 )
 
         if self.method == "localconformal":
-
             mad_estimator = ExtraTreesRegressor()
             normalizer = RegressorNormalizer(
                 self.obj, mad_estimator, AbsErrorErrFunc()
@@ -198,13 +193,10 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             pred = self.icp_.predict(X)
 
         if self.method == "splitconformal":
-
             if (
                 self.replications is None and self.type_pi is None
             ):  # type_pi is not used here, no bootstrap or kde
-
                 if return_pi:
-
                     DescribeResult = namedtuple(
                         "DescribeResult", ("mean", "lower", "upper")
                     )
@@ -213,7 +205,6 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                     )
 
                 else:
-
                     return pred
 
             else:  # self.method == "splitconformal" and if self.replications is not None, type_pi must be used
@@ -229,7 +220,11 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
 
                 assert self.type_pi in (
                     "bootstrap",
-                    "kde", "normal", "ecdf", "permutation", "smooth-bootstrap"
+                    "kde",
+                    "normal",
+                    "ecdf",
+                    "permutation",
+                    "smooth-bootstrap",
                 ), "`self.type_pi` must be in ('bootstrap', 'kde', 'normal', 'ecdf', 'permutation', 'smooth-bootstrap')"
 
                 if self.type_pi == "bootstrap":
@@ -265,8 +260,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                             for i in range(self.replications)
                         ]
                     ).T
-                else: # self.type_pi == "normal" or "ecdf" or "permutation" or "smooth-bootstrap"                    
-
+                else:  # self.type_pi == "normal" or "ecdf" or "permutation" or "smooth-bootstrap"
                     self.residuals_sims_ = np.asarray(
                         simulate_replications(
                             data=self.scaled_calibrated_residuals_,
@@ -302,11 +296,8 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                 )
 
         if self.method == "localconformal":
-
             if self.replications is None:
-
                 if return_pi:
-
                     predictions_bounds = self.icp_.predict(
                         X, significance=1 - self.level
                     )
@@ -318,11 +309,9 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                     )
 
                 else:
-
                     return pred
 
             else:  # (self.method == "localconformal") and if self.replications is not None
-
                 raise NotImplementedError(
                     "When self.method == 'localconformal', there are no simulations"
                 )

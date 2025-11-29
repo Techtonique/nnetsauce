@@ -172,7 +172,6 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
         probs = np.zeros((shape_X[0], self.n_classes_))
 
         if len(shape_X) == 1:  # one example
-
             n_features = shape_X[0]
 
             new_X = mo.rbind(
@@ -187,7 +186,6 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
                 probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)[0]
 
         else:  # multiple rows
-
             Z = self.X_scaler_.transform(X, **kwargs)
 
             # Fallback to standard model
