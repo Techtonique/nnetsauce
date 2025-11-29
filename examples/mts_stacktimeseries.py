@@ -34,7 +34,7 @@ stacker_mv = MTSStacker(
 
 # Fit and predict
 stacker_mv.fit(df_mv)
-forecast_mv = stacker_mv.predict(h=5, level=90)
+forecast_mv = stacker_mv.predict(h=5)
 
 print("Multivariate forecast shape:", forecast_mv.mean.shape)
 print("\nForecast for all series:")
