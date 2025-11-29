@@ -26,8 +26,8 @@ stacker_mv = MTSStacker(
         obj=Ridge(),
         lags=7,
         n_hidden_features=5,
-        type_pi='gaussian',
-        #replications=200
+        type_pi='kde',
+        replications=200
     ),
     split_ratio=0.6
 )

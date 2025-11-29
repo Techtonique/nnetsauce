@@ -126,29 +126,56 @@ class MTSStacker(MTS):
         elif isinstance(result, np.ndarray):
             return result[:, :self.n_series_]
         
-        DescribeResult = namedtuple(
-                "DescribeResult", ("mean", "lower", "upper")
-            )
 
-        # it's a tuple of (mean, lower, upper) or (mean, sims, lower, upper)
-        # Extract only the first n_series_ columns (original series predictions)
-        def slice_element(x):
-            """Slice an element to keep only first n_series_ columns."""
-            if isinstance(x, pd.DataFrame):
-                return x.iloc[:, :self.n_series_]
-            elif isinstance(x, np.ndarray):
-                return x[:, :self.n_series_]
-            elif isinstance(x, tuple):
-                # Handle tuple of DataFrames/arrays (e.g., sims)
-                return tuple(slice_element(item) for item in x)
-            else:
-                # Fallback for other types
-                return x
+        if self.meta_model.sims_ is None: 
         
-        res = mx.tuple_map(result, slice_element)
-        return DescribeResult(res[0], res[1], res[2])
+            DescribeResult = namedtuple(
+                    "DescribeResult", ("mean", "lower", "upper")
+                )
 
-
-
-
+            # it's a tuple of (mean, lower, upper) or (mean, sims, lower, upper)
+            # Extract only the first n_series_ columns (original series predictions)
+            def slice_element(x):
+                """Slice an element to keep only first n_series_ columns."""
+                if isinstance(x, pd.DataFrame):
+                    return x.iloc[:, :self.n_series_]
+                elif isinstance(x, np.ndarray):
+                    return x[:, :self.n_series_]
+                elif isinstance(x, tuple):
+                    # Handle tuple of DataFrames/arrays (e.g., sims)
+                    return tuple(slice_element(item) for item in x)
+                else:
+                    # Fallback for other types
+                    return x
             
+            res = mx.tuple_map(result, slice_element)
+            return DescribeResult(res[0], res[1], res[2])
+        
+        else:
+            
+            DescribeResult = namedtuple(
+                    "DescribeResult", ("mean", "sims", "lower", "upper")
+                )
+
+            # it's a tuple of (mean, lower, upper) or (mean, sims, lower, upper)
+            # Extract only the first n_series_ columns (original series predictions)
+            def slice_element(x):
+                """Slice an element to keep only first n_series_ columns."""
+                if isinstance(x, pd.DataFrame):
+                    return x.iloc[:, :self.n_series_]
+                elif isinstance(x, np.ndarray):
+                    return x[:, :self.n_series_]
+                elif isinstance(x, tuple):
+                    # Handle tuple of DataFrames/arrays (e.g., sims)
+                    return tuple(slice_element(item) for item in x)
+                else:
+                    # Fallback for other types
+                    return x
+            
+            res = mx.tuple_map(result, slice_element)
+            return DescribeResult(res[0], res[1], res[2], res[3])
+
+
+
+
+                
