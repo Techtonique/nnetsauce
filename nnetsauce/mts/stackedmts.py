@@ -195,22 +195,25 @@ class MTSStacker(MTS):
                 result, self.n_series_, self.output_dates_, self.series_names
             )
             
-            # Determine the type of result and return appropriate namedtuple
+            # Store the results for plotting
             if hasattr(self.meta_model, 'sims_') and self.meta_model.sims_ is not None:
                 DescribeResult = namedtuple("DescribeResult", ("mean", "sims", "lower", "upper"))
                 if len(processed_result) == 4:
-                    return DescribeResult(*processed_result)
+                    self.mean_, self.sims_, self.lower_, self.upper_ = processed_result
+                    return DescribeResult(self.mean_, self.sims_, self.lower_, self.upper_)
                 else:
                     # Handle case where we don't have exactly 4 elements
-                    return DescribeResult(processed_result[0], processed_result[1], 
-                                        processed_result[2], processed_result[3])
+                    self.mean_, self.sims_, self.lower_, self.upper_ = processed_result[0], processed_result[1], processed_result[2], processed_result[3]
+                    return DescribeResult(self.mean_, self.sims_, self.lower_, self.upper_)
             else:
                 DescribeResult = namedtuple("DescribeResult", ("mean", "lower", "upper"))
                 if len(processed_result) == 3:
-                    return DescribeResult(*processed_result)
+                    self.mean_, self.lower_, self.upper_ = processed_result
+                    return DescribeResult(self.mean_, self.lower_, self.upper_)
                 else:
                     # Handle case where we don't have exactly 3 elements
-                    return DescribeResult(processed_result[0], processed_result[1], processed_result[2])
+                    self.mean_, self.lower_, self.upper_ = processed_result[0], processed_result[1], processed_result[2]
+                    return DescribeResult(self.mean_, self.lower_, self.upper_)
 
     def plot(self, series=None, **kwargs):
         """
@@ -223,48 +226,62 @@ class MTSStacker(MTS):
         **kwargs : dict
             Additional parameters for plotting
         """
-        # First, ensure we have predictions by calling predict if needed
-        if not hasattr(self, 'mean_') or self.mean_ is None:
-            # Get predictions to populate mean_, lower_, upper_
-            _ = self.predict(h=10, level=95)  # Use default h=10 if not specified in kwargs
+        # Ensure we have predictions
+        if self.mean_ is None or self.lower_ is None or self.upper_ is None:
+            raise ValueError("Model forecasting must be obtained first (call predict)")
         
-        # Now use the parent MTS class plot method with our own attributes
-        # We need to temporarily set the required attributes for plotting
-        temp_attrs = {}
-        
-        # Store original attributes
-        original_attrs = {}
-        for attr in ['mean_', 'lower_', 'upper_', 'sims_', 'output_dates_', 'series_names', 'n_series', 'init_n_series_']:
-            if hasattr(self, attr):
-                original_attrs[attr] = getattr(self, attr)
-        
-        try:
-            # Use the parent class plot method directly
-            super().plot(series=series, **kwargs)
-            
-        except AssertionError as e:
-            if "doesn't exist in the input dataset" in str(e):
-                # Handle the case where series name doesn't match
-                if series is not None and series in self.series_names:
-                    # The series exists in our names, but the parent class might be using different names
-                    # Let's map the series name to an index and use that
-                    series_idx = self.series_names.index(series)
-                    super().plot(series=series_idx, **kwargs)
-                else:
-                    # Re-raise the error if we can't handle it
-                    raise
+        # Convert series name to index if needed
+        if isinstance(series, str):
+            if series in self.series_names:
+                series_idx = self.series_names.index(series)
             else:
-                raise
-        finally:
-            # Restore original attributes
-            for attr, value in original_attrs.items():
-                setattr(self, attr, value)
-
-    # Override the attributes that the parent MTS plot method expects
-    @property
-    def n_series(self):
-        return self.n_series_
-    
-    @property 
-    def init_n_series_(self):
-        return self.n_series_
+                raise ValueError(f"Series '{series}' doesn't exist in the input dataset")
+        else:
+            series_idx = series if series is not None else 0
+        
+        # Check bounds
+        if series_idx < 0 or series_idx >= self.n_series_:
+            raise ValueError(f"Series index {series_idx} is out of bounds (0 to {self.n_series_ - 1})")
+        
+        # Prepare data for plotting
+        y_all = list(self.df_.iloc[:, series_idx]) + list(self.mean_.iloc[:, series_idx])
+        y_test = list(self.mean_.iloc[:, series_idx])
+        n_points_all = len(y_all)
+        n_points_train = self.df_.shape[0]
+        
+        # Create x-axis values
+        if hasattr(self.df_, 'index') and hasattr(self.mean_, 'index'):
+            # Use dates if available
+            x_all = list(self.df_.index) + list(self.mean_.index)
+            x_test = list(self.mean_.index)
+            type_axis = "dates"
+        else:
+            # Use numeric indices
+            x_all = list(range(n_points_all))
+            x_test = list(range(n_points_train, n_points_all))
+            type_axis = "numeric"
+        
+        # Create the plot
+        import matplotlib.pyplot as plt
+        
+        fig, ax = plt.subplots()
+        ax.plot(x_all, y_all, "-", label="Historical")
+        ax.plot(x_test, y_test, "-", color="orange", label="Forecast")
+        ax.fill_between(
+            x_test,
+            self.lower_.iloc[:, series_idx],
+            self.upper_.iloc[:, series_idx],
+            alpha=0.2,
+            color="orange",
+            label="Prediction Interval"
+        )
+        
+        # Set title and labels
+        series_name = self.series_names[series_idx] if series_idx < len(self.series_names) else f"Series {series_idx}"
+        plt.title(f"Forecast for {series_name}", loc="left")
+        plt.xlabel("Time")
+        plt.ylabel("Value")
+        plt.legend()
+        
+        # Show the plot
+        plt.show()
