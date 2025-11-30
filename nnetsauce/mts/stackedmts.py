@@ -41,6 +41,10 @@ class MTSStacker(MTS):
         self.split_ratio = split_ratio
         self.fitted_base_models_ = []
         self.split_idx_ = None
+        self.mean_ = None
+        self.lower_ = None
+        self.upper_ = None
+        self.output_dates_ = None
 
     def fit(self, X, xreg=None, **kwargs):
         """
@@ -175,7 +179,17 @@ class MTSStacker(MTS):
             res = mx.tuple_map(result, slice_element)
             return DescribeResult(res[0], res[1], res[2], res[3])
 
-
-
+    def plot(self, series=None, **kwargs):
+        """
+        Plot the time series.
+        
+        Parameters
+        ----------
+        series : str, optional
+            Name of the series to plot
+        **kwargs : dict
+            Additional parameters for plotting
+        """
+        self.meta_model.plot(series=series, **kwargs)
 
                 
