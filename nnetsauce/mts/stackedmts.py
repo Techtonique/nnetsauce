@@ -243,45 +243,79 @@ class MTSStacker(MTS):
         if series_idx < 0 or series_idx >= self.n_series_:
             raise ValueError(f"Series index {series_idx} is out of bounds (0 to {self.n_series_ - 1})")
         
-        # Prepare data for plotting
-        y_all = list(self.df_.iloc[:, series_idx]) + list(self.mean_.iloc[:, series_idx])
-        y_test = list(self.mean_.iloc[:, series_idx])
-        n_points_all = len(y_all)
-        n_points_train = self.df_.shape[0]
-        
-        # Create x-axis values
-        if hasattr(self.df_, 'index') and hasattr(self.mean_, 'index'):
-            # Use dates if available
-            x_all = list(self.df_.index) + list(self.mean_.index)
-            x_test = list(self.mean_.index)
-            type_axis = "dates"
-        else:
-            # Use numeric indices
-            x_all = list(range(n_points_all))
-            x_test = list(range(n_points_train, n_points_all))
-            type_axis = "numeric"
-        
-        # Create the plot
+        # Prepare data for plotting - convert all dates to pandas Timestamp for consistency
         import matplotlib.pyplot as plt
+        import matplotlib.dates as mdates
         
-        fig, ax = plt.subplots()
-        ax.plot(x_all, y_all, "-", label="Historical")
-        ax.plot(x_test, y_test, "-", color="orange", label="Forecast")
-        ax.fill_between(
-            x_test,
-            self.lower_.iloc[:, series_idx],
-            self.upper_.iloc[:, series_idx],
-            alpha=0.2,
-            color="orange",
-            label="Prediction Interval"
-        )
+        # Get historical data
+        historical_data = self.df_.iloc[:, series_idx]
+        forecast_data = self.mean_.iloc[:, series_idx]
+        lower_data = self.lower_.iloc[:, series_idx]
+        upper_data = self.upper_.iloc[:, series_idx]
+        
+        # Convert indices to consistent datetime format
+        if hasattr(self.df_, 'index') and hasattr(self.mean_, 'index'):
+            # Convert all indices to pandas DatetimeIndex for consistency
+            hist_index = pd.to_datetime(self.df_.index)
+            forecast_index = pd.to_datetime(self.mean_.index)
+            
+            # Combine for full timeline
+            full_index = hist_index.union(forecast_index)
+            
+            # Create figure and axis
+            fig, ax = plt.subplots(figsize=(12, 6))
+            
+            # Plot historical data
+            ax.plot(hist_index, historical_data, "-", label="Historical", color='blue', linewidth=1.5)
+            
+            # Plot forecast data
+            ax.plot(forecast_index, forecast_data, "-", label="Forecast", color='red', linewidth=1.5)
+            
+            # Plot prediction intervals
+            ax.fill_between(forecast_index, lower_data, upper_data, alpha=0.3, color='red', label="Prediction Interval")
+            
+            # Add vertical line at the split point
+            if hasattr(self, 'split_idx_') and self.split_idx_ is not None:
+                split_date = hist_index[-1]  # Last historical date
+                ax.axvline(x=split_date, color='gray', linestyle='--', alpha=0.7, label='Train/Test Split')
+            
+            # Format x-axis for dates
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+            ax.xaxis.set_major_locator(mdates.YearLocator())
+            plt.xticks(rotation=45)
+            
+        else:
+            # Fallback to numeric indices if no dates available
+            n_points_train = self.df_.shape[0]
+            n_points_forecast = self.mean_.shape[0]
+            
+            x_hist = list(range(n_points_train))
+            x_forecast = list(range(n_points_train, n_points_train + n_points_forecast))
+            x_full = x_hist + x_forecast
+            
+            fig, ax = plt.subplots(figsize=(12, 6))
+            
+            # Plot historical data
+            ax.plot(x_hist, historical_data, "-", label="Historical", color='blue', linewidth=1.5)
+            
+            # Plot forecast data
+            ax.plot(x_forecast, forecast_data, "-", label="Forecast", color='red', linewidth=1.5)
+            
+            # Plot prediction intervals
+            ax.fill_between(x_forecast, lower_data, upper_data, alpha=0.3, color='red', label="Prediction Interval")
+            
+            # Add vertical line at the split point
+            if hasattr(self, 'split_idx_') and self.split_idx_ is not None:
+                ax.axvline(x=n_points_train - 0.5, color='gray', linestyle='--', alpha=0.7, label='Train/Test Split')
         
         # Set title and labels
         series_name = self.series_names[series_idx] if series_idx < len(self.series_names) else f"Series {series_idx}"
-        plt.title(f"Forecast for {series_name}", loc="left")
+        plt.title(f"Forecast for {series_name}", fontsize=14, fontweight='bold')
         plt.xlabel("Time")
         plt.ylabel("Value")
         plt.legend()
+        plt.grid(True, alpha=0.3)
         
-        # Show the plot
+        # Adjust layout and show
+        plt.tight_layout()
         plt.show()
