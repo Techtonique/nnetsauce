@@ -33,12 +33,15 @@ from .quantile.quantileclassification import QuantileClassifier
 from .randombag.randomBagClassifier import RandomBagClassifier
 from .randombag.randomBagRegressor import RandomBagRegressor
 from .randomfourier.randomfourier import RandomFourierEstimator
-from .randomfourier.rffridge import RandomFourierFeaturesRidge, RandomFourierFeaturesRidgeGCV
+from .rff.rffridge import (
+    RandomFourierFeaturesRidge,
+    RandomFourierFeaturesRidgeGCV,
+)
 from .ridge.ridge import RidgeRegressor
 from .ridge2.ridge2Classifier import Ridge2Classifier
 from .ridge2.ridge2Regressor import Ridge2Regressor
 from .ridge2.ridge2MultitaskClassifier import Ridge2MultitaskClassifier
-from .ridge2.ridge2MTSJAX import Ridge2Forecasting
+from .ridge2.ridge2MTSJAX import Ridge2Forecaster
 from .rvfl.bayesianrvflRegressor import BayesianRVFLRegressor
 from .rvfl.bayesianrvfl2Regressor import BayesianRVFL2Regressor
 from .sampling import SubSampler
@@ -87,7 +90,7 @@ __all__ = [
     "RandomFourierEstimator",
     "RandomFourierFeaturesRidge",
     "RandomFourierFeaturesRidgeGCV",
-    "RegressorUpdater",    
+    "RegressorUpdater",
     "ClassifierUpdater",
     "RidgeRegressor",
     "Ridge2Regressor",

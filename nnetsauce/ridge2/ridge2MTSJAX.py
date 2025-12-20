@@ -5,13 +5,11 @@ from scipy.stats import qmc, norm
 from functools import partial
 import matplotlib.pyplot as plt
 import warnings
-warnings.filterwarnings('ignore')
+
+warnings.filterwarnings("ignore")
 
 # Import scikit-optimize
-from skopt import gp_minimize
-from skopt.space import Integer, Real
-from skopt.utils import use_named_args
-from skopt.plots import plot_convergence
+
 
 class Ridge2Forecaster:
     """Vectorized Ridge2 RVFL for multivariate time series forecasting.
@@ -34,8 +32,16 @@ class Ridge2Forecaster:
         Random seed for reproducibility, by default 42
     """
 
-    def __init__(self, lags=1, nb_hidden=5, activ='relu', lambda_1=0.1,
-                 lambda_2=0.1, nodes_sim='sobol', seed=42):
+    def __init__(
+        self,
+        lags=1,
+        nb_hidden=5,
+        activ="relu",
+        lambda_1=0.1,
+        lambda_2=0.1,
+        nodes_sim="sobol",
+        seed=42,
+    ):
         self.lags = lags
         self.nb_hidden = nb_hidden
         self.lambda_1 = lambda_1
@@ -46,17 +52,19 @@ class Ridge2Forecaster:
 
         # Activation functions
         activations = {
-            'relu': lambda x: jnp.maximum(0, x),
-            'sigmoid': lambda x: 1 / (1 + jnp.exp(-x)),
-            'tanh': jnp.tanh,
-            'linear': lambda x: x
+            "relu": lambda x: jnp.maximum(0, x),
+            "sigmoid": lambda x: 1 / (1 + jnp.exp(-x)),
+            "tanh": jnp.tanh,
+            "linear": lambda x: x,
         }
         self.activation = jax.jit(activations[activ])
 
     def _create_lags(self, y):
         """Create lagged feature matrix (vectorized)."""
         n, p = y.shape
-        X = jnp.concatenate([y[self.lags-i-1:n-i-1] for i in range(self.lags)], axis=1)
+        X = jnp.concatenate(
+            [y[self.lags - i - 1: n - i - 1] for i in range(self.lags)], axis=1
+        )
         Y = y[self.lags:]
         return X, Y
 
@@ -64,13 +72,15 @@ class Ridge2Forecaster:
         """Initialize hidden layer weights using quasi-random sequences."""
         total_dim = n_features * self.nb_hidden
 
-        if self.nodes_sim == 'sobol':
+        if self.nodes_sim == "sobol":
             sampler = qmc.Sobol(d=total_dim, scramble=False, seed=self.seed)
             W = sampler.random(1).reshape(n_features, self.nb_hidden)
             W = 2 * W - 1
         else:
             key = jax.random.PRNGKey(self.seed)
-            W = jax.random.uniform(key, (n_features, self.nb_hidden), minval=-1, maxval=1)
+            W = jax.random.uniform(
+                key, (n_features, self.nb_hidden), minval=-1, maxval=1
+            )
 
         return jnp.array(W)
 
@@ -133,8 +143,15 @@ class Ridge2Forecaster:
         self.W = self._init_weights(X.shape[1])
         H = self._compute_hidden(X, self.W)
 
-        self.beta, self.gamma, self.Y_mean, self.X_mean, self.X_std, self.H_mean, self.H_std = \
-            self._solve_ridge2(X, H, Y)
+        (
+            self.beta,
+            self.gamma,
+            self.Y_mean,
+            self.X_mean,
+            self.X_std,
+            self.H_mean,
+            self.H_std,
+        ) = self._solve_ridge2(X, H, Y)
 
         # Compute residuals for prediction intervals
         X_s = (X - self.X_mean) / self.X_std
@@ -188,7 +205,7 @@ class Ridge2Forecaster:
 
         return jnp.array(forecasts)
 
-    def predict(self, h=5, level=None, method='gaussian', B=100):
+    def predict(self, h=5, level=None, method="gaussian", B=100):
         """Generate prediction intervals with proper uncertainty propagation.
 
         Parameters
@@ -211,17 +228,17 @@ class Ridge2Forecaster:
         upper : array-like of shape (h,)
             Upper bounds of prediction intervals.
         """
-        
+
         point_forecast = self._forecast(h)
 
         if level is None:
             return point_forecast
 
         # probabilistic prediction intervals
-        if method == 'gaussian':
+        if method == "gaussian":
             # Use residual std with horizon-dependent scaling
             residual_std = np.std(self.residuals, axis=0)
-            z = norm.ppf(1 - (1 - level/100) / 2)
+            z = norm.ppf(1 - (1 - level / 100) / 2)
 
             # Scale uncertainty by sqrt(h) for each horizon
             horizon_scale = np.sqrt(np.arange(1, h + 1))[:, None]
@@ -230,8 +247,7 @@ class Ridge2Forecaster:
             lower = point_forecast - z * std_expanded
             upper = point_forecast + z * std_expanded
 
-        elif method == 'bootstrap':
-
+        elif method == "bootstrap":
             # Proper residual bootstrap
             key = jax.random.PRNGKey(self.seed)
             n_residuals = len(self.residuals)
@@ -239,7 +255,9 @@ class Ridge2Forecaster:
 
             for _ in range(B):
                 key, subkey = jax.random.split(key)
-                boot_indices = np.random.choice(n_residuals, size=h, replace=True)
+                boot_indices = np.random.choice(
+                    n_residuals, size=h, replace=True
+                )
                 boot_resids = self.residuals[boot_indices]
 
                 current = self.last_obs.copy()
@@ -259,8 +277,7 @@ class Ridge2Forecaster:
             upper = jnp.percentile(sims, 100 - (100 - level) / 2, axis=0)
 
         return {
-            'mean': np.array(point_forecast),
-            'lower': np.array(lower),
-            'upper': np.array(upper)
+            "mean": np.array(point_forecast),
+            "lower": np.array(lower),
+            "upper": np.array(upper),
         }
-

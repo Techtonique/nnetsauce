@@ -412,7 +412,7 @@ class Ridge2Classifier(Ridge2, ClassifierMixin):
             )
             self.beta_ = opt.x
             self.minloglik_ = opt.fun
-        
+
         self.coef_ = self.beta_
 
         self.classes_ = np.unique(y)

@@ -7,5 +7,5 @@ __all__ = [
     "Ridge2Classifier",
     "Ridge2Regressor",
     "Ridge2MultitaskClassifier",
-    "Ridge2Forecaster"
+    "Ridge2Forecaster",
 ]
