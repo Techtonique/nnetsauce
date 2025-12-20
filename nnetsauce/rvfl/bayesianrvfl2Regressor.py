@@ -138,6 +138,7 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         self.Sigma_ = None
         self.GCV_ = None
         self.return_std = return_std
+        self.coef_ = None
 
     def fit(self, X, y, **kwargs):
         """Fit BayesianRVFL2Regressor to training data (X, y)
@@ -193,6 +194,8 @@ class BayesianRVFL2Regressor(Base, RegressorMixin):
         )
 
         self.beta_ = fit_obj["beta_hat"]
+
+        self.coef_ = self.beta_
 
         if self.return_std == True:
             self.Sigma_ = fit_obj["Sigma_hat"]

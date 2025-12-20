@@ -158,6 +158,7 @@ class Ridge2MultitaskClassifier(Ridge2, ClassifierMixin):
         )
 
         self.type_fit = "classification"
+        self.coef_ = None
 
     def fit(self, X, y, **kwargs):
         """Fit Ridge model to training data (X, y).

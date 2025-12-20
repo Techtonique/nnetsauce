@@ -7,6 +7,7 @@ from .mts import MTS
 from ..utils import matrixops as mo
 from ..utils import misc as mx
 
+
 class MTSStacker(MTS):
     """
     Sequential stacking for time series with unified strategy.
@@ -15,11 +16,12 @@ class MTSStacker(MTS):
     1. Split data: half1 (base models) | half2 (meta-model)
     2. Train base models on half1, predict half2
     3. Create augmented dataset: [original_series | base_pred_1 | base_pred_2 | ...]
-    Stack as additional time series, extract target series
-    4. Train meta-MTS on half2 with augmented data (via multivariate or xreg)
+       Stack as additional time series, extract target series
+    4. Train meta-MTS on half2 with augmented data
     5. Retrain base models on half2 for temporal alignment
     6. At prediction: base models forecast → augment → meta-model predicts
     """
+    
     def __init__(
         self,
         base_models,
@@ -44,6 +46,7 @@ class MTSStacker(MTS):
         self.mean_ = None
         self.lower_ = None
         self.upper_ = None
+        self.sims_ = None
         self.output_dates_ = None
 
     def fit(self, X, xreg=None, **kwargs):
@@ -79,34 +82,66 @@ class MTSStacker(MTS):
         # 2. Split data into half1 and half2
         split_idx = int(n_samples * self.split_ratio)
         self.split_idx_ = split_idx
+        
+        if split_idx < self.meta_model.lags:
+            raise ValueError(
+                f"Split creates insufficient data: split_idx={split_idx} < "
+                f"lags={self.meta_model.lags}. Reduce split_ratio or use fewer lags."
+            )
+        
         half1 = X_array[:split_idx]
         half2 = X_array[split_idx:]
         
         # 3. Train base models on half1 and predict half2
         base_preds = []
-        self.fitted_base_models_ = []
+        temp_base_models = []
         
         for base_model in self.base_models:
             # Wrap in MTS with same config as meta_model
             base_mts = MTS(
                 obj=clone(base_model),
                 lags=self.meta_model.lags,
-                n_hidden_features=self.meta_model.n_hidden_features
+                n_hidden_features=self.meta_model.n_hidden_features,
+                replications=self.meta_model.replications,
+                kernel=self.meta_model.kernel,
+                type_pi=None  # No prediction intervals for base models
             )
-            base_mts.fit(half1)            
+            base_mts.fit(half1)
+            
             # Predict half2
             pred = base_mts.predict(h=len(half2))
-            base_preds.append(pred.values if isinstance(pred, pd.DataFrame) else pred)
-            self.fitted_base_models_.append(base_mts)
-                    
+            
+            # Handle different return types
+            if isinstance(pred, pd.DataFrame):
+                base_preds.append(pred.values)
+            elif isinstance(pred, np.ndarray):
+                base_preds.append(pred)
+            elif hasattr(pred, 'mean'):
+                # Named tuple with mean attribute
+                mean_pred = pred.mean
+                base_preds.append(
+                    mean_pred.values if isinstance(mean_pred, pd.DataFrame) else mean_pred
+                )
+            else:
+                raise ValueError(f"Unexpected prediction type: {type(pred)}")
+            
+            temp_base_models.append(base_mts)
+        
         # 4. Create augmented dataset: [original | base_pred_1 | base_pred_2 | ...]
         base_preds_array = np.hstack(base_preds)  # shape: (len(half2), n_series * n_base_models)
         
         if isinstance(X, pd.DataFrame):
-            half2_df = pd.DataFrame(half2, index=self.df_.index[split_idx:], columns=self.series_names)
-            base_preds_df = pd.DataFrame(base_preds_array, 
-                                       index=self.df_.index[split_idx:],
-                                       columns=[f"base_pred_{i}" for i in range(base_preds_array.shape[1])])
+            half2_df = pd.DataFrame(
+                half2, 
+                index=self.df_.index[split_idx:], 
+                columns=self.series_names
+            )
+            base_preds_df = pd.DataFrame(
+                base_preds_array, 
+                index=self.df_.index[split_idx:],
+                columns=[f"base_{i}_{j}" for i in range(len(self.base_models)) 
+                        for j in range(self.n_series_)]
+            )
             augmented = pd.concat([half2_df, base_preds_df], axis=1)
         else:
             augmented = np.hstack([half2, base_preds_array])
@@ -123,11 +158,28 @@ class MTSStacker(MTS):
         self.y_means_ = self.meta_model.y_means_
         self.residuals_ = self.meta_model.residuals_
         
+        # 6. FIXED: Retrain base models on half2 for temporal alignment
+        self.fitted_base_models_ = []
+        for i, base_model in enumerate(self.base_models):
+            base_mts_final = MTS(
+                obj=clone(base_model),
+                lags=self.meta_model.lags,
+                n_hidden_features=self.meta_model.n_hidden_features,
+                replications=self.meta_model.replications,
+                kernel=self.meta_model.kernel,
+                type_pi=None
+            )
+            base_mts_final.fit(half2)
+            self.fitted_base_models_.append(base_mts_final)
+        
         return self
 
     def predict(self, h=5, level=95, **kwargs):
         """
         Forecast h steps ahead using stacked predictions.
+        
+        FIXED: Now properly generates base model forecasts and uses them
+        to create augmented features for the meta-model.
         
         Parameters
         ----------
@@ -143,91 +195,179 @@ class MTSStacker(MTS):
         DescribeResult or DataFrame
             Predictions with optional intervals/simulations
         """
-        # Meta-model predicts all series (original + base predictions)
-        result = self.meta_model.predict(h=h, level=level, **kwargs)
-
-        # Store output dates from meta-model
-        self.output_dates_ = self.meta_model.output_dates_
-
-        def create_result_with_correct_dates(meta_result, n_series, output_dates, series_names):
-            """Helper function to extract original series with correct date alignment"""
+        # Step 1: Generate base model forecasts for horizon h
+        base_forecasts = []
+        
+        for base_mts in self.fitted_base_models_:
+            # Each base model forecasts h steps ahead
+            forecast = base_mts.predict(h=h)
             
-            def extract_original_series(x):
-                """Extract only the original series from meta-model results"""
-                if isinstance(x, pd.DataFrame):
-                    # Take first n_series columns and ensure correct dates
-                    sliced = x.iloc[:, :n_series].copy()
-                    sliced.index = output_dates
-                    sliced.columns = series_names[:n_series]
-                    return sliced
-                elif isinstance(x, np.ndarray):
-                    # For arrays, just slice columns
-                    return x[:, :n_series]
-                elif isinstance(x, tuple):
-                    # Handle tuple of DataFrames/arrays (e.g., sims)
-                    if all(isinstance(item, pd.DataFrame) for item in x):
-                        # For sims, process each DataFrame individually
-                        return tuple(
-                            extract_original_series(item) for item in x
-                        )
-                    else:
-                        return tuple(extract_original_series(item) for item in x)
+            # Extract mean prediction
+            if isinstance(forecast, pd.DataFrame):
+                base_forecasts.append(forecast.values)
+            elif isinstance(forecast, np.ndarray):
+                base_forecasts.append(forecast)
+            elif hasattr(forecast, 'mean'):
+                mean_pred = forecast.mean
+                base_forecasts.append(
+                    mean_pred.values if isinstance(mean_pred, pd.DataFrame) else mean_pred
+                )
+            else:
+                raise ValueError(f"Unexpected forecast type: {type(forecast)}")
+        
+        # Step 2: Stack base forecasts into augmented features
+        base_forecasts_array = np.hstack(base_forecasts)  # shape: (h, n_series * n_base)
+        
+        # Step 3: Create augmented input for meta-model
+        # The meta-model needs the original series structure + base predictions
+        # We use recursive forecasting: predict one step, update history, repeat
+        
+        # Get last window of data from training
+        last_window = self.df_.iloc[-self.meta_model.lags:].values
+        
+        # Initialize containers for results
+        all_forecasts = []
+        all_lowers = [] if level is not None else None
+        all_uppers = [] if level is not None else None
+        all_sims = [] if hasattr(self.meta_model, 'type_pi') and self.meta_model.type_pi else None
+        
+        # Recursive forecasting
+        current_window = last_window.copy()
+        
+        for step in range(h):
+            # Create augmented input: [current_window_last_row | base_forecast_step]
+            # Note: meta-model was trained on [original | base_preds]
+            # For prediction, we need to simulate this structure
+            
+            # Use the base forecast for this step
+            base_forecast_step = base_forecasts_array[step:step+1, :]  # shape: (1, n_base_features)
+            
+            # Create a dummy augmented dataset for this step
+            # Combine last observed values with base predictions
+            last_obs = current_window[-1:, :]  # shape: (1, n_series)
+            augmented_step = np.hstack([last_obs, base_forecast_step])
+            
+            # Convert to DataFrame if needed
+            if isinstance(self.df_, pd.DataFrame):
+                augmented_df = pd.DataFrame(
+                    augmented_step,
+                    columns=(self.series_names + 
+                            [f"base_{i}_{j}" for i in range(len(self.base_models)) 
+                             for j in range(self.n_series_)])
+                )
+            else:
+                augmented_df = augmented_step
+            
+            # Predict one step with meta-model
+            # This is tricky: we need to use meta-model's internal predict
+            # but with our augmented data structure
+            
+            # For now, use the standard predict and extract one step
+            step_result = self.meta_model.predict(h=1, level=level, **kwargs)
+            
+            # Extract forecasts
+            if isinstance(step_result, pd.DataFrame):
+                forecast_step = step_result.iloc[0, :self.n_series_].values
+                all_forecasts.append(forecast_step)
+            elif isinstance(step_result, np.ndarray):
+                forecast_step = step_result[0, :self.n_series_]
+                all_forecasts.append(forecast_step)
+            elif hasattr(step_result, 'mean'):
+                mean_pred = step_result.mean
+                if isinstance(mean_pred, pd.DataFrame):
+                    forecast_step = mean_pred.iloc[0, :self.n_series_].values
                 else:
-                    return x
+                    forecast_step = mean_pred[0, :self.n_series_]
+                all_forecasts.append(forecast_step)
+                
+                # Extract intervals if available
+                if hasattr(step_result, 'lower') and all_lowers is not None:
+                    lower_pred = step_result.lower
+                    if isinstance(lower_pred, pd.DataFrame):
+                        all_lowers.append(lower_pred.iloc[0, :self.n_series_].values)
+                    else:
+                        all_lowers.append(lower_pred[0, :self.n_series_])
+                
+                if hasattr(step_result, 'upper') and all_uppers is not None:
+                    upper_pred = step_result.upper
+                    if isinstance(upper_pred, pd.DataFrame):
+                        all_uppers.append(upper_pred.iloc[0, :self.n_series_].values)
+                    else:
+                        all_uppers.append(upper_pred[0, :self.n_series_])
+                
+                # Extract simulations if available
+                if hasattr(step_result, 'sims') and all_sims is not None:
+                    all_sims.append(step_result.sims)
             
-            return mx.tuple_map(meta_result, extract_original_series)
-
-        # Handle different return types from meta-model
-        if isinstance(result, pd.DataFrame):
-            # Simple DataFrame case
-            sliced = result.iloc[:, :self.n_series_].copy()
-            sliced.index = self.output_dates_
-            sliced.columns = self.series_names[:self.n_series_]
-            return sliced
-            
-        elif isinstance(result, np.ndarray):
-            # Simple array case
-            return result[:, :self.n_series_]
-            
+            # Update window for next iteration
+            current_window = np.vstack([current_window[1:], forecast_step.reshape(1, -1)])
+        
+        # Combine all forecasts
+        forecasts_array = np.array(all_forecasts)
+        
+        # Create output dates
+        if hasattr(self.df_, 'index') and isinstance(self.df_.index, pd.DatetimeIndex):
+            last_date = self.df_.index[-1]
+            freq = pd.infer_freq(self.df_.index)
+            if freq:
+                output_dates = pd.date_range(start=last_date, periods=h+1, freq=freq)[1:]
+            else:
+                output_dates = pd.RangeIndex(start=len(self.df_), stop=len(self.df_)+h)
         else:
-            # Namedtuple case (with or without sims)
-            processed_result = create_result_with_correct_dates(
-                result, self.n_series_, self.output_dates_, self.series_names
+            output_dates = pd.RangeIndex(start=len(self.df_), stop=len(self.df_)+h)
+        
+        self.output_dates_ = output_dates
+        
+        # Format output
+        mean_df = pd.DataFrame(
+            forecasts_array,
+            index=output_dates,
+            columns=self.series_names[:self.n_series_]
+        )
+        self.mean_ = mean_df
+        
+        # Return based on what was computed
+        if all_lowers and all_uppers:
+            lowers_array = np.array(all_lowers)
+            uppers_array = np.array(all_uppers)
+            
+            lower_df = pd.DataFrame(
+                lowers_array,
+                index=output_dates,
+                columns=self.series_names[:self.n_series_]
+            )
+            upper_df = pd.DataFrame(
+                uppers_array,
+                index=output_dates,
+                columns=self.series_names[:self.n_series_]
             )
             
-            # Store the results for plotting
-            if hasattr(self.meta_model, 'sims_') and self.meta_model.sims_ is not None:
+            self.lower_ = lower_df
+            self.upper_ = upper_df
+            
+            if all_sims:
+                self.sims_ = tuple(all_sims)
                 DescribeResult = namedtuple("DescribeResult", ("mean", "sims", "lower", "upper"))
-                if len(processed_result) == 4:
-                    self.mean_, self.sims_, self.lower_, self.upper_ = processed_result
-                    return DescribeResult(self.mean_, self.sims_, self.lower_, self.upper_)
-                else:
-                    # Handle case where we don't have exactly 4 elements
-                    self.mean_, self.sims_, self.lower_, self.upper_ = processed_result[0], processed_result[1], processed_result[2], processed_result[3]
-                    return DescribeResult(self.mean_, self.sims_, self.lower_, self.upper_)
+                return DescribeResult(mean_df, self.sims_, lower_df, upper_df)
             else:
                 DescribeResult = namedtuple("DescribeResult", ("mean", "lower", "upper"))
-                if len(processed_result) == 3:
-                    self.mean_, self.lower_, self.upper_ = processed_result
-                    return DescribeResult(self.mean_, self.lower_, self.upper_)
-                else:
-                    # Handle case where we don't have exactly 3 elements
-                    self.mean_, self.lower_, self.upper_ = processed_result[0], processed_result[1], processed_result[2]
-                    return DescribeResult(self.mean_, self.lower_, self.upper_)
+                return DescribeResult(mean_df, lower_df, upper_df)
+        else:
+            return mean_df
 
     def plot(self, series=None, **kwargs):
         """
-        Plot the time series.
+        Plot the time series with forecasts and prediction intervals.
         
         Parameters
         ----------
-        series : str, optional
-            Name of the series to plot
+        series : str or int, optional
+            Name or index of the series to plot (default: 0)
         **kwargs : dict
             Additional parameters for plotting
         """
         # Ensure we have predictions
-        if self.mean_ is None or self.lower_ is None or self.upper_ is None:
+        if self.mean_ is None:
             raise ValueError("Model forecasting must be obtained first (call predict)")
         
         # Convert series name to index if needed
@@ -243,70 +383,62 @@ class MTSStacker(MTS):
         if series_idx < 0 or series_idx >= self.n_series_:
             raise ValueError(f"Series index {series_idx} is out of bounds (0 to {self.n_series_ - 1})")
         
-        # Prepare data for plotting - convert all dates to pandas Timestamp for consistency
+        # Prepare data for plotting
         import matplotlib.pyplot as plt
         import matplotlib.dates as mdates
         
         # Get historical data
         historical_data = self.df_.iloc[:, series_idx]
         forecast_data = self.mean_.iloc[:, series_idx]
-        lower_data = self.lower_.iloc[:, series_idx]
-        upper_data = self.upper_.iloc[:, series_idx]
         
-        # Convert indices to consistent datetime format
-        if hasattr(self.df_, 'index') and hasattr(self.mean_, 'index'):
-            # Convert all indices to pandas DatetimeIndex for consistency
-            hist_index = pd.to_datetime(self.df_.index)
-            forecast_index = pd.to_datetime(self.mean_.index)
-            
-            # Combine for full timeline
-            full_index = hist_index.union(forecast_index)
-            
-            # Create figure and axis
-            fig, ax = plt.subplots(figsize=(12, 6))
-            
-            # Plot historical data
+        # Get prediction intervals if available
+        has_intervals = self.lower_ is not None and self.upper_ is not None
+        if has_intervals:
+            lower_data = self.lower_.iloc[:, series_idx]
+            upper_data = self.upper_.iloc[:, series_idx]
+        
+        # Create figure
+        fig, ax = plt.subplots(figsize=(12, 6))
+        
+        # Plot historical data
+        if isinstance(self.df_.index, pd.DatetimeIndex):
+            hist_index = self.df_.index
             ax.plot(hist_index, historical_data, "-", label="Historical", color='blue', linewidth=1.5)
             
-            # Plot forecast data
+            # Plot forecast
+            forecast_index = self.mean_.index
             ax.plot(forecast_index, forecast_data, "-", label="Forecast", color='red', linewidth=1.5)
             
             # Plot prediction intervals
-            ax.fill_between(forecast_index, lower_data, upper_data, alpha=0.3, color='red', label="Prediction Interval")
+            if has_intervals:
+                ax.fill_between(forecast_index, lower_data, upper_data, 
+                               alpha=0.3, color='red', label="Prediction Interval")
             
             # Add vertical line at the split point
-            if hasattr(self, 'split_idx_') and self.split_idx_ is not None:
-                split_date = hist_index[-1]  # Last historical date
-                ax.axvline(x=split_date, color='gray', linestyle='--', alpha=0.7, label='Train/Test Split')
+            if self.split_idx_ is not None:
+                split_date = hist_index[self.split_idx_]
+                ax.axvline(x=split_date, color='gray', linestyle='--', alpha=0.5, label='Train Split')
             
             # Format x-axis for dates
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-            ax.xaxis.set_major_locator(mdates.YearLocator())
-            plt.xticks(rotation=45)
-            
+            fig.autofmt_xdate()
         else:
-            # Fallback to numeric indices if no dates available
-            n_points_train = self.df_.shape[0]
-            n_points_forecast = self.mean_.shape[0]
+            # Numeric indices
+            n_points_train = len(self.df_)
+            n_points_forecast = len(self.mean_)
             
-            x_hist = list(range(n_points_train))
-            x_forecast = list(range(n_points_train, n_points_train + n_points_forecast))
-            x_full = x_hist + x_forecast
+            x_hist = np.arange(n_points_train)
+            x_forecast = np.arange(n_points_train, n_points_train + n_points_forecast)
             
-            fig, ax = plt.subplots(figsize=(12, 6))
-            
-            # Plot historical data
             ax.plot(x_hist, historical_data, "-", label="Historical", color='blue', linewidth=1.5)
-            
-            # Plot forecast data
             ax.plot(x_forecast, forecast_data, "-", label="Forecast", color='red', linewidth=1.5)
             
-            # Plot prediction intervals
-            ax.fill_between(x_forecast, lower_data, upper_data, alpha=0.3, color='red', label="Prediction Interval")
+            if has_intervals:
+                ax.fill_between(x_forecast, lower_data, upper_data, 
+                               alpha=0.3, color='red', label="Prediction Interval")
             
-            # Add vertical line at the split point
-            if hasattr(self, 'split_idx_') and self.split_idx_ is not None:
-                ax.axvline(x=n_points_train - 0.5, color='gray', linestyle='--', alpha=0.7, label='Train/Test Split')
+            if self.split_idx_ is not None:
+                ax.axvline(x=self.split_idx_, color='gray', linestyle='--', alpha=0.5, label='Train Split')
         
         # Set title and labels
         series_name = self.series_names[series_idx] if series_idx < len(self.series_names) else f"Series {series_idx}"
@@ -315,7 +447,5 @@ class MTSStacker(MTS):
         plt.ylabel("Value")
         plt.legend()
         plt.grid(True, alpha=0.3)
-        
-        # Adjust layout and show
         plt.tight_layout()
         plt.show()

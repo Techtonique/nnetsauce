@@ -124,6 +124,7 @@ class Ridge2Regressor(Ridge2, RegressorMixin):
         )
 
         self.type_fit = "regression"
+        self.coef_ = None
 
     def fit(self, X, y, **kwargs):
         """Fit Ridge model to training data (X, y).
