@@ -21,6 +21,7 @@ from .mts.mts import MTS
 from .mts.mlarch import MLARCH
 from .mts.classical import ClassicalMTS
 from .mts.stackedmts import MTSStacker
+from .mts.multioutputmts import MultiOutputMTS
 from .multitask.multitaskClassifier import MultitaskClassifier
 from .multitask.simplemultitaskClassifier import SimpleMultitaskClassifier
 from .neuralnet.neuralnetregression import NeuralNetRegressor
@@ -76,6 +77,7 @@ __all__ = [
     "MedianVotingRegressor",
     "MTS",
     "MTSStacker",
+    "MultiOutputMTS",
     "MultitaskClassifier",
     "NeuralNetRegressor",
     "NeuralNetClassifier",
