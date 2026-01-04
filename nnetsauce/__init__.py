@@ -43,6 +43,7 @@ from .ridge2.ridge2Classifier import Ridge2Classifier
 from .ridge2.ridge2Regressor import Ridge2Regressor
 from .ridge2.ridge2MultitaskClassifier import Ridge2MultitaskClassifier
 from .ridge2.ridge2MTSJAX import Ridge2Forecaster
+from .ridge2.ridge2multioutputregressor import Ridge2MultiOutputRegressor
 from .rvfl.bayesianrvflRegressor import BayesianRVFLRegressor
 from .rvfl.bayesianrvfl2Regressor import BayesianRVFL2Regressor
 from .sampling import SubSampler
@@ -96,6 +97,7 @@ __all__ = [
     "ClassifierUpdater",
     "RidgeRegressor",
     "Ridge2Regressor",
+    "Ridge2MultiOutputRegressor",
     "Ridge2Classifier",
     "Ridge2MultitaskClassifier",
     "Ridge2Forecaster",

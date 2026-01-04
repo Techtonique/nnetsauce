@@ -85,6 +85,7 @@ nnetsauce/ridge2/ridge2Classifier.py
 nnetsauce/ridge2/ridge2MTSJAX.py
 nnetsauce/ridge2/ridge2MultitaskClassifier.py
 nnetsauce/ridge2/ridge2Regressor.py
+nnetsauce/ridge2/ridge2multioutputregressor.py
 nnetsauce/rvfl/__init__.py
 nnetsauce/rvfl/bayesianrvfl2Regressor.py
 nnetsauce/rvfl/bayesianrvflRegressor.py

@@ -1,3 +1,7 @@
+# version 0.49.0
+
+- add "Ridge2MultioutputRegressor", "MultiOutputMTS"  
+
 # version 0.39.1
 
 - Enhance `predict` method in `MTS` class to handle multiple quantiles (predict whole distribution, 
