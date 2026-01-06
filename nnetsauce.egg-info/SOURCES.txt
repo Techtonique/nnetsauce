@@ -26,6 +26,8 @@ nnetsauce/deep/__init__.py
 nnetsauce/deep/deepClassifier.py
 nnetsauce/deep/deepMTS.py
 nnetsauce/deep/deepRegressor.py
+nnetsauce/elasticnet2/__init__.py
+nnetsauce/elasticnet2/enet2.py
 nnetsauce/glm/__init__.py
 nnetsauce/glm/glm.py
 nnetsauce/glm/glmClassifier.py

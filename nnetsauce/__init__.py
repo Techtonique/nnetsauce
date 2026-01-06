@@ -9,6 +9,7 @@ from .datasets import Downloader
 from .deep.deepClassifier import DeepClassifier
 from .deep.deepRegressor import DeepRegressor
 from .deep.deepMTS import DeepMTS
+from .elasticnet2.enet2 import ElasticNet2Regressor
 from .glm.glmClassifier import GLMClassifier
 from .glm.glmRegressor import GLMRegressor
 from .kernel.kernel import KernelRidge
@@ -65,6 +66,7 @@ __all__ = [
     "DeepRegressor",
     "DeepMTS",
     "Downloader",
+    "ElasticNet2Regressor",
     "GLMClassifier",
     "GLMRegressor",
     "KernelRidge",
