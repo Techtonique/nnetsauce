@@ -23,6 +23,7 @@ from .mts.mlarch import MLARCH
 from .mts.classical import ClassicalMTS
 from .mts.stackedmts import MTSStacker
 from .mts.multioutputmts import MultiOutputMTS
+from .mts.discretetokenmts import DiscreteTokenMTS
 from .multitask.multitaskClassifier import MultitaskClassifier
 from .multitask.simplemultitaskClassifier import SimpleMultitaskClassifier
 from .neuralnet.neuralnetregression import NeuralNetRegressor
@@ -65,6 +66,7 @@ __all__ = [
     "DeepClassifier",
     "DeepRegressor",
     "DeepMTS",
+    "DiscreteTokenMTS",
     "Downloader",
     "ElasticNet2Regressor",
     "GLMClassifier",

@@ -1,3 +1,7 @@
+# version 0.50.0
+
+- add "DiscreteTokenMTS" for discrete token multivariate time series forecasting
+
 # version 0.49.0
 
 - add "Ridge2MultioutputRegressor", "MultiOutputMTS"  
