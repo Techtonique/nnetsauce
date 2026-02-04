@@ -1,3 +1,8 @@
+# version 0.50.1
+
+- add `MultiOutputRegressor` to `SimpleMultitaskClassifier`
+- Add `level` and `scoring` attributes to `QuantileClassifier` and `QuantileRegressor`
+
 # version 0.50.0
 
 - add "DiscreteTokenMTS" for discrete token multivariate time series forecasting
