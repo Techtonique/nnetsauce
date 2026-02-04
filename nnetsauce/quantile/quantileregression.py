@@ -75,8 +75,9 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
             "conformal",
             "studentized",
             "conformal-studentized",
-        ), "scoring must be 'predictions' or 'residuals'"
+        ), "scoring must be 'predictions' or 'residuals' or 'conformal' or 'studentized' or 'conformal-studentized'"
         self.obj = obj
+        self.level = level
         low_risk_level = (1 - level / 100) / 2
         self.quantiles = [low_risk_level, 0.5, 1 - low_risk_level]
         self.scoring = scoring

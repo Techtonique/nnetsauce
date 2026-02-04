@@ -11,6 +11,7 @@ from collections import namedtuple
 from copy import deepcopy
 from scipy.special import expit
 from sklearn.base import ClassifierMixin
+from sklearn.multioutput import MultiOutputRegressor
 from sklearn.preprocessing import StandardScaler
 
 
@@ -81,6 +82,7 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
         self.type_fit = "classification"
         self.obj = obj
         self.fit_objs_ = {}
+        self.multioutput_model_ = None
         self.X_scaler_ = StandardScaler()
         self.scaled_X_ = None
 
@@ -115,21 +117,37 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
         # multitask response
         Y = mo.one_hot_encode2(y, self.n_classes_)
 
+        # Try MultiOutputRegressor first (more efficient)
         try:
-            for i in range(self.n_classes_):
-                self.fit_objs_[i] = deepcopy(
-                    self.obj.fit(
-                        self.scaled_X_,
-                        Y[:, i],
-                        sample_weight=sample_weight,
-                        **kwargs
+            self.multioutput_model_ = MultiOutputRegressor(deepcopy(self.obj))
+            try:
+                self.multioutput_model_.fit(
+                    self.scaled_X_,
+                    Y,
+                    sample_weight=sample_weight,
+                    **kwargs
+                )
+            except TypeError:
+                # If sample_weight not supported, try without it
+                self.multioutput_model_.fit(self.scaled_X_, Y, **kwargs)
+        except Exception:
+            # Fallback: fit separate models for each class
+            self.multioutput_model_ = None
+            try:
+                for i in range(self.n_classes_):
+                    self.fit_objs_[i] = deepcopy(
+                        self.obj.fit(
+                            self.scaled_X_,
+                            Y[:, i],
+                            sample_weight=sample_weight,
+                            **kwargs
+                        )
                     )
-                )
-        except Exception as e:
-            for i in range(self.n_classes_):
-                self.fit_objs_[i] = deepcopy(
-                    self.obj.fit(self.scaled_X_, Y[:, i], **kwargs)
-                )
+            except TypeError:
+                for i in range(self.n_classes_):
+                    self.fit_objs_[i] = deepcopy(
+                        self.obj.fit(self.scaled_X_, Y[:, i], **kwargs)
+                    )
         return self
 
     def predict(self, X, **kwargs):
@@ -169,28 +187,43 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
 
         shape_X = X.shape
 
-        probs = np.zeros((shape_X[0], self.n_classes_))
+        if self.multioutput_model_ is not None:
+            # Use MultiOutputRegressor for prediction
+            if len(shape_X) == 1:  # one example
+                n_features = shape_X[0]
+                new_X = mo.rbind(
+                    X.reshape(1, n_features),
+                    np.ones(n_features).reshape(1, n_features),
+                )
+                Z = self.X_scaler_.transform(new_X, **kwargs)
+                probs = self.multioutput_model_.predict(Z, **kwargs)[:1, :]
+            else:  # multiple rows
+                Z = self.X_scaler_.transform(X, **kwargs)
+                probs = self.multioutput_model_.predict(Z, **kwargs)
+        else:
+            # Use separate models for each class
+            probs = np.zeros((shape_X[0], self.n_classes_))
 
-        if len(shape_X) == 1:  # one example
-            n_features = shape_X[0]
+            if len(shape_X) == 1:  # one example
+                n_features = shape_X[0]
 
-            new_X = mo.rbind(
-                X.reshape(1, n_features),
-                np.ones(n_features).reshape(1, n_features),
-            )
+                new_X = mo.rbind(
+                    X.reshape(1, n_features),
+                    np.ones(n_features).reshape(1, n_features),
+                )
 
-            Z = self.X_scaler_.transform(new_X, **kwargs)
+                Z = self.X_scaler_.transform(new_X, **kwargs)
 
-            # Fallback to standard model
-            for i in range(self.n_classes_):
-                probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)[0]
+                # Fallback to standard model
+                for i in range(self.n_classes_):
+                    probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)[0]
 
-        else:  # multiple rows
-            Z = self.X_scaler_.transform(X, **kwargs)
+            else:  # multiple rows
+                Z = self.X_scaler_.transform(X, **kwargs)
 
-            # Fallback to standard model
-            for i in range(self.n_classes_):
-                probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)
+                # Fallback to standard model
+                for i in range(self.n_classes_):
+                    probs[:, i] = self.fit_objs_[i].predict(Z, **kwargs)
 
         expit_raw_probs = expit(probs)
 

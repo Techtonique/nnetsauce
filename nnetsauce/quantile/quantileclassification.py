@@ -82,9 +82,11 @@ class QuantileClassifier(BaseEstimator, ClassifierMixin):
             "conformal",
             "studentized",
             "conformal-studentized",
-        ), "scoring must be 'predictions' or 'residuals'"
+        ), "scoring must be 'predictions' or 'residuals' or 'conformal' or 'studentized' or 'conformal-studentized'"
         self.obj = obj
-        quantileregressor = QuantileRegressor(self.obj)
+        self.level = level
+        self.scoring = scoring
+        quantileregressor = QuantileRegressor(self.obj, self.level, self.scoring)
         quantileregressor.predict = partial(
             quantileregressor.predict, return_pi=False
         )
