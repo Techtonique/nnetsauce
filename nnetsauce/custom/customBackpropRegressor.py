@@ -1,5 +1,9 @@
-import jax
-import jax.numpy as jnp
+try: 
+    import jax
+    import jax.numpy as jnp
+except ImportError as e: 
+     
+    pass 
 import nnetsauce as ns  # adjust if your import path differs
 import pandas as pd
 import numpy as np

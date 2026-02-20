@@ -3,11 +3,6 @@
 # License: BSD 3 Clear
 
 import copy
-try: 
-    import jax
-    JAX_AVAILABLE = True
-except ImportError: 
-    JAX_AVAILABLE = False
 import numpy as np
 import pandas as pd
 import platform
@@ -46,7 +41,6 @@ try:
     import jax.numpy as jnp
     JAX_AVAILABLE = True
 except ImportError:
-    JAX_AVAILABLE = False
     pass
 
 
@@ -471,8 +465,8 @@ class Base(BaseEstimator):
         )
 
     def _jax_create_layer(
-        self, scaled_X: jnp.ndarray, W: Optional[jnp.ndarray] = None
-    ) -> jnp.ndarray:
+        self, scaled_X, W = None
+    ):
         """JAX-compatible version of create_layer that exactly matches the original functionality."""
         key = jax.random.PRNGKey(self.seed)
         n_features = scaled_X.shape[1]

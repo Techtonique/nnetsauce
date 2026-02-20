@@ -1,0 +1,41 @@
+Metadata-Version: 2.4
+Name: nnetsauce
+Version: 0.51.0
+Summary: Quasi-randomized (neural) networks
+Home-page: https://techtonique.github.io/nnetsauce/
+Download-URL: https://github.com/Techtonique/nnetsauce
+Author: T. Moudiki
+Author-email: thierry.moudiki@gmail.com
+License: BSD Clause Clear
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+License-File: LICENSE
+Requires-Dist: joblib
+Requires-Dist: GPopt
+Requires-Dist: matplotlib
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: requests
+Requires-Dist: scipy
+Requires-Dist: scikit-learn
+Requires-Dist: statsmodels
+Requires-Dist: threadpoolctl
+Requires-Dist: tqdm
+Provides-Extra: jax
+Requires-Dist: jax; extra == "jax"
+Requires-Dist: jaxlib; extra == "jax"
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: download-url
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: license-file
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: summary
+
+Quasi-randomized (neural) networks for regression, classification and time series forecasting

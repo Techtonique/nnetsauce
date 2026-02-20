@@ -1,5 +1,10 @@
-import jax
-import jax.numpy as jnp
+try: 
+    import jax
+    import jax.numpy as jnp
+    JAX_AVAILABLE = True
+except ImportError:
+    JAX_AVAILABLE = False 
+    pass 
 import numpy as np
 from scipy.stats import qmc, norm
 from functools import partial
@@ -84,46 +89,48 @@ class Ridge2Forecaster:
 
         return jnp.array(W)
 
-    @partial(jax.jit, static_argnums=(0,))
-    def _compute_hidden(self, X, W):
-        """Compute hidden layer features (vectorized)."""
-        return self.activation(X @ W)
+    if JAX_AVAILABLE: 
 
-    @partial(jax.jit, static_argnums=(0,))
-    def _solve_ridge2(self, X, H, Y):
-        """Solve ridge regression with dual regularization."""
-        n, p_x = X.shape
-        _, p_h = H.shape
+        @partial(jax.jit, static_argnums=(0,))
+        def _compute_hidden(self, X, W):
+            """Compute hidden layer features (vectorized)."""
+            return self.activation(X @ W)
 
-        Y_mean = jnp.mean(Y, axis=0)
-        Y_c = Y - Y_mean
+        @partial(jax.jit, static_argnums=(0,))
+        def _solve_ridge2(self, X, H, Y):
+            """Solve ridge regression with dual regularization."""
+            n, p_x = X.shape
+            _, p_h = H.shape
 
-        X_mean = jnp.mean(X, axis=0)
-        X_std = jnp.std(X, axis=0)
-        X_std = jnp.where(X_std == 0, 1.0, X_std)
-        X_s = (X - X_mean) / X_std
+            Y_mean = jnp.mean(Y, axis=0)
+            Y_c = Y - Y_mean
 
-        H_mean = jnp.mean(H, axis=0)
-        H_std = jnp.std(H, axis=0)
-        H_std = jnp.where(H_std == 0, 1.0, H_std)
-        H_s = (H - H_mean) / H_std
+            X_mean = jnp.mean(X, axis=0)
+            X_std = jnp.std(X, axis=0)
+            X_std = jnp.where(X_std == 0, 1.0, X_std)
+            X_s = (X - X_mean) / X_std
 
-        XX = X_s.T @ X_s + self.lambda_1 * jnp.eye(p_x)
-        XH = X_s.T @ H_s
-        HH = H_s.T @ H_s + self.lambda_2 * jnp.eye(p_h)
+            H_mean = jnp.mean(H, axis=0)
+            H_std = jnp.std(H, axis=0)
+            H_std = jnp.where(H_std == 0, 1.0, H_std)
+            H_s = (H - H_mean) / H_std
 
-        XX_inv = jnp.linalg.inv(XX)
-        S = HH - XH.T @ XX_inv @ XH
-        S_inv = jnp.linalg.inv(S)
+            XX = X_s.T @ X_s + self.lambda_1 * jnp.eye(p_x)
+            XH = X_s.T @ H_s
+            HH = H_s.T @ H_s + self.lambda_2 * jnp.eye(p_h)
 
-        XY = X_s.T @ Y_c
-        HY = H_s.T @ Y_c
+            XX_inv = jnp.linalg.inv(XX)
+            S = HH - XH.T @ XX_inv @ XH
+            S_inv = jnp.linalg.inv(S)
 
-        beta = XX_inv @ (XY - XH @ S_inv @ (HY - XH.T @ XX_inv @ XY))
-        gamma = S_inv @ (HY - XH.T @ beta)
-        self.coef_ = jnp.concatenate([beta, gamma], axis=1)
+            XY = X_s.T @ Y_c
+            HY = H_s.T @ Y_c
 
-        return beta, gamma, Y_mean, X_mean, X_std, H_mean, H_std
+            beta = XX_inv @ (XY - XH @ S_inv @ (HY - XH.T @ XX_inv @ XY))
+            gamma = S_inv @ (HY - XH.T @ beta)
+            self.coef_ = jnp.concatenate([beta, gamma], axis=1)
+
+            return beta, gamma, Y_mean, X_mean, X_std, H_mean, H_std
 
     def fit(self, y):
         """Fit the Ridge2 model.
@@ -162,24 +169,25 @@ class Ridge2Forecaster:
         self.last_obs = y[-self.lags:]
         return self
 
-    @partial(jax.jit, static_argnums=(0,))
-    def _predict_step(self, x_new):
-        """Single prediction step (JIT-compiled).
+    if JAX_AVAILABLE: 
+        @partial(jax.jit, static_argnums=(0,))
+        def _predict_step(self, x_new):
+            """Single prediction step (JIT-compiled).
 
-        Parameters
-        ----------
-        x_new : array-like of shape (n_features,)
-            New input data.
+            Parameters
+            ----------
+            x_new : array-like of shape (n_features,)
+                New input data.
 
-        Returns
-        -------
-        y_next : float
-            Next-step prediction.
-        """
-        x_s = (x_new - self.X_mean) / self.X_std
-        h = self.activation(x_s @ self.W)
-        h_s = (h - self.H_mean) / self.H_std
-        return x_s @ self.beta + h_s @ self.gamma + self.Y_mean
+            Returns
+            -------
+            y_next : float
+                Next-step prediction.
+            """
+            x_s = (x_new - self.X_mean) / self.X_std
+            h = self.activation(x_s @ self.W)
+            h_s = (h - self.H_mean) / self.H_std
+            return x_s @ self.beta + h_s @ self.gamma + self.Y_mean
 
     def _forecast(self, h=5):
         """Generate h-step ahead recursive forecasts.
