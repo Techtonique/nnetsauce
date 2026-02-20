@@ -2,8 +2,9 @@ try:
     import jax
     import jax.numpy as jnp
     from jax import grad, jit, vmap
+    JAX_AVAILABLE = True
 except ImportError:
-    pass
+    JAX_AVAILABLE = False
 
 import numpy as np
 from sklearn.base import BaseEstimator, RegressorMixin

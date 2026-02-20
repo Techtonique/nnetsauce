@@ -4,7 +4,7 @@ try:
     JAX_AVAILABLE = True
 except ImportError:
     JAX_AVAILABLE = False 
-    pass 
+    
 import numpy as np
 from scipy.stats import qmc, norm
 from functools import partial

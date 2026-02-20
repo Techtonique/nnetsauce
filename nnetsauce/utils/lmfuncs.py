@@ -5,8 +5,9 @@ from numpy import linalg as la
 try:
     import jax.numpy as jnp
     from jax.numpy import linalg as jla
+    JAX_AVAILABLE = True
 except ImportError:
-    pass
+    JAX_AVAILABLE = False 
 
 # import .matrixops as mo
 from . import matrixops as mo

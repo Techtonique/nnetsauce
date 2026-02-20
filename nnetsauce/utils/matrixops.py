@@ -15,8 +15,9 @@ from sklearn.mixture import GaussianMixture
 try:
     import jax.numpy as jnp
     from jax import device_put
+    JAX_AVAILABLE = True
 except ImportError:
-    pass
+    JAX_AVAILABLE = False
 
 
 # column bind

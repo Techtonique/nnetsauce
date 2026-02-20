@@ -12,8 +12,9 @@ from ..optimizers import Optimizer
 
 try:
     import jax.numpy as jnp
+    JAX_AVAILABLE = True
 except ImportError:
-    pass
+    JAX_AVAILABLE = False
 
 
 class GLMRegressor(GLM, RegressorMixin):

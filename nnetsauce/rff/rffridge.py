@@ -2,8 +2,9 @@ try:
     import jax
     import jax.numpy as jnp
     from jax import random, vmap
+    JAX_AVAILABLE = True
 except ImportError:
-    pass 
+    JAX_AVAILABLE = False 
 import numpy as np
 from scipy.optimize import minimize_scalar
 from typing import Optional, Tuple, Union, Dict

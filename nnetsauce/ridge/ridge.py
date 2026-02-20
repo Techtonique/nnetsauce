@@ -16,8 +16,9 @@ try:
     import jax.numpy as jnp
     from jax import device_put
     from jax.numpy.linalg import inv as jinv
+    JAX_AVAILABLE = True
 except ImportError:
-    pass
+    JAX_AVAILABLE = False
 
 
 class RidgeRegressor(BaseEstimator, RegressorMixin):

@@ -41,7 +41,7 @@ try:
     import jax.numpy as jnp
     JAX_AVAILABLE = True
 except ImportError:
-    pass
+    JAX_AVAILABLE = False
 
 
 class Base(BaseEstimator):

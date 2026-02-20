@@ -8,7 +8,6 @@ try:
     from jax.scipy.special import gammaln, kv
     from jax.nn import softmax as jaxsoftmax
     from jax import jit
-
     JAX_AVAILABLE = True
 except ImportError:
     JAX_AVAILABLE = False
