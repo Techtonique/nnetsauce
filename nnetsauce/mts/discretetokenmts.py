@@ -108,16 +108,19 @@ class DiscreteTokenMTS(MTS):
         super().__init__(obj, **mts_kwargs)
         
         # Convert and validate vocabulary
-        self.vocab = np.asarray(vocab, dtype=np.float64)
+        self.vocab_original = np.asarray(vocab, dtype=np.float64)
         self._validate_vocabulary()
         
-        self.vocab_size = self.vocab.shape[0]
+        self.vocab_size = self.vocab_original.shape[0]
         self.vocab_mean_ = None
         self.vocab_std_ = None
+        self.normalize_vocab = normalize_vocab
         
         # Normalize if requested
         if normalize_vocab:
             self._normalize_vocabulary()
+        else:
+            self.vocab = self.vocab_original.copy()
         
         # Validate and set metric
         assert metric in ['euclidean', 'cosine'], \
@@ -142,17 +145,17 @@ class DiscreteTokenMTS(MTS):
     def _validate_vocabulary(self):
         """Comprehensive vocabulary validation"""
         # Check shape
-        assert self.vocab.ndim == 2, "vocab must be 2D array (vocab_size, n_series)"
-        assert self.vocab.shape[0] > 0, "vocab must have at least one token"
+        assert self.vocab_original.ndim == 2, "vocab must be 2D array (vocab_size, n_series)"
+        assert self.vocab_original.shape[0] > 0, "vocab must have at least one token"
         
         # Check for NaN/Inf
-        if np.any(np.isnan(self.vocab)) or np.any(np.isinf(self.vocab)):
+        if np.any(np.isnan(self.vocab_original)) or np.any(np.isinf(self.vocab_original)):
             raise ValueError("Vocabulary contains NaN or Inf values")
         
         # Check for duplicates
-        unique_rows = np.unique(self.vocab, axis=0)
-        if len(unique_rows) < len(self.vocab):
-            n_duplicates = len(self.vocab) - len(unique_rows)
+        unique_rows = np.unique(self.vocab_original, axis=0)
+        if len(unique_rows) < len(self.vocab_original):
+            n_duplicates = len(self.vocab_original) - len(unique_rows)
             warnings.warn(
                 f"Vocabulary contains {n_duplicates} duplicate vectors. "
                 "This reduces effective vocabulary size.",
@@ -160,8 +163,8 @@ class DiscreteTokenMTS(MTS):
             )
         
         # Check for near-duplicates
-        if len(self.vocab) > 1:
-            dists = euclidean_distances(self.vocab)
+        if len(self.vocab_original) > 1:
+            dists = euclidean_distances(self.vocab_original)
             np.fill_diagonal(dists, np.inf)
             min_dist = dists.min()
             
@@ -174,9 +177,9 @@ class DiscreteTokenMTS(MTS):
     
     def _normalize_vocabulary(self):
         """Center and scale vocabulary"""
-        self.vocab_mean_ = self.vocab.mean(axis=0)
-        self.vocab_std_ = self.vocab.std(axis=0) + 1e-8
-        self.vocab = (self.vocab - self.vocab_mean_) / self.vocab_std_
+        self.vocab_mean_ = self.vocab_original.mean(axis=0)
+        self.vocab_std_ = self.vocab_original.std(axis=0) + 1e-8
+        self.vocab = (self.vocab_original - self.vocab_mean_) / self.vocab_std_
     
     def fit(self, X, **kwargs):
         """
@@ -233,6 +236,10 @@ class DiscreteTokenMTS(MTS):
         errors : np.ndarray
             Distances to nearest tokens
         """
+        # Normalize predictions if vocabulary was normalized
+        if self.normalize_vocab:
+            continuous_preds = (continuous_preds - self.vocab_mean_) / self.vocab_std_
+        
         # Compute all distances at once
         dists = self.distance_func(continuous_preds, self.vocab)
         
@@ -244,12 +251,19 @@ class DiscreteTokenMTS(MTS):
             return nearest_indices, min_dists
         
         elif self.return_mode == 'token_vector':
-            return self.vocab[nearest_indices], min_dists
+            token_vecs = self.vocab[nearest_indices]
+            # Denormalize if vocabulary was normalized
+            if self.normalize_vocab:
+                token_vecs = token_vecs * self.vocab_std_ + self.vocab_mean_
+            return token_vecs, min_dists
         
         elif self.return_mode == 'both':
             # Return combined array: [token_id, dim_0, dim_1, ...]
             token_ids = nearest_indices.reshape(-1, 1)
             token_vecs = self.vocab[nearest_indices]
+            # Denormalize if vocabulary was normalized
+            if self.normalize_vocab:
+                token_vecs = token_vecs * self.vocab_std_ + self.vocab_mean_
             combined = np.column_stack([token_ids, token_vecs])
             return combined, min_dists
         
@@ -586,11 +600,15 @@ class DiscreteTokenMTS(MTS):
     # ========== Utility Methods ==========
     
     def tokens_to_vectors(self, token_ids):
-        """Convert token IDs to embedding vectors"""
+        """Convert token IDs to embedding vectors (in original scale)"""
         token_ids = np.asarray(token_ids).astype(int)
         assert np.all((token_ids >= 0) & (token_ids < self.vocab_size)), \
             f"Token IDs must be in range [0, {self.vocab_size-1}]"
-        return self.vocab[token_ids]
+        vectors = self.vocab[token_ids]
+        # Denormalize if vocabulary was normalized
+        if self.normalize_vocab:
+            vectors = vectors * self.vocab_std_ + self.vocab_mean_
+        return vectors
     
     def get_token_neighbors(self, token_id, k=5):
         """Find k nearest neighbors of a token"""
@@ -634,13 +652,17 @@ class DiscreteTokenMTS(MTS):
         report : dict
             Quality metrics including distances, condition number, coverage
         """
+        # Use original vocabulary for diagnostics to get meaningful statistics
+        vocab_to_diagnose = self.vocab_original
+        
         report = {
             'vocab_size': self.vocab_size,
-            'embedding_dim': self.vocab.shape[1],
+            'embedding_dim': vocab_to_diagnose.shape[1],
+            'normalized': self.normalize_vocab,
         }
         
         # Pairwise distances
-        dists = euclidean_distances(self.vocab)
+        dists = euclidean_distances(vocab_to_diagnose)
         np.fill_diagonal(dists, np.inf)
         
         report['min_pairwise_distance'] = dists.min()
@@ -648,16 +670,16 @@ class DiscreteTokenMTS(MTS):
         report['mean_pairwise_distance'] = dists[dists != np.inf].mean()
         
         # Condition number
-        U, s, Vt = np.linalg.svd(self.vocab, full_matrices=False)
+        U, s, Vt = np.linalg.svd(vocab_to_diagnose, full_matrices=False)
         report['condition_number'] = s.max() / (s.min() + 1e-10)
         
         # Coverage volume
-        ranges = self.vocab.max(axis=0) - self.vocab.min(axis=0)
+        ranges = vocab_to_diagnose.max(axis=0) - vocab_to_diagnose.min(axis=0)
         report['coverage_volume'] = np.prod(ranges)
         
         # Duplicates
-        unique_rows = np.unique(self.vocab, axis=0)
-        report['duplicate_count'] = len(self.vocab) - len(unique_rows)
+        unique_rows = np.unique(vocab_to_diagnose, axis=0)
+        report['duplicate_count'] = len(vocab_to_diagnose) - len(unique_rows)
         
         return report
     

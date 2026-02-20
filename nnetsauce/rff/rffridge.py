@@ -1,9 +1,13 @@
-import jax
-import jax.numpy as jnp
+try: 
+    import jax
+    import jax.numpy as jnp
+    from jax import random, vmap
+    JAX_AVAILABLE = True
+except ImportError:
+    JAX_AVAILABLE = False 
 import numpy as np
 from scipy.optimize import minimize_scalar
 from typing import Optional, Tuple, Union, Dict
-from jax import random, vmap
 from functools import partial
 from sklearn.base import BaseEstimator, RegressorMixin
 
@@ -39,6 +43,12 @@ class RandomFourierFeaturesRidge(BaseEstimator, RegressorMixin):
         random_seed : int
             Random seed for reproducibility
         """
+
+        if not JAX_AVAILABLE:
+            raise RuntimeError(
+                "JAX is required for this feature. Install with: pip install yourpackage[jax]"
+            )
+        
         self.n_features = n_features
         self.gamma = gamma
         self.alpha = alpha
@@ -53,8 +63,8 @@ class RandomFourierFeaturesRidge(BaseEstimator, RegressorMixin):
         self.S_N = None  # Posterior precision matrix
 
     def _compute_random_features(
-        self, X: jnp.ndarray, W: jnp.ndarray, b: jnp.ndarray
-    ) -> jnp.ndarray:
+        self, X, W, b
+    ):
         """Compute random Fourier features: sqrt(2/D) * cos(XW + b)"""
         projection = jnp.dot(X, W) + b  # Shape: (n_samples, n_features)
         features = jnp.sqrt(2.0 / self.n_features) * jnp.cos(projection)
@@ -67,8 +77,8 @@ class RandomFourierFeaturesRidge(BaseEstimator, RegressorMixin):
         return features
 
     def _init_random_weights(
-        self, input_dim: int
-    ) -> Tuple[jnp.ndarray, jnp.ndarray]:
+        self, input_dim
+    ):
         """Initialize random weights and biases for RFF"""
         # Sample from Gaussian distribution for RBF kernel
         # Variance = 2 * gamma for RBF kernel
@@ -86,11 +96,11 @@ class RandomFourierFeaturesRidge(BaseEstimator, RegressorMixin):
 
     def fit(
         self,
-        X: Union[jnp.ndarray, np.ndarray],
-        y: Union[jnp.ndarray, np.ndarray],
-        method: str = "bayesian",
-        noise_variance: Optional[float] = None,
-    ) -> "RandomFourierFeaturesRidge":
+        X,
+        y,
+        method = "bayesian",
+        noise_variance = None,
+    ):
         """
         Fit the model using either standard or Bayesian ridge regression.
 
@@ -141,7 +151,7 @@ class RandomFourierFeaturesRidge(BaseEstimator, RegressorMixin):
 
         return self
 
-    def _fit_standard(self, Phi: jnp.ndarray, y: jnp.ndarray) -> None:
+    def _fit_standard(self, Phi, y) -> None:
         """Standard ridge regression using lstsq with data augmentation"""
         n_samples, n_basis = Phi.shape
 
@@ -166,9 +176,9 @@ class RandomFourierFeaturesRidge(BaseEstimator, RegressorMixin):
 
     def _fit_bayesian(
         self,
-        Phi: jnp.ndarray,
-        y: jnp.ndarray,
-        noise_variance: Optional[float] = None,
+        Phi,
+        y,
+        noise_variance = None,
     ) -> None:
         """Bayesian ridge regression with evidence approximation"""
         n_samples, n_basis = Phi.shape
@@ -215,7 +225,7 @@ class RandomFourierFeaturesRidge(BaseEstimator, RegressorMixin):
         # Also store for compatibility
         self.weights = self.w_mean
 
-    def transform(self, X: Union[jnp.ndarray, np.ndarray]) -> jnp.ndarray:
+    def transform(self, X) :
         """Transform input data to random Fourier feature space"""
         if not self.is_fitted:
             raise ValueError("Model must be fitted before transforming")
@@ -225,10 +235,10 @@ class RandomFourierFeaturesRidge(BaseEstimator, RegressorMixin):
 
     def predict(
         self,
-        X: Union[jnp.ndarray, np.ndarray],
-        return_std: bool = False,
-        return_cov: bool = False,
-    ) -> Union[jnp.ndarray, Tuple[jnp.ndarray, jnp.ndarray]]:
+        X,
+        return_std = False,
+        return_cov = False,
+    ):
         """
         Make predictions, optionally with uncertainty quantification.
 
@@ -284,10 +294,10 @@ class RandomFourierFeaturesRidge(BaseEstimator, RegressorMixin):
 
     def sample_posterior(
         self,
-        X: Union[jnp.ndarray, np.ndarray],
-        n_samples: int = 1,
-        key: Optional[jax.random.PRNGKey] = None,
-    ) -> jnp.ndarray:
+        X,
+        n_samples = 1,
+        key = None,
+    ) :
         """
         Sample from the posterior predictive distribution.
 
@@ -406,12 +416,12 @@ class RandomFourierFeaturesRidgeGCV(RandomFourierFeaturesRidge):
 
     def _compute_gcv(
         self,
-        alpha: float,
-        s_sq: jnp.ndarray,
-        U: jnp.ndarray,
-        y: jnp.ndarray,
-        n_samples: int,
-    ) -> float:
+        alpha,
+        s_sq,
+        U,
+        y,
+        n_samples,
+    ):
         """
         Compute GCV score for a given alpha.
 
@@ -452,8 +462,8 @@ class RandomFourierFeaturesRidgeGCV(RandomFourierFeaturesRidge):
 
     def fit_gcv(
         self,
-        X: Union[jnp.ndarray, np.ndarray],
-        y: Union[jnp.ndarray, np.ndarray],
+        X,
+        y,
         alpha_range: Tuple[float, float] = (1e-8, 1e4),
         n_alphas: int = 50,
         method: str = "standard",
@@ -563,8 +573,8 @@ class RandomFourierFeaturesRidgeGCV(RandomFourierFeaturesRidge):
 
     def fit_gcv_with_path(
         self,
-        X: Union[jnp.ndarray, np.ndarray],
-        y: Union[jnp.ndarray, np.ndarray],
+        X,
+        y,
         alpha_range: Tuple[float, float] = (1e-8, 1e4),
         n_alphas: int = 100,
         method: str = "standard",

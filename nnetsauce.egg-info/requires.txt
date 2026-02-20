@@ -1,5 +1,5 @@
 joblib
-GPopt 
+GPopt
 matplotlib
 numpy
 pandas
@@ -9,3 +9,7 @@ scikit-learn
 statsmodels
 threadpoolctl
 tqdm
+
+[jax]
+jax
+jaxlib

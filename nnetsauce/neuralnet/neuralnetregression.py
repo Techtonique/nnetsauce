@@ -2,8 +2,9 @@ try:
     import jax
     import jax.numpy as jnp
     from jax import grad, jit, vmap
+    JAX_AVAILABLE = True
 except ImportError:
-    pass
+    JAX_AVAILABLE = False
 
 import numpy as np
 from sklearn.base import BaseEstimator, RegressorMixin
@@ -165,7 +166,12 @@ class NeuralNetRegressor(BaseEstimator, RegressorMixin):
         dropout=0,
         weights=None,
         random_state=None,
-    ):
+    ):        
+        if not JAX_AVAILABLE:
+            raise RuntimeError(
+                "JAX is required for this feature. Install with: pip install yourpackage[jax]"
+            )
+        
         if weights is None and hidden_layer_sizes is None:
             hidden_layer_sizes = (100,)  # default value if neither is provided
         self.hidden_layer_sizes = hidden_layer_sizes

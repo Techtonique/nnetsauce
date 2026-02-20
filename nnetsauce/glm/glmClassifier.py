@@ -13,8 +13,9 @@ from scipy.special import logsumexp, expit, erf
 
 try:
     import jax.numpy as jnp
+    JAX_AVAILABLE = True 
 except ImportError:
-    pass
+    JAX_AVAILABLE = False
 
 
 class GLMClassifier(GLM, ClassifierMixin):

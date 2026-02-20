@@ -1,4 +1,3 @@
-from .attention import AttentionMechanism
 from .base.base import Base
 from .base.baseRegressor import BaseRegressor
 from .boosting.adaBoostClassifier import AdaBoostClassifier

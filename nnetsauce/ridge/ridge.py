@@ -16,8 +16,9 @@ try:
     import jax.numpy as jnp
     from jax import device_put
     from jax.numpy.linalg import inv as jinv
+    JAX_AVAILABLE = True
 except ImportError:
-    pass
+    JAX_AVAILABLE = False
 
 
 class RidgeRegressor(BaseEstimator, RegressorMixin):
@@ -39,6 +40,11 @@ class RidgeRegressor(BaseEstimator, RegressorMixin):
             "gpu",
             "tpu",
         ), "`backend` must be in ('cpu', 'gpu', 'tpu')"
+
+        if not JAX_AVAILABLE and backend !="cpu":
+            raise RuntimeError(
+                "JAX is required for this feature. Install with: pip install yourpackage[jax]"
+            )
 
         sys_platform = platform.system()
 
