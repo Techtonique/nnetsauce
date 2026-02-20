@@ -206,40 +206,21 @@ class Base(BaseEstimator):
         self.beta_ = None
 
         # activation function -----
-        if sys_platform in ("Linux", "Darwin"):
-            activation_options = {
-                "relu": ac.relu if (self.backend == "cpu") else jnn.relu,
-                "tanh": np.tanh if (self.backend == "cpu") else jnp.tanh,
-                "sigmoid": (
-                    ac.sigmoid if (self.backend == "cpu") else jnn.sigmoid
-                ),
-                "prelu": partial(ac.prelu, a=a),
-                "elu": (
-                    partial(ac.elu, a=a)
-                    if (self.backend == "cpu")
-                    else partial(jnn.elu, a=a)
-                ),
-            }
-        else:  # on Windows currently, no JAX
-            activation_options = {
-                "relu": (
-                    ac.relu if (self.backend == "cpu") else NotImplementedError
-                ),
-                "tanh": (
-                    np.tanh if (self.backend == "cpu") else NotImplementedError
-                ),
-                "sigmoid": (
-                    ac.sigmoid
-                    if (self.backend == "cpu")
-                    else NotImplementedError
-                ),
-                "prelu": partial(ac.prelu, a=a),
-                "elu": (
-                    partial(ac.elu, a=a)
-                    if (self.backend == "cpu")
-                    else NotImplementedError
-                ),
-            }
+
+        activation_options = {
+            "relu": ac.relu if (self.backend == "cpu") else jnn.relu,
+            "tanh": np.tanh if (self.backend == "cpu") else jnp.tanh,
+            "sigmoid": (
+                ac.sigmoid if (self.backend == "cpu") else jnn.sigmoid
+            ),
+            "prelu": partial(ac.prelu, a=a),
+            "elu": (
+                partial(ac.elu, a=a)
+                if (self.backend == "cpu")
+                else partial(jnn.elu, a=a)
+            ),
+        }
+
         self.activation_func = activation_options[activation_name]
 
     # "preprocessing" methods to be inherited -----

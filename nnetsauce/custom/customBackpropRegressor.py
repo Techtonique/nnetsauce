@@ -1,9 +1,3 @@
-try: 
-    import jax
-    import jax.numpy as jnp
-except ImportError as e: 
-     
-    pass 
 import nnetsauce as ns  # adjust if your import path differs
 import pandas as pd
 import numpy as np
@@ -154,32 +148,7 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
         ndarray
             Gradient array with the same shape as W_.
         """
-        if self.type_grad == "autodiff":
-            raise NotImplementedError(
-                "Automatic differentiation is not implemented yet."
-            )
-            # Use JAX for automatic differentiation
-            W = deepcopy(self.model.W_)
-            W_flat = W.flatten()
-            n_params = W_flat.size
-
-            def loss_fn(W_flat):
-                W_reshaped = W_flat.reshape(W.shape)
-                self.model.W_ = W_reshaped
-                return self._loss(X, y)
-
-            grad_fn = jax.grad(loss_fn)
-            grad_flat = grad_fn(W_flat)
-            grad = grad_flat.reshape(W.shape)
-
-            # Add elastic net gradient
-            l1_grad = self.alpha * self.l1_ratio * np.sign(W)
-            l2_grad = self.alpha * (1 - self.l1_ratio) * W
-            grad += l1_grad + l2_grad
-
-            self.model.W_ = W
-            return grad
-
+        
         # Finite difference gradient computation
         W = deepcopy(self.model.W_)
         shape = W.shape
