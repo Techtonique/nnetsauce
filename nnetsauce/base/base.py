@@ -3,7 +3,11 @@
 # License: BSD 3 Clear
 
 import copy
-import jax
+try: 
+    import jax
+    JAX_AVAILABLE = True
+except ImportError: 
+    JAX_AVAILABLE = False
 import numpy as np
 import pandas as pd
 import platform
@@ -40,7 +44,9 @@ from ..sampling import SubSampler
 try:
     import jax.nn as jnn
     import jax.numpy as jnp
+    JAX_AVAILABLE = True
 except ImportError:
+    JAX_AVAILABLE = False
     pass
 
 

@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
-__version__ = '0.50.1'
+__version__ = '0.51.0'
 
 # get the dependencies and installs
 here = path.abspath(path.dirname(__file__))
@@ -20,11 +20,6 @@ dependency_links = [
     for x in all_reqs
     if x.startswith("git+")
 ]
-
-#if platform.system() in ('Linux', 'Darwin'):
-#    install_jax_requires = ['jax', 'jaxlib']  
-#else:
-#    install_jax_requires = []
 
 install_jax_requires = []
 
@@ -49,6 +44,9 @@ setup(
     include_package_data=True,
     author='T. Moudiki',
     install_requires=install_requires,
+    extras_require={
+        'jax': ['jax', 'jaxlib'],
+    },
     dependency_links=dependency_links,
     author_email='thierry.moudiki@gmail.com'
 )

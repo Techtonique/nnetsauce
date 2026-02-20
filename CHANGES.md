@@ -1,3 +1,7 @@
+# version 0.51.0
+
+- Make JAX optional, because of its size. If you want JAX, please install it manually or use `pip install nnetsauce[jax]`
+
 # version 0.50.1
 
 - add `MultiOutputRegressor` to `SimpleMultitaskClassifier`
