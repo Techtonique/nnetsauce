@@ -108,6 +108,11 @@ class Ridge2MultiOutputRegressor(Ridge2, RegressorMixin):
         seed=123,
         backend="cpu",
     ):
+        if not JAX_AVAILABLE and backend !="cpu":
+            raise RuntimeError(
+                "JAX is required for this feature. Install with: pip install yourpackage[jax]"
+            )
+        
         super().__init__(
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,

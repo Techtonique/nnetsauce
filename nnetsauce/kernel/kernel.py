@@ -41,6 +41,10 @@ class KernelRidge(BaseEstimator, RegressorMixin):
         length_scale=1.0,
         backend="cpu",
     ):
+        if not JAX_AVAILABLE and backend !="cpu":
+            raise RuntimeError(
+                "JAX is required for this feature. Install with: pip install yourpackage[jax]"
+            )
         self.alpha = alpha
         self.alpha_ = alpha
         self.kernel = kernel

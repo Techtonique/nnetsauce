@@ -41,6 +41,11 @@ class RidgeRegressor(BaseEstimator, RegressorMixin):
             "tpu",
         ), "`backend` must be in ('cpu', 'gpu', 'tpu')"
 
+        if not JAX_AVAILABLE and backend !="cpu":
+            raise RuntimeError(
+                "JAX is required for this feature. Install with: pip install yourpackage[jax]"
+            )
+
         sys_platform = platform.system()
 
         if (sys_platform == "Windows") and (backend in ("gpu", "tpu")):

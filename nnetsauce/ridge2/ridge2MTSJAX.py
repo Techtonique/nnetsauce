@@ -47,6 +47,11 @@ class Ridge2Forecaster:
         nodes_sim="sobol",
         seed=42,
     ):
+        if not JAX_AVAILABLE:
+            raise RuntimeError(
+                "JAX is required for this feature. Install with: pip install yourpackage[jax]"
+            )
+        
         self.lags = lags
         self.nb_hidden = nb_hidden
         self.lambda_1 = lambda_1

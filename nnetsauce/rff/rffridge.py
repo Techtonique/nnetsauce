@@ -43,6 +43,12 @@ class RandomFourierFeaturesRidge(BaseEstimator, RegressorMixin):
         random_seed : int
             Random seed for reproducibility
         """
+
+        if not JAX_AVAILABLE:
+            raise RuntimeError(
+                "JAX is required for this feature. Install with: pip install yourpackage[jax]"
+            )
+        
         self.n_features = n_features
         self.gamma = gamma
         self.alpha = alpha
