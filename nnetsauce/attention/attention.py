@@ -1,9 +1,9 @@
-# try: 
+# try:
 #     import jax
 #     import jax.numpy as jnp
 #     from jax import random, grad, jit
 #     JAX_AVAILABLE = True
-# except ImportError: 
+# except ImportError:
 #     JAX_AVAILABLE = False
 # import numpy as np
 # from typing import Optional, Tuple, Dict

@@ -9,7 +9,6 @@ except ImportError:
 from ..multitask import MultitaskClassifier, SimpleMultitaskClassifier
 from ..mts import ClassicalMTS
 
-
 removed_classifiers = [
     "ClassifierChain",
     "ComplementNB",

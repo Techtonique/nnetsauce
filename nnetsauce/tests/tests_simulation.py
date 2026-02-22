@@ -1,7 +1,6 @@
 import nnetsauce.simulation.nodesimulation as nsim
 import unittest as ut
 
-
 # Basic tests
 
 

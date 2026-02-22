@@ -200,7 +200,9 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             upper_  : 1-D array, shape [n_obs]
         """
         type_pi = self.type_pi if self.type_pi is not None else "kde"
-        replications = self.replications if self.replications is not None else 100
+        replications = (
+            self.replications if self.replications is not None else 100
+        )
 
         assert type_pi in (
             "bootstrap",
@@ -288,7 +290,6 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
         # splitconformal
         # ------------------------------------------------------------------ #
         if self.method == "splitconformal":
-
             if self.replications is None and self.type_pi is None:
                 # Plain split-conformal: symmetric quantile band
                 if return_pi:
@@ -319,9 +320,12 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                         "defaulting to 100."
                     )
 
-                self.sims_, self.mean_, self.lower_, self.upper_ = (
-                    self._simulate_from_residuals(pred, X.shape[0])
-                )
+                (
+                    self.sims_,
+                    self.mean_,
+                    self.lower_,
+                    self.upper_,
+                ) = self._simulate_from_residuals(pred, X.shape[0])
 
                 DescribeResult = namedtuple(
                     "DescribeResult", ("mean", "sims", "lower", "upper")
@@ -334,7 +338,6 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
         # localconformal
         # ------------------------------------------------------------------ #
         if self.method == "localconformal":
-
             if self.replications is None:
                 if return_pi:
                     predictions_bounds = self.icp_.predict(
@@ -364,9 +367,12 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                         "defaulting to 'kde'."
                     )
 
-                self.sims_, self.mean_, self.lower_, self.upper_ = (
-                    self._simulate_from_residuals(pred, X.shape[0])
-                )
+                (
+                    self.sims_,
+                    self.mean_,
+                    self.lower_,
+                    self.upper_,
+                ) = self._simulate_from_residuals(pred, X.shape[0])
 
                 DescribeResult = namedtuple(
                     "DescribeResult", ("mean", "sims", "lower", "upper")

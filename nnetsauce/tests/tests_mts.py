@@ -3,7 +3,6 @@ from sklearn import linear_model, gaussian_process
 import unittest as ut
 import nnetsauce as ns
 
-
 # Basic tests
 
 np.random.seed(123)

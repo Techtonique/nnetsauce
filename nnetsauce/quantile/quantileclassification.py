@@ -86,7 +86,9 @@ class QuantileClassifier(BaseEstimator, ClassifierMixin):
         self.obj = obj
         self.level = level
         self.scoring = scoring
-        quantileregressor = QuantileRegressor(self.obj, self.level, self.scoring)
+        quantileregressor = QuantileRegressor(
+            self.obj, self.level, self.scoring
+        )
         quantileregressor.predict = partial(
             quantileregressor.predict, return_pi=False
         )

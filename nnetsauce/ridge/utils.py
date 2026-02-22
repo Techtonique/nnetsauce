@@ -4,6 +4,7 @@ try:
     import jax.numpy as jnp
     from jax import device_put
     from jax.numpy.linalg import inv as jinv
+
     JAX_AVAILABLE = True
 except ImportError:
     JAX_AVAILABLE = False

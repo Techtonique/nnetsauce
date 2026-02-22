@@ -1,10 +1,11 @@
-try: 
+try:
     import jax
     import jax.numpy as jnp
     from jax import random, vmap
+
     JAX_AVAILABLE = True
 except ImportError:
-    JAX_AVAILABLE = False 
+    JAX_AVAILABLE = False
 import numpy as np
 from scipy.optimize import minimize_scalar
 from typing import Optional, Tuple, Union, Dict
@@ -48,7 +49,7 @@ class RandomFourierFeaturesRidge(BaseEstimator, RegressorMixin):
             raise RuntimeError(
                 "JAX is required for this feature. Install with: pip install yourpackage[jax]"
             )
-        
+
         self.n_features = n_features
         self.gamma = gamma
         self.alpha = alpha
@@ -62,9 +63,7 @@ class RandomFourierFeaturesRidge(BaseEstimator, RegressorMixin):
         self.w_cov = None  # Posterior covariance of weights
         self.S_N = None  # Posterior precision matrix
 
-    def _compute_random_features(
-        self, X, W, b
-    ):
+    def _compute_random_features(self, X, W, b):
         """Compute random Fourier features: sqrt(2/D) * cos(XW + b)"""
         projection = jnp.dot(X, W) + b  # Shape: (n_samples, n_features)
         features = jnp.sqrt(2.0 / self.n_features) * jnp.cos(projection)
@@ -76,9 +75,7 @@ class RandomFourierFeaturesRidge(BaseEstimator, RegressorMixin):
 
         return features
 
-    def _init_random_weights(
-        self, input_dim
-    ):
+    def _init_random_weights(self, input_dim):
         """Initialize random weights and biases for RFF"""
         # Sample from Gaussian distribution for RBF kernel
         # Variance = 2 * gamma for RBF kernel
@@ -98,8 +95,8 @@ class RandomFourierFeaturesRidge(BaseEstimator, RegressorMixin):
         self,
         X,
         y,
-        method = "bayesian",
-        noise_variance = None,
+        method="bayesian",
+        noise_variance=None,
     ):
         """
         Fit the model using either standard or Bayesian ridge regression.
@@ -178,7 +175,7 @@ class RandomFourierFeaturesRidge(BaseEstimator, RegressorMixin):
         self,
         Phi,
         y,
-        noise_variance = None,
+        noise_variance=None,
     ) -> None:
         """Bayesian ridge regression with evidence approximation"""
         n_samples, n_basis = Phi.shape
@@ -225,7 +222,7 @@ class RandomFourierFeaturesRidge(BaseEstimator, RegressorMixin):
         # Also store for compatibility
         self.weights = self.w_mean
 
-    def transform(self, X) :
+    def transform(self, X):
         """Transform input data to random Fourier feature space"""
         if not self.is_fitted:
             raise ValueError("Model must be fitted before transforming")
@@ -236,8 +233,8 @@ class RandomFourierFeaturesRidge(BaseEstimator, RegressorMixin):
     def predict(
         self,
         X,
-        return_std = False,
-        return_cov = False,
+        return_std=False,
+        return_cov=False,
     ):
         """
         Make predictions, optionally with uncertainty quantification.
@@ -295,9 +292,9 @@ class RandomFourierFeaturesRidge(BaseEstimator, RegressorMixin):
     def sample_posterior(
         self,
         X,
-        n_samples = 1,
-        key = None,
-    ) :
+        n_samples=1,
+        key=None,
+    ):
         """
         Sample from the posterior predictive distribution.
 

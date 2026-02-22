@@ -13,7 +13,8 @@ from scipy.special import logsumexp, expit, erf
 
 try:
     import jax.numpy as jnp
-    JAX_AVAILABLE = True 
+
+    JAX_AVAILABLE = True
 except ImportError:
     JAX_AVAILABLE = False
 

@@ -9,7 +9,6 @@ import numpy as np
 import os
 from ctypes import c_double, c_long
 
-
 dir_path = os.path.dirname(__file__)
 try:
     wherer = ctypes.cdll.LoadLibrary(dir_path + "/wherer.so")

@@ -27,7 +27,6 @@ from .timeseries import (
     mean_errors,
 )
 
-
 __all__ = [
     "beta_hat",
     "inv_penalized_cov",

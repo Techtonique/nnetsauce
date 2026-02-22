@@ -122,10 +122,7 @@ class SimpleMultitaskClassifier(Base, ClassifierMixin):
             self.multioutput_model_ = MultiOutputRegressor(deepcopy(self.obj))
             try:
                 self.multioutput_model_.fit(
-                    self.scaled_X_,
-                    Y,
-                    sample_weight=sample_weight,
-                    **kwargs
+                    self.scaled_X_, Y, sample_weight=sample_weight, **kwargs
                 )
             except TypeError:
                 # If sample_weight not supported, try without it

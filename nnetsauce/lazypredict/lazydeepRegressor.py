@@ -327,9 +327,9 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                     }
 
                     if self.custom_metric:
-                        scores_verbose[
-                            self.custom_metric.__name__
-                        ] = custom_metric
+                        scores_verbose[self.custom_metric.__name__] = (
+                            custom_metric
+                        )
 
                     print(scores_verbose)
                 if self.predictions:
@@ -455,9 +455,9 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                         }
 
                         if self.custom_metric:
-                            scores_verbose[
-                                self.custom_metric.__name__
-                            ] = custom_metric
+                            scores_verbose[self.custom_metric.__name__] = (
+                                custom_metric
+                            )
 
                         print(scores_verbose)
                     if self.predictions:
@@ -567,9 +567,9 @@ class LazyDeepRegressor(Custom, RegressorMixin):
                         }
 
                         if self.custom_metric:
-                            scores_verbose[
-                                self.custom_metric.__name__
-                            ] = custom_metric
+                            scores_verbose[self.custom_metric.__name__] = (
+                                custom_metric
+                            )
 
                         print(scores_verbose)
                     if self.predictions:

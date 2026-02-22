@@ -53,7 +53,6 @@ from .votingregressor import MedianVotingRegressor
 
 __all__ = [
     "AdaBoostClassifier",
-    "AttentionMechanism",
     "Base",
     "BaseRegressor",
     "BayesianRVFLRegressor",

@@ -17,6 +17,7 @@ try:
     import jax
     import jax.numpy as jnp
     from jax.numpy.linalg import pinv as jpinv
+
     JAX_AVAILABLE = True
 except ImportError:
     JAX_AVAILABLE = False
@@ -108,11 +109,11 @@ class Ridge2MultiOutputRegressor(Ridge2, RegressorMixin):
         seed=123,
         backend="cpu",
     ):
-        if not JAX_AVAILABLE and backend !="cpu":
+        if not JAX_AVAILABLE and backend != "cpu":
             raise RuntimeError(
                 "JAX is required for this feature. Install with: pip install yourpackage[jax]"
             )
-        
+
         super().__init__(
             n_hidden_features=n_hidden_features,
             activation_name=activation_name,
@@ -184,37 +185,36 @@ class Ridge2MultiOutputRegressor(Ridge2, RegressorMixin):
             X_ = jnp.array(X_)
             Phi_X_ = jnp.array(Phi_X_)
             centered_y = jnp.array(centered_y)
-            
+
             # Compute all matrix operations with JAX
             B = jnp.dot(X_.T, X_) + self.lambda1 * jnp.eye(n_features)
             C = jnp.dot(Phi_X_.T, X_)
-            D = jnp.dot(Phi_X_.T, Phi_X_) + self.lambda2 * jnp.eye(Phi_X_.shape[1])
-            
+            D = jnp.dot(Phi_X_.T, Phi_X_) + self.lambda2 * jnp.eye(
+                Phi_X_.shape[1]
+            )
+
             B_inv = jpinv(B)
             W = jnp.dot(C, B_inv)
             S_mat = D - jnp.dot(W, C.T)
             S_inv = jpinv(S_mat)
             Y = jnp.dot(S_inv, W)
-            
+
             # Build inverse matrix
-            inv_upper = jnp.hstack([
-                B_inv + jnp.dot(W.T, Y),
-                -Y.T
-            ])
+            inv_upper = jnp.hstack([B_inv + jnp.dot(W.T, Y), -Y.T])
             inv_lower = jnp.hstack([-Y, S_inv])
             inv = jnp.vstack([inv_upper, inv_lower])
-            
+
             # Compute beta for all outputs at once (vectorized)
             Z_T_y = jnp.dot(scaled_Z.T, centered_y)
             self.beta_ = jnp.dot(inv, Z_T_y)
-            
+
             # Convert back to numpy
             self.beta_ = np.array(self.beta_)
         else:
             # NumPy version
-            B = mo.crossprod(x=X_, backend=self.backend) + self.lambda1 * np.diag(
-                np.repeat(1, n_features)
-            )
+            B = mo.crossprod(
+                x=X_, backend=self.backend
+            ) + self.lambda1 * np.diag(np.repeat(1, n_features))
             C = mo.crossprod(x=Phi_X_, y=X_, backend=self.backend)
             D = mo.crossprod(
                 x=Phi_X_, backend=self.backend
@@ -246,7 +246,9 @@ class Ridge2MultiOutputRegressor(Ridge2, RegressorMixin):
 
             # Vectorized multi-output computation (no loop)
             Z_T_y = mo.crossprod(x=scaled_Z, y=centered_y, backend=self.backend)
-            self.beta_ = mo.safe_sparse_dot(a=inv, b=Z_T_y, backend=self.backend)
+            self.beta_ = mo.safe_sparse_dot(
+                a=inv, b=Z_T_y, backend=self.backend
+            )
 
         self.coef_ = self.beta_  # sklearn compatibility
 
@@ -279,7 +281,7 @@ class Ridge2MultiOutputRegressor(Ridge2, RegressorMixin):
             )
 
             cooked = self.cook_test_set(new_X, **kwargs)
-            
+
             if self.use_jax:
                 cooked = jnp.array(cooked)
                 predictions = self.y_mean_ + jnp.dot(cooked, self.beta_)
@@ -295,7 +297,7 @@ class Ridge2MultiOutputRegressor(Ridge2, RegressorMixin):
                 )[0]
 
         cooked = self.cook_test_set(X, **kwargs)
-        
+
         if self.use_jax:
             cooked = jnp.array(cooked)
             predictions = self.y_mean_ + jnp.dot(cooked, self.beta_)
@@ -369,10 +371,14 @@ class Ridge2MultiOutputRegressor(Ridge2, RegressorMixin):
             self.beta_ = np.zeros((n_features_total, n_outputs))
 
         # Create regularization mask
-        reg_mask = np.concatenate([
-            np.full(n_direct_features, self.lambda1),
-            np.full(n_features_total - n_direct_features, self.lambda2)
-        ])[:, np.newaxis]  # Shape: [n_features_total, 1]
+        reg_mask = np.concatenate(
+            [
+                np.full(n_direct_features, self.lambda1),
+                np.full(n_features_total - n_direct_features, self.lambda2),
+            ]
+        )[
+            :, np.newaxis
+        ]  # Shape: [n_features_total, 1]
 
         if self.use_jax:
             # JAX vectorized implementation (fully zero-loop)
@@ -380,70 +386,70 @@ class Ridge2MultiOutputRegressor(Ridge2, RegressorMixin):
             centered_y = jnp.array(centered_y)
             self.beta_ = jnp.array(self.beta_)
             reg_mask = jnp.array(reg_mask)
-            
+
             # Vectorized over all samples using scan
             def update_step(beta, inputs):
                 step, x_i, y_i = inputs
-                
+
                 # Learning rate with decay
                 lr = self.initial_learning_rate / (1 + self.decay * step)
-                
+
                 # Prediction: x_i @ beta -> [n_outputs]
                 prediction = jnp.dot(x_i, beta)
-                
+
                 # Error: y_i - prediction -> [n_outputs]
                 error = y_i - prediction
-                
+
                 # Gradient update (vectorized): lr * outer(x_i, error)
                 gradient_update = lr * jnp.outer(x_i, error)
-                
+
                 # Regularization: lr * (reg_mask * beta)
                 reg_update = lr * (reg_mask * beta)
-                
+
                 # Update: beta = beta + gradient - regularization
                 beta_new = beta + gradient_update - reg_update
-                
+
                 return beta_new, None
-            
+
             # Create step indices
-            steps = jnp.arange(self._step_count + 1, self._step_count + n_samples + 1)
-            
+            steps = jnp.arange(
+                self._step_count + 1, self._step_count + n_samples + 1
+            )
+
             # Run scan (zero-loop)
             self.beta_, _ = jax.lax.scan(
-                update_step,
-                self.beta_,
-                (steps, scaled_Z, centered_y)
+                update_step, self.beta_, (steps, scaled_Z, centered_y)
             )
-            
+
             self.beta_ = np.array(self.beta_)
             self._step_count += n_samples
         else:
             # NumPy vectorized implementation (single loop over samples)
             for i in range(n_samples):
                 self._step_count += 1
-                
+
                 # Current learning rate with decay
                 current_lr = self.initial_learning_rate / (
                     1 + self.decay * self._step_count
                 )
-                
+
                 # Current sample and target
                 x_i = scaled_Z[i, :]  # [n_features_total]
                 y_i = centered_y[i, :]  # [n_outputs]
-                
+
                 # Prediction: x_i @ beta -> [n_outputs]
                 prediction = x_i @ self.beta_
-                
+
                 # Error: y_i - prediction -> [n_outputs]
                 error = y_i - prediction
-                
+
                 # Vectorized gradient update: outer product
                 # Shape: [n_features_total, n_outputs]
                 gradient_update = current_lr * np.outer(x_i, error)
-                
+
                 # Vectorized regularization update
                 reg_update = current_lr * (reg_mask * self.beta_)
-                
+
                 # Combined update
                 self.beta_ += gradient_update - reg_update
 

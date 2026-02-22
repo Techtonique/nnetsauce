@@ -148,7 +148,7 @@ class CustomBackPropRegressor(Custom, RegressorMixin):
         ndarray
             Gradient array with the same shape as W_.
         """
-        
+
         # Finite difference gradient computation
         W = deepcopy(self.model.W_)
         shape = W.shape

@@ -35,10 +35,10 @@ from ..simulation import (
 )
 from ..sampling import SubSampler
 
-
 try:
     import jax.nn as jnn
     import jax.numpy as jnp
+
     JAX_AVAILABLE = True
 except ImportError:
     JAX_AVAILABLE = False
@@ -127,11 +127,11 @@ class Base(BaseEstimator):
         seed=123,
         backend="cpu",
     ):
-        if not JAX_AVAILABLE and backend !="cpu":
+        if not JAX_AVAILABLE and backend != "cpu":
             raise RuntimeError(
                 "JAX is required for this feature. Install with: pip install yourpackage[jax]"
             )
-        
+
         # input checks -----
 
         sys_platform = platform.system()
@@ -215,9 +215,7 @@ class Base(BaseEstimator):
         activation_options = {
             "relu": ac.relu if (self.backend == "cpu") else jnn.relu,
             "tanh": np.tanh if (self.backend == "cpu") else jnp.tanh,
-            "sigmoid": (
-                ac.sigmoid if (self.backend == "cpu") else jnn.sigmoid
-            ),
+            "sigmoid": (ac.sigmoid if (self.backend == "cpu") else jnn.sigmoid),
             "prelu": partial(ac.prelu, a=a),
             "elu": (
                 partial(ac.elu, a=a)
@@ -450,9 +448,7 @@ class Base(BaseEstimator):
             seed=self.seed,
         )
 
-    def _jax_create_layer(
-        self, scaled_X, W = None
-    ):
+    def _jax_create_layer(self, scaled_X, W=None):
         """JAX-compatible version of create_layer that exactly matches the original functionality."""
         key = jax.random.PRNGKey(self.seed)
         n_features = scaled_X.shape[1]

@@ -12,6 +12,7 @@ from ..optimizers import Optimizer
 
 try:
     import jax.numpy as jnp
+
     JAX_AVAILABLE = True
 except ImportError:
     JAX_AVAILABLE = False

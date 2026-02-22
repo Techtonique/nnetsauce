@@ -1,10 +1,11 @@
-try: 
+try:
     import jax
     import jax.numpy as jnp
+
     JAX_AVAILABLE = True
 except ImportError:
-    JAX_AVAILABLE = False 
-    
+    JAX_AVAILABLE = False
+
 import numpy as np
 from scipy.stats import qmc, norm
 from functools import partial
@@ -51,7 +52,7 @@ class Ridge2Forecaster:
             raise RuntimeError(
                 "JAX is required for this feature. Install with: pip install yourpackage[jax]"
             )
-        
+
         self.lags = lags
         self.nb_hidden = nb_hidden
         self.lambda_1 = lambda_1
@@ -94,7 +95,7 @@ class Ridge2Forecaster:
 
         return jnp.array(W)
 
-    if JAX_AVAILABLE: 
+    if JAX_AVAILABLE:
 
         @partial(jax.jit, static_argnums=(0,))
         def _compute_hidden(self, X, W):
@@ -174,7 +175,8 @@ class Ridge2Forecaster:
         self.last_obs = y[-self.lags:]
         return self
 
-    if JAX_AVAILABLE: 
+    if JAX_AVAILABLE:
+
         @partial(jax.jit, static_argnums=(0,))
         def _predict_step(self, x_new):
             """Single prediction step (JIT-compiled).

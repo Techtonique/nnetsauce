@@ -7,7 +7,6 @@ import nnetsauce.utils.lmfuncs as lmf
 import nnetsauce.utils.timeseries as ts
 import unittest as ut
 
-
 # Basic tests
 
 

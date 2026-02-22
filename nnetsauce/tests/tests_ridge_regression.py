@@ -3,7 +3,6 @@ from sklearn import datasets
 import unittest as ut
 import nnetsauce as ns
 
-
 # Basic tests
 
 np.random.seed(123)

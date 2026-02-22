@@ -51,7 +51,7 @@ coverage: ## check code coverage quickly with the default Python
 	coverage report --omit="venv/*,nnetsauce/tests/*" --show-missing
 
 docs: install ## generate docs		
-	pip install black pdoc 
+	uv pip install black pdoc 
 	black nnetsauce/* --line-length=80	
 	find nnetsauce/ -name "*.py" -exec autopep8 --max-line-length=80 --in-place {} +
 	pdoc -t docs nnetsauce/* --output-dir nnetsauce-docs
