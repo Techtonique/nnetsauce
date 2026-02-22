@@ -302,7 +302,7 @@ class CustomClassifier(Custom, ClassifierMixin):
                 X = pd.DataFrame(X.values.reshape(1, -1), columns=X.columns)
             else:
                 X = X.reshape(1, -1)
-            y = np.array([y], dtype=np.integer)
+            y = np.array([y], dtype=int)
 
         output_y, scaled_Z = self.cook_training_set(y=y, X=X, **kwargs)
         self.n_classes_ = len(np.unique(y))  # for compatibility with sklearn
