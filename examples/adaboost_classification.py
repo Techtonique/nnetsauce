@@ -21,7 +21,7 @@ np.random.seed(123)
 X_train, X_test, y_train, y_test = train_test_split(Z, t, test_size=0.2)
 
 # SAMME.R
-clf = LogisticRegression(solver='liblinear', multi_class = 'ovr', 
+clf = LogisticRegression(solver='liblinear', 
                          random_state=123)
 fit_obj = ns.AdaBoostClassifier(clf, 
                                 n_hidden_features=int(11.22338867), 

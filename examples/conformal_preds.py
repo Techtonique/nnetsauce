@@ -19,14 +19,14 @@ print(f"X_train.shape(): {X_train.shape}")
 print(f"X_test.shape(): {X_test.shape}")
 
 regr = ns.PredictionInterval(obj=ExtraTreesRegressor(),
-                             type_pi="bootstrap",
+                             type_pi="kde",
                              replications=100, 
                              level=95,
                              seed=312)
 start = time()
 regr.fit(X_train, y_train)
 print(f"Elapsed: {time() - start}s")
-preds = regr.predict(X_test)
+preds = regr.predict(X_test, return_pi=True)
 print(preds)
 print(f"coverage_rate: {np.mean((preds[2]<=y_test)*(preds[3]>=y_test))}")
 
@@ -38,7 +38,7 @@ regr2 = ns.PredictionInterval(obj=ExtraTreesRegressor(),
 start = time()
 regr2.fit(X_train, y_train)
 print(f"Elapsed: {time() - start}s")
-preds2 = regr2.predict(X_test)
+preds2 = regr2.predict(X_test, return_pi=True)
 print(preds2)
 print(f"coverage_rate: {np.mean((preds2[2]<=y_test)*(preds2[3]>=y_test))}")
 
@@ -50,7 +50,7 @@ regr = ns.PredictionInterval(obj=RandomForestRegressor(),
 start = time()
 regr.fit(X_train, y_train)
 print(f"Elapsed: {time() - start}s")
-preds = regr.predict(X_test)
+preds = regr.predict(X_test, return_pi=True)
 print(preds)
 print(f"coverage_rate: {np.mean((preds[2]<=y_test)*(preds[3]>=y_test))}")
 
@@ -62,7 +62,7 @@ regr2 = ns.PredictionInterval(obj=RandomForestRegressor(),
 start = time()
 regr2.fit(X_train, y_train)
 print(f"Elapsed: {time() - start}s")
-preds2 = regr2.predict(X_test)
+preds2 = regr2.predict(X_test, return_pi=True)
 print(preds2)
 print(f"coverage_rate: {np.mean((preds2[2]<=y_test)*(preds2[3]>=y_test))}")
 
@@ -74,7 +74,7 @@ regr2 = ns.PredictionInterval(obj=Ridge(),
 start = time()
 regr2.fit(X_train, y_train)
 print(f"Elapsed: {time() - start}s")
-preds2 = regr2.predict(X_test)
+preds2 = regr2.predict(X_test, return_pi=True)
 print(preds2)
 print(f"coverage_rate: {np.mean((preds2[2]<=y_test)*(preds2[3]>=y_test))}")
 

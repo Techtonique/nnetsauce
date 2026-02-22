@@ -208,8 +208,7 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                     return pred
 
             else:  # self.method == "splitconformal" and if self.replications is not None, type_pi must be used
-                raise NotImplementedError
-
+                
                 if self.type_pi is None:
                     self.type_pi = "kde"
                     raise Warning("type_pi must be set, setting to 'kde'")
