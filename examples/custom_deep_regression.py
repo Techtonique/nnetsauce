@@ -121,7 +121,7 @@ for data in load_datasets:
         print(f"\nElapsed: {time() - start} seconds\n")
 
         preds = regr.predict(X_test, return_pi=True, level=95, 
-                             method="localconformal")
+                             method="splitconformal")
         #print(f"preds: {preds}")
         coverage = np.mean((y_test >= preds.lower) & (y_test <= preds.upper))
         print(f"test coverage: {coverage} \n")

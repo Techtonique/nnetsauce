@@ -60,24 +60,6 @@ res = model.cross_val_score(X_train, y_train,
 
 print(res)
 
-model.set_params(n_hidden_features=10, dropout=0.5)
-
-res = model.cross_val_score(X_train, y_train, 
-                      X_test=X_test, y_test=y_test,
-                      scoring='accuracy',
-                      objective='abs')
-
-print(res)
-
-model.set_params(n_hidden_features=7, dropout=0.5)
-
-res = model.cross_val_score(X_train, y_train, 
-                      X_test=X_test, y_test=y_test,
-                      scoring='accuracy',
-                      objective='abs')
-
-print(res)
-
 print("\n\n Objective: relative -----")
 
 model = ns.CustomClassifier(LogisticRegressionCV())
@@ -98,20 +80,3 @@ res = model.cross_val_score(X_train, y_train,
 
 print(res)
 
-model.set_params(n_hidden_features=10, dropout=0.5)
-
-res = model.cross_val_score(X_train, y_train, 
-                      X_test=X_test, y_test=y_test,
-                      scoring='accuracy',
-                      objective='relative')
-
-print(res)
-
-model.set_params(n_hidden_features=7, dropout=0.5)
-
-res = model.cross_val_score(X_train, y_train, 
-                      X_test=X_test, y_test=y_test,
-                      scoring='accuracy',
-                      objective='relative')
-
-print(res)

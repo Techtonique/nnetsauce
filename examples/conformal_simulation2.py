@@ -73,24 +73,26 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = .2, random
 """                      
 
 for type_pi in ('bootstrap', 'kde', 'ecdf', 'permutation', 'smooth_bootstrap'):
-    print(f"\n\n### type_pi = {type_pi} ###\n")
-    regr1 = ns.PredictionInterval(RidgeCV(),
-                            replications=100,
-                            type_pi=type_pi) # 5 hidden nodes, ReLU activation function
-    regr1.fit(X_train, y_train)
-    start = time()
-    preds1 = regr1.predict(X_test, return_pi=True)
-    print(f"Elapsed: {time() - start}s")
-    print(f"coverage_rate conformalized QRNN RidgeCV: {np.mean((preds1[2]<=y_test)*(preds1[3]>=y_test))}")
-    print(f"predictive simulations: {preds1[1]}")
+    try: 
+        print(f"\n\n### type_pi = {type_pi} ###\n")
+        regr1 = ns.PredictionInterval(RidgeCV(),
+                                replications=100,
+                                type_pi=type_pi) # 5 hidden nodes, ReLU activation function
+        regr1.fit(X_train, y_train)
+        start = time()
+        preds1 = regr1.predict(X_test, return_pi=True)
+        print(f"Elapsed: {time() - start}s")
+        print(f"coverage_rate conformalized QRNN RidgeCV: {np.mean((preds1[2]<=y_test)*(preds1[3]>=y_test))}")
+        print(f"predictive simulations: {preds1[1]}")
 
-    max_idx = 50
-    plot_func(x = range(max_idx),
-            y = y_test[0:max_idx],
-            y_u = preds1.upper[0:max_idx],
-            y_l = preds1.lower[0:max_idx],
-            pred = preds1.mean[0:max_idx],
-            shade_color=split_color2,
-            title = f"conformalized QRNN RidgeCV ({max_idx} first points in test set)")
-
+        max_idx = 50
+        plot_func(x = range(max_idx),
+                y = y_test[0:max_idx],
+                y_u = preds1.upper[0:max_idx],
+                y_l = preds1.lower[0:max_idx],
+                pred = preds1.mean[0:max_idx],
+                shade_color=split_color2,
+                title = f"conformalized QRNN RidgeCV ({max_idx} first points in test set)")
+    except Exception as e: 
+        print(e)
 
