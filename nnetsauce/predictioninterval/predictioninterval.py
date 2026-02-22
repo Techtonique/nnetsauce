@@ -1,4 +1,5 @@
 from locale import normalize
+import warnings
 import numpy as np
 from collections import namedtuple
 from sklearn.base import BaseEstimator, RegressorMixin
@@ -149,6 +150,21 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
             self.icp_.fit(X_train, y_train)
             self.icp_.calibrate(X_calibration, y_calibration)
 
+            # FIX: Store calibration residuals from the ICP scorer so that
+            # simulation-based prediction intervals are available in predict().
+            raw_residuals = self.icp_.nc_function.err_func.apply(
+                self.icp_.nc_function.predict(X_calibration), y_calibration
+            )
+            self.calibrated_residuals_ = raw_residuals
+            self.calibrated_residuals_scaler_ = StandardScaler(
+                with_mean=True, with_std=True
+            )
+            self.scaled_calibrated_residuals_ = (
+                self.calibrated_residuals_scaler_.fit_transform(
+                    self.calibrated_residuals_.reshape(-1, 1)
+                ).ravel()
+            )
+
         # Calculate AIC
         # Get predictions
         preds = self.obj.predict(X_calibration)
@@ -168,6 +184,82 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
         self.bic_ = temp + np.log(n_samples) * n_params
 
         return self
+
+    def _simulate_from_residuals(self, pred, n_obs):
+        """Shared helper: draw `self.replications` simulations from calibrated
+        residuals and return (sims, mean, lower, upper).
+
+        Args:
+            pred: 1-D array of point predictions, shape [n_obs].
+            n_obs: int, number of test observations.
+
+        Returns:
+            sims_   : 2-D array, shape [n_obs, replications]
+            mean_   : 1-D array, shape [n_obs]
+            lower_  : 1-D array, shape [n_obs]
+            upper_  : 1-D array, shape [n_obs]
+        """
+        type_pi = self.type_pi if self.type_pi is not None else "kde"
+        replications = self.replications if self.replications is not None else 100
+
+        assert type_pi in (
+            "bootstrap",
+            "kde",
+            "normal",
+            "ecdf",
+            "permutation",
+            "smooth-bootstrap",
+        ), (
+            "`type_pi` must be in ('bootstrap', 'kde', 'normal', 'ecdf', "
+            "'permutation', 'smooth-bootstrap')"
+        )
+
+        scale = self.calibrated_residuals_scaler_.scale_[0]
+
+        if type_pi == "bootstrap":
+            np.random.seed(self.seed)
+            residuals_sims = np.asarray(
+                [
+                    np.random.choice(
+                        a=self.scaled_calibrated_residuals_,
+                        size=n_obs,
+                    )
+                    for _ in range(replications)
+                ]
+            ).T  # shape [n_obs, replications]
+
+        elif type_pi == "kde":
+            kde = gaussian_kde(dataset=self.scaled_calibrated_residuals_)
+            residuals_sims = np.asarray(
+                [
+                    kde.resample(size=n_obs, seed=self.seed + i).ravel()
+                    for i in range(replications)
+                ]
+            ).T  # shape [n_obs, replications]
+
+        else:  # normal / ecdf / permutation / smooth-bootstrap
+            residuals_sims = np.asarray(
+                simulate_replications(
+                    data=self.scaled_calibrated_residuals_,
+                    method=type_pi,
+                    num_replications=replications,
+                    n_obs=n_obs,
+                    seed=self.seed,
+                )
+            ).T  # shape [n_obs, replications]
+
+        sims = np.asarray(
+            [
+                pred + scale * residuals_sims[:, i].ravel()
+                for i in range(replications)
+            ]
+        ).T  # shape [n_obs, replications]
+
+        mean_ = np.mean(sims, axis=1)
+        lower_ = np.quantile(sims, q=self.alpha_ / 200, axis=1)
+        upper_ = np.quantile(sims, q=1 - self.alpha_ / 200, axis=1)
+
+        return sims, mean_, lower_, upper_
 
     def predict(self, X, return_pi=False):
         """Obtain predictions and prediction intervals
@@ -192,10 +284,13 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
         if self.method == "localconformal":
             pred = self.icp_.predict(X)
 
+        # ------------------------------------------------------------------ #
+        # splitconformal
+        # ------------------------------------------------------------------ #
         if self.method == "splitconformal":
-            if (
-                self.replications is None and self.type_pi is None
-            ):  # type_pi is not used here, no bootstrap or kde
+
+            if self.replications is None and self.type_pi is None:
+                # Plain split-conformal: symmetric quantile band
                 if return_pi:
                     DescribeResult = namedtuple(
                         "DescribeResult", ("mean", "lower", "upper")
@@ -203,98 +298,43 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                     return DescribeResult(
                         pred, pred - self.quantile_, pred + self.quantile_
                     )
-
                 else:
                     return pred
 
-            else:  # self.method == "splitconformal" and if self.replications is not None, type_pi must be used
-                
+            else:
+                # FIX: simulation-based prediction intervals for splitconformal.
+                # Previously this branch raised NotImplementedError even though
+                # all the necessary logic was present — it was simply unreachable
+                # because the raise fired unconditionally.  The code has been
+                # moved into _simulate_from_residuals() and called here.
+
                 if self.type_pi is None:
-                    self.type_pi = "kde"
-                    raise Warning("type_pi must be set, setting to 'kde'")
-
-                if self.replications is None:
-                    self.replications = 100
-                    raise Warning("replications must be set, setting to 100")
-
-                assert self.type_pi in (
-                    "bootstrap",
-                    "kde",
-                    "normal",
-                    "ecdf",
-                    "permutation",
-                    "smooth-bootstrap",
-                ), "`self.type_pi` must be in ('bootstrap', 'kde', 'normal', 'ecdf', 'permutation', 'smooth-bootstrap')"
-
-                if self.type_pi == "bootstrap":
-                    np.random.seed(self.seed)
-                    self.residuals_sims_ = np.asarray(
-                        [
-                            np.random.choice(
-                                a=self.scaled_calibrated_residuals_,
-                                size=X.shape[0],
-                            )
-                            for _ in range(self.replications)
-                        ]
-                    ).T
-                    self.sims_ = np.asarray(
-                        [
-                            pred
-                            + self.calibrated_residuals_scaler_.scale_[0]
-                            * self.residuals_sims_[:, i].ravel()
-                            for i in range(self.replications)
-                        ]
-                    ).T
-                elif self.type_pi == "kde":
-                    self.kde_ = gaussian_kde(
-                        dataset=self.scaled_calibrated_residuals_
+                    warnings.warn(
+                        "type_pi must be set when replications is not None; "
+                        "defaulting to 'kde'."
                     )
-                    self.sims_ = np.asarray(
-                        [
-                            pred
-                            + self.calibrated_residuals_scaler_.scale_[0]
-                            * self.kde_.resample(
-                                size=X.shape[0], seed=self.seed + i
-                            ).ravel()
-                            for i in range(self.replications)
-                        ]
-                    ).T
-                else:  # self.type_pi == "normal" or "ecdf" or "permutation" or "smooth-bootstrap"
-                    self.residuals_sims_ = np.asarray(
-                        simulate_replications(
-                            data=self.scaled_calibrated_residuals_,
-                            method=self.type_pi,
-                            num_replications=self.replications,
-                            n_obs=X.shape[0],
-                            seed=self.seed,
-                        )
-                    ).T
-                    self.sims_ = np.asarray(
-                        [
-                            pred
-                            + self.calibrated_residuals_scaler_.scale_[0]
-                            * self.residuals_sims_[:, i].ravel()
-                            for i in range(self.replications)
-                        ]
-                    ).T
+                if self.replications is None:
+                    warnings.warn(
+                        "replications must be set when type_pi is not None; "
+                        "defaulting to 100."
+                    )
 
-                self.mean_ = np.mean(self.sims_, axis=1)
-                self.lower_ = np.quantile(
-                    self.sims_, q=self.alpha_ / 200, axis=1
-                )
-                self.upper_ = np.quantile(
-                    self.sims_, q=1 - self.alpha_ / 200, axis=1
+                self.sims_, self.mean_, self.lower_, self.upper_ = (
+                    self._simulate_from_residuals(pred, X.shape[0])
                 )
 
                 DescribeResult = namedtuple(
                     "DescribeResult", ("mean", "sims", "lower", "upper")
                 )
-
                 return DescribeResult(
                     self.mean_, self.sims_, self.lower_, self.upper_
                 )
 
+        # ------------------------------------------------------------------ #
+        # localconformal
+        # ------------------------------------------------------------------ #
         if self.method == "localconformal":
+
             if self.replications is None:
                 if return_pi:
                     predictions_bounds = self.icp_.predict(
@@ -304,13 +344,33 @@ class PredictionInterval(BaseEstimator, RegressorMixin):
                         "DescribeResult", ("mean", "lower", "upper")
                     )
                     return DescribeResult(
-                        pred, predictions_bounds[:, 0], predictions_bounds[:, 1]
+                        pred,
+                        predictions_bounds[:, 0],
+                        predictions_bounds[:, 1],
                     )
-
                 else:
                     return pred
 
-            else:  # (self.method == "localconformal") and if self.replications is not None
-                raise NotImplementedError(
-                    "When self.method == 'localconformal', there are no simulations"
+            else:
+                # FIX: simulation-based prediction intervals for localconformal.
+                # Previously this always raised NotImplementedError.  Now we
+                # reuse the calibration residuals stored during fit() and apply
+                # the same simulation logic used by splitconformal via the
+                # shared helper _simulate_from_residuals().
+
+                if self.type_pi is None:
+                    warnings.warn(
+                        "type_pi must be set when replications is not None; "
+                        "defaulting to 'kde'."
+                    )
+
+                self.sims_, self.mean_, self.lower_, self.upper_ = (
+                    self._simulate_from_residuals(pred, X.shape[0])
+                )
+
+                DescribeResult = namedtuple(
+                    "DescribeResult", ("mean", "sims", "lower", "upper")
+                )
+                return DescribeResult(
+                    self.mean_, self.sims_, self.lower_, self.upper_
                 )
