@@ -36,10 +36,23 @@ Randomized and Quasi-Randomized (neural) networks.
 pip install nnetsauce
 ```
 
+or if you want to use GPUs
+
+```bash
+pip install nnetsauce[jax]
+```
+
+
 - __2nd method__: using `conda` (Linux and macOS only for now)
 
 ```bash
 conda install -c conda-forge nnetsauce 
+```
+
+or if you want to use GPUs
+
+```bash
+conda install -c conda-forge nnetsauce jax jaxlib
 ```
 
 (Note to self or developers: https://github.com/conda-forge/nnetsauce-feedstock and https://conda-forge.org/docs/maintainer/adding_pkgs.html#step-by-step-instructions and https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/#the-whole-ci-cd-workflow)
@@ -60,6 +73,15 @@ make install
 
 
 ### R 
+
+See also [https://thierrymoudiki.github.io/blog/2025/12/17/r/python/new-nnetsauce-R-uv](https://thierrymoudiki.github.io/blog/2025/12/17/r/python/new-nnetsauce-R-uv)
+
+**From [docs.techtonique.net](docs.techtonique.net)**
+
+```bash
+install.packages('nnetsauce', repos = c('https://techtonique.r-universe.dev',
+'https://cloud.r-project.org'))
+```
 
 **From GitHub**
 
