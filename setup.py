@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
-__version__ = '0.51.2'
+__version__ = '0.52.0'
 
 # get the dependencies and installs
 here = path.abspath(path.dirname(__file__))
@@ -46,6 +46,7 @@ setup(
     install_requires=install_requires,
     extras_require={
         'jax': ['jax', 'jaxlib'],
+        'pyvinecopulib': ['pyvinecopulib'],
     },
     dependency_links=dependency_links,
     author_email='thierry.moudiki@gmail.com'
