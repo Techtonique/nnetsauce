@@ -1,6 +1,14 @@
+# version 0.52.0
+
+- Add `pyvinecopulib` as optional dependency for `vinecopula_sample` function (used in `MTS` and `DeepMTS` classes)
+
+To install `pyvinecopulib`, please install it manually or use `pip install nnetsauce[pyvinecopulib]`
+
 # version 0.51.0
 
-- Make JAX optional, because of its size. If you want JAX, please install it manually or use `pip install nnetsauce[jax]`
+- Make JAX optional, because of its size. If you want JAX, please install it manually or use `pip install nnetsauce[jax]` 
+
+To install JAX, please install it manually or use `pip install nnetsauce[jax]`
 
 # version 0.50.1
 

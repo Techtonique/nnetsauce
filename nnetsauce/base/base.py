@@ -129,7 +129,7 @@ class Base(BaseEstimator):
     ):
         if not JAX_AVAILABLE and backend != "cpu":
             raise RuntimeError(
-                "JAX is required for this feature. Install with: pip install yourpackage[jax]"
+                "JAX is required for this feature. Install with: pip install nnetsauce[jax]"
             )
 
         # input checks -----
