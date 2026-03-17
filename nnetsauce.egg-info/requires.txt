@@ -13,3 +13,6 @@ tqdm
 [jax]
 jax
 jaxlib
+
+[pyvinecopulib]
+pyvinecopulib

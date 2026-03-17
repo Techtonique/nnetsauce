@@ -3,11 +3,8 @@ import nnetsauce as ns
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
-from sklearn.datasets import load_diabetes
-from sklearn.linear_model import ElasticNet, Ridge, LassoCV
-from sklearn.model_selection import train_test_split
+from sklearn.linear_model import Ridge
 from statsmodels.tsa.base.datetools import dates_from_str
-from nnetsauce.utils.model_selection import cross_val_score
 
 print(f"\n ----- Running: {os.path.basename(__file__)}... ----- \n")
 
