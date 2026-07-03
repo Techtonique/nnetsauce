@@ -1070,7 +1070,7 @@ class MTS(Base):
 
         if self.type_pi in ("bootstrap", "scp-bootstrap", "scp2-bootstrap"):
             assert self.replications is not None and isinstance(
-                self.replications, int
+                self.replications, (int, np.integer)
             ), "'replications' must be provided and be an integer"
             if self.verbose == 1:
                 self.residuals_sims_ = tuple(
@@ -1104,7 +1104,7 @@ class MTS(Base):
                 )
 
             assert self.replications is not None and isinstance(
-                self.replications, int
+                self.replications, (int, np.integer)
             ), "'replications' must be provided and be an integer"
             if self.verbose == 1:
                 self.residuals_sims_ = tuple(
@@ -1705,7 +1705,7 @@ class MTS(Base):
             ), f"series {series} doesn't exist in the input dataset"
             series_idx = self.df_.columns.get_loc(series)
         else:
-            assert isinstance(series, int) and (
+            assert isinstance(series, (int, np.integer)) and (
                 0 <= series < self.n_series
             ), f"check series index (< {self.n_series})"
             series_idx = series

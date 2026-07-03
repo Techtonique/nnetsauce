@@ -13538,10 +13538,14 @@ def i4_sobol(dim_num, seed):
         # 	Check parameters.
         #
         if dim_num < 1 or dim_max < dim_num:
-            print("I4_SOBOL - Fatal error!")
-            print("	The spatial dimension DIM_NUM should satisfy:")
-            print("		1 <= DIM_NUM <= %d" % dim_max)
-            print("	But this input value is DIM_NUM = %d" % dim_num)
+            raise ValueError(
+        f"i4_sobol: spatial dimension dim_num must satisfy "
+        f"1 <= dim_num <= {dim_max}, but got dim_num={dim_num}. "
+        f"This is typically caused by a large n_hidden_features "
+        f"(combined with lags and the number of series, for MTS) -- "
+        f"reduce n_hidden_features/lags, or set nodes_sim to "
+        f"'halton', 'hammersley', or 'uniform' instead of 'sobol'."
+             )
             return
 
         dim_num_save = dim_num
