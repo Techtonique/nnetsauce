@@ -292,4 +292,4 @@ class MLARCH:
             lower_bound = point_forecast - margin
             upper_bound = point_forecast + margin
 
-        return DescribeResult(point_forecast, sims, lower_bound, upper_bound)git pu
+        return DescribeResult(point_forecast, sims, lower_bound, upper_bound)
