@@ -180,9 +180,12 @@ class QuantileRegressor(BaseEstimator, RegressorMixin):
             # popsize=15,
             # maxiter=100,
             # tol=1e-4,
-            popsize=25,
-            maxiter=200,
-            tol=1e-6,
+            #popsize=25,
+            #maxiter=200,
+            #tol=1e-6,
+            popsize=15, 
+            maxiter=60, 
+            tol=1e-4,
             disp=False,
         )
 
