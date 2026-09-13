@@ -66,6 +66,9 @@ class CustomRegressor(Custom, RegressorMixin):
             scaling methods for inputs, hidden layer, and clustering respectively
             (and when relevant).
             Currently available: standardization ('std') or MinMax scaling ('minmax')
+        
+        center_response: boolean
+            Whether to center the response or not
 
         type_pi: str.
             type of prediction interval; currently `None` (split or local
@@ -129,6 +132,7 @@ class CustomRegressor(Custom, RegressorMixin):
         cluster_encode=True,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
+        center_response=True, 
         type_pi=None,
         replications=None,
         kernel=None,
@@ -153,6 +157,7 @@ class CustomRegressor(Custom, RegressorMixin):
             cluster_encode=cluster_encode,
             type_clust=type_clust,
             type_scaling=type_scaling,
+            center_response=center_response,
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,

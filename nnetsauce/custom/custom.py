@@ -60,6 +60,9 @@ class Custom(Base):
             (and when relevant).
             Currently available: standardization ('std') or MinMax scaling ('minmax')
 
+        center_response: boolean
+            Whether to center the response or not
+
         col_sample: float
             percentage of covariates randomly chosen for training
 
@@ -90,6 +93,7 @@ class Custom(Base):
         cluster_encode=True,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
+        center_response=True,
         col_sample=1,
         row_sample=1,
         seed=123,
@@ -107,6 +111,7 @@ class Custom(Base):
             cluster_encode=cluster_encode,
             type_clust=type_clust,
             type_scaling=type_scaling,
+            center_response=center_response,
             col_sample=col_sample,
             row_sample=row_sample,
             seed=seed,

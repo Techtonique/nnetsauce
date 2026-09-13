@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: nnetsauce
-Version: 0.53.0
+Version: 0.54.0
 Summary: Quasi-randomized (neural) networks
 Home-page: https://techtonique.github.io/nnetsauce/
 Download-URL: https://github.com/Techtonique/nnetsauce
@@ -33,7 +33,6 @@ Dynamic: classifier
 Dynamic: description
 Dynamic: download-url
 Dynamic: home-page
-Dynamic: keywords
 Dynamic: license
 Dynamic: license-file
 Dynamic: provides-extra

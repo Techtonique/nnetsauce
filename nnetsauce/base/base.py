@@ -92,6 +92,9 @@ class Base(BaseEstimator):
             scaling methods for inputs, hidden layer, and clustering respectively
             (and when relevant).
             Currently available: standardization ('std') or MinMax scaling ('minmax') or robust scaling ('robust') or  max absolute scaling ('maxabs')
+        
+        center_response: boolean
+            Whether to center the response or not
 
         col_sample: float
             percentage of features randomly chosen for training
@@ -122,6 +125,7 @@ class Base(BaseEstimator):
         cluster_encode=True,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
+        center_response=True, 
         col_sample=1,
         row_sample=1,
         seed=123,
@@ -189,6 +193,7 @@ class Base(BaseEstimator):
         self.cluster_encode = cluster_encode
         self.type_clust = type_clust
         self.type_scaling = type_scaling
+        self.center_response = center_response
         self.col_sample = col_sample
         self.row_sample = row_sample
         self.n_clusters = n_clusters
@@ -317,13 +322,6 @@ class Base(BaseEstimator):
 
         n_features = scaled_X.shape[1]
 
-        # hash_sim = {
-        #         "sobol": generate_sobol,
-        #         "hammersley": generate_hammersley,
-        #         "uniform": generate_uniform,
-        #         "halton": generate_halton
-        #     }
-
         if self.bias is False:  # no bias term in the hidden layer
             if W is None:
                 if self.nodes_sim == "sobol":
@@ -407,12 +405,6 @@ class Base(BaseEstimator):
                     n_points=self.n_hidden_features,
                     seed=self.seed,
                 )
-
-            # self.W_ = hash_sim[self.nodes_sim](
-            #         n_dims=n_features_1,
-            #         n_points=self.n_hidden_features,
-            #         seed=self.seed,
-            #     )
 
             return mo.dropout(
                 x=self.activation_func(
@@ -647,11 +639,17 @@ class Base(BaseEstimator):
 
         # Returning model inputs -----
         if mx.is_factor(y) is False:  # regression
-            # center y
-            if y is None:
-                self.y_mean_, centered_y = mo.center_response(self.y_)
-            else:
-                self.y_mean_, centered_y = mo.center_response(y)
+            if self.center_response == False:
+                if y is None: 
+                    self.y_mean_, centered_y = mo.center_response(self.y_, method="none")
+                else: 
+                    self.y_mean_, centered_y = mo.center_response(y, method="none")
+            else: 
+                # center y
+                if y is None:
+                    self.y_mean_, centered_y = mo.center_response(self.y_)
+                else:
+                    self.y_mean_, centered_y = mo.center_response(y)
 
             # y is subsampled
             if self.row_sample < 1:
