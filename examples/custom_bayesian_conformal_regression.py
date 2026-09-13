@@ -25,6 +25,13 @@ print(f"Elapsed: {time() - start}s")
 preds = regr.predict(X_test, return_std=True)
 print(f"coverage_rate Bayesian Ridge: {np.mean((preds[2]<=y_test)*(preds[3]>=y_test))}")
 
+regr = ns.CustomRegressor(BayesianRidge(), center_response=False)
+start = time()
+regr.fit(X_train, y_train)
+print(f"Elapsed: {time() - start}s")
+preds = regr.predict(X_test, return_std=True)
+print(f"coverage_rate Bayesian Ridge: {np.mean((preds[2]<=y_test)*(preds[3]>=y_test))}")
+
 regr2 = ns.CustomRegressor(ARDRegression())
 start = time()
 regr2.fit(X_train, y_train)
