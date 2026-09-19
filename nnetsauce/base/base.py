@@ -36,6 +36,7 @@ from ..simulation import (
 from ..sampling import SubSampler
 
 try:
+    import jax
     import jax.nn as jnn
     import jax.numpy as jnp
 
@@ -638,7 +639,10 @@ class Base(BaseEstimator):
                 )
 
         # Returning model inputs -----
-        if mx.is_factor(y) is False:  # regression
+        # type_fit is set to "regression" in __init__ for any RegressorMixin
+        # subclass; trust it over the cardinality heuristic when it is known.
+        _is_known_regressor = getattr(self, "type_fit", None) == "regression"
+        if _is_known_regressor or (mx.is_factor(y) is False):  # regression
             if self.center_response == False:
                 if y is None: 
                     self.y_mean_, centered_y = mo.center_response(self.y_, method="none")
@@ -897,13 +901,20 @@ class Base(BaseEstimator):
         )
 
         # Center response for regression
-        if not hasattr(mx, "is_factor") or not mx.is_factor(
-            y
+        _is_known_regressor = getattr(self, "type_fit", None) == "regression"
+        if (
+            _is_known_regressor
+            or not hasattr(mx, "is_factor")
+            or not mx.is_factor(y)
         ):  # regression case
-            self.y_mean_ = float(
-                jnp.mean(y)
-            )  # Convert to Python float for compatibility
-            centered_y = y - self.y_mean_
+            if getattr(self, "center_response", True) == False:
+                self.y_mean_ = 0.0
+                centered_y = y
+            else:
+                self.y_mean_ = float(
+                    jnp.mean(y)
+                )  # Convert to Python float for compatibility
+                centered_y = y - self.y_mean_
         else:
             centered_y = y
 
