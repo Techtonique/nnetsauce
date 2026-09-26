@@ -141,7 +141,9 @@ class MLARCH:
             return self._point_forecast(model.predict(h=h))
         else:
             if last_lags is None:
-                raise ValueError("last_lags required for a plain-regressor component")
+                raise ValueError(
+                    "last_lags required for a plain-regressor component"
+                )
             forecast = np.zeros(h)
             current = last_lags.copy()
             for i in range(h):
@@ -172,7 +174,9 @@ class MLARCH:
 
         # Step 1: mean model -- forecasts y as its own series (ns.MTS mode)
         # or via a manual AR(lags_vol) lag regression (plain-regressor mode)
-        fitted_mean, mean_lags = self._fit_component_series(self.model_mean, y, self.lags_vol)
+        fitted_mean, mean_lags = self._fit_component_series(
+            self.model_mean, y, self.lags_vol
+        )
         y_aligned = y[mean_lags:]
         mean_residuals = y_aligned - fitted_mean
         self._mean_lags = mean_lags
@@ -180,7 +184,7 @@ class MLARCH:
         # Step 2: ARCH volatility model -- forecasts log(squared residuals)
         # as its own series (ns.MTS mode) or via manual lag regression
         # (plain-regressor mode, lags = lags_vol -- the original behavior).
-        resid_squared = mean_residuals ** 2
+        resid_squared = mean_residuals**2
         log_resid_squared = np.log(resid_squared + 1e-8)
         fitted_log_sigma, sigma_lags = self._fit_component_series(
             self.model_sigma, log_resid_squared, self.lags_vol
@@ -189,7 +193,9 @@ class MLARCH:
         fitted_sigma = np.exp(fitted_log_sigma)
 
         # Step 3: standardized residuals, aligned to fitted_sigma's length
-        standardized_residuals = mean_residuals[sigma_lags:] / np.sqrt(fitted_sigma)
+        standardized_residuals = mean_residuals[sigma_lags:] / np.sqrt(
+            fitted_sigma
+        )
         self.z_mean_ = np.mean(standardized_residuals)
         self.z_std_ = np.std(standardized_residuals)
         standardized_residuals = (
@@ -203,12 +209,19 @@ class MLARCH:
         self._resid_lags = resid_lags
 
         # Store state needed for plain-regressor recursive forecasting
-        self._last_log_sigma_lags = log_resid_squared[-sigma_lags:].copy() \
-            if not _is_full_mts(self.model_sigma) else None
-        self._last_z_lags = standardized_residuals[-resid_lags:].copy() \
-            if not _is_full_mts(self.model_residuals) else None
-        self._last_y_lags = y[-mean_lags:].copy() \
-            if not _is_full_mts(self.model_mean) else None
+        self._last_log_sigma_lags = (
+            log_resid_squared[-sigma_lags:].copy()
+            if not _is_full_mts(self.model_sigma)
+            else None
+        )
+        self._last_z_lags = (
+            standardized_residuals[-resid_lags:].copy()
+            if not _is_full_mts(self.model_residuals)
+            else None
+        )
+        self._last_y_lags = (
+            y[-mean_lags:].copy() if not _is_full_mts(self.model_mean) else None
+        )
 
         # Store diagnostics
         self.fitted_volatility_mean_ = np.mean(np.sqrt(fitted_sigma))
@@ -239,10 +252,16 @@ class MLARCH:
             "DescribeResult", ("mean", "sims", "lower", "upper")
         )
 
-        mean_forecast = self._predict_component(self.model_mean, h, self._last_y_lags)
-        log_sigma_forecast = self._predict_component(self.model_sigma, h, self._last_log_sigma_lags)
+        mean_forecast = self._predict_component(
+            self.model_mean, h, self._last_y_lags
+        )
+        log_sigma_forecast = self._predict_component(
+            self.model_sigma, h, self._last_log_sigma_lags
+        )
         sigma_forecast = np.exp(log_sigma_forecast)
-        z_forecast_normalized = self._predict_component(self.model_residuals, h, self._last_z_lags)
+        z_forecast_normalized = self._predict_component(
+            self.model_residuals, h, self._last_z_lags
+        )
         z_forecast = z_forecast_normalized * self.z_std_ + self.z_mean_
 
         # Combine: μ + z × σ
@@ -280,6 +299,7 @@ class MLARCH:
         else:
             if return_sims and not _is_full_mts(self.model_residuals):
                 import warnings
+
                 warnings.warn(
                     "return_sims=True but model_residuals is a plain "
                     "sklearn regressor (no .sims available) -- falling "

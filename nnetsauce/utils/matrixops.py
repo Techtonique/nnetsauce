@@ -85,7 +85,8 @@ def center_response(y, method="mean"):
         y_median = np.median(y)
         return y_median, (y - y_median)
     elif method == "none":
-        return 0, y 
+        return 0, y
+
 
 # cluster the covariates
 def cluster_covariates(X, n_clusters, seed, type_clust="kmeans", **kwargs):

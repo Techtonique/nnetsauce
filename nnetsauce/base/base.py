@@ -93,7 +93,7 @@ class Base(BaseEstimator):
             scaling methods for inputs, hidden layer, and clustering respectively
             (and when relevant).
             Currently available: standardization ('std') or MinMax scaling ('minmax') or robust scaling ('robust') or  max absolute scaling ('maxabs')
-        
+
         center_response: boolean
             Whether to center the response or not
 
@@ -126,7 +126,7 @@ class Base(BaseEstimator):
         cluster_encode=True,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
-        center_response=True, 
+        center_response=True,
         col_sample=1,
         row_sample=1,
         seed=123,
@@ -644,11 +644,15 @@ class Base(BaseEstimator):
         _is_known_regressor = getattr(self, "type_fit", None) == "regression"
         if _is_known_regressor or (mx.is_factor(y) is False):  # regression
             if self.center_response == False:
-                if y is None: 
-                    self.y_mean_, centered_y = mo.center_response(self.y_, method="none")
-                else: 
-                    self.y_mean_, centered_y = mo.center_response(y, method="none")
-            else: 
+                if y is None:
+                    self.y_mean_, centered_y = mo.center_response(
+                        self.y_, method="none"
+                    )
+                else:
+                    self.y_mean_, centered_y = mo.center_response(
+                        y, method="none"
+                    )
+            else:
                 # center y
                 if y is None:
                     self.y_mean_, centered_y = mo.center_response(self.y_)
