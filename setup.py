@@ -2,7 +2,7 @@ import platform
 from setuptools import setup, find_packages
 from os import path
 
-__version__ = '0.56.0'
+__version__ = '0.56.1'
 
 # get the dependencies and installs
 here = path.abspath(path.dirname(__file__))
