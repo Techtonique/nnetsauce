@@ -49,13 +49,40 @@ class MLARCH:
         Lag order used ONLY for components that are plain sklearn
         regressors (not ns.MTS). Also used as a minimum-length sanity
         check regardless of mode.
+    z_method : {"oof", "in_sample"}, default="oof"
+        How the mean residuals and the volatility used to standardize them
+        are obtained.
+          - "in_sample" (behavior before this option existed): residuals and
+            sigma are the components' in-sample fitted values. A flexible
+            regressor (ExtraTrees, KNN, deep trees...) nearly interpolates
+            log(eps^2) in-sample, so |z| ~ 1 for every point, z_std_ shrinks
+            and the z distribution loses its tails -> predictive intervals
+            too narrow out of sample.
+          - "oof": expanding-window out-of-fold, one-step-ahead predictions
+            (n_folds folds; the first block is used for training only).
+            The standardized residuals then reflect genuine out-of-sample
+            forecast errors, which is what predict() extrapolates. For ns.MTS
+            components, the out-of-fold fits use a clone of `model.obj` on
+            the raw lag matrix (same approximation as for the scp* types).
+    n_folds : int, default=5
+        Number of out-of-fold blocks for z_method="oof".
+    floor_quantile : float or None, default=0.01
+        Squared residuals are floored at this quantile of the strictly
+        positive squared residuals before taking logs (scale-aware; avoids
+        log(1e-8) ~ -18.4 outliers from zero returns). None restores the
+        former absolute floor of 1e-8.
     """
 
-    def __init__(self, model_mean, model_sigma, model_residuals, lags_vol=10):
+    def __init__(self, model_mean, model_sigma, model_residuals, lags_vol=10,
+                 z_method="oof", n_folds=5, floor_quantile=0.01):
+        assert z_method in ("oof", "in_sample"), "z_method must be 'oof' or 'in_sample'"
         self.model_mean = model_mean
         self.model_sigma = model_sigma
         self.model_residuals = model_residuals
         self.lags_vol = lags_vol
+        self.z_method = z_method
+        self.n_folds = n_folds
+        self.floor_quantile = floor_quantile
 
     def _create_lags(self, y, lags):
         """Create a lagged feature matrix. Used both for the plain-
@@ -126,6 +153,41 @@ class MLARCH:
             fitted = model.predict(X)
             return fitted, lags
 
+    def _oof_component_series(self, model, series, lags_fallback):
+        """Expanding-window out-of-fold one-step-ahead fitted values.
+
+        Returns (oof_fitted, lags, n_skip): oof_fitted[i] predicts
+        series[lags + n_skip + i] from a model trained only on rows before
+        its block. The first n_skip rows (first block) have no OOF value.
+        """
+        lags = model.lags if _is_full_mts(model) else lags_fallback
+        if isinstance(lags, str):  # 'AIC'/'BIC' etc. -> resolve via a full fit
+            model.fit(series.reshape(-1, 1))
+            lags = model.lags
+        base = model.obj if _is_full_mts(model) else model
+        X = self._create_lags(series, lags)
+        y_ = series[lags:]
+        n_rows = len(y_)
+        bounds = np.linspace(0, n_rows, self.n_folds + 2).astype(int)
+        n_skip = bounds[1]
+        oof = np.empty(n_rows - n_skip)
+        for k in range(1, self.n_folds + 1):
+            start, stop = bounds[k], bounds[k + 1]
+            m = clone(base)
+            m.fit(X[:start], y_[:start])
+            oof[start - n_skip: stop - n_skip] = m.predict(X[start:stop])
+        return oof, lags, n_skip
+
+    def _log_squared(self, resid):
+        resid_squared = resid ** 2
+        if self.floor_quantile is None:  # exact pre-patch behavior
+            self.floor_ = 1e-8
+            return np.log(resid_squared + 1e-8)
+        else:
+            pos = resid_squared[resid_squared > 0]
+            self.floor_ = np.quantile(pos, self.floor_quantile) if pos.size else 1e-8
+        return np.log(np.maximum(resid_squared, self.floor_))
+
     def _predict_component(self, model, h, last_lags=None):
         """Forecast `model` h steps ahead, whichever mode it is.
 
@@ -141,9 +203,7 @@ class MLARCH:
             return self._point_forecast(model.predict(h=h))
         else:
             if last_lags is None:
-                raise ValueError(
-                    "last_lags required for a plain-regressor component"
-                )
+                raise ValueError("last_lags required for a plain-regressor component")
             forecast = np.zeros(h)
             current = last_lags.copy()
             for i in range(h):
@@ -172,35 +232,49 @@ class MLARCH:
         if len(y) < self.lags_vol + 20:
             raise ValueError(f"Need at least {self.lags_vol + 20} observations")
 
-        # Step 1: mean model -- forecasts y as its own series (ns.MTS mode)
-        # or via a manual AR(lags_vol) lag regression (plain-regressor mode)
-        fitted_mean, mean_lags = self._fit_component_series(
-            self.model_mean, y, self.lags_vol
-        )
-        y_aligned = y[mean_lags:]
-        mean_residuals = y_aligned - fitted_mean
-        self._mean_lags = mean_lags
+        if self.z_method == "in_sample":
+            # Step 1: mean model -- forecasts y as its own series (ns.MTS mode)
+            # or via a manual AR(lags_vol) lag regression (plain-regressor mode)
+            fitted_mean, mean_lags = self._fit_component_series(self.model_mean, y, self.lags_vol)
+            mean_residuals = y[mean_lags:] - fitted_mean
+            self._mean_lags = mean_lags
 
-        # Step 2: ARCH volatility model -- forecasts log(squared residuals)
-        # as its own series (ns.MTS mode) or via manual lag regression
-        # (plain-regressor mode, lags = lags_vol -- the original behavior).
-        resid_squared = mean_residuals**2
-        log_resid_squared = np.log(resid_squared + 1e-8)
-        fitted_log_sigma, sigma_lags = self._fit_component_series(
-            self.model_sigma, log_resid_squared, self.lags_vol
-        )
-        self._sigma_lags = sigma_lags
-        fitted_sigma = np.exp(fitted_log_sigma)
+            # Step 2: ARCH volatility model on log(squared residuals)
+            log_resid_squared = self._log_squared(mean_residuals)
+            fitted_log_sigma, sigma_lags = self._fit_component_series(
+                self.model_sigma, log_resid_squared, self.lags_vol
+            )
+            self._sigma_lags = sigma_lags
+            fitted_sigma = np.exp(fitted_log_sigma)
+            eps_for_z = mean_residuals[sigma_lags:]
+        else:
+            # Step 1: mean model. Out-of-fold residuals give honest error
+            # scale; the full-data fit is kept for forecasting.
+            oof_mean, mean_lags, n_skip_m = self._oof_component_series(
+                self.model_mean, y, self.lags_vol)
+            mean_residuals = y[mean_lags + n_skip_m:] - oof_mean
+            _, mean_lags = self._fit_component_series(self.model_mean, y, self.lags_vol)
+            self._mean_lags = mean_lags
+
+            # Step 2: volatility model on log(squared OOF residuals); OOF
+            # one-step-ahead log-variance predictions standardize the residuals
+            log_resid_squared = self._log_squared(mean_residuals)
+            oof_log_sigma, sigma_lags, n_skip_s = self._oof_component_series(
+                self.model_sigma, log_resid_squared, self.lags_vol)
+            fitted_sigma = np.exp(oof_log_sigma)
+            eps_for_z = mean_residuals[sigma_lags + n_skip_s:]
+            _, sigma_lags = self._fit_component_series(
+                self.model_sigma, log_resid_squared, self.lags_vol)
+            self._sigma_lags = sigma_lags
 
         # Step 3: standardized residuals, aligned to fitted_sigma's length
-        standardized_residuals = mean_residuals[sigma_lags:] / np.sqrt(
-            fitted_sigma
-        )
+        standardized_residuals = eps_for_z / np.sqrt(fitted_sigma)
         self.z_mean_ = np.mean(standardized_residuals)
         self.z_std_ = np.std(standardized_residuals)
         standardized_residuals = (
             standardized_residuals - self.z_mean_
         ) / self.z_std_
+        self.standardized_residuals_ = standardized_residuals
 
         # Step 4: residuals model
         _, resid_lags = self._fit_component_series(
@@ -209,19 +283,12 @@ class MLARCH:
         self._resid_lags = resid_lags
 
         # Store state needed for plain-regressor recursive forecasting
-        self._last_log_sigma_lags = (
-            log_resid_squared[-sigma_lags:].copy()
-            if not _is_full_mts(self.model_sigma)
-            else None
-        )
-        self._last_z_lags = (
-            standardized_residuals[-resid_lags:].copy()
-            if not _is_full_mts(self.model_residuals)
-            else None
-        )
-        self._last_y_lags = (
-            y[-mean_lags:].copy() if not _is_full_mts(self.model_mean) else None
-        )
+        self._last_log_sigma_lags = log_resid_squared[-sigma_lags:].copy() \
+            if not _is_full_mts(self.model_sigma) else None
+        self._last_z_lags = standardized_residuals[-resid_lags:].copy() \
+            if not _is_full_mts(self.model_residuals) else None
+        self._last_y_lags = y[-mean_lags:].copy() \
+            if not _is_full_mts(self.model_mean) else None
 
         # Store diagnostics
         self.fitted_volatility_mean_ = np.mean(np.sqrt(fitted_sigma))
@@ -252,16 +319,10 @@ class MLARCH:
             "DescribeResult", ("mean", "sims", "lower", "upper")
         )
 
-        mean_forecast = self._predict_component(
-            self.model_mean, h, self._last_y_lags
-        )
-        log_sigma_forecast = self._predict_component(
-            self.model_sigma, h, self._last_log_sigma_lags
-        )
+        mean_forecast = self._predict_component(self.model_mean, h, self._last_y_lags)
+        log_sigma_forecast = self._predict_component(self.model_sigma, h, self._last_log_sigma_lags)
         sigma_forecast = np.exp(log_sigma_forecast)
-        z_forecast_normalized = self._predict_component(
-            self.model_residuals, h, self._last_z_lags
-        )
+        z_forecast_normalized = self._predict_component(self.model_residuals, h, self._last_z_lags)
         z_forecast = z_forecast_normalized * self.z_std_ + self.z_mean_
 
         # Combine: μ + z × σ
@@ -299,7 +360,6 @@ class MLARCH:
         else:
             if return_sims and not _is_full_mts(self.model_residuals):
                 import warnings
-
                 warnings.warn(
                     "return_sims=True but model_residuals is a plain "
                     "sklearn regressor (no .sims available) -- falling "
