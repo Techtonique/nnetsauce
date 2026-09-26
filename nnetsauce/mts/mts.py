@@ -76,6 +76,9 @@ class MTS(Base):
             (and when relevant).
             Currently available: standardization ('std') or MinMax scaling ('minmax').
 
+        center_response: boolean
+            Whether to center the response or not
+
         lags: int.
             number of lags used for each time series.
             If string, lags must be one of 'AIC', 'AICc', or 'BIC'.
@@ -249,6 +252,7 @@ class MTS(Base):
         cluster_encode=True,
         type_clust="kmeans",
         type_scaling=("std", "std", "std"),
+        center_response=True,
         lags=1,
         type_pi="kde",
         level=95,
@@ -273,6 +277,7 @@ class MTS(Base):
             cluster_encode=cluster_encode,
             type_clust=type_clust,
             type_scaling=type_scaling,
+            center_response=center_response,
             seed=seed,
             backend=backend,
         )
