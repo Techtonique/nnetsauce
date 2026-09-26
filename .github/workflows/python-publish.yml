@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master  # Replace with your branch name
+      - main  # Replace with your branch name
 
 jobs:
   publish:
